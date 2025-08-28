@@ -1,0 +1,56 @@
+# Development and Documentation
+PLAN.md
+FEATURES.md
+TASKS.md
+WORDPRESS-STANDARDS.md
+CHANGELOG.md
+*.todo
+*.log
+.idea/
+.vscode/
+
+# Build and Dependencies
+/vendor/
+/node_modules/
+/build/
+/dist/
+*.lock
+package-lock.json
+composer.lock
+
+# Development Files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.env
+.env.local
+
+# Testing
+/tests/coverage/
+phpunit.xml
+.phpunit.result.cache
+
+# IDE Files
+*.sublime-project
+*.sublime-workspace
+.project
+.buildpath
+.settings/
+
+# Temporary Files
+*.tmp
+*.bak
+*.backup
+*.cache
+
+# WordPress
+wp-config.php
+/uploads/
+/upgrade/
+
+# Keep these
+!.gitignore
+!readme.txt
+!LICENSE
