@@ -13,29 +13,36 @@ With the U.S. ending its de minimis exemption on **August 29, 2025**, all intern
 
 ## Progress
 
-[x] Main plugin structure with WooCommerce dependency checking.
-[x] Fee calculation engine with country-based rules.
-[x] Settings framework integrated into WooCommerce.
-[x] Preset templates system (US, EU, China, UK, Canada, Australia).
-[x] Admin functionality with product HS code fields.
-[x] Display handler for cart, checkout, orders, and emails.
-[x] HPOS (High-Performance Order Storage) compatibility.
-[x] WooCommerce Blocks compatibility framework.
-[x] Email integration with custom styling.
-[x] AJAX handlers for admin operations.
-[x] Security implementation (nonces, sanitization, escaping).
-[x] Database table for fee calculation logs.
-[] Admin UI refinement
-[] JavaScript for interactive rule management
-[] CSV import/export functionality
-[] Testing calculator with real scenarios
-[] Complete block editor integration
-[] Add frontend tooltips and notices
-[] Implement agreement checkbox at checkout
-[] Create comprehensive testing suite
-[] Add more preset templates
-[] Performance optimization
-[] Multi-language support (POT file)
+### Completed
+
+- [x] Main plugin structure with WooCommerce dependency checking
+- [x] Fee calculation engine with country-based rules
+- [x] Settings framework integrated into WooCommerce
+- [x] Preset templates system (US, EU, China, UK, Canada, Australia)
+- [x] Admin functionality with product HS code fields
+- [x] Display handler for cart, checkout, orders, and emails
+- [x] HPOS (High-Performance Order Storage) compatibility
+- [x] Security implementation (nonces, sanitization, escaping)
+- [x] Database table for fee calculation logs
+- [x] Email integration with fee display
+- [x] AJAX handlers for admin operations
+- [x] Basic admin settings page
+
+### In Progress (10%)
+
+- [ ] WooCommerce Blocks checkout integration (framework ready)
+- [ ] Admin UI JavaScript for rule management
+- [ ] Testing with real scenarios
+
+### TODO (5%)
+
+- [ ] CSV import/export functionality
+- [ ] Frontend tooltips and notices
+- [ ] Agreement checkbox at checkout
+- [ ] Create comprehensive testing suite
+- [ ] Add more preset templates
+- [ ] Performance optimization
+- [ ] Multi-language support (POT file)
 
 ### Quick Start Example
 
@@ -53,14 +60,14 @@ WooCommerce > Settings > Customs Fees
     └── Label: US Import Duty
 ```
 
-### Available Preset
+### Available Preset Templates
 
-[] **US General Import (10%)** - Standard US import duty.
-[] **EU to US Import** - Common EU→US rates.
-[] **China to US Import** - Chinese goods duties.
-[] **UK VAT & Duty** - UK import VAT (20%) + duty.
-[] **Canada GST & Duty** - Canadian import fees.
-[] **Australia GST** - Australian GST (10%).
+- [ ] **US General Import (10%)** - Standard US import duty
+- [ ] **EU to US Import** - Common EU→US rates
+- [ ] **China to US Import** - Chinese goods duties
+- [ ] **UK VAT & Duty** - UK import VAT (20%) + duty
+- [ ] **Canada GST & Duty** - Canadian import fees
+- [ ] **Australia GST** - Australian GST (10%)
 
 ### Hooks and Filters
 
@@ -85,19 +92,21 @@ add_filter( 'cfwc_include_shipping_in_calculation', '__return_false' );
 
 ### Manual Testing Checklist
 
-- [ ] Plugin activation without errors.
-- [ ] WooCommerce dependency check.
-- [ ] Settings page loads correctly.
-- [ ] Rules can be added/edited/deleted.
-- [ ] Preset templates apply correctly.
-- [ ] Fees calculate on cart page.
-- [ ] Fees display on checkout (classic).
-- [ ] Fees display on checkout (blocks).
-- [ ] Fees appear in order emails.
-- [ ] Fees show in admin order view.
-- [ ] HS codes save on products.
-- [ ] AJAX operations work.
-- [ ] Cache clearing works.
+- [x] Plugin activation without errors
+- [x] WooCommerce dependency check
+- [x] Settings page loads correctly
+- [x] HPOS compatibility verified
+- [x] Security standards compliance (PHPCS)
+- [ ] Rules can be added/edited/deleted
+- [ ] Preset templates apply correctly
+- [ ] Fees calculate on cart page
+- [ ] Fees display on checkout (classic)
+- [ ] Fees display on checkout (blocks)
+- [ ] Fees appear in order emails
+- [ ] Fees show in admin order view
+- [ ] HS codes save on products
+- [ ] AJAX operations work
+- [ ] Cache clearing works
 
 ### Test Scenarios
 
