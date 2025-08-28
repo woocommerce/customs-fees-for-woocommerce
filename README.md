@@ -84,7 +84,7 @@ add_filter( 'cfwc_include_shipping_in_calculation', '__return_false' );
 
 ### Testing Status
 
-#### ✅ Working
+#### Working
 
 - Plugin activation without errors
 - WooCommerce dependency check
@@ -100,14 +100,14 @@ add_filter( 'cfwc_include_shipping_in_calculation', '__return_false' );
 - **Proper fee display with correct amounts**
 - **Prevents duplicate fee calculations**
 
-#### 🚧 In Progress
+#### In Progress
 
 - Display in order emails
 - Display in My Account order details
 - Admin order view integration
 - WooCommerce Blocks checkout support
 
-#### ✨ Recent Improvements (v1.0.1)
+#### Recent Improvements
 
 - Improved delete UX - single click with save reminder
 - Preset system prevents duplicate rules when adding
