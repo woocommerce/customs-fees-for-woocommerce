@@ -194,6 +194,9 @@ function cfwc_initialize_components() {
 function cfwc_woocommerce_init() {
 	// Add fee calculation to cart.
 	add_action( 'woocommerce_cart_calculate_fees', 'cfwc_calculate_customs_fees', 20 );
+	
+	// Add tooltip display on frontend.
+	add_action( 'wp_footer', 'cfwc_add_tooltip_script' );
 }
 
 /**
@@ -209,24 +212,94 @@ function cfwc_calculate_customs_fees() {
 		return;
 	}
 
-	// Check if fees are enabled.
-	$enabled = get_option( 'cfwc_enabled', false );
-	if ( ! $enabled ) {
-		return;
-	}
-
 	// Get the calculator instance and calculate fees.
 	$calculator = new CFWC_Calculator();
+	// Clear cache to ensure fresh rules.
+	$calculator->clear_cache();
 	$fees = $calculator->calculate_fees( WC()->cart );
 
 	// Add fees to cart if any.
 	if ( ! empty( $fees ) ) {
-		foreach ( $fees as $fee ) {
+		// Get display mode setting - fresh from database.
+		$display_mode = get_option( 'cfwc_display_mode', 'single' );
+		
+		// Debug logging for display mode.
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug only
+			error_log( 'CFWC Display Mode: ' . $display_mode . ', Fees count: ' . count( $fees ) );
+		}
+		
+		// Store tooltip text in session for display.
+		$tooltip_text = get_option( 'cfwc_tooltip_text', '' );
+		if ( ! empty( $tooltip_text ) ) {
+			WC()->session->set( 'cfwc_tooltip_text', $tooltip_text );
+		}
+		
+		if ( 'breakdown' === $display_mode ) {
+			// Breakdown display - show each fee separately, but combine same labels.
+			$combined_fees = array();
+			
+			foreach ( $fees as $fee ) {
+				$label = $fee['label'];
+				if ( ! isset( $combined_fees[ $label ] ) ) {
+					$combined_fees[ $label ] = array(
+						'amount' => 0,
+						'taxable' => isset( $fee['taxable'] ) ? $fee['taxable'] : true,
+						'tax_class' => isset( $fee['tax_class'] ) ? $fee['tax_class'] : '',
+					);
+				}
+				$combined_fees[ $label ]['amount'] += $fee['amount'];
+			}
+			
+			// Add each unique fee to cart.
+			foreach ( $combined_fees as $label => $fee_data ) {
+				WC()->cart->add_fee(
+					$label,
+					$fee_data['amount'],
+					$fee_data['taxable'],
+					$fee_data['tax_class']
+				);
+			}
+		} else {
+			// Single line display - combine all fees.
+			$total_fee = 0;
+			$taxable = true;
+			$tax_class = '';
+			$labels = array();
+			
+			foreach ( $fees as $fee ) {
+				$total_fee += $fee['amount'];
+				// Collect unique labels.
+				if ( ! empty( $fee['label'] ) && ! in_array( $fee['label'], $labels, true ) ) {
+					$labels[] = $fee['label'];
+				}
+				// Use first fee's tax settings.
+				if ( isset( $fee['taxable'] ) ) {
+					$taxable = $fee['taxable'];
+				}
+				if ( isset( $fee['tax_class'] ) ) {
+					$tax_class = $fee['tax_class'];
+				}
+			}
+			
+			// Create combined label from rule labels.
+			if ( count( $labels ) > 1 ) {
+				// Multiple different fees - use generic label.
+				$label = __( 'Customs & Import Fees', 'customs-fees-for-woocommerce' );
+			} elseif ( count( $labels ) === 1 ) {
+				// Single fee type - use its label.
+				$label = $labels[0];
+			} else {
+				// No labels - fallback.
+				$label = __( 'Customs & Import Fees', 'customs-fees-for-woocommerce' );
+			}
+			
+			// Add combined fee.
 			WC()->cart->add_fee(
-				$fee['label'],
-				$fee['amount'],
-				$fee['taxable'],
-				$fee['tax_class']
+				$label,
+				$total_fee,
+				$taxable,
+				$tax_class
 			);
 		}
 	}
@@ -300,7 +373,6 @@ function cfwc_set_default_options() {
 	add_option( 'cfwc_rules', array() );
 	add_option( 'cfwc_display_mode', 'single' ); // single or breakdown.
 	// Don't use translations here - they'll be translated when displayed.
-	add_option( 'cfwc_default_label', 'Customs & Import Fees' );
 	add_option( 'cfwc_tooltip_text', 'Estimated import duties and taxes based on destination country.' );
 
 	// Version tracking.
@@ -386,6 +458,153 @@ function cfwc_plugin_row_meta( $links, $file ) {
 	return array_merge( $links, $row_meta );
 }
 add_filter( 'plugin_row_meta', 'cfwc_plugin_row_meta', 10, 2 );
+
+/**
+ * Add tooltip script to frontend.
+ *
+ * @since 1.0.0
+ */
+function cfwc_add_tooltip_script() {
+	// Only on cart and checkout pages.
+	if ( ! is_cart() && ! is_checkout() ) {
+		return;
+	}
+	
+	// Get tooltip text from session.
+	$tooltip_text = '';
+	if ( WC()->session ) {
+		$tooltip_text = WC()->session->get( 'cfwc_tooltip_text', '' );
+	}
+	
+	// If no tooltip text, check options.
+	if ( empty( $tooltip_text ) ) {
+		$tooltip_text = get_option( 'cfwc_tooltip_text', '' );
+	}
+	
+	if ( empty( $tooltip_text ) ) {
+		return;
+	}
+	?>
+	<style>
+	.cfwc-tooltip {
+		display: inline-block;
+		position: relative;
+		margin-left: 5px;
+		cursor: help;
+	}
+	.cfwc-tooltip-icon {
+		display: inline-block;
+		width: 16px;
+		height: 16px;
+		line-height: 16px;
+		text-align: center;
+		border-radius: 50%;
+		background: #999;
+		color: #fff;
+		font-size: 12px;
+		font-weight: bold;
+	}
+	.cfwc-tooltip-text {
+		visibility: hidden;
+		width: 250px;
+		background-color: #333;
+		color: #fff;
+		text-align: left;
+		border-radius: 6px;
+		padding: 8px 10px;
+		position: absolute;
+		z-index: 999999;
+		bottom: 125%;
+		left: 50%;
+		margin-left: -125px;
+		opacity: 0;
+		transition: opacity 0.3s;
+		font-size: 13px;
+		line-height: 1.4;
+	}
+	.cfwc-tooltip-text::after {
+		content: "";
+		position: absolute;
+		top: 100%;
+		left: 50%;
+		margin-left: -5px;
+		border-width: 5px;
+		border-style: solid;
+		border-color: #333 transparent transparent transparent;
+	}
+	.cfwc-tooltip:hover .cfwc-tooltip-text {
+		visibility: visible;
+		opacity: 1;
+	}
+	</style>
+	<script>
+	jQuery(document).ready(function($) {
+			// Find customs fee rows - use exact text from settings.
+	var tooltipHTML = '<span class="cfwc-tooltip"><span class="cfwc-tooltip-icon">?</span><span class="cfwc-tooltip-text"><?php echo esc_js( wp_kses_post( $tooltip_text ) ); ?></span></span>';
+		
+		// For cart page.
+		$('.cart-subtotal').each(function() {
+			var $row = $(this);
+			var label = $row.find('th').text();
+			<?php
+			// Get all fee labels to match.
+			$rules = get_option( 'cfwc_rules', array() );
+			$labels = array();
+			foreach ( $rules as $rule ) {
+				if ( ! empty( $rule['label'] ) ) {
+					$labels[] = $rule['label'];
+				}
+			}
+			$labels[] = __( 'Customs & Import Fees', 'customs-fees-for-woocommerce' );
+			?>
+			var feeLabels = <?php echo wp_json_encode( $labels ); ?>;
+			
+			// Check if this is a customs fee.
+			feeLabels.forEach(function(feeLabel) {
+				if (label.indexOf(feeLabel) !== -1) {
+					$row.find('th').append(tooltipHTML);
+				}
+			});
+		});
+		
+		// For checkout page - find fee rows.
+		function addTooltips() {
+			$('.fee th, .fee td:first-child').each(function() {
+				var $cell = $(this);
+				var text = $cell.text();
+				
+				// Check if it's one of our fees and doesn't already have tooltip.
+				<?php echo 'var feeLabels = ' . wp_json_encode( $labels ) . ';'; ?>
+				
+				var isCustomsFee = false;
+				feeLabels.forEach(function(feeLabel) {
+					if (text.indexOf(feeLabel) !== -1) {
+						isCustomsFee = true;
+					}
+				});
+				
+				if (isCustomsFee && !$cell.find('.cfwc-tooltip').length) {
+					$cell.append(tooltipHTML);
+				}
+			});
+		}
+		
+		// Initial add.
+		addTooltips();
+		
+		// Re-add after checkout updates.
+		$(document.body).on('updated_checkout', function() {
+			addTooltips();
+		});
+		
+		// For cart updates.
+		$(document.body).on('updated_cart_totals', function() {
+			addTooltips();
+		});
+	});
+	</script>
+	<?php
+}
 
 /**
  * Show activation notice.

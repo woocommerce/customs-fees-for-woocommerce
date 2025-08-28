@@ -75,28 +75,20 @@ class CFWC_Calculator {
 			return $fees;
 		}
 
-		// Apply each rule, preventing duplicates by label.
-		$applied_labels = array();
-		
+		// Apply each rule.
 		foreach ( $rules as $rule ) {
-			$label = $this->get_fee_label( $rule, $country );
-			
-			// Skip if we've already applied a fee with this label.
-			if ( in_array( $label, $applied_labels, true ) ) {
-				continue;
-			}
-			
 			$fee = $this->calculate_single_fee( $rule, $cart_total );
 			if ( $fee !== false && $fee > 0 ) {
+				$label = $this->get_fee_label( $rule, $country );
+				
+				// For breakdown mode, we want all fees even with same label.
+				// For single mode, they'll be combined later anyway.
 				$fees[] = array(
 					'label'     => $label,
 					'amount'    => $fee,
 					'taxable'   => $this->is_fee_taxable( $rule ),
 					'tax_class' => $this->get_fee_tax_class( $rule ),
 				);
-				
-				// Track that we've applied this label.
-				$applied_labels[] = $label;
 			}
 		}
 
@@ -444,15 +436,6 @@ class CFWC_Calculator {
 	}
 
 	/**
-	 * Clear rules cache.
-	 *
-	 * @since 1.0.0
-	 */
-	public function clear_cache() {
-		$this->rules_cache = null;
-	}
-
-	/**
 	 * Calculate fees for a specific country (used by AJAX/API).
 	 *
 	 * @since 1.0.0
@@ -491,5 +474,21 @@ class CFWC_Calculator {
 		}
 
 		return $fees;
+	}
+
+	/**
+	 * Clear the rules cache.
+	 *
+	 * @since 1.0.0
+	 */
+	public function clear_cache() {
+		$this->rules_cache = null;
+		
+		// Also clear WordPress object cache for rules.
+		wp_cache_delete( 'cfwc_rules', 'cfwc' );
+		wp_cache_delete( 'cfwc_display_mode', 'cfwc' );
+		
+		// Clear transients if any.
+		delete_transient( 'cfwc_rules_cache' );
 	}
 }

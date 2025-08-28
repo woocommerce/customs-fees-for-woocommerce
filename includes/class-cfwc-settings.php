@@ -167,6 +167,12 @@ class CFWC_Settings {
 			// Clear any cached data.
 			wp_cache_flush();
 			
+			// Clear WooCommerce cart session to force recalculation.
+			if ( WC()->session ) {
+				WC()->session->set( 'cart_totals', null );
+				WC()->session->set( 'cfwc_tooltip_text', null );
+			}
+			
 			// Clear calculator cache if class exists.
 			if ( class_exists( 'CFWC_Calculator' ) ) {
 				$calculator = new CFWC_Calculator();
@@ -217,14 +223,6 @@ class CFWC_Settings {
 					'single'    => __( 'Single line item', 'customs-fees-for-woocommerce' ),
 					'breakdown' => __( 'Detailed breakdown', 'customs-fees-for-woocommerce' ),
 				),
-			),
-			array(
-				'title'       => __( 'Default Fee Label', 'customs-fees-for-woocommerce' ),
-				'desc'        => __( 'Default label for customs fees', 'customs-fees-for-woocommerce' ),
-				'id'          => 'cfwc_default_label',
-				'type'        => 'text',
-				'default'     => 'Customs & Import Fees',
-				'css'         => 'width: 400px;',
 			),
 			array(
 				'title'       => __( 'Help Text', 'customs-fees-for-woocommerce' ),
@@ -326,6 +324,15 @@ class CFWC_Settings {
 
 		// Save rules.
 		update_option( 'cfwc_rules', $rules );
+		
+		// Clear WooCommerce cart session to force recalculation.
+		if ( WC()->session ) {
+			WC()->session->set( 'cart_totals', null );
+			WC()->session->set( 'cfwc_tooltip_text', null );
+		}
+		
+		// Clear all caches.
+		wp_cache_flush();
 		
 		// Don't add settings error here - let WooCommerce handle the success message
 		// to avoid conflicts with their redirect process.

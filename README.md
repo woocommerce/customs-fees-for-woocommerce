@@ -84,35 +84,59 @@ add_filter( 'cfwc_include_shipping_in_calculation', '__return_false' );
 
 ### Testing Status
 
-#### Working
+- **Core Functionality**
 
-- Plugin activation without errors
-- WooCommerce dependency check
-- Settings page loads and displays correctly
-- HPOS compatibility declared
-- Security standards compliance (PHPCS)
-- Preset templates load and apply with **duplicate prevention**
-- Rules save to database correctly
-- Rules display after save
-- Delete rules functionality with save reminder
-- No page reload when adding presets
-- **Fee calculation on cart/checkout (classic shortcode)**
-- **Proper fee display with correct amounts**
-- **Prevents duplicate fee calculations**
+  - Plugin activation and HPOS compatibility
+  - WooCommerce dependency check
+  - Security standards compliance (PHPCS)
+  - Cache management for performance
+
+- **Admin Interface**
+
+  - Settings integrated under WooCommerce Tax tab
+  - Dynamic rules management (add/edit/delete)
+  - Inline editing without page reload
+  - Save button auto-activation
+  - Real-time validation
+
+- **Preset System**
+
+  - US, EU, and China import presets
+  - Duplicate prevention when applying
+  - Append or replace modes
+
+- **Fee Calculation**
+
+  - Country-based detection
+  - Percentage and flat rate support
+  - Minimum/maximum thresholds
+  - Multiple rules per country
+  - Tax-inclusive calculations
+
+- **Frontend Display**
+  - Cart and checkout integration (classic)
+  - Display modes (single line vs breakdown)
+  - Tooltip/help text with (?) icon
+  - Responsive design
+  - Auto-translation support
 
 #### In Progress
 
 - Display in order emails
 - Display in My Account order details
 - Admin order view integration
+
+#### Next Up: HS Code Integration
+
+- Add HS Code field to products.
+- Country of Origin tracking.
+- Display customs info throughout purchase flow.
+- More accurate duty calculations.
 - WooCommerce Blocks checkout support
-
-#### Recent Improvements
-
-- Improved delete UX - single click with save reminder
-- Preset system prevents duplicate rules when adding
-- Calculator prevents duplicate fee calculations
-- Better user feedback with inline notifications
+- CSV import/export for rules
+- Product category-based rules
+- Weight-based calculations
+- API integrations
 
 ### Test Scenarios
 
