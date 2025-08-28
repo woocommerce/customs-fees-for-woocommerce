@@ -297,17 +297,11 @@ register_deactivation_hook( CFWC_PLUGIN_FILE, 'cfwc_deactivate' );
  */
 function cfwc_set_default_options() {
 	// Main settings.
-	add_option( 'cfwc_enabled', false );
 	add_option( 'cfwc_rules', array() );
 	add_option( 'cfwc_display_mode', 'single' ); // single or breakdown.
-	add_option( 'cfwc_require_agreement', true );
-	add_option( 'cfwc_disclaimer_text', __( 'Customs fees are estimates and actual fees at delivery may vary.', 'customs-fees-for-woocommerce' ) );
-
-	// Display settings.
-	add_option( 'cfwc_show_tooltip', true );
-	add_option( 'cfwc_tooltip_text', __( 'Estimated import duties and taxes based on destination country.', 'customs-fees-for-woocommerce' ) );
-	add_option( 'cfwc_show_on_cart', true );
-	add_option( 'cfwc_show_on_checkout', true );
+	// Don't use translations here - they'll be translated when displayed.
+	add_option( 'cfwc_default_label', 'Customs & Import Fees' );
+	add_option( 'cfwc_tooltip_text', 'Estimated import duties and taxes based on destination country.' );
 
 	// Version tracking.
 	add_option( 'cfwc_version', CFWC_VERSION );
@@ -353,7 +347,7 @@ function cfwc_create_database_tables() {
 function cfwc_plugin_action_links( $links ) {
 	$settings_link = sprintf(
 		'<a href="%s">%s</a>',
-		esc_url( admin_url( 'admin.php?page=wc-settings&tab=cfwc' ) ),
+		esc_url( admin_url( 'admin.php?page=wc-settings&tab=tax&section=customs' ) ),
 		esc_html__( 'Settings', 'customs-fees-for-woocommerce' )
 	);
 
@@ -408,7 +402,7 @@ function cfwc_activation_notice() {
 					sprintf(
 						/* translators: %s: Settings page URL */
 						__( 'Customs Fees for WooCommerce has been activated! <a href="%s">Configure settings</a> to start adding customs fees to checkout.', 'customs-fees-for-woocommerce' ),
-						esc_url( admin_url( 'admin.php?page=wc-settings&tab=cfwc' ) )
+						esc_url( admin_url( 'admin.php?page=wc-settings&tab=tax&section=customs' ) )
 					)
 				);
 				?>

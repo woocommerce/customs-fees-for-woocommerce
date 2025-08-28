@@ -17,8 +17,8 @@ With the U.S. ending its de minimis exemption on **August 29, 2025**, all intern
 
 - [x] Main plugin structure with WooCommerce dependency checking
 - [x] Fee calculation engine with country-based rules
-- [x] Settings framework integrated into WooCommerce
-- [x] Preset templates system (US, EU, China, UK, Canada, Australia)
+- [x] Settings framework integrated into WooCommerce (simplified UX)
+- [x] Preset system integrated into fee rules (US, EU, China, UK, Canada, Australia)
 - [x] Admin functionality with product HS code fields
 - [x] Display handler for cart, checkout, orders, and emails
 - [x] HPOS (High-Performance Order Storage) compatibility
@@ -26,15 +26,15 @@ With the U.S. ending its de minimis exemption on **August 29, 2025**, all intern
 - [x] Database table for fee calculation logs
 - [x] Email integration with fee display
 - [x] AJAX handlers for admin operations
-- [x] Basic admin settings page
+- [x] Streamlined admin settings page (simplified UX)
 
-### In Progress (10%)
+### In Progress
 
 - [ ] WooCommerce Blocks checkout integration (framework ready)
 - [ ] Admin UI JavaScript for rule management
 - [ ] Testing with real scenarios
 
-### TODO (5%)
+### TODO
 
 - [ ] CSV import/export functionality
 - [ ] Frontend tooltips and notices
@@ -44,30 +44,22 @@ With the U.S. ending its de minimis exemption on **August 29, 2025**, all intern
 - [ ] Performance optimization
 - [ ] Multi-language support (POT file)
 
-### Quick Start Example
+### Quick Start
 
-```
-// Add 10% customs fee for US orders
-WooCommerce > Settings > Customs Fees
-├── Enable customs fees: ✓
-├── Display on cart: ✓
-├── Display on checkout: ✓
-└── Add Rule:
-    ├── Country: United States (US)
-    ├── Type: Percentage
-    ├── Rate: 10%
-    ├── Minimum: $5
-    └── Label: US Import Duty
-```
+1. Go to **WooCommerce > Settings > Tax > Customs Fees**
+2. Select a preset (e.g., "US General Import")
+3. Click **"Add Preset Rules"**
+4. Click **"Save changes"**
+5. Fees will now appear at checkout for matching countries!
 
-### Available Preset Templates
+### Available Presets
 
-- [ ] **US General Import (10%)** - Standard US import duty
-- [ ] **EU to US Import** - Common EU→US rates
-- [ ] **China to US Import** - Chinese goods duties
-- [ ] **UK VAT & Duty** - UK import VAT (20%) + duty
-- [ ] **Canada GST & Duty** - Canadian import fees
-- [ ] **Australia GST** - Australian GST (10%)
+- [x] **US General Import (10%)** - Standard US import duty
+- [x] **EU to US Import** - Common EU→US rates
+- [x] **China to US Import** - Chinese goods duties
+- [x] **UK VAT & Duty** - UK import VAT (20%) + duty
+- [x] **Canada GST & Duty** - Canadian import fees
+- [x] **Australia GST** - Australian GST (10%)
 
 ### Hooks and Filters
 
@@ -90,23 +82,37 @@ add_filter( 'cfwc_include_shipping_in_calculation', '__return_false' );
 
 ## Testing
 
-### Manual Testing Checklist
+### Testing Status
 
-- [x] Plugin activation without errors
-- [x] WooCommerce dependency check
-- [x] Settings page loads correctly
-- [x] HPOS compatibility verified
-- [x] Security standards compliance (PHPCS)
-- [ ] Rules can be added/edited/deleted
-- [ ] Preset templates apply correctly
-- [ ] Fees calculate on cart page
-- [ ] Fees display on checkout (classic)
-- [ ] Fees display on checkout (blocks)
-- [ ] Fees appear in order emails
-- [ ] Fees show in admin order view
-- [ ] HS codes save on products
-- [ ] AJAX operations work
-- [ ] Cache clearing works
+#### ✅ Working
+
+- Plugin activation without errors
+- WooCommerce dependency check
+- Settings page loads and displays correctly
+- HPOS compatibility declared
+- Security standards compliance (PHPCS)
+- Preset templates load and apply with **duplicate prevention**
+- Rules save to database correctly
+- Rules display after save
+- Delete rules functionality with save reminder
+- No page reload when adding presets
+- **Fee calculation on cart/checkout (classic shortcode)**
+- **Proper fee display with correct amounts**
+- **Prevents duplicate fee calculations**
+
+#### 🚧 In Progress
+
+- Display in order emails
+- Display in My Account order details
+- Admin order view integration
+- WooCommerce Blocks checkout support
+
+#### ✨ Recent Improvements (v1.0.1)
+
+- Improved delete UX - single click with save reminder
+- Preset system prevents duplicate rules when adding
+- Calculator prevents duplicate fee calculations
+- Better user feedback with inline notifications
 
 ### Test Scenarios
 

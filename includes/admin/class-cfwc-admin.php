@@ -26,9 +26,6 @@ class CFWC_Admin {
 	 * @since 1.0.0
 	 */
 	public function init() {
-		// Add admin menu items.
-		add_action( 'admin_menu', array( $this, 'add_menu_items' ), 99 );
-		
 		// Add admin notices.
 		add_action( 'admin_notices', array( $this, 'admin_notices' ) );
 		
@@ -41,23 +38,6 @@ class CFWC_Admin {
 		// Add product fields.
 		add_action( 'woocommerce_product_options_general_product_data', array( $this, 'add_product_fields' ) );
 		add_action( 'woocommerce_process_product_meta', array( $this, 'save_product_fields' ) );
-	}
-
-	/**
-	 * Add menu items.
-	 *
-	 * @since 1.0.0
-	 */
-	public function add_menu_items() {
-		// Quick access submenu under WooCommerce.
-		add_submenu_page(
-			'woocommerce',
-			__( 'Customs Fees', 'customs-fees-for-woocommerce' ),
-			__( 'Customs Fees', 'customs-fees-for-woocommerce' ),
-			'manage_woocommerce',
-			'wc-settings&tab=customs_fees',
-			''
-		);
 	}
 
 	/**
@@ -75,7 +55,7 @@ class CFWC_Admin {
 					printf(
 						/* translators: %s: Settings page URL */
 						esc_html__( 'Customs Fees for WooCommerce is activated! %s to configure your customs fee rules.', 'customs-fees-for-woocommerce' ),
-						'<a href="' . esc_url( admin_url( 'admin.php?page=wc-settings&tab=customs_fees' ) ) . '">' . esc_html__( 'Visit settings', 'customs-fees-for-woocommerce' ) . '</a>'
+						'<a href="' . esc_url( admin_url( 'admin.php?page=wc-settings&tab=tax&section=customs' ) ) . '">' . esc_html__( 'Visit settings', 'customs-fees-for-woocommerce' ) . '</a>'
 					);
 					?>
 				</p>
@@ -94,7 +74,7 @@ class CFWC_Admin {
 					printf(
 						/* translators: %s: Settings page URL */
 						esc_html__( 'Customs fees are currently disabled. %s to enable and configure.', 'customs-fees-for-woocommerce' ),
-						'<a href="' . esc_url( admin_url( 'admin.php?page=wc-settings&tab=customs_fees' ) ) . '">' . esc_html__( 'Enable customs fees', 'customs-fees-for-woocommerce' ) . '</a>'
+						'<a href="' . esc_url( admin_url( 'admin.php?page=wc-settings&tab=tax&section=customs' ) ) . '">' . esc_html__( 'Enable customs fees', 'customs-fees-for-woocommerce' ) . '</a>'
 					);
 					?>
 				</p>

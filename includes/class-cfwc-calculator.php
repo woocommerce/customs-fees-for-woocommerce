@@ -75,16 +75,28 @@ class CFWC_Calculator {
 			return $fees;
 		}
 
-		// Apply each rule.
+		// Apply each rule, preventing duplicates by label.
+		$applied_labels = array();
+		
 		foreach ( $rules as $rule ) {
+			$label = $this->get_fee_label( $rule, $country );
+			
+			// Skip if we've already applied a fee with this label.
+			if ( in_array( $label, $applied_labels, true ) ) {
+				continue;
+			}
+			
 			$fee = $this->calculate_single_fee( $rule, $cart_total );
 			if ( $fee !== false && $fee > 0 ) {
 				$fees[] = array(
-					'label'     => $this->get_fee_label( $rule, $country ),
+					'label'     => $label,
 					'amount'    => $fee,
 					'taxable'   => $this->is_fee_taxable( $rule ),
 					'tax_class' => $this->get_fee_tax_class( $rule ),
 				);
+				
+				// Track that we've applied this label.
+				$applied_labels[] = $label;
 			}
 		}
 

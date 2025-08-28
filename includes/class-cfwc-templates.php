@@ -29,16 +29,24 @@ class CFWC_Templates {
 	private $templates = array();
 
 	/**
+	 * Constructor.
+	 *
+	 * @since 1.0.0
+	 */
+	public function __construct() {
+		// Templates are loaded on demand to avoid issues with translation functions.
+	}
+
+	/**
 	 * Initialize the templates handler.
 	 *
 	 * @since 1.0.0
 	 */
 	public function init() {
-		$this->load_templates();
-		
 		// Add AJAX handlers for template loading.
 		add_action( 'wp_ajax_cfwc_load_template', array( $this, 'ajax_load_template' ) );
 		add_action( 'wp_ajax_cfwc_get_templates', array( $this, 'ajax_get_templates' ) );
+		add_action( 'wp_ajax_cfwc_apply_template', array( $this, 'ajax_apply_template' ) );
 	}
 
 	/**
@@ -190,6 +198,10 @@ class CFWC_Templates {
 	 * @return array Templates.
 	 */
 	public function get_templates() {
+		// Load templates on demand if not already loaded.
+		if ( empty( $this->templates ) ) {
+			$this->load_templates();
+		}
 		return $this->templates;
 	}
 
@@ -201,6 +213,10 @@ class CFWC_Templates {
 	 * @return array|false Template data or false if not found.
 	 */
 	public function get_template( $template_id ) {
+		// Ensure templates are loaded.
+		if ( empty( $this->templates ) ) {
+			$this->load_templates();
+		}
 		return isset( $this->templates[ $template_id ] ) ? $this->templates[ $template_id ] : false;
 	}
 
@@ -210,7 +226,7 @@ class CFWC_Templates {
 	 * @since 1.0.0
 	 * @param string $template_id Template ID.
 	 * @param bool   $append      Whether to append to existing rules or replace.
-	 * @return bool Success status.
+	 * @return array|false Array with status and counts, or false on error.
 	 */
 	public function apply_template( $template_id, $append = false ) {
 		$template = $this->get_template( $template_id );
@@ -220,11 +236,34 @@ class CFWC_Templates {
 		}
 
 		$existing_rules = get_option( 'cfwc_rules', array() );
+		$added_count = 0;
+		$duplicate_count = 0;
 		
 		if ( $append ) {
-			$rules = array_merge( $existing_rules, $template['rules'] );
+			// Check for duplicates when appending
+			$rules = $existing_rules;
+			
+			foreach ( $template['rules'] as $new_rule ) {
+				// Check if rule already exists (same country + label combination)
+				$is_duplicate = false;
+				foreach ( $existing_rules as $existing_rule ) {
+					if ( $existing_rule['country'] === $new_rule['country'] && 
+					     $existing_rule['label'] === $new_rule['label'] ) {
+						$is_duplicate = true;
+						$duplicate_count++;
+						break;
+					}
+				}
+				
+				if ( ! $is_duplicate ) {
+					$rules[] = $new_rule;
+					$added_count++;
+				}
+			}
 		} else {
+			// Replace all rules
 			$rules = $template['rules'];
+			$added_count = count( $template['rules'] );
 		}
 
 		update_option( 'cfwc_rules', $rules );
@@ -233,15 +272,20 @@ class CFWC_Templates {
 		$calculator = new CFWC_Calculator();
 		$calculator->clear_cache();
 		
-		return true;
+		return array(
+			'success' => true,
+			'added' => $added_count,
+			'duplicates' => $duplicate_count,
+			'total_rules' => count( $rules ),
+		);
 	}
 
 	/**
-	 * AJAX handler to load a template.
+	 * AJAX handler to apply a template.
 	 *
 	 * @since 1.0.0
 	 */
-	public function ajax_load_template() {
+	public function ajax_apply_template() {
 		check_ajax_referer( 'cfwc_admin_nonce', 'nonce' );
 		
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
@@ -251,16 +295,53 @@ class CFWC_Templates {
 		$template_id = sanitize_text_field( wp_unslash( $_POST['template_id'] ?? '' ) );
 		$append      = isset( $_POST['append'] ) && 'true' === $_POST['append'];
 		
-		if ( $this->apply_template( $template_id, $append ) ) {
+		$result = $this->apply_template( $template_id, $append );
+		
+		if ( $result && is_array( $result ) ) {
+			// Build appropriate message based on results
+			$message = '';
+			
+			if ( $append ) {
+				if ( $result['duplicates'] > 0 && $result['added'] > 0 ) {
+					$message = sprintf(
+						/* translators: %1$d: number of rules added, %2$d: number of duplicates skipped */
+						__( 'Added %1$d new rules. Skipped %2$d duplicates.', 'customs-fees-for-woocommerce' ),
+						$result['added'],
+						$result['duplicates']
+					);
+				} elseif ( $result['duplicates'] > 0 && $result['added'] === 0 ) {
+					$message = __( 'All preset rules already exist. No rules added.', 'customs-fees-for-woocommerce' );
+				} else {
+					$message = sprintf(
+						/* translators: %d: number of rules added */
+						__( '%d preset rules added successfully.', 'customs-fees-for-woocommerce' ),
+						$result['added']
+					);
+				}
+			} else {
+				$message = __( 'All rules replaced with preset.', 'customs-fees-for-woocommerce' );
+			}
+			
 			wp_send_json_success( array(
-				'message' => __( 'Template applied successfully.', 'customs-fees-for-woocommerce' ),
+				'message' => $message,
 				'rules'   => get_option( 'cfwc_rules', array() ),
+				'added'   => $result['added'],
+				'duplicates' => $result['duplicates'],
 			) );
 		} else {
 			wp_send_json_error( array(
-				'message' => __( 'Failed to apply template.', 'customs-fees-for-woocommerce' ),
+				'message' => __( 'Failed to apply preset.', 'customs-fees-for-woocommerce' ),
 			) );
 		}
+	}
+
+	/**
+	 * AJAX handler to load a template (legacy).
+	 *
+	 * @since 1.0.0
+	 */
+	public function ajax_load_template() {
+		$this->ajax_apply_template();
 	}
 
 	/**
