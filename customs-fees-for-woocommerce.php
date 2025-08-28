@@ -4,7 +4,7 @@
  * Plugin URI: https://github.com/shameemreza/customs-fees-for-woocommerce
  * Description: Add transparent customs and import fee calculations to WooCommerce checkout. Simple fee tables similar to tax settings, no complex API integrations required.
  * Version: 1.0.0
- * Author: Shameem Reza
+ * Author: WooCommerce
  * Author URI: https://woocommerce.com
  * License: GPL-2.0-or-later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -13,7 +13,7 @@
  * Requires at least: 6.0
  * Tested up to: 6.8
  * Requires PHP: 7.4
- * WC requires at least: 8.0
+ * WC requires at least: 9.0
  * WC tested up to: 10.1.2
  * Requires Plugins: woocommerce
  *
