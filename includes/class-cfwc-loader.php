@@ -137,10 +137,10 @@ class CFWC_Loader {
 			array(
 				'ajax_url'        => admin_url( 'admin-ajax.php' ),
 				'nonce'          => wp_create_nonce( 'cfwc-frontend' ),
-				'tooltip_text'   => get_option( 'cfwc_tooltip_text', '' ),
+				'tooltip_text'   => cfwc_get_tooltip_text(),
 				'show_tooltip'   => get_option( 'cfwc_show_tooltip', true ),
 				'require_agreement' => get_option( 'cfwc_require_agreement', true ),
-				'disclaimer_text' => get_option( 'cfwc_disclaimer_text', '' ),
+				'disclaimer_text' => cfwc_get_disclaimer_text(),
 				'i18n' => array(
 					'fee_details'    => __( 'View fee details', 'customs-fees-for-woocommerce' ),
 					'loading'        => __( 'Loading...', 'customs-fees-for-woocommerce' ),

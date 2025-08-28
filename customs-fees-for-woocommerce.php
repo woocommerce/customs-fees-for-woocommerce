@@ -34,11 +34,55 @@ define( 'CFWC_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'CFWC_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 
 /**
+ * Default strings (stored in options unlocalized; localized at display time).
+ */
+define( 'CFWC_DEFAULT_DISCLAIMER', 'Customs fees are estimates and actual fees at delivery may vary.' );
+define( 'CFWC_DEFAULT_TOOLTIP', 'Estimated import duties and taxes based on destination country.' );
+
+/**
  * Check if WooCommerce is active.
  *
  * @since 1.0.0
  * @return bool True if WooCommerce is active, false otherwise.
  */
+/**
+ * Get disclaimer text with localization fallback at display time.
+ *
+ * Stored options are unlocalized to avoid early JIT loading. When displaying,
+ * return a translated default if the option is empty or equals the raw default.
+ *
+ * @since 1.0.0
+ * @return string
+ */
+function cfwc_get_disclaimer_text() {
+	$value = get_option( 'cfwc_disclaimer_text', '' );
+
+	if ( empty( $value ) || $value === CFWC_DEFAULT_DISCLAIMER ) {
+		return __( 'Customs fees are estimates and actual fees at delivery may vary.', 'customs-fees-for-woocommerce' );
+	}
+
+	return $value;
+}
+
+/**
+ * Get tooltip text with localization fallback at display time.
+ *
+ * Stored options are unlocalized to avoid early JIT loading. When displaying,
+ * return a translated default if the option is empty or equals the raw default.
+ *
+ * @since 1.0.0
+ * @return string
+ */
+function cfwc_get_tooltip_text() {
+	$value = get_option( 'cfwc_tooltip_text', '' );
+
+	if ( empty( $value ) || $value === CFWC_DEFAULT_TOOLTIP ) {
+		return __( 'Estimated import duties and taxes based on destination country.', 'customs-fees-for-woocommerce' );
+	}
+
+	return $value;
+}
+
 function cfwc_is_woocommerce_active() {
 	return class_exists( 'WooCommerce' );
 }
@@ -90,7 +134,17 @@ function cfwc_init() {
 	// Hook into WooCommerce.
 	add_action( 'woocommerce_init', 'cfwc_woocommerce_init' );
 }
-add_action( 'plugins_loaded', 'cfwc_init' );
+add_action( 'init', 'cfwc_init' );
+
+/**
+ * Load plugin textdomain.
+ *
+ * @since 1.0.0
+ */
+function cfwc_load_textdomain() {
+	load_plugin_textdomain( 'customs-fees-for-woocommerce', false, dirname( CFWC_PLUGIN_BASENAME ) . '/languages' );
+}
+add_action( 'init', 'cfwc_load_textdomain', 0 );
 
 /**
  * Declare HPOS and WooCommerce feature compatibility.
@@ -242,8 +296,8 @@ function cfwc_activate() {
 	if ( version_compare( PHP_VERSION, '7.4', '<' ) ) {
 		deactivate_plugins( CFWC_PLUGIN_BASENAME );
 		wp_die(
-			esc_html__( 'Customs Fees for WooCommerce requires PHP 7.4 or higher.', 'customs-fees-for-woocommerce' ),
-			esc_html__( 'Plugin Activation Error', 'customs-fees-for-woocommerce' ),
+			esc_html( 'Customs Fees for WooCommerce requires PHP 7.4 or higher.' ),
+			esc_html( 'Plugin Activation Error' ),
 			array( 'response' => 200, 'back_link' => true )
 		);
 	}
@@ -253,8 +307,8 @@ function cfwc_activate() {
 	if ( version_compare( $wp_version, '6.0', '<' ) ) {
 		deactivate_plugins( CFWC_PLUGIN_BASENAME );
 		wp_die(
-			esc_html__( 'Customs Fees for WooCommerce requires WordPress 6.0 or higher.', 'customs-fees-for-woocommerce' ),
-			esc_html__( 'Plugin Activation Error', 'customs-fees-for-woocommerce' ),
+			esc_html( 'Customs Fees for WooCommerce requires WordPress 6.0 or higher.' ),
+			esc_html( 'Plugin Activation Error' ),
 			array( 'response' => 200, 'back_link' => true )
 		);
 	}
@@ -301,11 +355,11 @@ function cfwc_set_default_options() {
 	add_option( 'cfwc_rules', array() );
 	add_option( 'cfwc_display_mode', 'single' ); // single or breakdown.
 	add_option( 'cfwc_require_agreement', true );
-	add_option( 'cfwc_disclaimer_text', __( 'Customs fees are estimates and actual fees at delivery may vary.', 'customs-fees-for-woocommerce' ) );
+	add_option( 'cfwc_disclaimer_text', CFWC_DEFAULT_DISCLAIMER );
 
 	// Display settings.
 	add_option( 'cfwc_show_tooltip', true );
-	add_option( 'cfwc_tooltip_text', __( 'Estimated import duties and taxes based on destination country.', 'customs-fees-for-woocommerce' ) );
+	add_option( 'cfwc_tooltip_text', CFWC_DEFAULT_TOOLTIP );
 	add_option( 'cfwc_show_on_cart', true );
 	add_option( 'cfwc_show_on_checkout', true );
 

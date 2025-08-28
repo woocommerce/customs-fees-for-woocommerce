@@ -146,8 +146,9 @@ class CFWC_Display {
 				echo '<div class="cfwc-order-fees">';
 				echo '<h3>' . esc_html__( 'Customs & Import Fees', 'customs-fees-for-woocommerce' ) . '</h3>';
 				echo '<p>' . wp_kses_post( wc_price( $fee->get_total() ) ) . '</p>';
-				if ( get_option( 'cfwc_disclaimer_text' ) ) {
-					echo '<p class="cfwc-disclaimer">' . esc_html( get_option( 'cfwc_disclaimer_text' ) ) . '</p>';
+				$disclaimer = cfwc_get_disclaimer_text();
+				if ( $disclaimer ) {
+					echo '<p class="cfwc-disclaimer">' . esc_html( $disclaimer ) . '</p>';
 				}
 				echo '</div>';
 			}
@@ -164,7 +165,7 @@ class CFWC_Display {
 	 */
 	private function render_fee_row( $label, $amount, $context = 'cart' ) {
 		$show_tooltip = get_option( 'cfwc_show_tooltip', true );
-		$tooltip_text = get_option( 'cfwc_tooltip_text', '' );
+		$tooltip_text = cfwc_get_tooltip_text();
 		
 		?>
 		<tr class="cfwc-fee-row fee">

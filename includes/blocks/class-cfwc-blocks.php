@@ -184,7 +184,7 @@ class CFWC_Blocks {
 			'enabled'    => true,
 			'fees'       => $fee_data,
 			'total'      => $total_fees,
-			'disclaimer' => get_option( 'cfwc_disclaimer_text', '' ),
+			'disclaimer' => cfwc_get_disclaimer_text(),
 		);
 		
 		return $cart_data;

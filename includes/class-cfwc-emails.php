@@ -101,7 +101,7 @@ class CFWC_Emails {
 			return;
 		}
 
-		$disclaimer = get_option( 'cfwc_disclaimer_text' );
+		$disclaimer = cfwc_get_disclaimer_text();
 		
 		if ( $plain_text ) {
 			echo "\n" . esc_html__( 'CUSTOMS & IMPORT INFORMATION', 'customs-fees-for-woocommerce' ) . "\n";
