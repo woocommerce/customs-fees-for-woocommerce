@@ -1,6 +1,6 @@
 === Customs Fees for WooCommerce ===
 Contributors: shameemreza
-Tags: woocommerce, checkout, fees, customs, duties, import, taxes, international
+Tags: woocommerce, fees, customs, duties, tarrifs
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4

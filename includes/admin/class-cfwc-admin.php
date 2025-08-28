@@ -28,16 +28,16 @@ class CFWC_Admin {
 	public function init() {
 		// Add admin menu items.
 		add_action( 'admin_menu', array( $this, 'add_menu_items' ), 99 );
-		
+
 		// Add admin notices.
 		add_action( 'admin_notices', array( $this, 'admin_notices' ) );
-		
+
 		// Add order admin meta boxes.
 		add_action( 'add_meta_boxes', array( $this, 'add_order_meta_boxes' ) );
-		
+
 		// Admin scripts and styles.
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
-		
+
 		// Add product fields.
 		add_action( 'woocommerce_product_options_general_product_data', array( $this, 'add_product_fields' ) );
 		add_action( 'woocommerce_process_product_meta', array( $this, 'save_product_fields' ) );
@@ -54,7 +54,7 @@ class CFWC_Admin {
 			'woocommerce',
 			__( 'Customs Fees', 'customs-fees-for-woocommerce' ),
 			__( 'Customs Fees', 'customs-fees-for-woocommerce' ),
-			'manage_woocommerce',
+			'manage_woocommerce', // phpcs:ignore WordPress.WP.Capabilities.Unknown -- WooCommerce registers this capability for managing WooCommerce.
 			'wc-settings&tab=customs_fees',
 			''
 		);
@@ -131,14 +131,14 @@ class CFWC_Admin {
 	 */
 	public function render_order_meta_box( $post_or_order ) {
 		$order = ( $post_or_order instanceof WP_Post ) ? wc_get_order( $post_or_order->ID ) : $post_or_order;
-		
+
 		if ( ! $order ) {
 			return;
 		}
 
 		$fees       = $order->get_fees();
 		$total_fees = 0;
-		
+
 		foreach ( $fees as $fee ) {
 			if ( strpos( $fee->get_name(), __( 'Customs & Import Fees', 'customs-fees-for-woocommerce' ) ) !== false ) {
 				$total_fees += $fee->get_total();
@@ -160,23 +160,27 @@ class CFWC_Admin {
 	 */
 	public function add_product_fields() {
 		echo '<div class="options_group">';
-		
-		woocommerce_wp_text_input( array(
-			'id'          => '_cfwc_hs_code',
-			'label'       => __( 'HS Code', 'customs-fees-for-woocommerce' ),
-			'placeholder' => __( 'e.g., 6109.10', 'customs-fees-for-woocommerce' ),
-			'desc_tip'    => true,
-			'description' => __( 'Harmonized System code for customs classification.', 'customs-fees-for-woocommerce' ),
-		) );
-		
-		woocommerce_wp_text_input( array(
-			'id'          => '_cfwc_country_of_origin',
-			'label'       => __( 'Country of Origin', 'customs-fees-for-woocommerce' ),
-			'placeholder' => __( 'e.g., CN, US, GB', 'customs-fees-for-woocommerce' ),
-			'desc_tip'    => true,
-			'description' => __( 'Two-letter country code where the product was manufactured.', 'customs-fees-for-woocommerce' ),
-		) );
-		
+
+		woocommerce_wp_text_input(
+			array(
+				'id'          => '_cfwc_hs_code',
+				'label'       => __( 'HS Code', 'customs-fees-for-woocommerce' ),
+				'placeholder' => __( 'e.g., 6109.10', 'customs-fees-for-woocommerce' ),
+				'desc_tip'    => true,
+				'description' => __( 'Harmonized System code for customs classification.', 'customs-fees-for-woocommerce' ),
+			)
+		);
+
+		woocommerce_wp_text_input(
+			array(
+				'id'          => '_cfwc_country_of_origin',
+				'label'       => __( 'Country of Origin', 'customs-fees-for-woocommerce' ),
+				'placeholder' => __( 'e.g., CN, US, GB', 'customs-fees-for-woocommerce' ),
+				'desc_tip'    => true,
+				'description' => __( 'Two-letter country code where the product was manufactured.', 'customs-fees-for-woocommerce' ),
+			)
+		);
+
 		echo '</div>';
 	}
 
@@ -193,7 +197,7 @@ class CFWC_Admin {
 		}
 
 		// Check user permissions.
-		if ( ! current_user_can( 'edit_product', $post_id ) ) {
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
 			return;
 		}
 
@@ -207,7 +211,7 @@ class CFWC_Admin {
 		$hs_code = isset( $_POST['_cfwc_hs_code'] ) ? sanitize_text_field( wp_unslash( $_POST['_cfwc_hs_code'] ) ) : '';
 		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing
 		$country = isset( $_POST['_cfwc_country_of_origin'] ) ? sanitize_text_field( wp_unslash( $_POST['_cfwc_country_of_origin'] ) ) : '';
-		
+
 		update_post_meta( $post_id, '_cfwc_hs_code', $hs_code );
 		update_post_meta( $post_id, '_cfwc_country_of_origin', strtoupper( substr( $country, 0, 2 ) ) );
 	}
@@ -231,16 +235,21 @@ class CFWC_Admin {
 		}
 
 		// Add inline styles for now.
-		wp_add_inline_style( 'woocommerce_admin_styles', '
+		wp_add_inline_style(
+			'woocommerce_admin_styles',
+			'
 			.cfwc-rules-table { width: 100%; margin-top: 20px; }
 			.cfwc-rules-table th { text-align: left; }
 			.cfwc-rules-table .button-small { margin: 0 5px; }
 			.cfwc-template-selector { margin: 20px 0; padding: 15px; background: #f7f7f7; border-radius: 4px; }
 			.cfwc-template-selector select { min-width: 300px; }
-		' );
+		'
+		);
 
 		// Add inline script for interactivity.
-		wp_add_inline_script( 'jquery', '
+		wp_add_inline_script(
+			'jquery',
+			'
 			jQuery(document).ready(function($) {
 				// Template selector handler.
 				$("#cfwc-apply-template").on("click", function(e) {
@@ -254,6 +263,7 @@ class CFWC_Admin {
 					}
 				});
 			});
-		' );
+		'
+		);
 	}
 }

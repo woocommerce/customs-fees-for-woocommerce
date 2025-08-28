@@ -30,11 +30,11 @@ class CFWC_Ajax {
 		add_action( 'wp_ajax_cfwc_save_rule', array( $this, 'save_rule' ) );
 		add_action( 'wp_ajax_cfwc_delete_rule', array( $this, 'delete_rule' ) );
 		add_action( 'wp_ajax_cfwc_reorder_rules', array( $this, 'reorder_rules' ) );
-		
+
 		// Import/Export.
 		add_action( 'wp_ajax_cfwc_export_rules', array( $this, 'export_rules' ) );
 		add_action( 'wp_ajax_cfwc_import_rules', array( $this, 'import_rules' ) );
-		
+
 		// Testing.
 		add_action( 'wp_ajax_cfwc_test_calculation', array( $this, 'test_calculation' ) );
 	}
@@ -46,7 +46,8 @@ class CFWC_Ajax {
 	 */
 	public function save_rule() {
 		check_ajax_referer( 'cfwc_admin_nonce', 'nonce' );
-		
+
+		// phpcs:ignore WordPress.WP.Capabilities.Unknown -- 'manage_woocommerce' is a WooCommerce-registered capability.
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
 			wp_die( -1 );
 		}
@@ -54,7 +55,7 @@ class CFWC_Ajax {
 		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$rule_data = isset( $_POST['rule'] ) ? wp_unslash( $_POST['rule'] ) : array();
 		$rule_id   = isset( $_POST['rule_id'] ) ? absint( $_POST['rule_id'] ) : null;
-		
+
 		// Sanitize rule data.
 		$rule = array(
 			'country'   => sanitize_text_field( $rule_data['country'] ?? '' ),
@@ -70,7 +71,7 @@ class CFWC_Ajax {
 
 		// Get existing rules.
 		$rules = get_option( 'cfwc_rules', array() );
-		
+
 		// Update or add rule.
 		if ( null !== $rule_id && isset( $rules[ $rule_id ] ) ) {
 			$rules[ $rule_id ] = $rule;
@@ -81,16 +82,18 @@ class CFWC_Ajax {
 
 		// Save rules.
 		update_option( 'cfwc_rules', $rules );
-		
+
 		// Clear cache.
 		$calculator = new CFWC_Calculator();
 		$calculator->clear_cache();
 
-		wp_send_json_success( array(
-			'message' => __( 'Rule saved successfully.', 'customs-fees-for-woocommerce' ),
-			'rule_id' => $rule_id,
-			'rule'    => $rule,
-		) );
+		wp_send_json_success(
+			array(
+				'message' => __( 'Rule saved successfully.', 'customs-fees-for-woocommerce' ),
+				'rule_id' => $rule_id,
+				'rule'    => $rule,
+			)
+		);
 	}
 
 	/**
@@ -100,42 +103,49 @@ class CFWC_Ajax {
 	 */
 	public function delete_rule() {
 		check_ajax_referer( 'cfwc_admin_nonce', 'nonce' );
-		
+
+		// phpcs:ignore WordPress.WP.Capabilities.Unknown -- 'manage_woocommerce' is a WooCommerce-registered capability.
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
 			wp_die( -1 );
 		}
 
 		$rule_id = isset( $_POST['rule_id'] ) ? absint( $_POST['rule_id'] ) : null;
-		
+
 		if ( null === $rule_id ) {
-			wp_send_json_error( array(
-				'message' => __( 'Invalid rule ID.', 'customs-fees-for-woocommerce' ),
-			) );
+			wp_send_json_error(
+				array(
+					'message' => __( 'Invalid rule ID.', 'customs-fees-for-woocommerce' ),
+				)
+			);
 		}
 
 		// Get existing rules.
 		$rules = get_option( 'cfwc_rules', array() );
-		
+
 		// Remove rule.
 		if ( isset( $rules[ $rule_id ] ) ) {
 			unset( $rules[ $rule_id ] );
 			// Re-index array.
 			$rules = array_values( $rules );
-			
+
 			// Save rules.
 			update_option( 'cfwc_rules', $rules );
-			
+
 			// Clear cache.
 			$calculator = new CFWC_Calculator();
 			$calculator->clear_cache();
 
-			wp_send_json_success( array(
-				'message' => __( 'Rule deleted successfully.', 'customs-fees-for-woocommerce' ),
-			) );
+			wp_send_json_success(
+				array(
+					'message' => __( 'Rule deleted successfully.', 'customs-fees-for-woocommerce' ),
+				)
+			);
 		} else {
-			wp_send_json_error( array(
-				'message' => __( 'Rule not found.', 'customs-fees-for-woocommerce' ),
-			) );
+			wp_send_json_error(
+				array(
+					'message' => __( 'Rule not found.', 'customs-fees-for-woocommerce' ),
+				)
+			);
 		}
 	}
 
@@ -146,24 +156,27 @@ class CFWC_Ajax {
 	 */
 	public function reorder_rules() {
 		check_ajax_referer( 'cfwc_admin_nonce', 'nonce' );
-		
+
+		// phpcs:ignore WordPress.WP.Capabilities.Unknown -- 'manage_woocommerce' is a WooCommerce-registered capability.
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
 			wp_die( -1 );
 		}
 
 		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$order = isset( $_POST['order'] ) ? array_map( 'absint', wp_unslash( $_POST['order'] ) ) : array();
-		
+
 		if ( empty( $order ) ) {
-			wp_send_json_error( array(
-				'message' => __( 'Invalid order data.', 'customs-fees-for-woocommerce' ),
-			) );
+			wp_send_json_error(
+				array(
+					'message' => __( 'Invalid order data.', 'customs-fees-for-woocommerce' ),
+				)
+			);
 		}
 
 		// Get existing rules.
-		$rules = get_option( 'cfwc_rules', array() );
+		$rules     = get_option( 'cfwc_rules', array() );
 		$reordered = array();
-		
+
 		// Reorder based on provided order.
 		foreach ( $order as $index ) {
 			if ( isset( $rules[ $index ] ) ) {
@@ -173,14 +186,16 @@ class CFWC_Ajax {
 
 		// Save reordered rules.
 		update_option( 'cfwc_rules', $reordered );
-		
+
 		// Clear cache.
 		$calculator = new CFWC_Calculator();
 		$calculator->clear_cache();
 
-		wp_send_json_success( array(
-			'message' => __( 'Rules reordered successfully.', 'customs-fees-for-woocommerce' ),
-		) );
+		wp_send_json_success(
+			array(
+				'message' => __( 'Rules reordered successfully.', 'customs-fees-for-woocommerce' ),
+			)
+		);
 	}
 
 	/**
@@ -190,16 +205,17 @@ class CFWC_Ajax {
 	 */
 	public function export_rules() {
 		check_ajax_referer( 'cfwc_admin_nonce', 'nonce' );
-		
+
+		// phpcs:ignore WordPress.WP.Capabilities.Unknown -- 'manage_woocommerce' is a WooCommerce-registered capability.
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
 			wp_die( -1 );
 		}
 
 		$rules = get_option( 'cfwc_rules', array() );
-		
+
 		// Create CSV content.
 		$csv_content = "Country,Type,Rate,Amount,Minimum,Maximum,Label,Taxable,Tax Class\n";
-		
+
 		foreach ( $rules as $rule ) {
 			$csv_content .= sprintf(
 				'"%s","%s",%.2f,%.2f,%.2f,%.2f,"%s","%s","%s"' . "\n",
@@ -215,11 +231,13 @@ class CFWC_Ajax {
 			);
 		}
 
-		wp_send_json_success( array(
-			'filename' => 'customs-fees-rules-' . gmdate( 'Y-m-d' ) . '.csv',
-			'content'  => base64_encode( $csv_content ),
-			'message'  => __( 'Export ready for download.', 'customs-fees-for-woocommerce' ),
-		) );
+		wp_send_json_success(
+			array(
+				'filename' => 'customs-fees-rules-' . gmdate( 'Y-m-d' ) . '.csv',
+				'content'  => base64_encode( $csv_content ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- Encoding CSV for JSON transport to client for download, not obfuscation.
+				'message'  => __( 'Export ready for download.', 'customs-fees-for-woocommerce' ),
+			)
+		);
 	}
 
 	/**
@@ -229,7 +247,8 @@ class CFWC_Ajax {
 	 */
 	public function import_rules() {
 		check_ajax_referer( 'cfwc_admin_nonce', 'nonce' );
-		
+
+		// phpcs:ignore WordPress.WP.Capabilities.Unknown -- 'manage_woocommerce' is a WooCommerce-registered capability.
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
 			wp_die( -1 );
 		}
@@ -237,23 +256,25 @@ class CFWC_Ajax {
 		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$csv_content = isset( $_POST['csv_content'] ) ? wp_unslash( $_POST['csv_content'] ) : '';
 		$append      = isset( $_POST['append'] ) && 'true' === $_POST['append'];
-		
+
 		if ( empty( $csv_content ) ) {
-			wp_send_json_error( array(
-				'message' => __( 'No CSV content provided.', 'customs-fees-for-woocommerce' ),
-			) );
+			wp_send_json_error(
+				array(
+					'message' => __( 'No CSV content provided.', 'customs-fees-for-woocommerce' ),
+				)
+			);
 		}
 
 		// Parse CSV.
-		$lines = explode( "\n", $csv_content );
-		$headers = str_getcsv( array_shift( $lines ) );
+		$lines     = explode( "\n", $csv_content );
+		$headers   = str_getcsv( array_shift( $lines ) );
 		$new_rules = array();
-		
+
 		foreach ( $lines as $line ) {
 			if ( empty( trim( $line ) ) ) {
 				continue;
 			}
-			
+
 			$data = str_getcsv( $line );
 			if ( count( $data ) === count( $headers ) ) {
 				$new_rules[] = array(
@@ -271,32 +292,36 @@ class CFWC_Ajax {
 		}
 
 		if ( empty( $new_rules ) ) {
-			wp_send_json_error( array(
-				'message' => __( 'No valid rules found in CSV.', 'customs-fees-for-woocommerce' ),
-			) );
+			wp_send_json_error(
+				array(
+					'message' => __( 'No valid rules found in CSV.', 'customs-fees-for-woocommerce' ),
+				)
+			);
 		}
 
 		// Get existing rules if appending.
 		if ( $append ) {
 			$existing_rules = get_option( 'cfwc_rules', array() );
-			$new_rules = array_merge( $existing_rules, $new_rules );
+			$new_rules      = array_merge( $existing_rules, $new_rules );
 		}
 
 		// Save rules.
 		update_option( 'cfwc_rules', $new_rules );
-		
+
 		// Clear cache.
 		$calculator = new CFWC_Calculator();
 		$calculator->clear_cache();
 
-		wp_send_json_success( array(
-			'message' => sprintf(
+		wp_send_json_success(
+			array(
+				'message' => sprintf(
 				/* translators: %d: Number of rules imported */
-				__( '%d rules imported successfully.', 'customs-fees-for-woocommerce' ),
-				count( $new_rules )
-			),
-			'rules' => $new_rules,
-		) );
+					__( '%d rules imported successfully.', 'customs-fees-for-woocommerce' ),
+					count( $new_rules )
+				),
+				'rules'   => $new_rules,
+			)
+		);
 	}
 
 	/**
@@ -306,28 +331,33 @@ class CFWC_Ajax {
 	 */
 	public function test_calculation() {
 		check_ajax_referer( 'cfwc_admin_nonce', 'nonce' );
-		
+
+		// phpcs:ignore WordPress.WP.Capabilities.Unknown -- 'manage_woocommerce' is a WooCommerce-registered capability.
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
 			wp_die( -1 );
 		}
 
 		$country    = sanitize_text_field( wp_unslash( $_POST['country'] ?? '' ) );
 		$cart_total = floatval( $_POST['cart_total'] ?? 0 );
-		
+
 		if ( empty( $country ) || $cart_total <= 0 ) {
-			wp_send_json_error( array(
-				'message' => __( 'Invalid test parameters.', 'customs-fees-for-woocommerce' ),
-			) );
+			wp_send_json_error(
+				array(
+					'message' => __( 'Invalid test parameters.', 'customs-fees-for-woocommerce' ),
+				)
+			);
 		}
 
 		// Calculate fees.
 		$calculator = new CFWC_Calculator();
-		$fees = $calculator->calculate_fees_for_country( $country, $cart_total );
-		
-		wp_send_json_success( array(
-			'message' => __( 'Calculation complete.', 'customs-fees-for-woocommerce' ),
-			'fees'    => $fees,
-			'total'   => array_sum( array_column( $fees, 'amount' ) ),
-		) );
+		$fees       = $calculator->calculate_fees_for_country( $country, $cart_total );
+
+		wp_send_json_success(
+			array(
+				'message' => __( 'Calculation complete.', 'customs-fees-for-woocommerce' ),
+				'fees'    => $fees,
+				'total'   => array_sum( array_column( $fees, 'amount' ) ),
+			)
+		);
 	}
 }

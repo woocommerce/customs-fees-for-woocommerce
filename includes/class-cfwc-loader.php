@@ -135,16 +135,16 @@ class CFWC_Loader {
 			'cfwc-frontend',
 			'cfwc_params',
 			array(
-				'ajax_url'        => admin_url( 'admin-ajax.php' ),
-				'nonce'          => wp_create_nonce( 'cfwc-frontend' ),
-				'tooltip_text'   => cfwc_get_tooltip_text(),
-				'show_tooltip'   => get_option( 'cfwc_show_tooltip', true ),
+				'ajax_url'          => admin_url( 'admin-ajax.php' ),
+				'nonce'             => wp_create_nonce( 'cfwc-frontend' ),
+				'tooltip_text'      => cfwc_get_tooltip_text(),
+				'show_tooltip'      => get_option( 'cfwc_show_tooltip', true ),
 				'require_agreement' => get_option( 'cfwc_require_agreement', true ),
-				'disclaimer_text' => cfwc_get_disclaimer_text(),
-				'i18n' => array(
-					'fee_details'    => __( 'View fee details', 'customs-fees-for-woocommerce' ),
-					'loading'        => __( 'Loading...', 'customs-fees-for-woocommerce' ),
-					'error'          => __( 'An error occurred. Please try again.', 'customs-fees-for-woocommerce' ),
+				'disclaimer_text'   => cfwc_get_disclaimer_text(),
+				'i18n'              => array(
+					'fee_details' => __( 'View fee details', 'customs-fees-for-woocommerce' ),
+					'loading'     => __( 'Loading...', 'customs-fees-for-woocommerce' ),
+					'error'       => __( 'An error occurred. Please try again.', 'customs-fees-for-woocommerce' ),
 				),
 			)
 		);
@@ -190,19 +190,19 @@ class CFWC_Loader {
 			'cfwc-admin',
 			'cfwc_admin',
 			array(
-				'ajax_url'     => admin_url( 'admin-ajax.php' ),
-				'nonce'        => wp_create_nonce( 'cfwc-admin' ),
-				'countries'    => WC()->countries->get_countries(),
-				'currency'     => get_woocommerce_currency_symbol(),
-				'templates'    => $this->get_available_templates(),
-				'i18n' => array(
-					'confirm_delete' => __( 'Are you sure you want to delete this rule?', 'customs-fees-for-woocommerce' ),
+				'ajax_url'  => admin_url( 'admin-ajax.php' ),
+				'nonce'     => wp_create_nonce( 'cfwc-admin' ),
+				'countries' => WC()->countries->get_countries(),
+				'currency'  => get_woocommerce_currency_symbol(),
+				'templates' => $this->get_available_templates(),
+				'i18n'      => array(
+					'confirm_delete'   => __( 'Are you sure you want to delete this rule?', 'customs-fees-for-woocommerce' ),
 					'confirm_template' => __( 'This will replace all existing rules. Continue?', 'customs-fees-for-woocommerce' ),
-					'saving'         => __( 'Saving...', 'customs-fees-for-woocommerce' ),
-					'saved'          => __( 'Settings saved!', 'customs-fees-for-woocommerce' ),
-					'error'          => __( 'An error occurred. Please try again.', 'customs-fees-for-woocommerce' ),
-					'add_rule'       => __( 'Add Rule', 'customs-fees-for-woocommerce' ),
-					'edit_rule'      => __( 'Edit Rule', 'customs-fees-for-woocommerce' ),
+					'saving'           => __( 'Saving...', 'customs-fees-for-woocommerce' ),
+					'saved'            => __( 'Settings saved!', 'customs-fees-for-woocommerce' ),
+					'error'            => __( 'An error occurred. Please try again.', 'customs-fees-for-woocommerce' ),
+					'add_rule'         => __( 'Add Rule', 'customs-fees-for-woocommerce' ),
+					'edit_rule'        => __( 'Edit Rule', 'customs-fees-for-woocommerce' ),
 				),
 			)
 		);
@@ -216,12 +216,12 @@ class CFWC_Loader {
 	 */
 	private function get_available_templates() {
 		return array(
-			'us_general'    => __( 'U.S. General Import (2025 rules)', 'customs-fees-for-woocommerce' ),
+			'us_general'     => __( 'U.S. General Import (2025 rules)', 'customs-fees-for-woocommerce' ),
 			'us_electronics' => __( 'U.S. Electronics Import', 'customs-fees-for-woocommerce' ),
-			'us_textiles'   => __( 'U.S. Textiles & Apparel', 'customs-fees-for-woocommerce' ),
-			'eu_to_us'      => __( 'EU to U.S. Standard', 'customs-fees-for-woocommerce' ),
-			'uk_to_us'      => __( 'UK to U.S. Standard', 'customs-fees-for-woocommerce' ),
-			'simplified'    => __( 'Simple 10% All Countries', 'customs-fees-for-woocommerce' ),
+			'us_textiles'    => __( 'U.S. Textiles & Apparel', 'customs-fees-for-woocommerce' ),
+			'eu_to_us'       => __( 'EU to U.S. Standard', 'customs-fees-for-woocommerce' ),
+			'uk_to_us'       => __( 'UK to U.S. Standard', 'customs-fees-for-woocommerce' ),
+			'simplified'     => __( 'Simple 10% All Countries', 'customs-fees-for-woocommerce' ),
 		);
 	}
 

@@ -71,14 +71,14 @@ class CFWC_Calculator {
 
 		// Calculate cart totals.
 		$cart_total = $this->get_cart_total( $cart );
-		if ( $cart_total <= 0 ) {
+		if ( 0 >= $cart_total ) {
 			return $fees;
 		}
 
 		// Apply each rule.
 		foreach ( $rules as $rule ) {
 			$fee = $this->calculate_single_fee( $rule, $cart_total );
-			if ( $fee !== false && $fee > 0 ) {
+			if ( false !== $fee && 0 < $fee ) {
 				$fees[] = array(
 					'label'     => $this->get_fee_label( $rule, $country ),
 					'amount'    => $fee,
@@ -125,7 +125,7 @@ class CFWC_Calculator {
 	 * @return array Applicable rules.
 	 */
 	private function get_rules_for_country( $country ) {
-		$all_rules = $this->get_all_rules();
+		$all_rules     = $this->get_all_rules();
 		$country_rules = array();
 
 		foreach ( $all_rules as $rule ) {
@@ -185,7 +185,7 @@ class CFWC_Calculator {
 		}
 
 		// Check for wildcard (all countries).
-		if ( $rule['country'] === '*' || $rule['country'] === 'all' ) {
+		if ( '*' === $rule['country'] || 'all' === $rule['country'] ) {
 			return true;
 		}
 
@@ -241,9 +241,9 @@ class CFWC_Calculator {
 			case 'percentage':
 				// Calculate percentage-based fee.
 				$rate = isset( $rule['rate'] ) ? (float) $rule['rate'] : 0;
-				if ( $rate > 0 ) {
+				if ( 0 < $rate ) {
 					// Convert percentage to decimal if needed.
-					if ( $rate > 1 ) {
+					if ( 1 < $rate ) {
 						$rate = $rate / 100;
 					}
 					$fee = $cart_total * $rate;
@@ -268,12 +268,12 @@ class CFWC_Calculator {
 		}
 
 		// Apply minimum fee if set.
-		if ( isset( $rule['minimum'] ) && $rule['minimum'] > 0 ) {
+		if ( isset( $rule['minimum'] ) && 0 < $rule['minimum'] ) {
 			$fee = max( $fee, (float) $rule['minimum'] );
 		}
 
 		// Apply maximum fee if set.
-		if ( isset( $rule['maximum'] ) && $rule['maximum'] > 0 ) {
+		if ( isset( $rule['maximum'] ) && 0 < $rule['maximum'] ) {
 			$fee = min( $fee, (float) $rule['maximum'] );
 		}
 
@@ -311,7 +311,7 @@ class CFWC_Calculator {
 				// Apply tier rate.
 				if ( isset( $tier['rate'] ) ) {
 					$rate = (float) $tier['rate'];
-					if ( $rate > 1 ) {
+					if ( 1 < $rate ) {
 						$rate = $rate / 100;
 					}
 					$fee = $cart_total * $rate;
@@ -340,7 +340,7 @@ class CFWC_Calculator {
 		}
 
 		// Get country name.
-		$countries = WC()->countries->get_countries();
+		$countries    = WC()->countries->get_countries();
 		$country_name = isset( $countries[ $country ] ) ? $countries[ $country ] : $country;
 
 		// Default label.
@@ -406,7 +406,7 @@ class CFWC_Calculator {
 		}
 
 		// Log to database or file.
-		if ( $total_fees > 0 ) {
+		if ( 0 < $total_fees ) {
 			global $wpdb;
 			$table_name = $wpdb->prefix . 'cfwc_logs';
 
@@ -415,11 +415,11 @@ class CFWC_Calculator {
 			$result = $wpdb->insert(
 				$table_name,
 				array(
-					'country'     => $country,
-					'cart_total'  => $cart_total,
-					'fee_amount'  => $total_fees,
-					'fee_type'    => 'calculated',
-					'created_at'  => current_time( 'mysql' ),
+					'country'    => $country,
+					'cart_total' => $cart_total,
+					'fee_amount' => $total_fees,
+					'fee_type'   => 'calculated',
+					'created_at' => current_time( 'mysql' ),
 				),
 				array( '%s', '%f', '%f', '%s', '%s' )
 			);
@@ -450,10 +450,10 @@ class CFWC_Calculator {
 	 */
 	public function calculate_fees_for_country( $country, $cart_total ) {
 		$fees = array();
-		
+
 		// Get rules for this country.
 		$rule = $this->get_country_rule( $country );
-		
+
 		if ( ! $rule ) {
 			return $fees;
 		}
@@ -469,9 +469,9 @@ class CFWC_Calculator {
 		// Apply minimum/maximum.
 		$fee_amount = $this->apply_min_max_fee( $fee_amount, $rule );
 
-		if ( $fee_amount > 0 ) {
+		if ( 0 < $fee_amount ) {
 			$fees[] = array(
-				'label'     => $rule['label'] ?: __( 'Customs & Import Fees', 'customs-fees-for-woocommerce' ),
+				'label'     => ! empty( $rule['label'] ) ? $rule['label'] : __( 'Customs & Import Fees', 'customs-fees-for-woocommerce' ),
 				'amount'    => $fee_amount,
 				'taxable'   => $rule['taxable'],
 				'tax_class' => $rule['tax_class'],

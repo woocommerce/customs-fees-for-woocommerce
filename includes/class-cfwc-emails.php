@@ -28,13 +28,13 @@ class CFWC_Emails {
 	public function init() {
 		// Add fees to email order totals.
 		add_filter( 'woocommerce_get_order_item_totals', array( $this, 'add_fees_to_email_totals' ), 10, 3 );
-		
+
 		// Add custom content to emails.
 		add_action( 'woocommerce_email_after_order_table', array( $this, 'add_customs_info_to_email' ), 15, 4 );
-		
+
 		// Admin email notifications.
 		add_action( 'woocommerce_email_order_meta', array( $this, 'add_admin_email_meta' ), 10, 3 );
-		
+
 		// Customize email styles.
 		add_filter( 'woocommerce_email_styles', array( $this, 'add_email_styles' ), 10, 2 );
 	}
@@ -45,12 +45,14 @@ class CFWC_Emails {
 	 * @since 1.0.0
 	 * @param array    $totals Order totals.
 	 * @param WC_Order $order  Order object.
-	 * @param bool     $tax_display Tax display setting.
+	 * @param bool     $_tax_display Tax display setting.
 	 * @return array Modified totals.
 	 */
-	public function add_fees_to_email_totals( $totals, $order, $tax_display = false ) {
+	public function add_fees_to_email_totals( $totals, $order, $_tax_display = false ) {
+		// Unused param kept for WooCommerce filter signature.
+		unset( $_tax_display );
 		$fees = $order->get_fees();
-		
+
 		foreach ( $fees as $fee ) {
 			$fee_name = $fee->get_name();
 			if ( strpos( $fee_name, __( 'Customs & Import Fees', 'customs-fees-for-woocommerce' ) ) !== false ) {
@@ -68,7 +70,7 @@ class CFWC_Emails {
 				return $new_totals;
 			}
 		}
-		
+
 		return $totals;
 	}
 
@@ -79,17 +81,19 @@ class CFWC_Emails {
 	 * @param WC_Order $order         Order object.
 	 * @param bool     $sent_to_admin Whether email is for admin.
 	 * @param bool     $plain_text    Whether email is plain text.
-	 * @param WC_Email $email         Email object.
+	 * @param WC_Email $_email        Email object.
 	 */
-	public function add_customs_info_to_email( $order, $sent_to_admin, $plain_text, $email ) {
+	public function add_customs_info_to_email( $order, $sent_to_admin, $plain_text, $_email ) {
+		// Unused param kept for WooCommerce action signature.
+		unset( $_email );
 		// Only show for customer emails.
 		if ( $sent_to_admin ) {
 			return;
 		}
 
-		$fees       = $order->get_fees();
+		$fees        = $order->get_fees();
 		$has_customs = false;
-		
+
 		foreach ( $fees as $fee ) {
 			if ( strpos( $fee->get_name(), __( 'Customs & Import Fees', 'customs-fees-for-woocommerce' ) ) !== false ) {
 				$has_customs = true;
@@ -102,7 +106,7 @@ class CFWC_Emails {
 		}
 
 		$disclaimer = cfwc_get_disclaimer_text();
-		
+
 		if ( $plain_text ) {
 			echo "\n" . esc_html__( 'CUSTOMS & IMPORT INFORMATION', 'customs-fees-for-woocommerce' ) . "\n";
 			echo "----------------------------------------\n";
@@ -145,10 +149,10 @@ class CFWC_Emails {
 		$fees        = $order->get_fees();
 		$total_fees  = 0;
 		$fee_details = array();
-		
+
 		foreach ( $fees as $fee ) {
 			if ( strpos( $fee->get_name(), __( 'Customs & Import Fees', 'customs-fees-for-woocommerce' ) ) !== false ) {
-				$total_fees += $fee->get_total();
+				$total_fees   += $fee->get_total();
 				$fee_details[] = array(
 					'name'   => $fee->get_name(),
 					'amount' => $fee->get_total(),
@@ -190,10 +194,12 @@ class CFWC_Emails {
 	 *
 	 * @since 1.0.0
 	 * @param string   $css   Email CSS.
-	 * @param WC_Email $email Email object.
+	 * @param WC_Email $_email Email object.
 	 * @return string Modified CSS.
 	 */
-	public function add_email_styles( $css, $email ) {
+	public function add_email_styles( $css, $_email ) {
+		// Unused param kept for WooCommerce filter signature.
+		unset( $_email );
 		$additional_css = '
 			.cfwc-customs-notice {
 				margin: 20px 0;
@@ -221,7 +227,7 @@ class CFWC_Emails {
 				padding-left: 20px;
 			}
 		';
-		
+
 		return $css . $additional_css;
 	}
 }

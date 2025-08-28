@@ -28,19 +28,19 @@ class CFWC_Display {
 	public function init() {
 		// Cart page display.
 		add_action( 'woocommerce_cart_totals_after_shipping', array( $this, 'display_cart_fees' ), 20 );
-		
+
 		// Classic checkout display.
 		add_action( 'woocommerce_review_order_after_shipping', array( $this, 'display_checkout_fees' ), 20 );
-		
+
 		// Order pages display.
 		add_filter( 'woocommerce_get_order_item_totals', array( $this, 'add_fees_to_order_totals' ), 10, 3 );
-		
+
 		// Email display.
 		add_action( 'woocommerce_email_after_order_table', array( $this, 'display_fees_in_email' ), 10, 4 );
-		
+
 		// My Account order display.
 		add_action( 'woocommerce_order_details_after_order_table', array( $this, 'display_fees_in_account' ) );
-		
+
 		// Enqueue frontend scripts.
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 	}
@@ -57,7 +57,7 @@ class CFWC_Display {
 
 		// Get calculated fees from cart.
 		$fees = WC()->cart->get_fees();
-		
+
 		foreach ( $fees as $fee ) {
 			if ( strpos( $fee->id, 'customs-fee' ) === 0 ) {
 				$this->render_fee_row( $fee->name, $fee->amount, 'cart' );
@@ -77,7 +77,7 @@ class CFWC_Display {
 
 		// Get calculated fees from cart.
 		$fees = WC()->cart->get_fees();
-		
+
 		foreach ( $fees as $fee ) {
 			if ( strpos( $fee->id, 'customs-fee' ) === 0 ) {
 				$this->render_fee_row( $fee->name, $fee->amount, 'checkout' );
@@ -91,12 +91,14 @@ class CFWC_Display {
 	 * @since 1.0.0
 	 * @param array    $totals Order totals.
 	 * @param WC_Order $order  Order object.
-	 * @param bool     $tax_display Whether to display tax.
+	 * @param bool     $_tax_display Whether to display tax.
 	 * @return array Modified totals.
 	 */
-	public function add_fees_to_order_totals( $totals, $order, $tax_display = false ) {
+	public function add_fees_to_order_totals( $totals, $order, $_tax_display = false ) {
+		// Unused param kept for WooCommerce filter signature.
+		unset( $_tax_display );
 		$fees = $order->get_fees();
-		
+
 		foreach ( $fees as $fee ) {
 			if ( strpos( $fee->get_name(), __( 'Customs & Import Fees', 'customs-fees-for-woocommerce' ) ) !== false ) {
 				$totals['customs_fees'] = array(
@@ -105,7 +107,7 @@ class CFWC_Display {
 				);
 			}
 		}
-		
+
 		return $totals;
 	}
 
@@ -116,11 +118,13 @@ class CFWC_Display {
 	 * @param WC_Order $order         Order object.
 	 * @param bool     $sent_to_admin Whether email is sent to admin.
 	 * @param bool     $plain_text    Whether email is plain text.
-	 * @param WC_Email $email         Email object.
+	 * @param WC_Email $_email        Email object.
 	 */
-	public function display_fees_in_email( $order, $sent_to_admin, $plain_text, $email = null ) {
+	public function display_fees_in_email( $order, $sent_to_admin, $plain_text, $_email = null ) {
+		// Unused param kept for WooCommerce action signature.
+		unset( $_email );
 		$fees = $order->get_fees();
-		
+
 		foreach ( $fees as $fee ) {
 			if ( strpos( $fee->get_name(), __( 'Customs & Import Fees', 'customs-fees-for-woocommerce' ) ) !== false ) {
 				if ( $plain_text ) {
@@ -140,7 +144,7 @@ class CFWC_Display {
 	 */
 	public function display_fees_in_account( $order ) {
 		$fees = $order->get_fees();
-		
+
 		foreach ( $fees as $fee ) {
 			if ( strpos( $fee->get_name(), __( 'Customs & Import Fees', 'customs-fees-for-woocommerce' ) ) !== false ) {
 				echo '<div class="cfwc-order-fees">';
@@ -161,12 +165,14 @@ class CFWC_Display {
 	 * @since 1.0.0
 	 * @param string $label   Fee label.
 	 * @param float  $amount  Fee amount.
-	 * @param string $context Display context (cart/checkout).
+	 * @param string $_context Display context (cart/checkout).
 	 */
-	private function render_fee_row( $label, $amount, $context = 'cart' ) {
+	private function render_fee_row( $label, $amount, $_context = 'cart' ) {
+		// Unused param reserved for future use.
+		unset( $_context );
 		$show_tooltip = get_option( 'cfwc_show_tooltip', true );
 		$tooltip_text = cfwc_get_tooltip_text();
-		
+
 		?>
 		<tr class="cfwc-fee-row fee">
 			<th>
@@ -192,13 +198,16 @@ class CFWC_Display {
 	public function enqueue_scripts() {
 		if ( is_cart() || is_checkout() || is_account_page() ) {
 			// Inline styles for now, will move to separate file later.
-			wp_add_inline_style( 'woocommerce-general', '
+			wp_add_inline_style(
+				'woocommerce-general',
+				'
 				.cfwc-fee-row th { font-weight: normal; }
 				.cfwc-tooltip { cursor: help; margin-left: 5px; }
 				.cfwc-tooltip .dashicons { font-size: 16px; width: 16px; height: 16px; }
 				.cfwc-disclaimer { font-size: 0.9em; color: #666; font-style: italic; }
 				.cfwc-order-fees { margin-top: 20px; padding: 15px; background: #f7f7f7; border-radius: 4px; }
-			' );
+			'
+			);
 		}
 	}
 }

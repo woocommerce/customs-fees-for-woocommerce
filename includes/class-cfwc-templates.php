@@ -35,7 +35,7 @@ class CFWC_Templates {
 	 */
 	public function init() {
 		$this->load_templates();
-		
+
 		// Add AJAX handlers for template loading.
 		add_action( 'wp_ajax_cfwc_load_template', array( $this, 'ajax_load_template' ) );
 		add_action( 'wp_ajax_cfwc_get_templates', array( $this, 'ajax_get_templates' ) );
@@ -48,7 +48,7 @@ class CFWC_Templates {
 	 */
 	private function load_templates() {
 		$this->templates = array(
-			'us_general' => array(
+			'us_general'    => array(
 				'name'        => __( 'US General Import (10%)', 'customs-fees-for-woocommerce' ),
 				'description' => __( 'Standard 10% import duty for general merchandise entering the US', 'customs-fees-for-woocommerce' ),
 				'rules'       => array(
@@ -65,7 +65,7 @@ class CFWC_Templates {
 					),
 				),
 			),
-			'eu_to_us' => array(
+			'eu_to_us'      => array(
 				'name'        => __( 'EU to US Import', 'customs-fees-for-woocommerce' ),
 				'description' => __( 'Common rates for EU goods entering the US market', 'customs-fees-for-woocommerce' ),
 				'rules'       => array(
@@ -82,7 +82,7 @@ class CFWC_Templates {
 					),
 				),
 			),
-			'china_to_us' => array(
+			'china_to_us'   => array(
 				'name'        => __( 'China to US Import', 'customs-fees-for-woocommerce' ),
 				'description' => __( 'Import duties for Chinese goods entering the US', 'customs-fees-for-woocommerce' ),
 				'rules'       => array(
@@ -99,7 +99,7 @@ class CFWC_Templates {
 					),
 				),
 			),
-			'uk_vat' => array(
+			'uk_vat'        => array(
 				'name'        => __( 'UK VAT & Duty', 'customs-fees-for-woocommerce' ),
 				'description' => __( 'UK import VAT (20%) and duty for international shipments', 'customs-fees-for-woocommerce' ),
 				'rules'       => array(
@@ -127,7 +127,7 @@ class CFWC_Templates {
 					),
 				),
 			),
-			'canada_gst' => array(
+			'canada_gst'    => array(
 				'name'        => __( 'Canada GST & Duty', 'customs-fees-for-woocommerce' ),
 				'description' => __( 'Canadian GST and import duties', 'customs-fees-for-woocommerce' ),
 				'rules'       => array(
@@ -214,13 +214,13 @@ class CFWC_Templates {
 	 */
 	public function apply_template( $template_id, $append = false ) {
 		$template = $this->get_template( $template_id );
-		
+
 		if ( ! $template ) {
 			return false;
 		}
 
 		$existing_rules = get_option( 'cfwc_rules', array() );
-		
+
 		if ( $append ) {
 			$rules = array_merge( $existing_rules, $template['rules'] );
 		} else {
@@ -228,11 +228,11 @@ class CFWC_Templates {
 		}
 
 		update_option( 'cfwc_rules', $rules );
-		
+
 		// Clear cache.
 		$calculator = new CFWC_Calculator();
 		$calculator->clear_cache();
-		
+
 		return true;
 	}
 
@@ -243,23 +243,28 @@ class CFWC_Templates {
 	 */
 	public function ajax_load_template() {
 		check_ajax_referer( 'cfwc_admin_nonce', 'nonce' );
-		
+
+		// phpcs:ignore WordPress.WP.Capabilities.Unknown -- 'manage_woocommerce' is a WooCommerce-registered capability.
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
 			wp_die( -1 );
 		}
 
 		$template_id = sanitize_text_field( wp_unslash( $_POST['template_id'] ?? '' ) );
 		$append      = isset( $_POST['append'] ) && 'true' === $_POST['append'];
-		
+
 		if ( $this->apply_template( $template_id, $append ) ) {
-			wp_send_json_success( array(
-				'message' => __( 'Template applied successfully.', 'customs-fees-for-woocommerce' ),
-				'rules'   => get_option( 'cfwc_rules', array() ),
-			) );
+			wp_send_json_success(
+				array(
+					'message' => __( 'Template applied successfully.', 'customs-fees-for-woocommerce' ),
+					'rules'   => get_option( 'cfwc_rules', array() ),
+				)
+			);
 		} else {
-			wp_send_json_error( array(
-				'message' => __( 'Failed to apply template.', 'customs-fees-for-woocommerce' ),
-			) );
+			wp_send_json_error(
+				array(
+					'message' => __( 'Failed to apply template.', 'customs-fees-for-woocommerce' ),
+				)
+			);
 		}
 	}
 
@@ -270,7 +275,8 @@ class CFWC_Templates {
 	 */
 	public function ajax_get_templates() {
 		check_ajax_referer( 'cfwc_admin_nonce', 'nonce' );
-		
+
+		// phpcs:ignore WordPress.WP.Capabilities.Unknown -- 'manage_woocommerce' is a WooCommerce-registered capability.
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
 			wp_die( -1 );
 		}

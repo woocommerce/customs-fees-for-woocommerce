@@ -48,7 +48,7 @@ class CFWC_Settings {
 		add_filter( 'woocommerce_settings_tabs_array', array( $this, 'add_settings_tab' ), 50 );
 		add_action( 'woocommerce_settings_tabs_' . self::TAB_ID, array( $this, 'render_settings_tab' ) );
 		add_action( 'woocommerce_update_options_' . self::TAB_ID, array( $this, 'save_settings' ) );
-		
+
 		// Add settings sections.
 		add_action( 'woocommerce_settings_' . self::TAB_ID, array( $this, 'output_sections' ) );
 	}
@@ -85,25 +85,25 @@ class CFWC_Settings {
 		$array_keys = array_keys( $sections );
 		foreach ( $sections as $id => $label ) {
 			echo '<li>';
-			
+
 			$url = admin_url( 'admin.php?page=wc-settings&tab=' . self::TAB_ID );
 			if ( $id ) {
 				$url .= '&section=' . sanitize_title( $id );
 			}
-			
+
 			$class = ( $current_section === $id ) ? 'current' : '';
-			
+
 			printf(
 				'<a href="%s" class="%s">%s</a>',
 				esc_url( $url ),
 				esc_attr( $class ),
 				esc_html( $label )
 			);
-			
+
 			if ( end( $array_keys ) !== $id ) {
 				echo ' | ';
 			}
-			
+
 			echo '</li>';
 		}
 
@@ -122,15 +122,15 @@ class CFWC_Settings {
 			case 'rules':
 				$this->render_rules_section();
 				break;
-				
+
 			case 'display':
 				$this->render_display_section();
 				break;
-				
+
 			case 'templates':
 				$this->render_templates_section();
 				break;
-				
+
 			default:
 				$this->render_general_section();
 				break;
@@ -212,7 +212,7 @@ class CFWC_Settings {
 	private function render_rules_section() {
 		// Get saved rules.
 		$rules = get_option( 'cfwc_rules', array() );
-		
+
 		// Include the rules template.
 		include CFWC_PLUGIN_DIR . 'includes/admin/views/rules-section.php';
 	}
@@ -316,16 +316,16 @@ class CFWC_Settings {
 			case 'rules':
 				$this->save_rules();
 				break;
-				
+
 			case 'display':
 				$settings = $this->get_display_settings();
 				WC_Admin_Settings::save_fields( $settings );
 				break;
-				
+
 			case 'templates':
 				// Templates are loaded via AJAX, no save action needed here.
 				break;
-				
+
 			default:
 				$settings = $this->get_general_settings();
 				WC_Admin_Settings::save_fields( $settings );
@@ -334,7 +334,7 @@ class CFWC_Settings {
 
 		// Clear any cached data.
 		wp_cache_flush();
-		
+
 		// Clear calculator cache.
 		$calculator = new CFWC_Calculator();
 		$calculator->clear_cache();
@@ -353,13 +353,14 @@ class CFWC_Settings {
 		}
 
 		// Check permissions.
+		// phpcs:ignore WordPress.WP.Capabilities.Unknown -- 'manage_woocommerce' is a WooCommerce-registered capability.
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
 			return;
 		}
 
 		// Get and sanitize rules.
 		$rules = array();
-		
+
 		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		if ( isset( $_POST['cfwc_rules'] ) && is_array( $_POST['cfwc_rules'] ) ) {
 			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
@@ -376,7 +377,7 @@ class CFWC_Settings {
 					'taxable'   => isset( $rule['taxable'] ) ? (bool) $rule['taxable'] : true,
 					'tax_class' => sanitize_text_field( $rule['tax_class'] ?? '' ),
 				);
-				
+
 				// Only add if country is set.
 				if ( ! empty( $sanitized_rule['country'] ) ) {
 					$rules[] = $sanitized_rule;
@@ -404,7 +405,7 @@ class CFWC_Settings {
 	 */
 	public static function get_countries_for_rules() {
 		$countries = WC()->countries->get_countries();
-		
+
 		// Add "All Countries" option.
 		$countries = array_merge(
 			array( '*' => __( 'All Countries', 'customs-fees-for-woocommerce' ) ),
