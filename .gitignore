@@ -1,10 +1,5 @@
 # Development and Documentation
-PLAN.md
-FEATURES.md
-TASKS.md
-WORDPRESS-STANDARDS.md
-CHANGELOG.md
-HS-CODE-PLAN.md
+*.md
 *.todo
 *.log
 .idea/
