@@ -1,53 +1,40 @@
-# Development and Documentation
-*.md
-
-*.todo
-*.log
-.idea/
-.vscode/
-
-# Build and Dependencies
-/vendor/
-/node_modules/
-/build/
-/dist/
-*.lock
-package-lock.json
-composer.lock
-
-# Development Files
+# OS Files
 .DS_Store
 Thumbs.db
+
+# Editor files
 *.swp
 *.swo
 *~
+.idea/
+.vscode/
+
+# Build files
+node_modules/
+vendor/
+composer.lock
+package-lock.json
+
+# Development files
+*.log
 .env
-.env.local
 
-# Testing
-/tests/coverage/
-phpunit.xml
-.phpunit.result.cache
-
-# IDE Files
-*.sublime-project
-*.sublime-workspace
-.project
-.buildpath
-.settings/
-
-# Temporary Files
-*.tmp
+# Backup files
 *.bak
 *.backup
-*.cache
+*.old
 
-# WordPress
-wp-config.php
-/uploads/
-/upgrade/
+# Temporary files
+*.tmp
+*.temp
 
-# Keep these
-!.gitignore
-!readme.txt
-!LICENSE
+# Development files
+*.md
+*.txt
+*.json
+*.yml
+*.yaml
+*.xml
+*.csv
+*.xls
+*.xlsx

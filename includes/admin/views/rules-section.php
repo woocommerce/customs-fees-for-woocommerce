@@ -418,8 +418,14 @@ jQuery(document).ready(function($) {
 					showNotice(response.data.message || '<?php echo esc_js( __( 'Failed to apply preset.', 'customs-fees-for-woocommerce' ) ); ?>', 'error');
 				}
 			},
-			error: function() {
-				showNotice('<?php echo esc_js( __( 'An error occurred. Please try again.', 'customs-fees-for-woocommerce' ) ); ?>', 'error');
+			error: function(xhr, status, error) {
+				console.error('CFWC Preset Error:', status, error);
+				console.error('Response:', xhr.responseText);
+				var errorMsg = '<?php echo esc_js( __( 'An error occurred while applying the preset.', 'customs-fees-for-woocommerce' ) ); ?>';
+				if (xhr.responseText) {
+					errorMsg += ' ' + '<?php echo esc_js( __( 'Check browser console for details.', 'customs-fees-for-woocommerce' ) ); ?>';
+				}
+				showNotice(errorMsg, 'error');
 			}
 		});
 	}

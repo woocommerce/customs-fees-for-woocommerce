@@ -1,22 +1,21 @@
 <?php
 /**
  * Plugin Name:       Customs Fees for WooCommerce
- * Plugin URI:        https://github.com/yourusername/customs-fees-for-woocommerce
+ * Plugin URI:        https://woocommerce.com
  * Description:       Add customs and import fees to WooCommerce orders based on destination country and product origin.
- * Version:           1.0.0
- * Requires at least: 5.8
- * Requires PHP:      7.4
- * Author:            Your Name
- * Author URI:        https://yourwebsite.com
+ * Version: 1.0.0
+ * Author:            WooCommerce
+ * Author URI:        https://woocommerce.com
  * License:           GPL v2 or later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       customs-fees-for-woocommerce
  * Domain Path:       /languages
- * 
  * Requires Plugins:  woocommerce
- * 
- * WC requires at least: 5.0
- * WC tested up to: 8.5
+ * Requires at least: 6.0
+ * Tested up to: 6.8
+ * Requires PHP: 7.4
+ * WC requires at least: 9.0.0
+ * WC tested up to: 10.1.2
  *
  * @package CustomsFeesForWooCommerce
  */
@@ -160,21 +159,21 @@ class Customs_Fees_WooCommerce {
 		$loader = new CFWC_Loader();
 		$loader->init();
 		
-		// Initialize templates to register AJAX handlers
-		$templates = new CFWC_Templates();
+			// Initialize templates to register AJAX handlers
+	$templates = new CFWC_Templates();
+	$templates->init();
 	}
 
 	/**
 	 * Load plugin textdomain.
 	 *
 	 * @since 1.0.0
+	 * @deprecated 1.0.1 WordPress automatically loads translations for plugins hosted on WordPress.org since 4.6
 	 */
 	public function load_textdomain() {
-		load_plugin_textdomain(
-			'customs-fees-for-woocommerce',
-			false,
-			dirname( CFWC_PLUGIN_BASENAME ) . '/languages'
-		);
+		// WordPress 4.6+ automatically loads translations for plugins hosted on WordPress.org.
+		// This method is kept empty for backward compatibility.
+		// Translations are loaded automatically by WordPress.
 	}
 
 	/**
@@ -473,18 +472,33 @@ function cfwc_uninstall() {
 	// Remove transients.
 	delete_transient( 'cfwc_rules_cache' );
 
-	// Remove product meta.
+	// Remove product meta - using direct queries for complete cleanup during uninstall.
+	// Note: These queries use meta_key which can be slower, but this is acceptable
+	// for uninstall operations which only run once when the plugin is deleted.
 	global $wpdb;
-	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Necessary for cleanup
+	
+	// Remove HS code meta
+	// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+	// phpcs:disable WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 	$wpdb->delete(
 		$wpdb->postmeta,
-		array( 'meta_key' => '_cfwc_hs_code' )
+		array( 'meta_key' => '_cfwc_hs_code' ) // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 	);
-	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Necessary for cleanup
+	// phpcs:enable WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+	// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+	
+	// Remove country of origin meta
+	// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+	// phpcs:disable WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 	$wpdb->delete(
 		$wpdb->postmeta,
-		array( 'meta_key' => '_cfwc_country_of_origin' )
+		array( 'meta_key' => '_cfwc_country_of_origin' ) // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 	);
+	// phpcs:enable WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+	// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+	
+	// Clear any cached data
+	wp_cache_flush();
 }
 register_uninstall_hook( __FILE__, 'cfwc_uninstall' );
 
