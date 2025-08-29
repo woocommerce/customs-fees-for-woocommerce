@@ -73,14 +73,14 @@ class CFWC_Templates {
 				),
 			),
 			'eu_to_us' => array(
-				'name'        => __( 'EU to US Import', 'customs-fees-for-woocommerce' ),
-				'description' => __( 'Common rates for EU goods entering the US market', 'customs-fees-for-woocommerce' ),
+				'name'        => __( 'EU to US Import (15%)', 'customs-fees-for-woocommerce' ),
+				'description' => __( 'Standard 15% rate for EU goods entering US', 'customs-fees-for-woocommerce' ),
 				'rules'       => array(
 					array(
 						'country'        => 'US',
 						'origin_country' => 'EU',  // Applies to EU countries
 						'type'           => 'percentage',
-						'rate'           => 12,
+						'rate'           => 15,
 						'amount'         => 0,
 						'label'          => __( 'US Import Duty (from EU)', 'customs-fees-for-woocommerce' ),
 						'taxable'        => true,
@@ -89,8 +89,8 @@ class CFWC_Templates {
 				),
 			),
 			'china_to_us' => array(
-				'name'        => __( 'China to US Import', 'customs-fees-for-woocommerce' ),
-				'description' => __( 'Import duties for Chinese goods entering the US', 'customs-fees-for-woocommerce' ),
+				'name'        => __( 'China to US Import (25%)', 'customs-fees-for-woocommerce' ),
+				'description' => __( 'US reciprocal tariff for Chinese goods - 25%', 'customs-fees-for-woocommerce' ),
 				'rules'       => array(
 					array(
 						'country'        => 'US',
@@ -98,12 +98,299 @@ class CFWC_Templates {
 						'type'           => 'percentage',
 						'rate'           => 25,
 						'amount'         => 0,
-						'label'          => __( 'US Import Duty (from China)', 'customs-fees-for-woocommerce' ),
+						'label'          => __( 'US Tariff (China)', 'customs-fees-for-woocommerce' ),
 						'taxable'        => true,
 						'tax_class'      => '',
 					),
 				),
 			),
+			
+			// US Reciprocal Tariffs - Major Trading Partners
+			'us_india_tariff' => array(
+				'name'        => __( 'India to US (25%)', 'customs-fees-for-woocommerce' ),
+				'description' => __( 'US reciprocal tariff for goods from India - 25%', 'customs-fees-for-woocommerce' ),
+				'rules'       => array(
+					array(
+						'country'        => 'US',
+						'origin_country' => 'IN',
+						'type'           => 'percentage',
+						'rate'           => 25,
+						'amount'         => 0,
+						'label'          => __( 'US Tariff (India)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => true,
+						'tax_class'      => '',
+					),
+				),
+			),
+			'us_uk_tariff' => array(
+				'name'        => __( 'UK to US (10%)', 'customs-fees-for-woocommerce' ),
+				'description' => __( 'US reciprocal tariff for goods from United Kingdom - 10%', 'customs-fees-for-woocommerce' ),
+				'rules'       => array(
+					array(
+						'country'        => 'US',
+						'origin_country' => 'GB',
+						'type'           => 'percentage',
+						'rate'           => 10,
+						'amount'         => 0,
+						'label'          => __( 'US Tariff (UK)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => true,
+						'tax_class'      => '',
+					),
+				),
+			),
+			'us_japan_tariff' => array(
+				'name'        => __( 'Japan to US (15%)', 'customs-fees-for-woocommerce' ),
+				'description' => __( 'US reciprocal tariff for goods from Japan - 15%', 'customs-fees-for-woocommerce' ),
+				'rules'       => array(
+					array(
+						'country'        => 'US',
+						'origin_country' => 'JP',
+						'type'           => 'percentage',
+						'rate'           => 15,
+						'amount'         => 0,
+						'label'          => __( 'US Tariff (Japan)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => true,
+						'tax_class'      => '',
+					),
+				),
+			),
+			'us_brazil_tariff' => array(
+				'name'        => __( 'Brazil to US (10%)', 'customs-fees-for-woocommerce' ),
+				'description' => __( 'US reciprocal tariff for goods from Brazil - 10%', 'customs-fees-for-woocommerce' ),
+				'rules'       => array(
+					array(
+						'country'        => 'US',
+						'origin_country' => 'BR',
+						'type'           => 'percentage',
+						'rate'           => 10,
+						'amount'         => 0,
+						'label'          => __( 'US Tariff (Brazil)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => true,
+						'tax_class'      => '',
+					),
+				),
+			),
+			'us_switzerland_tariff' => array(
+				'name'        => __( 'Switzerland to US (39%)', 'customs-fees-for-woocommerce' ),
+				'description' => __( 'US reciprocal tariff for goods from Switzerland - 39%', 'customs-fees-for-woocommerce' ),
+				'rules'       => array(
+					array(
+						'country'        => 'US',
+						'origin_country' => 'CH',
+						'type'           => 'percentage',
+						'rate'           => 39,
+						'amount'         => 0,
+						'label'          => __( 'US Tariff (Switzerland)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => true,
+						'tax_class'      => '',
+					),
+				),
+			),
+			
+			// Southeast Asian Countries
+			'us_vietnam_tariff' => array(
+				'name'        => __( 'Vietnam to US (20%)', 'customs-fees-for-woocommerce' ),
+				'description' => __( 'US reciprocal tariff for goods from Vietnam - 20%', 'customs-fees-for-woocommerce' ),
+				'rules'       => array(
+					array(
+						'country'        => 'US',
+						'origin_country' => 'VN',
+						'type'           => 'percentage',
+						'rate'           => 20,
+						'amount'         => 0,
+						'label'          => __( 'US Tariff (Vietnam)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => true,
+						'tax_class'      => '',
+					),
+				),
+			),
+			'us_thailand_tariff' => array(
+				'name'        => __( 'Thailand to US (19%)', 'customs-fees-for-woocommerce' ),
+				'description' => __( 'US reciprocal tariff for goods from Thailand - 19%', 'customs-fees-for-woocommerce' ),
+				'rules'       => array(
+					array(
+						'country'        => 'US',
+						'origin_country' => 'TH',
+						'type'           => 'percentage',
+						'rate'           => 19,
+						'amount'         => 0,
+						'label'          => __( 'US Tariff (Thailand)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => true,
+						'tax_class'      => '',
+					),
+				),
+			),
+			'us_indonesia_tariff' => array(
+				'name'        => __( 'Indonesia to US (19%)', 'customs-fees-for-woocommerce' ),
+				'description' => __( 'US reciprocal tariff for goods from Indonesia - 19%', 'customs-fees-for-woocommerce' ),
+				'rules'       => array(
+					array(
+						'country'        => 'US',
+						'origin_country' => 'ID',
+						'type'           => 'percentage',
+						'rate'           => 19,
+						'amount'         => 0,
+						'label'          => __( 'US Tariff (Indonesia)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => true,
+						'tax_class'      => '',
+					),
+				),
+			),
+			
+			// South Asian Countries
+			'us_bangladesh_tariff' => array(
+				'name'        => __( 'Bangladesh to US (20%)', 'customs-fees-for-woocommerce' ),
+				'description' => __( 'US reciprocal tariff for goods from Bangladesh - 20%', 'customs-fees-for-woocommerce' ),
+				'rules'       => array(
+					array(
+						'country'        => 'US',
+						'origin_country' => 'BD',
+						'type'           => 'percentage',
+						'rate'           => 20,
+						'amount'         => 0,
+						'label'          => __( 'US Tariff (Bangladesh)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => true,
+						'tax_class'      => '',
+					),
+				),
+			),
+			'us_pakistan_tariff' => array(
+				'name'        => __( 'Pakistan to US (19%)', 'customs-fees-for-woocommerce' ),
+				'description' => __( 'US reciprocal tariff for goods from Pakistan - 19%', 'customs-fees-for-woocommerce' ),
+				'rules'       => array(
+					array(
+						'country'        => 'US',
+						'origin_country' => 'PK',
+						'type'           => 'percentage',
+						'rate'           => 19,
+						'amount'         => 0,
+						'label'          => __( 'US Tariff (Pakistan)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => true,
+						'tax_class'      => '',
+					),
+				),
+			),
+			
+			// East Asian Countries
+			'us_south_korea_tariff' => array(
+				'name'        => __( 'South Korea to US (15%)', 'customs-fees-for-woocommerce' ),
+				'description' => __( 'US reciprocal tariff for goods from South Korea - 15%', 'customs-fees-for-woocommerce' ),
+				'rules'       => array(
+					array(
+						'country'        => 'US',
+						'origin_country' => 'KR',
+						'type'           => 'percentage',
+						'rate'           => 15,
+						'amount'         => 0,
+						'label'          => __( 'US Tariff (South Korea)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => true,
+						'tax_class'      => '',
+					),
+				),
+			),
+			'us_taiwan_tariff' => array(
+				'name'        => __( 'Taiwan to US (20%)', 'customs-fees-for-woocommerce' ),
+				'description' => __( 'US reciprocal tariff for goods from Taiwan - 20%', 'customs-fees-for-woocommerce' ),
+				'rules'       => array(
+					array(
+						'country'        => 'US',
+						'origin_country' => 'TW',
+						'type'           => 'percentage',
+						'rate'           => 20,
+						'amount'         => 0,
+						'label'          => __( 'US Tariff (Taiwan)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => true,
+						'tax_class'      => '',
+					),
+				),
+			),
+			
+			// Middle Eastern Countries
+			'us_turkey_tariff' => array(
+				'name'        => __( 'Turkey to US (15%)', 'customs-fees-for-woocommerce' ),
+				'description' => __( 'US reciprocal tariff for goods from Turkey - 15%', 'customs-fees-for-woocommerce' ),
+				'rules'       => array(
+					array(
+						'country'        => 'US',
+						'origin_country' => 'TR',
+						'type'           => 'percentage',
+						'rate'           => 15,
+						'amount'         => 0,
+						'label'          => __( 'US Tariff (Turkey)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => true,
+						'tax_class'      => '',
+					),
+				),
+			),
+			'us_israel_tariff' => array(
+				'name'        => __( 'Israel to US (15%)', 'customs-fees-for-woocommerce' ),
+				'description' => __( 'US reciprocal tariff for goods from Israel - 15%', 'customs-fees-for-woocommerce' ),
+				'rules'       => array(
+					array(
+						'country'        => 'US',
+						'origin_country' => 'IL',
+						'type'           => 'percentage',
+						'rate'           => 15,
+						'amount'         => 0,
+						'label'          => __( 'US Tariff (Israel)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => true,
+						'tax_class'      => '',
+					),
+				),
+			),
+			
+			// African Countries
+			'us_south_africa_tariff' => array(
+				'name'        => __( 'South Africa to US (30%)', 'customs-fees-for-woocommerce' ),
+				'description' => __( 'US reciprocal tariff for goods from South Africa - 30%', 'customs-fees-for-woocommerce' ),
+				'rules'       => array(
+					array(
+						'country'        => 'US',
+						'origin_country' => 'ZA',
+						'type'           => 'percentage',
+						'rate'           => 30,
+						'amount'         => 0,
+						'label'          => __( 'US Tariff (South Africa)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => true,
+						'tax_class'      => '',
+					),
+				),
+			),
+			'us_nigeria_tariff' => array(
+				'name'        => __( 'Nigeria to US (15%)', 'customs-fees-for-woocommerce' ),
+				'description' => __( 'US reciprocal tariff for goods from Nigeria - 15%', 'customs-fees-for-woocommerce' ),
+				'rules'       => array(
+					array(
+						'country'        => 'US',
+						'origin_country' => 'NG',
+						'type'           => 'percentage',
+						'rate'           => 15,
+						'amount'         => 0,
+						'label'          => __( 'US Tariff (Nigeria)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => true,
+						'tax_class'      => '',
+					),
+				),
+			),
+			
+			// Pacific Countries
+			'us_new_zealand_tariff' => array(
+				'name'        => __( 'New Zealand to US (15%)', 'customs-fees-for-woocommerce' ),
+				'description' => __( 'US reciprocal tariff for goods from New Zealand - 15%', 'customs-fees-for-woocommerce' ),
+				'rules'       => array(
+					array(
+						'country'        => 'US',
+						'origin_country' => 'NZ',
+						'type'           => 'percentage',
+						'rate'           => 15,
+						'amount'         => 0,
+						'label'          => __( 'US Tariff (New Zealand)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => true,
+						'tax_class'      => '',
+					),
+				),
+			),
+			
 			'uk_vat' => array(
 				'name'        => __( 'UK VAT & Duty', 'customs-fees-for-woocommerce' ),
 				'description' => __( 'UK import VAT (20%) and duty for international shipments', 'customs-fees-for-woocommerce' ),
@@ -156,6 +443,182 @@ class CFWC_Templates {
 					),
 				),
 			),
+			
+			// Multi-Country Groups
+			'us_high_tariff_countries' => array(
+				'name'        => __( 'US High Tariff Countries (30%+)', 'customs-fees-for-woocommerce' ),
+				'description' => __( 'Countries with 30% or higher US reciprocal tariffs', 'customs-fees-for-woocommerce' ),
+				'rules'       => array(
+					array(
+						'country'        => 'US',
+						'origin_country' => 'CH',  // Switzerland - 39%
+						'type'           => 'percentage',
+						'rate'           => 39,
+						'amount'         => 0,
+						'label'          => __( 'US Tariff (Switzerland)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => true,
+						'tax_class'      => '',
+					),
+					array(
+						'country'        => 'US',
+						'origin_country' => 'SY',  // Syria - 41%
+						'type'           => 'percentage',
+						'rate'           => 41,
+						'amount'         => 0,
+						'label'          => __( 'US Tariff (Syria)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => true,
+						'tax_class'      => '',
+					),
+					array(
+						'country'        => 'US',
+						'origin_country' => 'MM',  // Myanmar - 40%
+						'type'           => 'percentage',
+						'rate'           => 40,
+						'amount'         => 0,
+						'label'          => __( 'US Tariff (Myanmar)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => true,
+						'tax_class'      => '',
+					),
+					array(
+						'country'        => 'US',
+						'origin_country' => 'LA',  // Laos - 40%
+						'type'           => 'percentage',
+						'rate'           => 40,
+						'amount'         => 0,
+						'label'          => __( 'US Tariff (Laos)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => true,
+						'tax_class'      => '',
+					),
+					array(
+						'country'        => 'US',
+						'origin_country' => 'IQ',  // Iraq - 35%
+						'type'           => 'percentage',
+						'rate'           => 35,
+						'amount'         => 0,
+						'label'          => __( 'US Tariff (Iraq)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => true,
+						'tax_class'      => '',
+					),
+					array(
+						'country'        => 'US',
+						'origin_country' => 'RS',  // Serbia - 35%
+						'type'           => 'percentage',
+						'rate'           => 35,
+						'amount'         => 0,
+						'label'          => __( 'US Tariff (Serbia)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => true,
+						'tax_class'      => '',
+					),
+					array(
+						'country'        => 'US',
+						'origin_country' => 'DZ',  // Algeria - 30%
+						'type'           => 'percentage',
+						'rate'           => 30,
+						'amount'         => 0,
+						'label'          => __( 'US Tariff (Algeria)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => true,
+						'tax_class'      => '',
+					),
+					array(
+						'country'        => 'US',
+						'origin_country' => 'BA',  // Bosnia and Herzegovina - 30%
+						'type'           => 'percentage',
+						'rate'           => 30,
+						'amount'         => 0,
+						'label'          => __( 'US Tariff (Bosnia)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => true,
+						'tax_class'      => '',
+					),
+					array(
+						'country'        => 'US',
+						'origin_country' => 'LY',  // Libya - 30%
+						'type'           => 'percentage',
+						'rate'           => 30,
+						'amount'         => 0,
+						'label'          => __( 'US Tariff (Libya)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => true,
+						'tax_class'      => '',
+					),
+				),
+			),
+			
+			'us_southeast_asia_all' => array(
+				'name'        => __( 'US-Southeast Asia All Countries', 'customs-fees-for-woocommerce' ),
+				'description' => __( 'All Southeast Asian countries with US reciprocal tariffs', 'customs-fees-for-woocommerce' ),
+				'rules'       => array(
+					array(
+						'country'        => 'US',
+						'origin_country' => 'VN',  // Vietnam - 20%
+						'type'           => 'percentage',
+						'rate'           => 20,
+						'amount'         => 0,
+						'label'          => __( 'US Tariff (Vietnam)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => true,
+						'tax_class'      => '',
+					),
+					array(
+						'country'        => 'US',
+						'origin_country' => 'TH',  // Thailand - 19%
+						'type'           => 'percentage',
+						'rate'           => 19,
+						'amount'         => 0,
+						'label'          => __( 'US Tariff (Thailand)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => true,
+						'tax_class'      => '',
+					),
+					array(
+						'country'        => 'US',
+						'origin_country' => 'MY',  // Malaysia - 19%
+						'type'           => 'percentage',
+						'rate'           => 19,
+						'amount'         => 0,
+						'label'          => __( 'US Tariff (Malaysia)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => true,
+						'tax_class'      => '',
+					),
+					array(
+						'country'        => 'US',
+						'origin_country' => 'ID',  // Indonesia - 19%
+						'type'           => 'percentage',
+						'rate'           => 19,
+						'amount'         => 0,
+						'label'          => __( 'US Tariff (Indonesia)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => true,
+						'tax_class'      => '',
+					),
+					array(
+						'country'        => 'US',
+						'origin_country' => 'PH',  // Philippines - 19%
+						'type'           => 'percentage',
+						'rate'           => 19,
+						'amount'         => 0,
+						'label'          => __( 'US Tariff (Philippines)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => true,
+						'tax_class'      => '',
+					),
+					array(
+						'country'        => 'US',
+						'origin_country' => 'KH',  // Cambodia - 19%
+						'type'           => 'percentage',
+						'rate'           => 19,
+						'amount'         => 0,
+						'label'          => __( 'US Tariff (Cambodia)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => true,
+						'tax_class'      => '',
+					),
+					array(
+						'country'        => 'US',
+						'origin_country' => 'BN',  // Brunei - 25%
+						'type'           => 'percentage',
+						'rate'           => 25,
+						'amount'         => 0,
+						'label'          => __( 'US Tariff (Brunei)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => true,
+						'tax_class'      => '',
+					),
+				),
+			),
+			
 			'australia_gst' => array(
 				'name'        => __( 'Australia GST', 'customs-fees-for-woocommerce' ),
 				'description' => __( 'Australian GST (10%) on imported goods', 'customs-fees-for-woocommerce' ),
