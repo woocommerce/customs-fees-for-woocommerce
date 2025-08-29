@@ -130,10 +130,8 @@ function cfwc_includes() {
 		require_once CFWC_PLUGIN_DIR . 'includes/admin/class-cfwc-ajax.php';
 	}
 
-	// Block editor support (if WooCommerce Blocks is active).
-	if ( class_exists( 'Automattic\WooCommerce\Blocks\Package' ) ) {
-		require_once CFWC_PLUGIN_DIR . 'includes/class-cfwc-blocks.php';
-	}
+	// Blocks compatibility support.
+	require_once CFWC_PLUGIN_DIR . 'includes/class-cfwc-blocks.php';
 
 	// Email customizations.
 	require_once CFWC_PLUGIN_DIR . 'includes/class-cfwc-emails.php';
@@ -178,11 +176,8 @@ function cfwc_initialize_components() {
 		$ajax->init();
 	}
 
-	// Initialize block support if available.
-	if ( class_exists( 'Automattic\WooCommerce\Blocks\Package' ) ) {
-		$blocks = new CFWC_Blocks();
-		$blocks->init();
-	}
+	// Initialize blocks compatibility.
+	$blocks = new CFWC_Blocks();
 
 	// Initialize email customizations.
 	$emails = new CFWC_Emails();
