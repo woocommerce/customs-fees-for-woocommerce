@@ -125,9 +125,9 @@ add_filter( 'cfwc_include_shipping_in_calculation', '__return_false' );
 
 **What works with WooCommerce Blocks:**
 
-- ✅ Customs fees calculation and display
-- ✅ Fee rules based on country
-- ✅ Order processing with customs fees
+- Customs fees calculation and display
+- Fee rules based on country
+- Order processing with customs fees
 
 **What's available in Classic cart/checkout only:**
 
