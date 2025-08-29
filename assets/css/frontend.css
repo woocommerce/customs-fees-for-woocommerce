@@ -1,0 +1,47 @@
+/**
+ * Customs Fees for WooCommerce - Frontend Styles
+ *
+ * @package CustomsFeesForWooCommerce
+ */
+
+/* Customs fee display styles */
+.cfwc-fee-row th {
+  font-weight: normal;
+}
+
+.cfwc-tooltip {
+  cursor: help;
+  margin-left: 5px;
+}
+
+.cfwc-tooltip .dashicons {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.cfwc-disclaimer {
+  font-size: 0.9em;
+  color: #666;
+  font-style: italic;
+}
+
+.cfwc-order-fees {
+  margin-top: 20px;
+  padding: 15px;
+  background: #f7f7f7;
+  border-radius: 4px;
+}
+
+/* HS code display styles */
+.cfwc-hs-code {
+  display: block;
+  font-size: 0.875em;
+  color: #666;
+  margin-top: 4px;
+}
+
+.cfwc-origin {
+  display: inline-block;
+  margin-left: 10px;
+}

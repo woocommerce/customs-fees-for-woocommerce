@@ -51,16 +51,22 @@ class CFWC_Products {
 			return $product_name;
 		}
 		
+		// Don't add to blocks cart (handled by JavaScript)
+		if ( has_block( 'woocommerce/cart' ) ) {
+			return $product_name;
+		}
+		
 		$product_id = $cart_item['product_id'];
 		$hs_code = get_post_meta( $product_id, '_cfwc_hs_code', true );
 		$origin = get_post_meta( $product_id, '_cfwc_country_of_origin', true );
 		
 		if ( $hs_code || $origin ) {
-			$customs_info = '<div class="cfwc-product-customs-info" style="font-size: 0.875em; color: #666; margin-top: 5px;">';
+			// Use a break tag to ensure it appears on a new line right after product name
+			$customs_info = '<br/><small style="color: #666;">';
 			
 			if ( $hs_code ) {
 				$customs_info .= sprintf(
-					'<span class="cfwc-hs-code">%s: %s</span>',
+					'%s: %s',
 					__( 'HS Code', 'customs-fees-for-woocommerce' ),
 					esc_html( $hs_code )
 				);
@@ -75,13 +81,13 @@ class CFWC_Products {
 				}
 				
 				$customs_info .= sprintf(
-					'<span class="cfwc-origin">%s: %s</span>',
+					'%s: %s',
 					__( 'Origin', 'customs-fees-for-woocommerce' ),
 					esc_html( $origin_display )
 				);
 			}
 			
-			$customs_info .= '</div>';
+			$customs_info .= '</small>';
 			
 			$product_name .= $customs_info;
 		}
@@ -104,6 +110,11 @@ class CFWC_Products {
 			return $quantity_html;
 		}
 		
+		// Don't add to blocks checkout (handled by JavaScript)
+		if ( has_block( 'woocommerce/checkout' ) ) {
+			return $quantity_html;
+		}
+		
 		$product_id = $cart_item['product_id'];
 		$hs_code = get_post_meta( $product_id, '_cfwc_hs_code', true );
 		$origin = get_post_meta( $product_id, '_cfwc_country_of_origin', true );
@@ -119,7 +130,7 @@ class CFWC_Products {
 				if ( $hs_code ) {
 					$customs_info .= ', ';
 				}
-				$customs_info .= sprintf( 'Origin: %s', esc_html( $origin ) );
+				$customs_info .= sprintf( 'Origin: %s', esc_html( strtoupper( $origin ) ) );
 			}
 			
 			$customs_info .= '</div>';

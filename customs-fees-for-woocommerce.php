@@ -132,7 +132,7 @@ function cfwc_includes() {
 
 	// Block editor support (if WooCommerce Blocks is active).
 	if ( class_exists( 'Automattic\WooCommerce\Blocks\Package' ) ) {
-		require_once CFWC_PLUGIN_DIR . 'includes/blocks/class-cfwc-blocks.php';
+		require_once CFWC_PLUGIN_DIR . 'includes/class-cfwc-blocks.php';
 	}
 
 	// Email customizations.

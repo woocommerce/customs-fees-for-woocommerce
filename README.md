@@ -114,17 +114,31 @@ add_filter( 'cfwc_include_shipping_in_calculation', '__return_false' );
   - Tax-inclusive calculations
 
 - **Frontend Display**
-  - Cart and checkout integration (classic)
+  - Cart and checkout integration (classic & blocks)
   - Display modes (single line vs breakdown)
-  - Tooltip/help text with (?) icon
+  - Tooltip/help text with (?) icon (classic only)
+  - HS codes display (classic only)
   - Responsive design
   - Auto-translation support
+
+### WooCommerce Blocks Compatibility
+
+**What works with WooCommerce Blocks:**
+
+- ✅ Customs fees calculation and display
+- ✅ Fee rules based on country
+- ✅ Order processing with customs fees
+
+**What's available in Classic cart/checkout only:**
+
+- HS codes and Country of Origin display
+- Tooltip help text with (?) icons
+- These are platform limitations of WooCommerce Blocks
 
 #### Next Up:
 
 - Country of Origin tracking.
 - More accurate duty calculations.
-- WooCommerce Blocks checkout support
 - CSV import/export for rules
 - Product category-based rules
 - Weight-based calculations
