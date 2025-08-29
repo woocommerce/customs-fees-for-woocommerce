@@ -1,0 +1,59 @@
+/*!
+ * Customs Fees for WooCommerce - Frontend Styles
+ * Tooltip styles for fee explanation.
+ */
+
+.cfwc-tooltip {
+  display: inline-block;
+  position: relative;
+  margin-left: 5px;
+  cursor: help;
+}
+
+.cfwc-tooltip-icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  text-align: center;
+  border-radius: 50%;
+  background: #999;
+  color: #fff;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.cfwc-tooltip-text {
+  visibility: hidden;
+  width: 250px;
+  background-color: #333;
+  color: #fff;
+  text-align: left;
+  border-radius: 6px;
+  padding: 8px 10px;
+  position: absolute;
+  z-index: 999999;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -125px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.cfwc-tooltip-text::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #333 transparent transparent transparent;
+}
+
+.cfwc-tooltip:hover .cfwc-tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}

@@ -78,6 +78,12 @@ class CFWC_Loader {
 		// Admin hooks.
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
 
+		// Core plugin hooks/filters centralized here.
+		add_action( 'woocommerce_cart_calculate_fees', 'cfwc_calculate_customs_fees', 20 );
+		add_action( 'admin_notices', 'cfwc_activation_notice' );
+		add_filter( 'plugin_action_links_' . CFWC_PLUGIN_BASENAME, 'cfwc_plugin_action_links' );
+		add_filter( 'plugin_row_meta', 'cfwc_plugin_row_meta', 10, 2 );
+
 		// AJAX hooks.
 		add_action( 'wp_ajax_cfwc_save_rules', array( $this, 'ajax_save_rules' ) );
 		add_action( 'wp_ajax_cfwc_delete_rule', array( $this, 'ajax_delete_rule' ) );
@@ -108,9 +114,13 @@ class CFWC_Loader {
 			return;
 		}
 
-		// Check if fees are enabled.
-		if ( ! get_option( 'cfwc_enabled', false ) ) {
-			return;
+		// Resolve tooltip text (session takes precedence).
+		$tooltip_text = '';
+		if ( function_exists( 'WC' ) && WC()->session ) {
+			$tooltip_text = WC()->session->get( 'cfwc_tooltip_text', '' );
+		}
+		if ( empty( $tooltip_text ) ) {
+			$tooltip_text = get_option( 'cfwc_tooltip_text', '' );
 		}
 
 		// Enqueue styles.
@@ -130,21 +140,32 @@ class CFWC_Loader {
 			true
 		);
 
+		// Build fee labels array from rules and the generic label.
+		$rules  = get_option( 'cfwc_rules', array() );
+		$labels = array();
+		if ( is_array( $rules ) ) {
+			foreach ( $rules as $rule ) {
+				if ( is_array( $rule ) && ! empty( $rule['label'] ) ) {
+					$labels[] = $rule['label'];
+				}
+			}
+		}
+		$labels[] = __( 'Customs & Import Fees', 'customs-fees-for-woocommerce' );
+		$labels   = array_values( array_unique( $labels ) );
+
 		// Localize script with data.
 		wp_localize_script(
 			'cfwc-frontend',
 			'cfwc_params',
 			array(
-				'ajax_url'        => admin_url( 'admin-ajax.php' ),
-				'nonce'          => wp_create_nonce( 'cfwc-frontend' ),
-				'tooltip_text'   => get_option( 'cfwc_tooltip_text', '' ),
-				'show_tooltip'   => get_option( 'cfwc_show_tooltip', true ),
-				'require_agreement' => get_option( 'cfwc_require_agreement', true ),
-				'disclaimer_text' => get_option( 'cfwc_disclaimer_text', '' ),
-				'i18n' => array(
-					'fee_details'    => __( 'View fee details', 'customs-fees-for-woocommerce' ),
-					'loading'        => __( 'Loading...', 'customs-fees-for-woocommerce' ),
-					'error'          => __( 'An error occurred. Please try again.', 'customs-fees-for-woocommerce' ),
+				'ajax_url'     => admin_url( 'admin-ajax.php' ),
+				'nonce'        => wp_create_nonce( 'cfwc-frontend' ),
+				'tooltip_text' => wp_kses_post( $tooltip_text ),
+				'fee_labels'   => $labels,
+				'i18n'         => array(
+					'fee_details' => __( 'View fee details', 'customs-fees-for-woocommerce' ),
+					'loading'     => __( 'Loading...', 'customs-fees-for-woocommerce' ),
+					'error'       => __( 'An error occurred. Please try again.', 'customs-fees-for-woocommerce' ),
 				),
 			)
 		);
@@ -162,9 +183,12 @@ class CFWC_Loader {
 			return;
 		}
 
-		// Check if we're on our settings tab.
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		if ( ! isset( $_GET['tab'] ) || 'cfwc' !== $_GET['tab'] ) {
+		// Check if we're on our settings section under the Tax tab.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading URL parameters for conditional asset enqueue.
+		$tab     = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['tab'] ) ) : '';
+		$section = isset( $_GET['section'] ) ? sanitize_text_field( wp_unslash( $_GET['section'] ) ) : '';
+
+		if ( 'tax' !== $tab || 'customs' !== $section ) {
 			return;
 		}
 
