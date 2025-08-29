@@ -1,0 +1,4 @@
+*** Customs Fees for WooCommerce Changelog ***
+
+2025-08-29 - version 1.0.0
+* Initial release
