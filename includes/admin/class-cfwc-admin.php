@@ -35,9 +35,14 @@ class CFWC_Admin {
 		// Admin scripts and styles.
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		
-		// Add product fields.
-		add_action( 'woocommerce_product_options_general_product_data', array( $this, 'add_product_fields' ) );
+		// Add product fields to inventory tab for better UX.
+		add_action( 'woocommerce_product_options_inventory_product_data', array( $this, 'add_product_fields' ), 15 );
 		add_action( 'woocommerce_process_product_meta', array( $this, 'save_product_fields' ) );
+		
+		// Add customs info as order item meta in admin.
+		add_filter( 'woocommerce_order_item_display_meta_key', array( $this, 'format_meta_key' ), 10, 3 );
+		add_filter( 'woocommerce_order_item_display_meta_value', array( $this, 'format_meta_value' ), 10, 3 );
+		add_action( 'woocommerce_before_order_itemmeta', array( $this, 'display_customs_meta_in_order' ), 10, 3 );
 	}
 
 	/**
@@ -116,11 +121,15 @@ class CFWC_Admin {
 			return;
 		}
 
+		// Display customs fees summary.
 		$fees       = $order->get_fees();
 		$total_fees = 0;
 		
 		foreach ( $fees as $fee ) {
-			if ( strpos( $fee->get_name(), __( 'Customs & Import Fees', 'customs-fees-for-woocommerce' ) ) !== false ) {
+			if ( strpos( $fee->get_name(), __( 'Customs & Import Fees', 'customs-fees-for-woocommerce' ) ) !== false ||
+			     strpos( strtolower( $fee->get_name() ), 'customs' ) !== false ||
+			     strpos( strtolower( $fee->get_name() ), 'import' ) !== false ||
+			     strpos( strtolower( $fee->get_name() ), 'duty' ) !== false ) {
 				$total_fees += $fee->get_total();
 			}
 		}
@@ -131,6 +140,49 @@ class CFWC_Admin {
 		} else {
 			echo '<p>' . esc_html__( 'No customs fees applied to this order.', 'customs-fees-for-woocommerce' ) . '</p>';
 		}
+		
+		// Display HS codes and origin for order items.
+		$items = $order->get_items();
+		if ( ! empty( $items ) ) {
+			echo '<hr style="margin: 15px 0;">';
+			echo '<p><strong>' . esc_html__( 'Product Customs Information:', 'customs-fees-for-woocommerce' ) . '</strong></p>';
+			echo '<ul style="margin: 10px 0 0 20px;">';
+			
+			foreach ( $items as $item ) {
+				if ( ! is_a( $item, 'WC_Order_Item_Product' ) ) {
+					continue;
+				}
+				
+				$product = $item->get_product();
+				if ( ! $product ) {
+					continue;
+				}
+				
+				$product_id = $product->get_id();
+				$hs_code = get_post_meta( $product_id, '_cfwc_hs_code', true );
+				$origin = get_post_meta( $product_id, '_cfwc_country_of_origin', true );
+				
+				if ( $hs_code || $origin ) {
+					echo '<li>';
+					echo '<strong>' . esc_html( $item->get_name() ) . '</strong><br>';
+					
+					if ( $hs_code ) {
+						echo esc_html__( 'HS Code:', 'customs-fees-for-woocommerce' ) . ' ' . esc_html( $hs_code );
+						if ( $origin ) {
+							echo ' | ';
+						}
+					}
+					
+					if ( $origin ) {
+						echo esc_html__( 'Origin:', 'customs-fees-for-woocommerce' ) . ' ' . esc_html( strtoupper( $origin ) );
+					}
+					
+					echo '</li>';
+				}
+			}
+			
+			echo '</ul>';
+		}
 	}
 
 	/**
@@ -139,14 +191,21 @@ class CFWC_Admin {
 	 * @since 1.0.0
 	 */
 	public function add_product_fields() {
-		echo '<div class="options_group">';
+		echo '<div class="options_group show_if_simple show_if_variable">';
+		
+		// Add a separator heading for clarity.
+		echo '<p class="form-field" style="margin: 0; padding: 8px 12px; background: #f8f8f8; border-bottom: 1px solid #ddd;">';
+		echo '<strong>' . esc_html__( 'Customs & Import Information', 'customs-fees-for-woocommerce' ) . '</strong>';
+		echo '</p>';
 		
 		woocommerce_wp_text_input( array(
 			'id'          => '_cfwc_hs_code',
-			'label'       => __( 'HS Code', 'customs-fees-for-woocommerce' ),
-			'placeholder' => __( 'e.g., 6109.10', 'customs-fees-for-woocommerce' ),
+			'label'       => __( 'HS/Tariff Code', 'customs-fees-for-woocommerce' ),
+			'placeholder' => __( 'e.g., 6109.10 or 6109.10.0012', 'customs-fees-for-woocommerce' ),
 			'desc_tip'    => true,
-			'description' => __( 'Harmonized System code for customs classification.', 'customs-fees-for-woocommerce' ),
+			'description' => __( 'Harmonized System code for customs classification. This helps calculate accurate import duties.', 'customs-fees-for-woocommerce' ),
+			'type'        => 'text',
+			'class'       => 'short',
 		) );
 		
 		woocommerce_wp_text_input( array(
@@ -154,7 +213,13 @@ class CFWC_Admin {
 			'label'       => __( 'Country of Origin', 'customs-fees-for-woocommerce' ),
 			'placeholder' => __( 'e.g., CN, US, GB', 'customs-fees-for-woocommerce' ),
 			'desc_tip'    => true,
-			'description' => __( 'Two-letter country code where the product was manufactured.', 'customs-fees-for-woocommerce' ),
+			'description' => __( 'Two-letter ISO country code where the product was manufactured (e.g., CN for China, US for United States).', 'customs-fees-for-woocommerce' ),
+			'type'        => 'text',
+			'class'       => 'short',
+			'custom_attributes' => array(
+				'maxlength' => '2',
+				'style'     => 'text-transform: uppercase;',
+			),
 		) );
 		
 		echo '</div>';
@@ -235,5 +300,94 @@ class CFWC_Admin {
 				});
 			});
 		' );
+	}
+
+	/**
+	 * Display customs info as order item meta in admin.
+	 *
+	 * @since 1.0.0
+	 * @param int           $item_id Order item ID.
+	 * @param WC_Order_Item $item    Order item object.
+	 * @param WC_Product    $product Product object.
+	 */
+	public function display_customs_meta_in_order( $item_id, $item, $product ) {
+		// Only in admin and for product line items.
+		if ( ! is_admin() || ! is_a( $item, 'WC_Order_Item_Product' ) ) {
+			return;
+		}
+		
+		// Get product if not provided.
+		if ( ! $product ) {
+			$product = $item->get_product();
+		}
+		
+		if ( ! $product ) {
+			return;
+		}
+		
+		$product_id = $product->get_id();
+		$hs_code = get_post_meta( $product_id, '_cfwc_hs_code', true );
+		$origin = get_post_meta( $product_id, '_cfwc_country_of_origin', true );
+		
+		// Display as meta data similar to SKU.
+		if ( $hs_code || $origin ) {
+			echo '<div class="cfwc-order-item-meta" style="margin-top: 0.5em;">';
+			echo '<table cellspacing="0" class="display_meta">';
+			
+			if ( $hs_code ) {
+				echo '<tr>';
+				echo '<th>' . esc_html__( 'HS Code:', 'customs-fees-for-woocommerce' ) . '</th>';
+				echo '<td><p>' . esc_html( $hs_code ) . '</p></td>';
+				echo '</tr>';
+			}
+			
+			if ( $origin ) {
+				echo '<tr>';
+				echo '<th>' . esc_html__( 'Origin:', 'customs-fees-for-woocommerce' ) . '</th>';
+				echo '<td><p>' . esc_html( strtoupper( $origin ) ) . '</p></td>';
+				echo '</tr>';
+			}
+			
+			echo '</table>';
+			echo '</div>';
+		}
+	}
+
+	/**
+	 * Format meta key display.
+	 *
+	 * @since 1.0.0
+	 * @param string        $display_key Display key.
+	 * @param WC_Meta_Data  $meta        Meta data object.
+	 * @param WC_Order_Item $item        Order item object.
+	 * @return string
+	 */
+	public function format_meta_key( $display_key, $meta, $item ) {
+		if ( 'cfwc_hs_code' === $meta->key ) {
+			return __( 'HS Code', 'customs-fees-for-woocommerce' );
+		}
+		
+		if ( 'cfwc_origin' === $meta->key ) {
+			return __( 'Origin', 'customs-fees-for-woocommerce' );
+		}
+		
+		return $display_key;
+	}
+
+	/**
+	 * Format meta value display.
+	 *
+	 * @since 1.0.0
+	 * @param string        $display_value Display value.
+	 * @param WC_Meta_Data  $meta          Meta data object.
+	 * @param WC_Order_Item $item          Order item object.
+	 * @return string
+	 */
+	public function format_meta_value( $display_value, $meta, $item ) {
+		if ( 'cfwc_origin' === $meta->key ) {
+			return strtoupper( $display_value );
+		}
+		
+		return $display_value;
 	}
 }

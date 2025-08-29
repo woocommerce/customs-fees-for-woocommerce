@@ -137,6 +137,9 @@ function cfwc_includes() {
 
 	// Email customizations.
 	require_once CFWC_PLUGIN_DIR . 'includes/class-cfwc-emails.php';
+	
+	// Product HS Code support.
+	require_once CFWC_PLUGIN_DIR . 'includes/class-cfwc-products.php';
 }
 
 /**
@@ -184,6 +187,9 @@ function cfwc_initialize_components() {
 	// Initialize email customizations.
 	$emails = new CFWC_Emails();
 	$emails->init();
+	
+	// Initialize product HS Code support.
+	$products = new CFWC_Products();
 }
 
 /**

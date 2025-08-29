@@ -27,19 +27,19 @@ With the U.S. ending its de minimis exemption on **August 29, 2025**, all intern
 - [x] Email integration with fee display
 - [x] AJAX handlers for admin operations
 - [x] Streamlined admin settings page (simplified UX)
+- [x] **HS code and Country of Origin display** on all order pages and emails
+- [x] **Admin order meta box** shows product customs information
+- [x] **Admin order items** show HS code/origin as separate meta.
 
 ### In Progress
 
+- [ ] Beta testing
 - [ ] WooCommerce Blocks checkout integration (framework ready)
-- [ ] Admin UI JavaScript for rule management
-- [ ] Testing with real scenarios
 
 ### TODO
 
+- [ ] Admin UI JavaScript for enhanced rule management
 - [ ] CSV import/export functionality
-- [ ] Frontend tooltips and notices
-- [ ] Agreement checkbox at checkout
-- [ ] Create comprehensive testing suite
 - [ ] Add more preset templates
 - [ ] Performance optimization
 - [ ] Multi-language support (POT file)
@@ -120,17 +120,9 @@ add_filter( 'cfwc_include_shipping_in_calculation', '__return_false' );
   - Responsive design
   - Auto-translation support
 
-#### In Progress
+#### Next Up:
 
-- Display in order emails
-- Display in My Account order details
-- Admin order view integration
-
-#### Next Up: HS Code Integration
-
-- Add HS Code field to products.
 - Country of Origin tracking.
-- Display customs info throughout purchase flow.
 - More accurate duty calculations.
 - WooCommerce Blocks checkout support
 - CSV import/export for rules
