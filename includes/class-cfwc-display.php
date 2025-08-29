@@ -302,7 +302,7 @@ class CFWC_Display {
 	 */
 	private function render_fee_row( $label, $amount, $context = 'cart' ) {
 		$show_tooltip = get_option( 'cfwc_show_tooltip', true );
-		$tooltip_text = get_option( 'cfwc_tooltip_text', '' );
+		$tooltip_text = class_exists( 'CFWC_Settings' ) ? CFWC_Settings::get_default_help_text() : '';
 		
 		?>
 		<tr class="cfwc-fee-row fee">

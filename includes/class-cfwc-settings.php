@@ -62,7 +62,7 @@ class CFWC_Settings {
 	 * @return array Modified sections.
 	 */
 	public function add_customs_section( $sections ) {
-		$sections['customs'] = __( 'Customs Fees', 'customs-fees-for-woocommerce' );
+		$sections['customs'] = __( 'Customs & Import Fees', 'customs-fees-for-woocommerce' );
 		return $sections;
 	}
 
@@ -79,61 +79,8 @@ class CFWC_Settings {
 			return;
 		}
 		
-		// Get the subsection.
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading URL parameter for display purposes.
-		$subsection = isset( $_GET['subsection'] ) ? sanitize_text_field( wp_unslash( $_GET['subsection'] ) ) : '';
-		
-		// Output subsection navigation.
-		$this->output_subsection_nav( $subsection );
-		
-		// Output the appropriate settings based on subsection.
-		if ( 'rules' === $subsection ) {
-			$this->render_rules_section();
-		} else {
-			$this->render_general_section();
-		}
-	}
-	
-	/**
-	 * Output subsection navigation.
-	 *
-	 * @since 1.0.0
-	 * @param string $current_subsection Current subsection.
-	 */
-	private function output_subsection_nav( $current_subsection ) {
-		$subsections = array(
-			''          => __( 'Settings', 'customs-fees-for-woocommerce' ),
-			'rules'     => __( 'Fee Rules', 'customs-fees-for-woocommerce' ),
-		);
-		
-		echo '<ul class="subsubsub">';
-		
-		$array_keys = array_keys( $subsections );
-		foreach ( $subsections as $id => $label ) {
-			echo '<li>';
-			
-			$url = admin_url( 'admin.php?page=wc-settings&tab=tax&section=customs' );
-			if ( $id ) {
-				$url .= '&subsection=' . sanitize_title( $id );
-			}
-			
-			$class = ( $current_subsection === $id ) ? 'current' : '';
-			
-			printf(
-				'<a href="%s" class="%s">%s</a>',
-				esc_url( $url ),
-				esc_attr( $class ),
-				esc_html( $label )
-			);
-			
-			if ( end( $array_keys ) !== $id ) {
-				echo ' | ';
-			}
-			
-			echo '</li>';
-		}
-		
-		echo '</ul><br class="clear" />';
+		// Render the consolidated rules and settings section.
+		$this->render_consolidated_section();
 	}
 
 	/**
@@ -150,19 +97,8 @@ class CFWC_Settings {
 		}
 		
 		try {
-			// Get the subsection.
-			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading URL parameter for display purposes.
-			$subsection = isset( $_GET['subsection'] ) ? sanitize_text_field( wp_unslash( $_GET['subsection'] ) ) : '';
-			
-			// Save the appropriate settings based on subsection.
-			if ( 'rules' === $subsection ) {
-				$this->save_rules();
-			} else {
-				$settings = $this->get_general_settings();
-				if ( ! empty( $settings ) ) {
-					WC_Admin_Settings::save_fields( $settings );
-				}
-			}
+			// Save rules.
+			$this->save_rules();
 			
 			// Clear any cached data.
 			wp_cache_flush();
@@ -190,66 +126,11 @@ class CFWC_Settings {
 	}
 
 	/**
-	 * Render general settings section.
+	 * Render consolidated settings and rules section.
 	 *
 	 * @since 1.0.0
 	 */
-	private function render_general_section() {
-		$settings = $this->get_general_settings();
-		WC_Admin_Settings::output_fields( $settings );
-	}
-
-	/**
-	 * Get general settings fields.
-	 *
-	 * @since 1.0.0
-	 * @return array Settings fields.
-	 */
-	private function get_general_settings() {
-		$settings = array(
-			array(
-				'title' => __( 'Customs Fees Settings', 'customs-fees-for-woocommerce' ),
-				'type'  => 'title',
-				'desc'  => '',
-				'id'    => 'cfwc_general_settings',
-			),
-			array(
-				'title'   => __( 'Display Mode', 'customs-fees-for-woocommerce' ),
-				'desc'    => __( 'Choose how fees appear at checkout', 'customs-fees-for-woocommerce' ),
-				'id'      => 'cfwc_display_mode',
-				'type'    => 'select',
-				'default' => 'single',
-				'options' => array(
-					'single'    => __( 'Single line item', 'customs-fees-for-woocommerce' ),
-					'breakdown' => __( 'Detailed breakdown', 'customs-fees-for-woocommerce' ),
-				),
-			),
-			array(
-				'title'       => __( 'Help Text', 'customs-fees-for-woocommerce' ),
-				'desc'        => __( 'Optional tooltip shown next to customs fees', 'customs-fees-for-woocommerce' ),
-				'id'          => 'cfwc_tooltip_text',
-				'type'        => 'textarea',
-				'default'     => 'Estimated import duties and taxes based on destination country.',
-				'css'         => 'width: 400px; height: 50px; resize: vertical;',
-				'custom_attributes' => array(
-					'rows' => 2,
-				),
-			),
-			array(
-				'type' => 'sectionend',
-				'id'   => 'cfwc_general_settings',
-			),
-		);
-
-		return apply_filters( 'cfwc_general_settings', $settings );
-	}
-
-	/**
-	 * Render fee rules section.
-	 *
-	 * @since 1.0.0
-	 */
-	private function render_rules_section() {
+	private function render_consolidated_section() {
 		// Get saved rules.
 		$rules = get_option( 'cfwc_rules', array() );
 		
@@ -257,8 +138,14 @@ class CFWC_Settings {
 		$templates_handler = new CFWC_Templates();
 		$templates = $templates_handler->get_templates();
 		
-		// Include the rules template.
-		include CFWC_PLUGIN_DIR . 'includes/admin/views/rules-section.php';
+		?>
+		<div class="cfwc-settings-wrapper">
+			<h2><?php esc_html_e( 'Customs & Import Fees Settings', 'customs-fees-for-woocommerce' ); ?></h2>
+			
+			<!-- Include the rules template -->
+			<?php include CFWC_PLUGIN_DIR . 'includes/admin/views/rules-section.php'; ?>
+		</div>
+		<?php
 	}
 
 	/**
@@ -303,15 +190,14 @@ class CFWC_Settings {
 					}
 					
 					$sanitized_rule = array(
-						'country'   => isset( $rule['country'] ) ? sanitize_text_field( $rule['country'] ) : '',
-						'type'      => isset( $rule['type'] ) ? sanitize_text_field( $rule['type'] ) : 'percentage',
-						'rate'      => isset( $rule['rate'] ) ? floatval( $rule['rate'] ) : 0,
-						'amount'    => isset( $rule['amount'] ) ? floatval( $rule['amount'] ) : 0,
-						'minimum'   => isset( $rule['minimum'] ) ? floatval( $rule['minimum'] ) : 0,
-						'maximum'   => isset( $rule['maximum'] ) ? floatval( $rule['maximum'] ) : 0,
-						'label'     => isset( $rule['label'] ) ? sanitize_text_field( $rule['label'] ) : '',
-						'taxable'   => isset( $rule['taxable'] ) ? (bool) $rule['taxable'] : true,
-						'tax_class' => isset( $rule['tax_class'] ) ? sanitize_text_field( $rule['tax_class'] ) : '',
+						'country'        => isset( $rule['country'] ) ? sanitize_text_field( $rule['country'] ) : '',
+						'origin_country' => isset( $rule['origin_country'] ) ? sanitize_text_field( $rule['origin_country'] ) : '',
+						'type'           => isset( $rule['type'] ) ? sanitize_text_field( $rule['type'] ) : 'percentage',
+						'rate'           => isset( $rule['rate'] ) ? floatval( $rule['rate'] ) : 0,
+						'amount'         => isset( $rule['amount'] ) ? floatval( $rule['amount'] ) : 0,
+						'label'          => isset( $rule['label'] ) ? sanitize_text_field( $rule['label'] ) : '',
+						'taxable'        => isset( $rule['taxable'] ) ? (bool) $rule['taxable'] : true,
+						'tax_class'      => isset( $rule['tax_class'] ) ? sanitize_text_field( $rule['tax_class'] ) : '',
 					);
 					
 					// Only add if country is set.
@@ -354,5 +240,15 @@ class CFWC_Settings {
 		);
 
 		return apply_filters( 'cfwc_countries_for_rules', $countries );
+	}
+	
+	/**
+	 * Get default help tooltip text.
+	 *
+	 * @since 1.0.0
+	 * @return string Default help text.
+	 */
+	public static function get_default_help_text() {
+		return __( 'Estimated import duties and taxes based on destination country.', 'customs-fees-for-woocommerce' );
 	}
 }

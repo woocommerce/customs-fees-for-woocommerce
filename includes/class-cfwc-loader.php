@@ -137,7 +137,7 @@ class CFWC_Loader {
 			array(
 				'ajax_url'        => admin_url( 'admin-ajax.php' ),
 				'nonce'          => wp_create_nonce( 'cfwc-frontend' ),
-				'tooltip_text'   => get_option( 'cfwc_tooltip_text', '' ),
+				'tooltip_text'   => class_exists( 'CFWC_Settings' ) ? CFWC_Settings::get_default_help_text() : '',
 				'show_tooltip'   => get_option( 'cfwc_show_tooltip', true ),
 				'require_agreement' => get_option( 'cfwc_require_agreement', true ),
 				'disclaimer_text' => get_option( 'cfwc_disclaimer_text', '' ),

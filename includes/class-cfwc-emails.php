@@ -213,7 +213,7 @@ class CFWC_Emails {
 		}
 
 		// Get tooltip/help text.
-		$tooltip_text = get_option( 'cfwc_tooltip_text', '' );
+		$tooltip_text = class_exists( 'CFWC_Settings' ) ? CFWC_Settings::get_default_help_text() : '';
 		
 		if ( $plain_text ) {
 			echo "\n" . esc_html__( 'CUSTOMS & IMPORT INFORMATION', 'customs-fees-for-woocommerce' ) . "\n";

@@ -16,8 +16,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 
 <div class="cfwc-rules-section">
-	<h2><?php esc_html_e( 'Fee Rules', 'customs-fees-for-woocommerce' ); ?></h2>
-	<p><?php esc_html_e( 'Configure customs fee rules based on destination countries.', 'customs-fees-for-woocommerce' ); ?></p>
 	
 	<!-- Quick Preset Loader -->
 	<div class="cfwc-preset-loader">
@@ -38,8 +36,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<button type="button" class="button button-primary cfwc-add-preset">
 			<?php esc_html_e( 'Add Preset Rules', 'customs-fees-for-woocommerce' ); ?>
 		</button>
-		<button type="button" class="button cfwc-replace-preset">
-			<?php esc_html_e( 'Replace All Rules', 'customs-fees-for-woocommerce' ); ?>
+		<button type="button" class="button cfwc-delete-all">
+			<?php esc_html_e( 'Delete All Rules', 'customs-fees-for-woocommerce' ); ?>
 		</button>
 		
 		<div id="cfwc-preset-description" style="margin-top: 10px; display: none;">
@@ -51,25 +49,45 @@ if ( ! defined( 'ABSPATH' ) ) {
 	
 	<!-- Rules Table -->
 	<div class="cfwc-rules-table">
-		<h3><?php esc_html_e( 'Current Rules', 'customs-fees-for-woocommerce' ); ?></h3>
+		<div class="cfwc-rules-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+			<div>
+				<h3 style="margin: 0 0 5px 0;"><?php esc_html_e( 'All Rules', 'customs-fees-for-woocommerce' ); ?></h3>
+				<p style="margin: 0; color: #666;"><?php esc_html_e( 'Configure customs fee rules based on destination countries and product origins.', 'customs-fees-for-woocommerce' ); ?></p>
+			</div>
+			<button type="button" class="button cfwc-add-rule">
+				<?php esc_html_e( 'Add New Rule', 'customs-fees-for-woocommerce' ); ?>
+			</button>
+		</div>
 		
 		<table class="widefat fixed striped">
 			<thead>
 				<tr>
-					<th><?php esc_html_e( 'Country', 'customs-fees-for-woocommerce' ); ?></th>
-					<th><?php esc_html_e( 'Type', 'customs-fees-for-woocommerce' ); ?></th>
-					<th><?php esc_html_e( 'Rate/Amount', 'customs-fees-for-woocommerce' ); ?></th>
-					<th><?php esc_html_e( 'Minimum', 'customs-fees-for-woocommerce' ); ?></th>
-					<th><?php esc_html_e( 'Maximum', 'customs-fees-for-woocommerce' ); ?></th>
-					<th><?php esc_html_e( 'Label', 'customs-fees-for-woocommerce' ); ?></th>
-					<th><?php esc_html_e( 'Actions', 'customs-fees-for-woocommerce' ); ?></th>
+					<th style="width: 20%;"><?php esc_html_e( 'Label', 'customs-fees-for-woocommerce' ); ?></th>
+					<th style="width: 18%;"><?php esc_html_e( 'Destination', 'customs-fees-for-woocommerce' ); ?></th>
+					<th style="width: 18%;"><?php esc_html_e( 'Origin Country', 'customs-fees-for-woocommerce' ); ?></th>
+					<th style="width: 12%;"><?php esc_html_e( 'Type', 'customs-fees-for-woocommerce' ); ?></th>
+					<th style="width: 12%;"><?php esc_html_e( 'Rate/Amount', 'customs-fees-for-woocommerce' ); ?></th>
+					<th style="width: 20%;"><?php esc_html_e( 'Actions', 'customs-fees-for-woocommerce' ); ?></th>
 				</tr>
 			</thead>
 			<tbody id="cfwc-rules-tbody">
 				<?php if ( ! empty( $rules ) ) : ?>
 					<?php foreach ( $rules as $index => $rule ) : ?>
 						<tr>
+							<td><?php echo esc_html( $rule['label'] ?? '' ); ?></td>
 							<td><?php echo esc_html( WC()->countries->countries[ $rule['country'] ] ?? $rule['country'] ); ?></td>
+							<td>
+								<?php 
+								$origin = $rule['origin_country'] ?? '';
+								if ( empty( $origin ) ) {
+									esc_html_e( 'All Origins', 'customs-fees-for-woocommerce' );
+								} elseif ( 'EU' === $origin ) {
+									esc_html_e( 'EU Countries', 'customs-fees-for-woocommerce' );
+								} else {
+									echo esc_html( WC()->countries->countries[ $origin ] ?? $origin );
+								}
+								?>
+							</td>
 							<td><?php echo esc_html( ucfirst( $rule['type'] ) ); ?></td>
 							<td>
 								<?php
@@ -80,9 +98,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 								}
 								?>
 							</td>
-							<td><?php echo wp_kses_post( wc_price( $rule['minimum'] ?? 0 ) ); ?></td>
-							<td><?php echo wp_kses_post( wc_price( $rule['maximum'] ?? 0 ) ); ?></td>
-							<td><?php echo esc_html( $rule['label'] ?? '' ); ?></td>
 							<td>
 								<button type="button" class="button cfwc-edit-rule" data-index="<?php echo esc_attr( $index ); ?>">
 									<?php esc_html_e( 'Edit', 'customs-fees-for-woocommerce' ); ?>
@@ -95,17 +110,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<?php endforeach; ?>
 				<?php else : ?>
 					<tr class="no-rules">
-						<td colspan="7"><?php esc_html_e( 'No rules configured. Use the preset loader above or add rules manually.', 'customs-fees-for-woocommerce' ); ?></td>
+						<td colspan="6"><?php esc_html_e( 'No rules configured. Use the preset loader above or add rules manually.', 'customs-fees-for-woocommerce' ); ?></td>
 					</tr>
 				<?php endif; ?>
 			</tbody>
 		</table>
-		
-		<p>
-			<button type="button" class="button button-primary cfwc-add-rule">
-				<?php esc_html_e( 'Add New Rule', 'customs-fees-for-woocommerce' ); ?>
-			</button>
-		</p>
 	</div>
 	
 	<!-- Hidden input for rules data -->
@@ -128,46 +137,94 @@ if ( ! defined( 'ABSPATH' ) ) {
 	margin-top: 0;
 }
 
-.cfwc-notice {
-	display: none;
-	margin: 10px 0;
-	padding: 10px;
-	border-left: 4px solid #00a0d2;
-	background: #f0f8ff;
+/* Admin notice styles - Fixed positioning and width */
+.cfwc-admin-notice {
+	position: relative;
+	margin: 5px 0 15px;
+	padding: 12px 40px 12px 12px;
+	border: 1px solid transparent;
+	border-left-width: 4px;
+	box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
+	background: #fff;
+	display: block;
 }
 
-.cfwc-notice.error {
-	border-color: #dc3232;
-	background: #fbeaea;
+.cfwc-admin-notice.error {
+	border-left-color: #dc3232;
 }
 
-.cfwc-notice.warning {
-	border-color: #ffb900;
-	background: #fff8e5;
+.cfwc-admin-notice.warning {
+	border-left-color: #ffb900;
 }
 
-.cfwc-notice.info {
-	border-color: #00a0d2;
-	background: #f0f8ff;
+.cfwc-admin-notice.info {
+	border-left-color: #00a0d2;
 }
 
-.cfwc-notice.success {
-	border-color: #46b450;
-	background: #ecf7ed;
+.cfwc-admin-notice.success {
+	border-left-color: #46b450;
 }
 
-/* Preset buttons */
-.cfwc-replace-preset {
+.cfwc-admin-notice .notice-message {
+	margin: 0;
+	padding: 0;
+}
+
+.cfwc-admin-notice button.notice-dismiss {
+	position: absolute;
+	top: 0;
+	right: 1px;
+	border: none;
+	margin: 0;
+	padding: 9px;
+	background: none;
+	color: #b4b9be;
+	cursor: pointer;
+	width: 36px;
+	height: 36px;
+	text-align: center;
+}
+
+.cfwc-admin-notice button.notice-dismiss:before {
+	content: "\f153";
+	font: normal 16px/20px dashicons;
+	speak: never;
+	display: block;
+	width: 20px;
+	height: 20px;
+	text-align: center;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.cfwc-admin-notice button.notice-dismiss:hover {
+	color: #c00;
+}
+
+.cfwc-admin-notice button.notice-dismiss:focus {
+	outline: none;
+	box-shadow: 0 0 0 1px #5b9dd9, 0 0 2px 1px rgba(30,140,190,.8);
+}
+
+/* Delete all button styles */
+.cfwc-delete-all {
 	margin-left: 10px;
+	color: #a00;
+	border-color: #a00;
 }
 
-.cfwc-replace-preset.confirm-replace {
+.cfwc-delete-all:hover {
+	color: #dc3232;
+	border-color: #dc3232;
+}
+
+.cfwc-delete-all.confirm-delete {
 	background: #d63638;
 	border-color: #d63638;
 	color: #fff;
 }
 
-.cfwc-replace-preset.confirm-replace:hover {
+.cfwc-delete-all.confirm-delete:hover {
 	background: #b32d2e;
 	border-color: #b32d2e;
 	color: #fff;
@@ -184,6 +241,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 	transition: opacity 0.3s;
 }
 
+/* Table styling improvements */
+.cfwc-rules-table table {
+	table-layout: fixed;
+}
+
+.cfwc-rules-table th,
+.cfwc-rules-table td {
+	padding: 10px;
+	vertical-align: middle;
+}
+
 /* Editing row styles */
 .cfwc-rule-editing {
 	background: #f0f8ff;
@@ -198,6 +266,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 	width: 100%;
 	max-width: 100%;
 }
+
+/* WooCommerce native select2 styling - match WooCommerce exactly */
+.cfwc-rule-editing .wc-enhanced-select,
+.cfwc-country-select,
+.cfwc-origin-select {
+	min-width: 150px !important;
+	max-width: 100% !important;
+	width: 100% !important;
+}
+
+/* Let WooCommerce handle Select2 styling natively */
 </style>
 
 <script>
@@ -229,6 +308,27 @@ jQuery(document).ready(function($) {
 		$saveButtons.first().animate({opacity: 0.5}, 200).animate({opacity: 1}, 200);
 	}
 	
+	// Initialize Select2 using WooCommerce's native enhanced select
+	function initCountrySelect(selector) {
+		// Use WooCommerce's native enhanced select functionality
+		if ( typeof wc_enhanced_select_params !== 'undefined' ) {
+			$(selector).selectWoo({
+				minimumResultsForSearch: 10,
+				allowClear: true,
+				placeholder: $(selector).data('placeholder') || wc_enhanced_select_params.i18n_no_matches,
+				width: '100%'
+			}).addClass('enhanced');
+		} else if ($.fn.select2) {
+			// Fallback to regular select2
+			$(selector).select2({
+				minimumResultsForSearch: 10,
+				allowClear: true,
+				placeholder: '<?php echo esc_js( __( 'Select a country', 'customs-fees-for-woocommerce' ) ); ?>',
+				width: '100%'
+			});
+		}
+	}
+	
 	// Preset data for descriptions
 	var presetData = <?php echo wp_json_encode( $templates ); ?>;
 	
@@ -256,38 +356,34 @@ jQuery(document).ready(function($) {
 		applyPreset(presetId, true); // true = add to existing
 	});
 	
-	// Replace all rules (secondary action - requires double-click confirmation)
-	$('.cfwc-replace-preset').on('click', function() {
-		var presetId = $('#cfwc-preset-select').val();
-		if (!presetId) {
-			showNotice('<?php echo esc_js( __( 'Please select a preset first.', 'customs-fees-for-woocommerce' ) ); ?>', 'error');
+	// Delete all rules
+	$('.cfwc-delete-all').on('click', function() {
+		// Check if there are existing rules
+		var existingRules = $('.cfwc-rules-table tbody tr').not('.no-rules').length;
+		if (existingRules === 0) {
+			showNotice('<?php echo esc_js( __( 'No rules to delete.', 'customs-fees-for-woocommerce' ) ); ?>', 'warning');
 			return;
 		}
 		
-		// Check if there are existing rules
-		var existingRules = $('.cfwc-rules-table tbody tr').not('.no-rules').length;
-		if (existingRules > 0) {
-			// Require double-click confirmation for safety
-			if ($(this).hasClass('confirm-replace')) {
-				// Second click - proceed
-				showNotice('<?php echo esc_js( __( 'Replacing all rules...', 'customs-fees-for-woocommerce' ) ); ?>', 'info');
-				applyPreset(presetId, false); // false = replace all
-				$(this).removeClass('confirm-replace').text('<?php echo esc_js( __( 'Replace All Rules', 'customs-fees-for-woocommerce' ) ); ?>');
-			} else {
-				// First click - show warning
-				showNotice('<?php echo esc_js( __( 'Warning: This will remove all existing rules. Click again to confirm.', 'customs-fees-for-woocommerce' ) ); ?>', 'warning');
-				$(this).addClass('confirm-replace').text('<?php echo esc_js( __( 'Click to Confirm Replace', 'customs-fees-for-woocommerce' ) ); ?>');
-				
-				// Reset button after 5 seconds
-				var $button = $(this);
-				setTimeout(function() {
-					$button.removeClass('confirm-replace').text('<?php echo esc_js( __( 'Replace All Rules', 'customs-fees-for-woocommerce' ) ); ?>');
-				}, 5000);
-			}
+		// Require confirmation
+		if ($(this).hasClass('confirm-delete')) {
+			// Second click - proceed
+			var rules = [];
+			$('#cfwc_rules').val(JSON.stringify(rules));
+			updateRulesTable(rules);
+			enableSaveButton();
+			showNotice('<?php echo esc_js( __( 'All rules deleted. Remember to click "Save changes" to persist.', 'customs-fees-for-woocommerce' ) ); ?>', 'success');
+			$(this).removeClass('confirm-delete').text('<?php echo esc_js( __( 'Delete All Rules', 'customs-fees-for-woocommerce' ) ); ?>');
 		} else {
-			// No existing rules, just load the preset
-			showNotice('<?php echo esc_js( __( 'Loading preset rules...', 'customs-fees-for-woocommerce' ) ); ?>', 'info');
-			applyPreset(presetId, false);
+			// First click - show warning
+			showNotice('<?php echo esc_js( __( 'Warning: This will delete all existing rules. Click again to confirm.', 'customs-fees-for-woocommerce' ) ); ?>', 'warning');
+			$(this).addClass('confirm-delete').text('<?php echo esc_js( __( 'Click to Confirm Delete', 'customs-fees-for-woocommerce' ) ); ?>');
+			
+			// Reset button after 5 seconds
+			var $button = $(this);
+			setTimeout(function() {
+				$button.removeClass('confirm-delete').text('<?php echo esc_js( __( 'Delete All Rules', 'customs-fees-for-woocommerce' ) ); ?>');
+			}, 5000);
 		}
 	});
 	
@@ -328,16 +424,57 @@ jQuery(document).ready(function($) {
 		});
 	}
 	
-	// Show inline notice
+	// Show admin notice - Fixed positioning
 	function showNotice(message, type) {
-		var notice = $('<div class="cfwc-notice ' + type + '">' + message + '</div>');
-		$('.cfwc-preset-loader').append(notice);
-		notice.fadeIn();
-		setTimeout(function() {
-			notice.fadeOut(function() {
-				notice.remove();
+		// Remove any existing notices
+		$('.cfwc-admin-notice').remove();
+		
+		var noticeHtml = '<div class="cfwc-admin-notice notice is-dismissible ' + type + '">' +
+			'<p class="notice-message">' + message + '</p>' +
+			'<button type="button" class="notice-dismiss"><span class="screen-reader-text"><?php echo esc_js( __( 'Dismiss this notice', 'customs-fees-for-woocommerce' ) ); ?></span></button>' +
+			'</div>';
+		
+		var $notice = $(noticeHtml);
+		
+		// Insert after the preset loader section
+		$('.cfwc-preset-loader').after($notice);
+		
+		// Dismiss on click
+		$notice.find('.notice-dismiss').on('click', function() {
+			$notice.fadeOut(300, function() {
+				$notice.remove();
 			});
-		}, 3000);
+		});
+		
+		// Auto-dismiss after 10 seconds (longer duration for better readability)
+		setTimeout(function() {
+			$notice.fadeOut(300, function() {
+				$notice.remove();
+			});
+		}, 10000);
+	}
+	
+	// Build country options
+	function getCountryOptions(selectedCountry) {
+		var countries = <?php echo wp_json_encode( WC()->countries->get_countries() ); ?>;
+		var html = '<option value=""><?php echo esc_js( __( 'Select country...', 'customs-fees-for-woocommerce' ) ); ?></option>';
+		for (var code in countries) {
+			html += '<option value="' + code + '"' + (code === selectedCountry ? ' selected' : '') + '>' + countries[code] + '</option>';
+		}
+		return html;
+	}
+	
+	// Build origin country options (including special options)
+	function getOriginOptions(selectedOrigin) {
+		var countries = <?php echo wp_json_encode( WC()->countries->get_countries() ); ?>;
+		var html = '<option value=""><?php echo esc_js( __( 'All Origins', 'customs-fees-for-woocommerce' ) ); ?></option>';
+		html += '<option value="EU"' + (selectedOrigin === 'EU' ? ' selected' : '') + '><?php echo esc_js( __( 'EU Countries', 'customs-fees-for-woocommerce' ) ); ?></option>';
+		html += '<optgroup label="<?php echo esc_js( __( 'Specific Country', 'customs-fees-for-woocommerce' ) ); ?>">';
+		for (var code in countries) {
+			html += '<option value="' + code + '"' + (code === selectedOrigin ? ' selected' : '') + '>' + countries[code] + '</option>';
+		}
+		html += '</optgroup>';
+		return html;
 	}
 	
 	// Add new rule functionality
@@ -349,13 +486,12 @@ jQuery(document).ready(function($) {
 		
 		// Create new empty rule
 		var newRule = {
+			label: '',
 			country: '',
+			origin_country: '',
 			type: 'percentage',
 			rate: 0,
 			amount: 0,
-			minimum: 0,
-			maximum: 0,
-			label: '',
 			taxable: true,
 			tax_class: ''
 		};
@@ -369,15 +505,17 @@ jQuery(document).ready(function($) {
 		// Create new row HTML (editable fields)
 		var newRowHtml = '<tr class="cfwc-rule-row cfwc-rule-editing">';
 		
-		// Country selector
-		newRowHtml += '<td><select name="cfwc_rule_country" class="cfwc-rule-field" data-field="country" style="width: 100%;">';
-		newRowHtml += '<option value=""><?php echo esc_js( __( 'Select country...', 'customs-fees-for-woocommerce' ) ); ?></option>';
-		<?php
-		$countries = WC()->countries->get_countries();
-		foreach ( $countries as $code => $name ) {
-			echo 'newRowHtml += \'<option value="' . esc_attr( $code ) . '">' . esc_js( $name ) . '</option>\';' . "\n";
-		}
-		?>
+		// Label input (first column)
+		newRowHtml += '<td><input type="text" name="cfwc_rule_label" class="cfwc-rule-field" data-field="label" value="" placeholder="<?php echo esc_attr( __( 'Fee label', 'customs-fees-for-woocommerce' ) ); ?>" style="width: 100%;" /></td>';
+		
+		// Destination country selector - use wc-enhanced-select class
+		newRowHtml += '<td><select name="cfwc_rule_country" class="cfwc-rule-field cfwc-country-select wc-enhanced-select" data-field="country" data-placeholder="<?php echo esc_attr( __( 'Choose a country...', 'customs-fees-for-woocommerce' ) ); ?>">';
+		newRowHtml += getCountryOptions('');
+		newRowHtml += '</select></td>';
+		
+		// Origin country selector - use wc-enhanced-select class
+		newRowHtml += '<td><select name="cfwc_rule_origin" class="cfwc-rule-field cfwc-origin-select wc-enhanced-select" data-field="origin_country" data-placeholder="<?php echo esc_attr( __( 'Choose origin...', 'customs-fees-for-woocommerce' ) ); ?>">';
+		newRowHtml += getOriginOptions('');
 		newRowHtml += '</select></td>';
 		
 		// Type selector
@@ -389,134 +527,43 @@ jQuery(document).ready(function($) {
 		// Rate/Amount input
 		newRowHtml += '<td><input type="number" name="cfwc_rule_rate" class="cfwc-rule-field" data-field="rate" value="0" step="0.01" style="width: 80px;" /></td>';
 		
-		// Minimum input
-		newRowHtml += '<td><input type="number" name="cfwc_rule_minimum" class="cfwc-rule-field" data-field="minimum" value="0" step="0.01" style="width: 80px;" /></td>';
-		
-		// Maximum input
-		newRowHtml += '<td><input type="number" name="cfwc_rule_maximum" class="cfwc-rule-field" data-field="maximum" value="0" step="0.01" style="width: 80px;" /></td>';
-		
-		// Label input
-		newRowHtml += '<td><input type="text" name="cfwc_rule_label" class="cfwc-rule-field" data-field="label" value="" placeholder="<?php echo esc_attr( __( 'Fee label', 'customs-fees-for-woocommerce' ) ); ?>" style="width: 100%;" /></td>';
-		
 		// Actions
 		newRowHtml += '<td>';
-		newRowHtml += '<button type="button" class="button cfwc-save-rule"><?php echo esc_js( __( 'Save', 'customs-fees-for-woocommerce' ) ); ?></button> ';
-		newRowHtml += '<button type="button" class="button cfwc-cancel-rule"><?php echo esc_js( __( 'Cancel', 'customs-fees-for-woocommerce' ) ); ?></button>';
+		newRowHtml += '<button type="button" class="button button-primary cfwc-save-rule"><?php echo esc_js( __( 'Save', 'customs-fees-for-woocommerce' ) ); ?></button> ';
+		newRowHtml += '<button type="button" class="button cfwc-cancel-edit"><?php echo esc_js( __( 'Cancel', 'customs-fees-for-woocommerce' ) ); ?></button>';
 		newRowHtml += '</td>';
 		
 		newRowHtml += '</tr>';
 		
-		// Remove "no rules" message if present
-		$('#cfwc-rules-tbody .no-rules').remove();
+		// Remove "no rules" row if exists
+		$('.cfwc-rules-table tbody .no-rules').remove();
 		
-		// Add the new row
-		var $newRow = $(newRowHtml);
-		$('#cfwc-rules-tbody').append($newRow);
+		// Add new row to table
+		$('.cfwc-rules-table tbody').append(newRowHtml);
 		
-		// Store the index
-		$newRow.data('index', rules.length - 1);
+		// Initialize Select2 on new selects
+		initCountrySelect('.cfwc-rules-table tbody tr:last .cfwc-country-select');
+		initCountrySelect('.cfwc-rules-table tbody tr:last .cfwc-origin-select');
 		
-		// Fade in the new row
-		$newRow.hide().fadeIn(300);
+		// Scroll to new row
+		$('html, body').animate({
+			scrollTop: $('.cfwc-rules-table tbody tr:last').offset().top - 100
+		}, 500);
 		
-		// Focus on first input
-		$newRow.find('select[name="cfwc_rule_country"]').focus();
+		// Focus on label field
+		$('.cfwc-rules-table tbody tr:last input[name="cfwc_rule_label"]').focus();
 		
-		// Show notice
-		showNotice('<?php echo esc_js( __( 'Configure your new rule and click Save.', 'customs-fees-for-woocommerce' ) ); ?>', 'info');
-	});
-	
-	// Save new/edited rule
-	$(document).on('click', '.cfwc-save-rule', function(e) {
-		e.preventDefault();
-		
-		var $row = $(this).closest('tr');
-		var index = $row.data('index');
-		var rules = JSON.parse($('#cfwc_rules').val() || '[]');
-		
-		// Get values from form fields
-		var updatedRule = {
-			country: $row.find('[data-field="country"]').val(),
-			type: $row.find('[data-field="type"]').val(),
-			rate: parseFloat($row.find('[data-field="rate"]').val()) || 0,
-			amount: parseFloat($row.find('[data-field="rate"]').val()) || 0, // Use rate field for both
-			minimum: parseFloat($row.find('[data-field="minimum"]').val()) || 0,
-			maximum: parseFloat($row.find('[data-field="maximum"]').val()) || 0,
-			label: $row.find('[data-field="label"]').val(),
-			taxable: true,
-			tax_class: ''
-		};
-		
-		// Validate
-		if (!updatedRule.country) {
-			showNotice('<?php echo esc_js( __( 'Please select a country.', 'customs-fees-for-woocommerce' ) ); ?>', 'error');
-			$row.find('[data-field="country"]').focus();
-			return;
-		}
-		
-		if (!updatedRule.label) {
-			showNotice('<?php echo esc_js( __( 'Please enter a fee label.', 'customs-fees-for-woocommerce' ) ); ?>', 'error');
-			$row.find('[data-field="label"]').focus();
-			return;
-		}
-		
-		// Update rule in array
-		rules[index] = updatedRule;
-		
-		// Save to hidden field
-		$('#cfwc_rules').val(JSON.stringify(rules));
-		
-		// Replace editing row with display row
-		var displayRow = createRuleRow(updatedRule, index);
-		$row.replaceWith(displayRow);
-		displayRow.hide().fadeIn(300);
-		
-		// Enable save button
-		enableSaveButton();
-		showNotice('<?php echo esc_js( __( 'Rule updated. Click "Save changes" to persist and see changes on frontend.', 'customs-fees-for-woocommerce' ) ); ?>', 'success');
-	});
-	
-	// Cancel editing rule
-	$(document).on('click', '.cfwc-cancel-rule', function(e) {
-		e.preventDefault();
-		
-		var $row = $(this).closest('tr');
-		var index = $row.data('index');
-		var rules = JSON.parse($('#cfwc_rules').val() || '[]');
-		
-		if (index !== undefined && rules[index]) {
-			// Existing rule - restore display
-			var rule = rules[index];
-			if (rule.country) {
-				// Rule has data - show it
-				var displayRow = createRuleRow(rule, index);
-				$row.replaceWith(displayRow);
-				displayRow.hide().fadeIn(300);
+		// Handle type change
+		$('.cfwc-rules-table tbody tr:last select[name="cfwc_rule_type"]').on('change', function() {
+			var $row = $(this).closest('tr');
+			var type = $(this).val();
+			
+			if (type === 'percentage') {
+				$row.find('input[name="cfwc_rule_rate"]').attr('data-field', 'rate').attr('placeholder', '%');
 			} else {
-				// Empty rule - remove it
-				rules.splice(index, 1);
-				$('#cfwc_rules').val(JSON.stringify(rules));
-				$row.fadeOut(300, function() {
-					$(this).remove();
-					updateRuleIndexes();
-					if ($('#cfwc-rules-tbody tr').length === 0) {
-						$('#cfwc-rules-tbody').html('<tr class="no-rules"><td colspan="7"><?php echo esc_js( __( 'No rules configured. Use the preset loader above or add rules manually.', 'customs-fees-for-woocommerce' ) ); ?></td></tr>');
-					}
-				});
+				$row.find('input[name="cfwc_rule_rate"]').attr('data-field', 'amount').attr('placeholder', '<?php echo esc_attr( get_woocommerce_currency_symbol() ); ?>');
 			}
-		} else {
-			// New rule - just remove the row
-			rules.pop(); // Remove last added rule
-			$('#cfwc_rules').val(JSON.stringify(rules));
-			$row.fadeOut(300, function() {
-				$(this).remove();
-				if ($('#cfwc-rules-tbody tr').length === 0) {
-					$('#cfwc-rules-tbody').html('<tr class="no-rules"><td colspan="7"><?php echo esc_js( __( 'No rules configured. Use the preset loader above or add rules manually.', 'customs-fees-for-woocommerce' ) ); ?></td></tr>');
-				}
-			});
-		}
-		
-		showNotice('<?php echo esc_js( __( 'Edit cancelled.', 'customs-fees-for-woocommerce' ) ); ?>', 'info');
+		});
 	});
 	
 	// Edit rule functionality
@@ -524,208 +571,212 @@ jQuery(document).ready(function($) {
 		e.preventDefault();
 		
 		var $button = $(this);
+		var $row = $button.closest('tr');
 		var index = $button.data('index');
 		var rules = JSON.parse($('#cfwc_rules').val() || '[]');
 		var rule = rules[index];
 		
-		if (!rule) return;
-		
-		var $row = $button.closest('tr');
-		
 		// Create edit row HTML
-		var editRowHtml = '<tr class="cfwc-rule-row cfwc-rule-editing">';
+		var editRowHtml = '';
 		
-		// Country selector
-		editRowHtml += '<td><select name="cfwc_rule_country" class="cfwc-rule-field" data-field="country" style="width: 100%;">';
-		<?php
-		$countries = WC()->countries->get_countries();
-		foreach ( $countries as $code => $name ) {
-			echo 'editRowHtml += \'<option value="' . esc_attr( $code ) . '">' . esc_js( $name ) . '</option>\';' . "\n";
-		}
-		?>
+		// Label input (first column)
+		editRowHtml += '<td><input type="text" name="cfwc_rule_label" class="cfwc-rule-field" data-field="label" value="' + (rule.label || '') + '" placeholder="<?php echo esc_attr( __( 'Fee label', 'customs-fees-for-woocommerce' ) ); ?>" style="width: 100%;" /></td>';
+		
+		// Destination country selector - use wc-enhanced-select class
+		editRowHtml += '<td><select name="cfwc_rule_country" class="cfwc-rule-field cfwc-country-select wc-enhanced-select" data-field="country" data-placeholder="<?php echo esc_attr( __( 'Choose a country...', 'customs-fees-for-woocommerce' ) ); ?>">';
+		editRowHtml += getCountryOptions(rule.country);
+		editRowHtml += '</select></td>';
+		
+		// Origin country selector - use wc-enhanced-select class
+		editRowHtml += '<td><select name="cfwc_rule_origin" class="cfwc-rule-field cfwc-origin-select wc-enhanced-select" data-field="origin_country" data-placeholder="<?php echo esc_attr( __( 'Choose origin...', 'customs-fees-for-woocommerce' ) ); ?>">';
+		editRowHtml += getOriginOptions(rule.origin_country || '');
 		editRowHtml += '</select></td>';
 		
 		// Type selector
 		editRowHtml += '<td><select name="cfwc_rule_type" class="cfwc-rule-field" data-field="type">';
-		editRowHtml += '<option value="percentage"><?php echo esc_js( __( 'Percentage', 'customs-fees-for-woocommerce' ) ); ?></option>';
-		editRowHtml += '<option value="flat"><?php echo esc_js( __( 'Flat', 'customs-fees-for-woocommerce' ) ); ?></option>';
+		editRowHtml += '<option value="percentage"' + (rule.type === 'percentage' ? ' selected' : '') + '><?php echo esc_js( __( 'Percentage', 'customs-fees-for-woocommerce' ) ); ?></option>';
+		editRowHtml += '<option value="flat"' + (rule.type === 'flat' ? ' selected' : '') + '><?php echo esc_js( __( 'Flat', 'customs-fees-for-woocommerce' ) ); ?></option>';
 		editRowHtml += '</select></td>';
 		
 		// Rate/Amount input
-		editRowHtml += '<td><input type="number" name="cfwc_rule_rate" class="cfwc-rule-field" data-field="rate" step="0.01" style="width: 80px;" /></td>';
-		
-		// Minimum input
-		editRowHtml += '<td><input type="number" name="cfwc_rule_minimum" class="cfwc-rule-field" data-field="minimum" step="0.01" style="width: 80px;" /></td>';
-		
-		// Maximum input
-		editRowHtml += '<td><input type="number" name="cfwc_rule_maximum" class="cfwc-rule-field" data-field="maximum" step="0.01" style="width: 80px;" /></td>';
-		
-		// Label input
-		editRowHtml += '<td><input type="text" name="cfwc_rule_label" class="cfwc-rule-field" data-field="label" placeholder="<?php echo esc_attr( __( 'Fee label', 'customs-fees-for-woocommerce' ) ); ?>" style="width: 100%;" /></td>';
+		var rateField = rule.type === 'percentage' ? 'rate' : 'amount';
+		var rateValue = rule.type === 'percentage' ? rule.rate : rule.amount;
+		editRowHtml += '<td><input type="number" name="cfwc_rule_rate" class="cfwc-rule-field" data-field="' + rateField + '" value="' + rateValue + '" step="0.01" style="width: 80px;" /></td>';
 		
 		// Actions
 		editRowHtml += '<td>';
-		editRowHtml += '<button type="button" class="button cfwc-save-rule"><?php echo esc_js( __( 'Save', 'customs-fees-for-woocommerce' ) ); ?></button> ';
-		editRowHtml += '<button type="button" class="button cfwc-cancel-rule"><?php echo esc_js( __( 'Cancel', 'customs-fees-for-woocommerce' ) ); ?></button>';
+		editRowHtml += '<button type="button" class="button button-primary cfwc-save-rule" data-index="' + index + '"><?php echo esc_js( __( 'Save', 'customs-fees-for-woocommerce' ) ); ?></button> ';
+		editRowHtml += '<button type="button" class="button cfwc-cancel-edit"><?php echo esc_js( __( 'Cancel', 'customs-fees-for-woocommerce' ) ); ?></button>';
 		editRowHtml += '</td>';
 		
-		editRowHtml += '</tr>';
+		// Replace row content
+		$row.addClass('cfwc-rule-editing').html(editRowHtml);
 		
-		// Create edit row and set values
-		var $editRow = $(editRowHtml);
-		$editRow.data('index', index);
+		// Initialize Select2 on selects
+		initCountrySelect($row.find('.cfwc-country-select'));
+		initCountrySelect($row.find('.cfwc-origin-select'));
 		
-		// Set current values
-		$editRow.find('[data-field="country"]').val(rule.country);
-		$editRow.find('[data-field="type"]').val(rule.type);
-		$editRow.find('[data-field="rate"]').val(rule.type === 'percentage' ? rule.rate : rule.amount);
-		$editRow.find('[data-field="minimum"]').val(rule.minimum);
-		$editRow.find('[data-field="maximum"]').val(rule.maximum);
-		$editRow.find('[data-field="label"]').val(rule.label);
-		
-		// Replace row with edit row
-		$row.replaceWith($editRow);
-		$editRow.hide().fadeIn(200);
-		
-		// Focus on first field
-		$editRow.find('[data-field="country"]').focus();
+		// Handle type change
+		$row.find('select[name="cfwc_rule_type"]').on('change', function() {
+			var type = $(this).val();
+			
+			if (type === 'percentage') {
+				$row.find('input[name="cfwc_rule_rate"]').attr('data-field', 'rate').attr('placeholder', '%');
+			} else {
+				$row.find('input[name="cfwc_rule_rate"]').attr('data-field', 'amount').attr('placeholder', '<?php echo esc_attr( get_woocommerce_currency_symbol() ); ?>');
+			}
+		});
 	});
 	
-	// Delete rule - single click with inline delete
+	// Save rule functionality
+	$(document).on('click', '.cfwc-save-rule', function(e) {
+		e.preventDefault();
+		
+		var $button = $(this);
+		var $row = $button.closest('tr');
+		var index = $button.data('index');
+		var rules = JSON.parse($('#cfwc_rules').val() || '[]');
+		
+		// Collect data from fields
+		var ruleData = {};
+		$row.find('.cfwc-rule-field').each(function() {
+			var field = $(this).data('field');
+			var value = $(this).val();
+			
+			if (field === 'rate' || field === 'amount') {
+				value = parseFloat(value) || 0;
+			}
+			
+			ruleData[field] = value;
+		});
+		
+		// Ensure all required fields are present
+		ruleData.taxable = ruleData.taxable !== undefined ? ruleData.taxable : true;
+		ruleData.tax_class = ruleData.tax_class || '';
+		
+		// For new rules, ensure amount field exists even if type is percentage
+		if (!ruleData.hasOwnProperty('amount')) {
+			ruleData.amount = 0;
+		}
+		if (!ruleData.hasOwnProperty('rate')) {
+			ruleData.rate = 0;
+		}
+		
+		// Update or add rule
+		if (index !== undefined) {
+			rules[index] = $.extend({}, rules[index], ruleData);
+		} else {
+			// Find the new rule (last one)
+			rules[rules.length - 1] = ruleData;
+		}
+		
+		// Update hidden field
+		$('#cfwc_rules').val(JSON.stringify(rules));
+		
+		// Update table
+		updateRulesTable(rules);
+		
+		// Enable save button
+		enableSaveButton();
+		
+		showNotice('<?php echo esc_js( __( 'Rule saved. Remember to click "Save changes" to persist.', 'customs-fees-for-woocommerce' ) ); ?>', 'success');
+	});
+	
+	// Cancel edit functionality
+	$(document).on('click', '.cfwc-cancel-edit', function(e) {
+		e.preventDefault();
+		
+		var rules = JSON.parse($('#cfwc_rules').val() || '[]');
+		updateRulesTable(rules);
+	});
+	
+	// Delete rule functionality - CUSTOM CONFIRMATION
 	$(document).on('click', '.cfwc-delete-rule', function(e) {
 		e.preventDefault();
 		
 		var $button = $(this);
 		var index = $button.data('index');
-		var $row = $button.closest('tr');
 		
-		// Simply delete the rule immediately - like WooCommerce tax rates
-		// Get current rules
-		var rules = JSON.parse($('#cfwc_rules').val() || '[]');
-		// Remove the rule
-		rules.splice(index, 1);
-		// Update hidden field
-		$('#cfwc_rules').val(JSON.stringify(rules));
-		
-		// Add strike-through effect then remove
-		$row.css('opacity', '0.5').css('text-decoration', 'line-through');
-		
-		// Remove the row with fade effect
-		setTimeout(function() {
-			$row.fadeOut(200, function() {
-				$row.remove();
-				// Update table if no rules left
-				if ($('#cfwc-rules-tbody tr').not('.no-rules').length === 0) {
-					$('#cfwc-rules-tbody').html('<tr class="no-rules"><td colspan="7"><?php echo esc_js( __( 'No rules configured. Use the preset loader above or add rules manually.', 'customs-fees-for-woocommerce' ) ); ?></td></tr>');
-				}
-				// Re-index remaining delete buttons
-				updateRuleIndexes();
-			});
-		}, 300);
-		
-		// Show notice and enable save button
-		showNotice('<?php echo esc_js( __( 'Rule removed. Click "Save changes" to persist.', 'customs-fees-for-woocommerce' ) ); ?>', 'warning');
-		
-		// Enable save button using helper function
-		enableSaveButton();
+		// Double-click confirmation like Delete All
+		if ($button.hasClass('confirm-delete')) {
+			// Second click - proceed with deletion
+			var rules = JSON.parse($('#cfwc_rules').val() || '[]');
+			
+			// Remove rule
+			rules.splice(index, 1);
+			
+			// Update hidden field
+			$('#cfwc_rules').val(JSON.stringify(rules));
+			
+			// Update table
+			updateRulesTable(rules);
+			
+			// Enable save button
+			enableSaveButton();
+			
+			// Show success message for deletion
+			showNotice('<?php echo esc_js( __( 'Rule deleted successfully. Remember to click "Save changes" to persist.', 'customs-fees-for-woocommerce' ) ); ?>', 'success');
+		} else {
+			// First click - show warning
+			showNotice('<?php echo esc_js( __( 'Click the delete button again to confirm deletion.', 'customs-fees-for-woocommerce' ) ); ?>', 'warning');
+			$button.addClass('confirm-delete').css('background', '#d63638').css('color', '#fff');
+			
+			// Reset button after 3 seconds
+			setTimeout(function() {
+				$button.removeClass('confirm-delete').css('background', '').css('color', '');
+			}, 3000);
+		}
 	});
 	
-	// Helper function to create rule row HTML
-	function createRuleRow(rule, index) {
-		var countries = <?php echo wp_json_encode( WC()->countries->get_countries() ); ?>;
-		var countryName = countries[rule.country] || rule.country;
-		var type = rule.type === 'percentage' ? '<?php echo esc_js( __( 'Percentage', 'customs-fees-for-woocommerce' ) ); ?>' : '<?php echo esc_js( __( 'Flat', 'customs-fees-for-woocommerce' ) ); ?>';
-		var rateAmount = rule.type === 'percentage' ? (rule.rate + '%') : ('<?php echo esc_js( get_woocommerce_currency_symbol() ); ?>' + rule.amount);
-		var minimum = rule.minimum > 0 ? ('<?php echo esc_js( get_woocommerce_currency_symbol() ); ?>' + rule.minimum) : '-';
-		var maximum = rule.maximum > 0 ? ('<?php echo esc_js( get_woocommerce_currency_symbol() ); ?>' + rule.maximum) : '-';
-		
-		var html = '<tr>';
-		html += '<td>' + countryName + '</td>';
-		html += '<td>' + type + '</td>';
-		html += '<td>' + rateAmount + '</td>';
-		html += '<td>' + minimum + '</td>';
-		html += '<td>' + maximum + '</td>';
-		html += '<td>' + rule.label + '</td>';
-		html += '<td>';
-		html += '<button type="button" class="button cfwc-edit-rule" data-index="' + index + '"><?php echo esc_js( __( 'Edit', 'customs-fees-for-woocommerce' ) ); ?></button> ';
-		html += '<button type="button" class="button cfwc-delete-rule" data-index="' + index + '"><?php echo esc_js( __( 'Delete', 'customs-fees-for-woocommerce' ) ); ?></button>';
-		html += '</td>';
-		html += '</tr>';
-		
-		return $(html);
-	}
-	
-	// Function to update rule indexes after deletion
-	function updateRuleIndexes() {
-		$('#cfwc-rules-tbody tr').each(function(index) {
-			$(this).find('.cfwc-edit-rule').data('index', index).attr('data-index', index);
-			$(this).find('.cfwc-delete-rule').data('index', index).attr('data-index', index);
-		});
-	}
-	
-	// Function to dynamically update rules table
+	// Update rules table
 	function updateRulesTable(rules) {
+		var countries = <?php echo wp_json_encode( WC()->countries->get_countries() ); ?>;
 		var tbody = $('#cfwc-rules-tbody');
+		tbody.empty();
 		
-		// Check if we need to remove "no rules" message
-		if (tbody.find('.no-rules').length > 0) {
-			tbody.find('.no-rules').fadeOut(200, function() {
-				$(this).remove();
-				addRulesToTable(rules, tbody, true);
-			});
+		if (rules.length === 0) {
+			tbody.append('<tr class="no-rules"><td colspan="6"><?php echo esc_js( __( 'No rules configured. Use the preset loader above or add rules manually.', 'customs-fees-for-woocommerce' ) ); ?></td></tr>');
 		} else {
-			addRulesToTable(rules, tbody, false);
+			$.each(rules, function(index, rule) {
+				var row = '<tr>';
+				
+				// Label (first column)
+				row += '<td>' + (rule.label || '') + '</td>';
+				
+				// Destination country
+				row += '<td>' + (countries[rule.country] || rule.country || '<?php echo esc_js( __( 'Not set', 'customs-fees-for-woocommerce' ) ); ?>') + '</td>';
+				
+				// Origin country
+				var originText = '';
+				if (!rule.origin_country || rule.origin_country === '') {
+					originText = '<?php echo esc_js( __( 'All Origins', 'customs-fees-for-woocommerce' ) ); ?>';
+				} else if (rule.origin_country === 'EU') {
+					originText = '<?php echo esc_js( __( 'EU Countries', 'customs-fees-for-woocommerce' ) ); ?>';
+				} else {
+					originText = countries[rule.origin_country] || rule.origin_country;
+				}
+				row += '<td>' + originText + '</td>';
+				
+				// Type
+				row += '<td>' + (rule.type === 'percentage' ? '<?php echo esc_js( __( 'Percentage', 'customs-fees-for-woocommerce' ) ); ?>' : '<?php echo esc_js( __( 'Flat', 'customs-fees-for-woocommerce' ) ); ?>') + '</td>';
+				
+				// Rate/Amount
+				if (rule.type === 'percentage') {
+					row += '<td>' + (rule.rate || 0) + '%</td>';
+				} else {
+					row += '<td><?php echo esc_js( get_woocommerce_currency_symbol() ); ?>' + (rule.amount || 0) + '</td>';
+				}
+				
+				// Actions
+				row += '<td>';
+				row += '<button type="button" class="button cfwc-edit-rule" data-index="' + index + '"><?php echo esc_js( __( 'Edit', 'customs-fees-for-woocommerce' ) ); ?></button> ';
+				row += '<button type="button" class="button cfwc-delete-rule" data-index="' + index + '"><?php echo esc_js( __( 'Delete', 'customs-fees-for-woocommerce' ) ); ?></button>';
+				row += '</td>';
+				
+				row += '</tr>';
+				tbody.append(row);
+			});
 		}
-	}
-	
-	// Helper function to add rules to table
-	function addRulesToTable(rules, tbody, isEmptyTable) {
-		if (rules.length === 0 && isEmptyTable) {
-			tbody.html('<tr class="no-rules"><td colspan="7"><?php echo esc_js( __( 'No rules configured. Use the preset loader above or add rules manually.', 'customs-fees-for-woocommerce' ) ); ?></td></tr>');
-			return;
-		}
-		
-		// For replace mode, clear the table
-		if (!isEmptyTable) {
-			tbody.empty();
-		}
-		
-		// Get country names
-		var countries = <?php echo wp_json_encode( WC()->countries->countries ); ?>;
-		
-		// Add each rule as a table row with fade-in effect
-		$.each(rules, function(index, rule) {
-			var row = $('<tr style="display:none;">');
-			row.html(
-				'<td>' + (countries[rule.country] || rule.country) + '</td>' +
-				'<td>' + rule.type.charAt(0).toUpperCase() + rule.type.slice(1) + '</td>' +
-				'<td>' + (rule.type === 'percentage' ? rule.rate + '%' : formatPrice(rule.amount)) + '</td>' +
-				'<td>' + formatPrice(rule.minimum || 0) + '</td>' +
-				'<td>' + formatPrice(rule.maximum || 0) + '</td>' +
-				'<td>' + (rule.label || '') + '</td>' +
-				'<td>' +
-					'<button type="button" class="button cfwc-edit-rule" data-index="' + index + '"><?php echo esc_js( __( 'Edit', 'customs-fees-for-woocommerce' ) ); ?></button> ' +
-					'<button type="button" class="button cfwc-delete-rule" data-index="' + index + '"><?php echo esc_js( __( 'Delete', 'customs-fees-for-woocommerce' ) ); ?></button>' +
-				'</td>'
-			);
-			
-			tbody.append(row);
-			// Fade in with slight delay for visual effect
-			setTimeout(function() {
-				row.fadeIn(300);
-			}, index * 50);
-		});
-	}
-	
-	// Helper function to format price (basic implementation)
-	function formatPrice(amount) {
-		var currencySymbol = '<?php echo esc_js( get_woocommerce_currency_symbol() ); ?>';
-		var decimals = <?php echo absint( wc_get_price_decimals() ); ?>;
-		var formattedAmount = parseFloat(amount).toFixed(decimals);
-		
-		// Basic formatting - you might want to enhance this
-		return currencySymbol + formattedAmount;
 	}
 });
 </script>
-

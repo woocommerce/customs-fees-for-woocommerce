@@ -193,10 +193,8 @@ class CFWC_Admin {
 	public function add_product_fields() {
 		echo '<div class="options_group show_if_simple show_if_variable">';
 		
-		// Add a separator heading for clarity.
-		echo '<p class="form-field" style="margin: 0; padding: 8px 12px; background: #f8f8f8; border-bottom: 1px solid #ddd;">';
-		echo '<strong>' . esc_html__( 'Customs & Import Information', 'customs-fees-for-woocommerce' ) . '</strong>';
-		echo '</p>';
+		// Add a heading without grey background to match WooCommerce style.
+		echo '<h4 style="margin: 10px 12px 5px; font-size: 14px; font-weight: 600;">' . esc_html__( 'Customs & Import Fees', 'customs-fees-for-woocommerce' ) . '</h4>';
 		
 		woocommerce_wp_text_input( array(
 			'id'          => '_cfwc_hs_code',
@@ -205,21 +203,19 @@ class CFWC_Admin {
 			'desc_tip'    => true,
 			'description' => __( 'Harmonized System code for customs classification. This helps calculate accurate import duties.', 'customs-fees-for-woocommerce' ),
 			'type'        => 'text',
-			'class'       => 'short',
 		) );
 		
-		woocommerce_wp_text_input( array(
+		// Country of Origin dropdown with WooCommerce countries.
+		$countries = WC()->countries->get_countries();
+		$origin_value = get_post_meta( get_the_ID(), '_cfwc_country_of_origin', true );
+		
+		woocommerce_wp_select( array(
 			'id'          => '_cfwc_country_of_origin',
 			'label'       => __( 'Country of Origin', 'customs-fees-for-woocommerce' ),
-			'placeholder' => __( 'e.g., CN, US, GB', 'customs-fees-for-woocommerce' ),
 			'desc_tip'    => true,
-			'description' => __( 'Two-letter ISO country code where the product was manufactured (e.g., CN for China, US for United States).', 'customs-fees-for-woocommerce' ),
-			'type'        => 'text',
-			'class'       => 'short',
-			'custom_attributes' => array(
-				'maxlength' => '2',
-				'style'     => 'text-transform: uppercase;',
-			),
+			'description' => __( 'Select the country where this product was manufactured. This determines which customs rules apply.', 'customs-fees-for-woocommerce' ),
+			'options'     => array( '' => __( 'Select a country', 'customs-fees-for-woocommerce' ) ) + $countries,
+			'value'       => $origin_value,
 		) );
 		
 		echo '</div>';
@@ -253,8 +249,13 @@ class CFWC_Admin {
 		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing
 		$country = isset( $_POST['_cfwc_country_of_origin'] ) ? sanitize_text_field( wp_unslash( $_POST['_cfwc_country_of_origin'] ) ) : '';
 		
+		// Validate country code (should be 2 letters).
+		if ( ! empty( $country ) && ! array_key_exists( $country, WC()->countries->get_countries() ) ) {
+			$country = '';
+		}
+		
 		update_post_meta( $post_id, '_cfwc_hs_code', $hs_code );
-		update_post_meta( $post_id, '_cfwc_country_of_origin', strtoupper( substr( $country, 0, 2 ) ) );
+		update_post_meta( $post_id, '_cfwc_country_of_origin', $country );
 	}
 
 	/**
@@ -264,7 +265,31 @@ class CFWC_Admin {
 	 * @param string $hook Current admin page hook.
 	 */
 	public function enqueue_scripts( $hook ) {
-		// Only load on relevant pages.
+		// Load on product pages for Select2.
+		if ( in_array( $hook, array( 'post.php', 'post-new.php' ), true ) ) {
+			global $post_type;
+			if ( 'product' === $post_type ) {
+				// Ensure WooCommerce Select2 (SelectWoo) is loaded.
+				wp_enqueue_script( 'wc-enhanced-select' );
+				wp_enqueue_style( 'woocommerce_admin_styles' );
+				
+				// Initialize Select2 directly on our country field.
+				wp_add_inline_script( 'wc-enhanced-select', '
+					jQuery( document ).ready( function( $ ) {
+						// Initialize SelectWoo directly on our field
+						if ( $.fn.selectWoo ) {
+							$( "#_cfwc_country_of_origin" ).selectWoo({
+								minimumResultsForSearch: 10,
+								allowClear: true,
+								placeholder: "' . esc_js( __( 'Select a country', 'customs-fees-for-woocommerce' ) ) . '"
+							}).addClass( "enhanced" );
+						}
+					});
+				' );
+			}
+		}
+		
+		// Only load on WooCommerce settings pages.
 		if ( 'woocommerce_page_wc-settings' !== $hook ) {
 			return;
 		}
