@@ -82,10 +82,8 @@ class CFWC_Emails {
 			foreach ( $totals as $key => $total ) {
 				// Add customs fees before order total.
 				if ( 'order_total' === $key && $total_customs > 0 ) {
-					// Add each customs fee separately or as combined based on display mode.
-					$display_mode = get_option( 'cfwc_display_mode', 'single' );
-					
-					if ( 'breakdown' === $display_mode && count( $customs_fees ) > 1 ) {
+					// Always show breakdown of fees for transparency.
+					if ( count( $customs_fees ) > 1 ) {
 						// Show breakdown of fees.
 						foreach ( $customs_fees as $customs_fee ) {
 							$new_totals[ 'customs_fee_' . sanitize_key( $customs_fee['name'] ) ] = array(
@@ -94,13 +92,9 @@ class CFWC_Emails {
 							);
 						}
 					} else {
-						// Single line display.
-						$label = count( $customs_fees ) > 1 ? 
-							__( 'Customs & Import Fees', 'customs-fees-for-woocommerce' ) : 
-							$customs_fees[0]['name'];
-						
+						// Single fee display.
 						$new_totals['customs_fees'] = array(
-							'label' => $label . ':',
+							'label' => $customs_fees[0]['name'] . ':',
 							'value' => wc_price( $total_customs, array( 'currency' => $order->get_currency() ) ),
 						);
 					}

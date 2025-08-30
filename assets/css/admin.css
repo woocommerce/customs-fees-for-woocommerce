@@ -1,0 +1,249 @@
+/**
+ * Admin Styles for Customs Fees for WooCommerce
+ *
+ * @package CustomsFeesForWooCommerce
+ * @since 1.0.0
+ */
+
+/* Rules Table General Styles */
+.cfwc-rules-table {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.cfwc-rules-table th {
+  text-align: left;
+}
+
+.cfwc-rules-table .button-small {
+  margin: 0 5px;
+}
+
+/* Template Selector */
+.cfwc-template-selector {
+  margin: 20px 0;
+  padding: 15px;
+  background: #f7f7f7;
+  border-radius: 4px;
+}
+
+.cfwc-template-selector select {
+  min-width: 300px;
+}
+
+/* Preset Loader Section */
+.cfwc-preset-loader {
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+}
+
+.cfwc-preset-loader h3 {
+  margin-top: 0;
+}
+
+/* Admin Notice Styles - Fixed positioning and width */
+.cfwc-admin-notice {
+  position: relative;
+  margin: 5px 0 15px;
+  padding: 12px 40px 12px 12px;
+  border: 1px solid transparent;
+  border-left-width: 4px;
+  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.1);
+  background: #fff;
+  display: block;
+}
+
+.cfwc-admin-notice.error {
+  border-left-color: #dc3232;
+}
+
+.cfwc-admin-notice.warning {
+  border-left-color: #ffb900;
+}
+
+.cfwc-admin-notice.info {
+  border-left-color: #00a0d2;
+}
+
+.cfwc-admin-notice.success {
+  border-left-color: #46b450;
+}
+
+.cfwc-admin-notice .notice-message {
+  margin: 0;
+  padding: 0;
+}
+
+.cfwc-admin-notice button.notice-dismiss {
+  position: absolute;
+  top: 0;
+  right: 1px;
+  border: none;
+  margin: 0;
+  padding: 9px;
+  background: none;
+  color: #b4b9be;
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  text-align: center;
+}
+
+.cfwc-admin-notice button.notice-dismiss:before {
+  content: "\f153";
+  font: normal 16px/20px dashicons;
+  speak: never;
+  display: block;
+  width: 20px;
+  height: 20px;
+  text-align: center;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.cfwc-admin-notice button.notice-dismiss:hover {
+  color: #c00;
+}
+
+.cfwc-admin-notice button.notice-dismiss:focus {
+  outline: none;
+  box-shadow: 0 0 0 1px #5b9dd9, 0 0 2px 1px rgba(30, 140, 190, 0.8);
+}
+
+/* Delete All Button Styles */
+.cfwc-delete-all {
+  margin-left: 10px;
+  color: #a00;
+  border-color: #a00;
+}
+
+.cfwc-delete-all:hover {
+  color: #dc3232;
+  border-color: #dc3232;
+}
+
+.cfwc-delete-all.confirm-delete {
+  background: #d63638;
+  border-color: #d63638;
+  color: #fff;
+}
+
+.cfwc-delete-all.confirm-delete:hover {
+  background: #b32d2e;
+  border-color: #b32d2e;
+  color: #fff;
+}
+
+/* Delete Button Hover State */
+.cfwc-delete-rule:hover {
+  color: #d63638;
+  border-color: #d63638;
+}
+
+/* Table Row Fade Effect */
+.cfwc-rules-table tbody tr {
+  transition: opacity 0.3s;
+}
+
+/* Table Styling Improvements */
+.cfwc-rules-table table {
+  table-layout: fixed;
+}
+
+.cfwc-rules-table th,
+.cfwc-rules-table td {
+  padding: 10px;
+  vertical-align: middle;
+}
+
+/* Editing Row Styles */
+.cfwc-rule-editing {
+  background: #f0f8ff;
+  border: 1px solid #0073aa;
+}
+
+.cfwc-rule-editing td {
+  padding: 10px 5px;
+}
+
+.cfwc-rule-field {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* WooCommerce Native Select2 Styling - Match WooCommerce exactly */
+.cfwc-rule-editing .wc-enhanced-select,
+.cfwc-country-select,
+.cfwc-origin-select {
+  min-width: 150px !important;
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+/* Product Edit Page - Country of Origin Select2 */
+#_cfwc_country_of_origin {
+  width: 50%;
+  min-width: 250px;
+}
+
+/* Select2 Container for our field specifically */
+span[aria-labelledby="select2-_cfwc_country_of_origin-container"] {
+  width: 50% !important;
+  min-width: 250px !important;
+  max-width: 400px !important;
+}
+
+/* The select2 dropdown itself */
+.select2-dropdown {
+  min-width: 250px !important;
+}
+
+/* Preset Select Styling */
+#cfwc-preset-select {
+  min-width: 200px;
+}
+
+/* Preset Description */
+#cfwc-preset-description {
+  margin-top: 10px;
+  display: none;
+}
+
+/* Rules Header Layout */
+.cfwc-rules-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.cfwc-rules-header h3 {
+  margin: 0 0 5px 0;
+}
+
+.cfwc-rules-header p {
+  margin: 0;
+  color: #666;
+}
+
+/* Rules Table Column Widths */
+.cfwc-rules-table thead th:nth-child(1) {
+  width: 20%;
+}
+
+.cfwc-rules-table thead th:nth-child(2),
+.cfwc-rules-table thead th:nth-child(3) {
+  width: 18%;
+}
+
+.cfwc-rules-table thead th:nth-child(4),
+.cfwc-rules-table thead th:nth-child(5) {
+  width: 12%;
+}
+
+.cfwc-rules-table thead th:nth-child(6) {
+  width: 20%;
+}

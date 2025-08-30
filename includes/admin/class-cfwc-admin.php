@@ -68,24 +68,6 @@ class CFWC_Admin {
 			<?php
 			delete_transient( 'cfwc_activated' );
 		}
-
-		// Check if customs fees are disabled.
-		$screen = get_current_screen();
-		if ( $screen && 'shop_order' === $screen->id && ! get_option( 'cfwc_enabled', false ) ) {
-			?>
-			<div class="notice notice-info is-dismissible">
-				<p>
-					<?php
-					printf(
-						/* translators: %s: Settings page URL */
-						esc_html__( 'Customs fees are currently disabled. %s to enable and configure.', 'customs-fees-for-woocommerce' ),
-						'<a href="' . esc_url( admin_url( 'admin.php?page=wc-settings&tab=tax&section=customs' ) ) . '">' . esc_html__( 'Enable customs fees', 'customs-fees-for-woocommerce' ) . '</a>'
-					);
-					?>
-				</p>
-			</div>
-			<?php
-		}
 	}
 
 	/**
@@ -210,12 +192,16 @@ class CFWC_Admin {
 		$origin_value = get_post_meta( get_the_ID(), '_cfwc_country_of_origin', true );
 		
 		woocommerce_wp_select( array(
-			'id'          => '_cfwc_country_of_origin',
-			'label'       => __( 'Country of Origin', 'customs-fees-for-woocommerce' ),
-			'desc_tip'    => true,
-			'description' => __( 'Select the country where this product was manufactured. This determines which customs rules apply.', 'customs-fees-for-woocommerce' ),
-			'options'     => array( '' => __( 'Select a country', 'customs-fees-for-woocommerce' ) ) + $countries,
-			'value'       => $origin_value,
+			'id'                => '_cfwc_country_of_origin',
+			'label'             => __( 'Country of Origin', 'customs-fees-for-woocommerce' ),
+			'desc_tip'          => true,
+			'description'       => __( 'Select the country where this product was manufactured. This determines which customs rules apply.', 'customs-fees-for-woocommerce' ),
+			'options'           => array( '' => __( 'Select a country', 'customs-fees-for-woocommerce' ) ) + $countries,
+			'value'             => $origin_value,
+			'class'             => 'wc-enhanced-select',
+			'custom_attributes' => array(
+				'data-placeholder' => __( 'Select a country', 'customs-fees-for-woocommerce' ),
+			),
 		) );
 		
 		echo '</div>';
@@ -273,16 +259,31 @@ class CFWC_Admin {
 				wp_enqueue_script( 'wc-enhanced-select' );
 				wp_enqueue_style( 'woocommerce_admin_styles' );
 				
-				// Initialize Select2 directly on our country field.
+				// Also load our admin CSS for proper select2 styling.
+				wp_enqueue_style(
+					'cfwc-admin',
+					CFWC_PLUGIN_URL . 'assets/css/admin.css',
+					array( 'woocommerce_admin_styles' ),
+					CFWC_VERSION
+				);
+				
+				// Initialize Select2 on our country field - trigger WooCommerce's native enhancement.
 				wp_add_inline_script( 'wc-enhanced-select', '
 					jQuery( document ).ready( function( $ ) {
-						// Initialize SelectWoo directly on our field
-						if ( $.fn.selectWoo ) {
-							$( "#_cfwc_country_of_origin" ).selectWoo({
-								minimumResultsForSearch: 10,
-								allowClear: true,
-								placeholder: "' . esc_js( __( 'Select a country', 'customs-fees-for-woocommerce' ) ) . '"
-							}).addClass( "enhanced" );
+						// Use WooCommerce\'s native enhanced select initialization
+						$( document.body ).trigger( "wc-enhanced-select-init" );
+						
+						// Ensure our specific field is enhanced if not already
+						var $countryField = $( "#_cfwc_country_of_origin" );
+						if ( $countryField.length && !$countryField.hasClass( "enhanced" ) ) {
+							if ( $.fn.selectWoo ) {
+								$countryField.selectWoo({
+									minimumResultsForSearch: 10,
+									allowClear: true,
+									placeholder: $countryField.data( "placeholder" ) || "' . esc_js( __( 'Select a country', 'customs-fees-for-woocommerce' ) ) . '",
+									width: "resolve"
+								}).addClass( "enhanced" );
+							}
 						}
 					});
 				' );
@@ -294,37 +295,79 @@ class CFWC_Admin {
 			return;
 		}
 
-		// Check if we're on the customs fees tab.
+		// Check if we're on the Tax tab with customs section.
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		if ( ! isset( $_GET['tab'] ) || 'customs_fees' !== $_GET['tab'] ) {
+		$tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['tab'] ) ) : '';
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$section = isset( $_GET['section'] ) ? sanitize_text_field( wp_unslash( $_GET['section'] ) ) : '';
+		
+		if ( 'tax' !== $tab || 'customs' !== $section ) {
 			return;
 		}
 
-		// Add inline styles for now.
-		wp_add_inline_style( 'woocommerce_admin_styles', '
-			.cfwc-rules-table { width: 100%; margin-top: 20px; }
-			.cfwc-rules-table th { text-align: left; }
-			.cfwc-rules-table .button-small { margin: 0 5px; }
-			.cfwc-template-selector { margin: 20px 0; padding: 15px; background: #f7f7f7; border-radius: 4px; }
-			.cfwc-template-selector select { min-width: 300px; }
-		' );
+		// Enqueue admin CSS.
+		wp_enqueue_style(
+			'cfwc-admin',
+			CFWC_PLUGIN_URL . 'assets/css/admin.css',
+			array( 'woocommerce_admin_styles' ),
+			CFWC_VERSION
+		);
 
-		// Add inline script for interactivity.
-		wp_add_inline_script( 'jquery', '
-			jQuery(document).ready(function($) {
-				// Template selector handler.
-				$("#cfwc-apply-template").on("click", function(e) {
-					e.preventDefault();
-					var template = $("#cfwc-template-select").val();
-					if (template) {
-						if (confirm("' . esc_js( __( 'Apply this template? This will replace your current rules.', 'customs-fees-for-woocommerce' ) ) . '")) {
-							// Template application would be handled here via AJAX.
-							console.log("Applying template: " + template);
-						}
-					}
-				});
-			});
-		' );
+		// Enqueue admin JavaScript with dependencies.
+		wp_enqueue_script(
+			'cfwc-admin',
+			CFWC_PLUGIN_URL . 'assets/js/admin.js',
+			array( 'jquery', 'wc-enhanced-select', 'selectWoo' ),
+			CFWC_VERSION,
+			true
+		);
+
+		// Get templates for JavaScript.
+		$templates_handler = new CFWC_Templates();
+		$templates = $templates_handler->get_templates();
+
+		// Localize script with data.
+		wp_localize_script( 'cfwc-admin', 'cfwc_admin', array(
+			'ajax_url'        => admin_url( 'admin-ajax.php' ),
+			'nonce'           => wp_create_nonce( 'cfwc_admin_nonce' ),
+			'countries'       => WC()->countries->get_countries(),
+			'currency_symbol' => get_woocommerce_currency_symbol(),
+			'templates'       => $templates,
+			'strings'         => array(
+				'select_country'           => __( 'Select a country', 'customs-fees-for-woocommerce' ),
+				'select_preset_first'      => __( 'Please select a preset first.', 'customs-fees-for-woocommerce' ),
+				'adding_preset'            => __( 'Adding preset rules...', 'customs-fees-for-woocommerce' ),
+				'no_rules_delete'          => __( 'No rules to delete.', 'customs-fees-for-woocommerce' ),
+				'all_deleted'              => __( 'All rules deleted. Remember to click "Save changes" to persist.', 'customs-fees-for-woocommerce' ),
+				'delete_all'               => __( 'Delete All Rules', 'customs-fees-for-woocommerce' ),
+				'delete_warning'           => __( 'Warning: This will delete all existing rules. Click again to confirm.', 'customs-fees-for-woocommerce' ),
+				'confirm_delete'           => __( 'Click to Confirm Delete', 'customs-fees-for-woocommerce' ),
+				'preset_applied'           => __( 'Preset applied successfully!', 'customs-fees-for-woocommerce' ),
+				'save_reminder'            => __( 'Remember to click "Save changes" to persist these rules.', 'customs-fees-for-woocommerce' ),
+				'preset_failed'            => __( 'Failed to apply preset.', 'customs-fees-for-woocommerce' ),
+				'preset_error'             => __( 'An error occurred while applying the preset.', 'customs-fees-for-woocommerce' ),
+				'check_console'            => __( 'Check browser console for details.', 'customs-fees-for-woocommerce' ),
+				'dismiss_notice'           => __( 'Dismiss this notice', 'customs-fees-for-woocommerce' ),
+				'select_country_placeholder' => __( 'Select country...', 'customs-fees-for-woocommerce' ),
+				'all_origins'              => __( 'All Origins', 'customs-fees-for-woocommerce' ),
+				'eu_countries'             => __( 'EU Countries', 'customs-fees-for-woocommerce' ),
+				'specific_country'         => __( 'Specific Country', 'customs-fees-for-woocommerce' ),
+				'fee_label'                => __( 'Fee label', 'customs-fees-for-woocommerce' ),
+				'choose_country'           => __( 'Choose a country...', 'customs-fees-for-woocommerce' ),
+				'choose_origin'            => __( 'Choose origin...', 'customs-fees-for-woocommerce' ),
+				'percentage'               => __( 'Percentage', 'customs-fees-for-woocommerce' ),
+				'flat'                     => __( 'Flat', 'customs-fees-for-woocommerce' ),
+				'save'                     => __( 'Save', 'customs-fees-for-woocommerce' ),
+				'cancel'                   => __( 'Cancel', 'customs-fees-for-woocommerce' ),
+				'edit'                     => __( 'Edit', 'customs-fees-for-woocommerce' ),
+				'delete'                   => __( 'Delete', 'customs-fees-for-woocommerce' ),
+				'rule_saved'               => __( 'Rule saved. Remember to click "Save changes" to persist.', 'customs-fees-for-woocommerce' ),
+				'rule_deleted'             => __( 'Rule deleted successfully. Remember to click "Save changes" to persist.', 'customs-fees-for-woocommerce' ),
+				'delete_confirm'           => __( 'Click the delete button again to confirm deletion.', 'customs-fees-for-woocommerce' ),
+				'no_rules'                 => __( 'No rules configured. Use the preset loader above or add rules manually.', 'customs-fees-for-woocommerce' ),
+				'not_set'                  => __( 'Not set', 'customs-fees-for-woocommerce' ),
+			)
+		) );
 	}
 
 	/**

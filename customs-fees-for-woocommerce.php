@@ -114,9 +114,6 @@ class Customs_Fees_WooCommerce {
 		// Add plugin action links.
 		add_filter( 'plugin_action_links_' . CFWC_PLUGIN_BASENAME, array( $this, 'add_action_links' ) );
 
-		// Add tooltip to cart/checkout.
-		add_action( 'wp_footer', array( $this, 'add_tooltip_script' ) );
-
 		// HPOS compatibility.
 		add_action( 'before_woocommerce_init', array( $this, 'declare_hpos_compatibility' ) );
 	}
@@ -288,128 +285,6 @@ class Customs_Fees_WooCommerce {
 		return array_merge( $plugin_links, $links );
 	}
 
-	/**
-	 * Add tooltip script to frontend.
-	 *
-	 * @since 1.0.0
-	 */
-	public function add_tooltip_script() {
-		// Only on cart and checkout pages.
-		if ( ! is_cart() && ! is_checkout() ) {
-			return;
-		}
-
-		// Check if we should show tooltip.
-		$show_tooltip = get_option( 'cfwc_show_tooltip', true );
-		if ( ! $show_tooltip ) {
-			return;
-		}
-
-		// Get tooltip text from session first (it's set during cart calculation).
-		$tooltip_text = '';
-		if ( WC()->session ) {
-			$tooltip_text = WC()->session->get( 'cfwc_tooltip_text', '' );
-		}
-		
-		// Fallback to default translatable text if not in session.
-		if ( empty( $tooltip_text ) && class_exists( 'CFWC_Settings' ) ) {
-			$tooltip_text = CFWC_Settings::get_default_help_text();
-		}
-		
-		if ( empty( $tooltip_text ) ) {
-			return;
-		}
-		?>
-		<style>
-		.cfwc-tooltip {
-			position: relative;
-			display: inline-block;
-			margin-left: 5px;
-			cursor: help;
-		}
-		.cfwc-tooltip-icon {
-			display: inline-block;
-			width: 16px;
-			height: 16px;
-			line-height: 16px;
-			text-align: center;
-			background: #999;
-			color: #fff;
-			border-radius: 50%;
-			font-size: 12px;
-			font-weight: bold;
-		}
-		.cfwc-tooltip-text {
-			visibility: hidden;
-			width: 250px;
-			background-color: #333;
-			color: #fff;
-			text-align: left;
-			border-radius: 6px;
-			padding: 8px 10px;
-			position: absolute;
-			z-index: 1000;
-			bottom: 125%;
-			left: 50%;
-			margin-left: -125px;
-			opacity: 0;
-			transition: opacity 0.3s;
-			font-size: 13px;
-			line-height: 1.4;
-		}
-		.cfwc-tooltip:hover .cfwc-tooltip-text {
-			visibility: visible;
-			opacity: 1;
-		}
-		.cfwc-tooltip-text::after {
-			content: "";
-			position: absolute;
-			top: 100%;
-			left: 50%;
-			margin-left: -5px;
-			border-width: 5px;
-			border-style: solid;
-			border-color: #333 transparent transparent transparent;
-		}
-		@media (max-width: 768px) {
-			.cfwc-tooltip-text {
-				width: 200px;
-				margin-left: -100px;
-			}
-		}
-		</style>
-		<script>
-		jQuery(document).ready(function($) {
-			// Add tooltip to customs fee labels.
-			function addCustomsTooltips() {
-				// For cart and checkout fee rows.
-				$('tr.fee').each(function() {
-					var $label = $(this).find('th, td').first();
-					var labelText = $label.text();
-					
-					// Check if this is a customs fee and doesn't already have tooltip.
-					if ((labelText.indexOf('Customs') > -1 || labelText.indexOf('Import') > -1 || labelText.indexOf('Duty') > -1) 
-						&& !$label.find('.cfwc-tooltip').length) {
-						
-						// Clean the label text by removing zero-width spaces.
-						var cleanLabel = labelText.replace(/\u200B/g, '');
-						
-						$label.html(cleanLabel + ' <span class="cfwc-tooltip"><span class="cfwc-tooltip-icon">?</span><span class="cfwc-tooltip-text"><?php echo esc_js( $tooltip_text ); ?></span></span>');
-					}
-				});
-			}
-			
-			// Initial load.
-			addCustomsTooltips();
-			
-			// After cart/checkout updates.
-			$(document.body).on('updated_cart_totals updated_checkout', function() {
-				addCustomsTooltips();
-			});
-		});
-		</script>
-		<?php
-	}
 }
 
 /**
@@ -465,7 +340,6 @@ function cfwc_uninstall() {
 	// Remove options.
 	delete_option( 'cfwc_rules' );
 	delete_option( 'cfwc_version' );
-	delete_option( 'cfwc_display_mode' );
 
 	// Remove transients.
 	delete_transient( 'cfwc_rules_cache' );
@@ -510,69 +384,3 @@ function cfwc_init() {
 }
 add_action( 'plugins_loaded', 'cfwc_init' );
 
-/**
- * Add tooltip to frontend.
- *
- * @since 1.0.0
- */
-function cfwc_add_frontend_tooltip() {
-	// Only on cart and checkout pages.
-	if ( ! is_cart() && ! is_checkout() ) {
-		return;
-	}
-
-	// Get tooltip text from session first (it's set during cart calculation).
-	$tooltip_text = '';
-	if ( WC()->session ) {
-		$tooltip_text = WC()->session->get( 'cfwc_tooltip_text', '' );
-	}
-	
-	// Fallback to default translatable text if not in session.
-	if ( empty( $tooltip_text ) && class_exists( 'CFWC_Settings' ) ) {
-		$tooltip_text = CFWC_Settings::get_default_help_text();
-	}
-	
-	if ( empty( $tooltip_text ) ) {
-		return;
-	}
-	?>
-	<style>
-	.cfwc-tooltip {
-		position: relative;
-		display: inline-block;
-		margin-left: 5px;
-	}
-	.cfwc-tooltip .cfwc-tooltiptext {
-		visibility: hidden;
-		width: 250px;
-		background-color: #333;
-		color: #fff;
-		text-align: left;
-		border-radius: 6px;
-		padding: 8px 10px;
-		position: absolute;
-		z-index: 1;
-		bottom: 125%;
-		left: 50%;
-		margin-left: -125px;
-		opacity: 0;
-		transition: opacity 0.3s;
-	}
-	.cfwc-tooltip:hover .cfwc-tooltiptext {
-		visibility: visible;
-		opacity: 1;
-	}
-	.cfwc-tooltip .cfwc-tooltiptext::after {
-		content: "";
-		position: absolute;
-		top: 100%;
-		left: 50%;
-		margin-left: -5px;
-		border-width: 5px;
-		border-style: solid;
-		border-color: #333 transparent transparent transparent;
-	}
-	</style>
-	<?php
-}
-add_action( 'wp_footer', 'cfwc_add_frontend_tooltip' );

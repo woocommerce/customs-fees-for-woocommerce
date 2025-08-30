@@ -62,7 +62,7 @@ class CFWC_Products {
 		
 		if ( $hs_code || $origin ) {
 			// Use a break tag to ensure it appears on a new line right after product name
-			$customs_info = '<br/><small style="color: #666;">';
+			$customs_info = '<br/><small class="cfwc-cart-customs">';
 			
 			if ( $hs_code ) {
 				$customs_info .= sprintf(
@@ -120,7 +120,7 @@ class CFWC_Products {
 		$origin = get_post_meta( $product_id, '_cfwc_country_of_origin', true );
 		
 		if ( $hs_code || $origin ) {
-			$customs_info = '<div class="cfwc-checkout-customs" style="font-size: 0.85em; color: #666;">';
+			$customs_info = '<div class="cfwc-checkout-customs">';
 			
 			if ( $hs_code ) {
 				$customs_info .= sprintf( 'HS: %s', esc_html( $hs_code ) );

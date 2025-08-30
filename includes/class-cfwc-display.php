@@ -29,9 +29,6 @@ class CFWC_Display {
 		// Override the default fee display to show our grouped format.
 		add_filter( 'woocommerce_cart_totals_fee_html', array( $this, 'customize_fee_display' ), 10, 2 );
 		
-		// Add tooltip to the main fee label.
-		add_filter( 'woocommerce_cart_totals_fee_label', array( $this, 'add_tooltip_to_fee_label' ), 10, 2 );
-		
 		// Order pages display - adds to order totals table.
 		add_filter( 'woocommerce_get_order_item_totals', array( $this, 'add_fees_to_order_totals' ), 10, 3 );
 		
@@ -44,36 +41,8 @@ class CFWC_Display {
 		// Save fee breakdown to order when order is created.
 		add_action( 'woocommerce_checkout_create_order', array( $this, 'save_fee_breakdown_to_order' ), 10, 2 );
 		
-		// Enqueue frontend scripts.
-		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
-	}
-
-	/**
-	 * Add tooltip to the main fee label.
-	 *
-	 * @since 1.0.0
-	 * @param string $label The fee label.
-	 * @param object $fee   The fee object.
-	 * @return string Modified label with tooltip.
-	 */
-	public function add_tooltip_to_fee_label( $label, $fee ) {
-		// Only modify our customs fees label.
-		if ( $fee->name !== __( 'Customs & Import Fees', 'customs-fees-for-woocommerce' ) ) {
-			return $label;
-		}
-		
-		// Add tooltip if enabled.
-		$show_tooltip = get_option( 'cfwc_show_tooltip', true );
-		if ( $show_tooltip ) {
-			$tooltip_text = WC()->session->get( 'cfwc_tooltip_text', '' );
-			if ( $tooltip_text ) {
-				$label .= '<span class="cfwc-tooltip" title="' . esc_attr( $tooltip_text ) . '">';
-				$label .= '<span class="dashicons dashicons-info-outline"></span>';
-				$label .= '</span>';
-			}
-		}
-		
-		return $label;
+		// Enqueue frontend assets for tooltips.
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_tooltip_assets' ) );
 	}
 
 	/**
@@ -96,32 +65,17 @@ class CFWC_Display {
 			return $cart_totals_fee_html;
 		}
 
-		// Build the breakdown display with inline styles to ensure they apply.
-		// Use ul/li structure with inline styles to override any theme styles.
-		$html = '<ul id="cfwc_fees_breakdown" class="cfwc-fees-list" style="list-style: none !important; margin: 0 !important; padding: 0 !important;">';
+		// Build the breakdown display - clean list like tax display.
+		$html = '<div id="cfwc_fees_breakdown" class="cfwc-fees-breakdown">';
 		
-		$total_items = count( $breakdown );
-		$current = 0;
 		foreach ( $breakdown as $index => $fee_item ) {
-			$fee_id = 'cfwc_fee_' . $index;
-			$current++;
-			// Remove bottom margin for last item.
-			$margin = ( $current === $total_items ) ? '0' : '0 0 0.5em 0';
-			$html .= '<li class="cfwc-fee-item" style="list-style: none !important; margin: ' . $margin . ' !important; padding: 0 !important;">';
-			// Use radio input with unique names so all can be checked.
-			// Don't use disabled to maintain native theme styling.
-			// Inline style pointer-events: none will prevent interaction.
-			$html .= '<input type="radio" name="cfwc_fee_' . esc_attr( $index ) . '" id="' . esc_attr( $fee_id ) . '" ';
-			$html .= 'value="' . esc_attr( $index ) . '" class="cfwc-fee-radio" checked="checked" style="pointer-events: none !important; margin: 0 0.5em 0 0 !important;" />';
-			$html .= '<label for="' . esc_attr( $fee_id ) . '">';
-			$html .= esc_html( $fee_item['label'] );
-			// Format the price exactly like WooCommerce shipping methods.
-			$html .= wc_price( $fee_item['amount'] );
-			$html .= '</label>';
-			$html .= '</li>';
+			$html .= '<div class="cfwc-fee-item">';
+			$html .= '<span class="cfwc-fee-label">' . esc_html( $fee_item['label'] ) . '</span>';
+			$html .= '<span class="cfwc-fee-amount"><strong>' . wc_price( $fee_item['amount'] ) . '</strong></span>';
+			$html .= '</div>';
 		}
 		
-		$html .= '</ul>';
+		$html .= '</div>';
 		
 		// No tooltip here since it's already shown on the left label.
 		
@@ -162,10 +116,10 @@ class CFWC_Display {
 				$value_html = '';
 				if ( ! empty( $breakdown ) && is_array( $breakdown ) ) {
 					// Show breakdown with nice list formatting.
-					$value_html = '<ul class="cfwc-fees-breakdown woocommerce-order-overview" style="margin: 0; padding: 0; list-style: none;">';
+					$value_html = '<ul class="cfwc-fees-breakdown woocommerce-order-overview">';
 					foreach ( $breakdown as $fee_item ) {
-						$value_html .= '<li class="cfwc-fee-item" style="margin: 0 0 0.25em 0;">';
-						$value_html .= '<span style="color: #515151;">' . esc_html( $fee_item['label'] ) . ':</span> ';
+						$value_html .= '<li class="cfwc-fee-item">';
+						$value_html .= '<span class="cfwc-fee-label">' . esc_html( $fee_item['label'] ) . ':</span> ';
 						$value_html .= '<strong>' . wc_price( $fee_item['amount'], array( 'currency' => $order->get_currency() ) ) . '</strong>';
 						$value_html .= '</li>';
 					}
@@ -210,14 +164,14 @@ class CFWC_Display {
 					} else {
 						echo '  ' . esc_html( wp_strip_all_tags( wc_price( $fee->get_total(), array( 'currency' => $order->get_currency() ) ) ) ) . "\n";
 					}
-				} else {
-					echo '<h3>' . esc_html( $fee->get_name() ) . '</h3>';
-					if ( ! empty( $breakdown ) && is_array( $breakdown ) ) {
-						echo '<ul style="margin: 0; padding-left: 20px;">';
-						foreach ( $breakdown as $fee_item ) {
-							echo '<li>' . esc_html( $fee_item['label'] ) . ': ' . wp_kses_post( wc_price( $fee_item['amount'], array( 'currency' => $order->get_currency() ) ) ) . '</li>';
-						}
-						echo '</ul>';
+									} else {
+						echo '<h3>' . esc_html( $fee->get_name() ) . '</h3>';
+						if ( ! empty( $breakdown ) && is_array( $breakdown ) ) {
+							echo '<ul class="cfwc-email-breakdown">';
+							foreach ( $breakdown as $fee_item ) {
+								echo '<li>' . esc_html( $fee_item['label'] ) . ': ' . wp_kses_post( wc_price( $fee_item['amount'], array( 'currency' => $order->get_currency() ) ) ) . '</li>';
+							}
+							echo '</ul>';
 					} else {
 						echo '<p>' . wp_kses_post( wc_price( $fee->get_total(), array( 'currency' => $order->get_currency() ) ) ) . '</p>';
 					}
@@ -268,7 +222,7 @@ class CFWC_Display {
 		$origin = get_post_meta( $product_id, '_cfwc_country_of_origin', true );
 		
 		if ( $hs_code || $origin ) {
-			$customs_info = '<br><small style="color: #666; font-size: 0.9em;">';
+			$customs_info = '<br><small class="cfwc-order-customs">';
 			
 			if ( $hs_code ) {
 				$customs_info .= sprintf( 
@@ -301,70 +255,48 @@ class CFWC_Display {
 		return $item_name;
 	}
 
-
-
 	/**
-	 * Enqueue frontend scripts and styles.
+	 * Enqueue tooltip assets on cart and checkout pages.
 	 *
 	 * @since 1.0.0
 	 */
-	public function enqueue_scripts() {
-		if ( is_cart() || is_checkout() || is_account_page() ) {
-			// Only add minimal styles for elements not using inline styles.
-			wp_add_inline_style( 'woocommerce-general', '
-				/* Tooltip on the main label */
-				.cfwc-tooltip {
-					cursor: help;
-					margin-left: 5px;
-					display: inline-block;
-					vertical-align: middle;
-				}
-				
-				.cfwc-tooltip .dashicons {
-					font-size: 16px;
-					width: 16px;
-					height: 16px;
-					color: #999;
-				}
-				
-				/* Disclaimer text (if used) */
-				.cfwc-disclaimer {
-					font-size: 0.9em;
-					color: #666;
-					font-style: italic;
-				}
-				
-				/* Order fees section (for order pages) */
-				.cfwc-order-fees {
-					margin-top: 20px;
-					padding: 15px;
-					background: #f7f7f7;
-					border-radius: 4px;
-				}
-				
-				/* High contrast mode support for tooltip */
-				@media (prefers-contrast: high) {
-					.cfwc-tooltip .dashicons {
-						color: inherit;
-					}
-				}
-				
-				/* RTL language support for tooltip */
-				.rtl .cfwc-tooltip {
-					margin-left: 0;
-					margin-right: 5px;
-				}
-			' );
-			
-			// Add small JavaScript to ensure radio buttons stay checked.
-			wp_add_inline_script( 'woocommerce', '
-				jQuery( function( $ ) {
-					// Ensure customs fee radio buttons always stay checked.
-					$( document ).on( "change", ".cfwc-fee-radio", function() {
-						$( this ).prop( "checked", true );
-					});
-				});
-			' );
+	public function enqueue_tooltip_assets() {
+		// Only on cart and checkout pages.
+		if ( ! is_cart() && ! is_checkout() ) {
+			return;
 		}
+
+		// Enqueue styles.
+		wp_enqueue_style(
+			'cfwc-frontend',
+			CFWC_PLUGIN_URL . 'assets/css/frontend.css',
+			array(),
+			CFWC_VERSION
+		);
+
+		// Enqueue scripts.
+		wp_enqueue_script(
+			'cfwc-frontend',
+			CFWC_PLUGIN_URL . 'assets/js/frontend.js',
+			array( 'jquery' ),
+			CFWC_VERSION,
+			true
+		);
+
+		// Get tooltip text from session first (it's set during cart calculation).
+		$tooltip_text = '';
+		if ( WC()->session ) {
+			$tooltip_text = WC()->session->get( 'cfwc_tooltip_text', '' );
+		}
+		
+		// Fallback to default translatable text if not in session.
+		if ( empty( $tooltip_text ) && class_exists( 'CFWC_Settings' ) ) {
+			$tooltip_text = CFWC_Settings::get_default_help_text();
+		}
+
+		// Localize script with tooltip text.
+		wp_localize_script( 'cfwc-frontend', 'cfwc_params', array(
+			'tooltip_text' => $tooltip_text,
+		) );
 	}
 }

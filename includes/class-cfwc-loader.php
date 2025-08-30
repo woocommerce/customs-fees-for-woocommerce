@@ -72,8 +72,8 @@ class CFWC_Loader {
 	 * @since 1.0.0
 	 */
 	private function register_hooks() {
-		// Frontend hooks.
-		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_frontend_assets' ) );
+		// Frontend hooks are now handled by CFWC_Display for better organization.
+		// The display class enqueues frontend assets on cart/checkout pages.
 
 		// Admin hooks.
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
@@ -100,16 +100,16 @@ class CFWC_Loader {
 	/**
 	 * Enqueue frontend assets.
 	 *
+	 * Note: This method is currently not used as frontend assets are handled
+	 * by CFWC_Display::enqueue_tooltip_assets() for better organization.
+	 * Kept for potential future use.
+	 *
 	 * @since 1.0.0
+	 * @deprecated 1.0.1 Use CFWC_Display::enqueue_tooltip_assets() instead.
 	 */
 	public function enqueue_frontend_assets() {
-		// Only load on cart and checkout pages.
-		if ( ! is_cart() && ! is_checkout() ) {
-			return;
-		}
-
-		// Check if fees are enabled.
-		if ( ! get_option( 'cfwc_enabled', false ) ) {
+		// Only load on cart, checkout, account, and order received pages.
+		if ( ! is_cart() && ! is_checkout() && ! is_account_page() && ! is_order_received_page() ) {
 			return;
 		}
 
@@ -117,7 +117,7 @@ class CFWC_Loader {
 		wp_enqueue_style(
 			'cfwc-frontend',
 			CFWC_PLUGIN_URL . 'assets/css/frontend.css',
-			array(),
+			array( 'woocommerce-general' ),
 			CFWC_VERSION
 		);
 
@@ -130,6 +130,15 @@ class CFWC_Loader {
 			true
 		);
 
+		// Get tooltip text from session first, then fallback to default.
+		$tooltip_text = '';
+		if ( WC()->session ) {
+			$tooltip_text = WC()->session->get( 'cfwc_tooltip_text', '' );
+		}
+		if ( empty( $tooltip_text ) && class_exists( 'CFWC_Settings' ) ) {
+			$tooltip_text = CFWC_Settings::get_default_help_text();
+		}
+		
 		// Localize script with data.
 		wp_localize_script(
 			'cfwc-frontend',
@@ -137,10 +146,7 @@ class CFWC_Loader {
 			array(
 				'ajax_url'        => admin_url( 'admin-ajax.php' ),
 				'nonce'          => wp_create_nonce( 'cfwc-frontend' ),
-				'tooltip_text'   => class_exists( 'CFWC_Settings' ) ? CFWC_Settings::get_default_help_text() : '',
-				'show_tooltip'   => get_option( 'cfwc_show_tooltip', true ),
-				'require_agreement' => get_option( 'cfwc_require_agreement', true ),
-				'disclaimer_text' => get_option( 'cfwc_disclaimer_text', '' ),
+				'tooltip_text'   => $tooltip_text,
 				'i18n' => array(
 					'fee_details'    => __( 'View fee details', 'customs-fees-for-woocommerce' ),
 					'loading'        => __( 'Loading...', 'customs-fees-for-woocommerce' ),
