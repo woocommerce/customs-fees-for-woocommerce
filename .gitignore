@@ -1,40 +1,101 @@
-# OS Files
+# Operating System Files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+desktop.ini
 
-# Editor files
-*.swp
-*.swo
-*~
+# IDE Files
 .idea/
 .vscode/
+*.sublime-project
+*.sublime-workspace
+.project
+.settings/
 
-# Build files
+# Dependency Directories
 node_modules/
 vendor/
-composer.lock
-package-lock.json
+bower_components/
 
-# Development files
+# Build Files
+/build/
+/dist/
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Development Files
+*.map
+.sass-cache/
+*.css.map
+*.js.map
+
+# WordPress
+wp-config.php
+wp-content/uploads/
+wp-content/blogs.dir/
+wp-content/upgrade/
+wp-content/backup-db/
+wp-content/advanced-cache.php
+wp-content/wp-cache-config.php
+sitemap.xml
+*.log
+
+# Environment Files
 .env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
-# Backup files
-*.bak
-*.backup
-*.old
-
-# Temporary files
+# Temporary Files
 *.tmp
-*.temp
+*.bak
+*.swp
+*~
 
-# Development files
-*.md
-*.txt
-*.json
-*.yml
-*.yaml
-*.xml
-*.csv
-*.xls
-*.xlsx
+# Testing
+/tests/coverage/
+.phpunit.result.cache
+
+# Package Files
+*.zip
+*.tar.gz
+*.rar
+
+# Compiled Files
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# macOS specific
+.AppleDouble
+.LSOverride
+Icon
+.DocumentRevisions-V100
+.fseventsd
+.TemporaryItems
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows specific
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk

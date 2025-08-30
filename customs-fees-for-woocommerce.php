@@ -3,7 +3,7 @@
  * Plugin Name:       Customs Fees for WooCommerce
  * Plugin URI:        https://woocommerce.com
  * Description:       Add customs and import fees to WooCommerce orders based on destination country and product origin.
- * Version: 1.0.0
+ * Version:           1.0.0
  * Author:            WooCommerce
  * Author URI:        https://woocommerce.com
  * License:           GPL v2 or later
@@ -12,10 +12,10 @@
  * Domain Path:       /languages
  * Requires Plugins:  woocommerce
  * Requires at least: 6.0
- * Tested up to: 6.8
- * Requires PHP: 7.4
+ * Tested up to:      6.8
+ * Requires PHP:      7.4
  * WC requires at least: 9.0.0
- * WC tested up to: 10.1.2
+ * WC tested up to:   10.1.2
  *
  * @package CustomsFeesForWooCommerce
  */
@@ -30,51 +30,30 @@ define( 'CFWC_VERSION', '1.0.0' );
 define( 'CFWC_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'CFWC_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'CFWC_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
-
-/**
- * Check if WooCommerce is active.
- *
- * @since 1.0.0
- * @return bool True if WooCommerce is active, false otherwise.
- */
-function cfwc_is_woocommerce_active() {
-	return in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ), true )
-		|| ( is_multisite() && array_key_exists( 'woocommerce/woocommerce.php', get_site_option( 'active_sitewide_plugins', array() ) ) );
-}
-
-/**
- * Display admin notice if WooCommerce is not active.
- *
- * @since 1.0.0
- */
-function cfwc_woocommerce_not_active_notice() {
-	?>
-	<div class="notice notice-error">
-		<p><?php esc_html_e( 'Customs Fees for WooCommerce requires WooCommerce to be installed and active.', 'customs-fees-for-woocommerce' ); ?></p>
-	</div>
-	<?php
-}
-
-// Check if WooCommerce is active before loading the plugin.
-if ( ! cfwc_is_woocommerce_active() ) {
-	add_action( 'admin_notices', 'cfwc_woocommerce_not_active_notice' );
-	return;
-}
+define( 'CFWC_PLUGIN_FILE', __FILE__ );
 
 /**
  * Main plugin class.
  *
  * @since 1.0.0
  */
-class Customs_Fees_WooCommerce {
+final class Customs_Fees_WooCommerce {
 
 	/**
 	 * Plugin instance.
 	 *
 	 * @since 1.0.0
-	 * @var Customs_Fees_WooCommerce
+	 * @var Customs_Fees_WooCommerce|null
 	 */
 	private static $instance = null;
+
+	/**
+	 * Plugin loader instance.
+	 *
+	 * @since 1.0.0
+	 * @var CFWC_Loader|null
+	 */
+	private $loader = null;
 
 	/**
 	 * Get plugin instance.
@@ -82,8 +61,8 @@ class Customs_Fees_WooCommerce {
 	 * @since 1.0.0
 	 * @return Customs_Fees_WooCommerce
 	 */
-	public static function get_instance() {
-		if ( null === self::$instance ) {
+	public static function instance() {
+		if ( is_null( self::$instance ) ) {
 			self::$instance = new self();
 		}
 		return self::$instance;
@@ -95,206 +74,120 @@ class Customs_Fees_WooCommerce {
 	 * @since 1.0.0
 	 */
 	private function __construct() {
-		$this->init_hooks();
-		$this->load_dependencies();
+		// Check dependencies.
+		if ( ! $this->check_dependencies() ) {
+			return;
+		}
+
+		// Initialize the plugin.
+		$this->init();
 	}
 
 	/**
-	 * Initialize hooks.
+	 * Check plugin dependencies.
 	 *
 	 * @since 1.0.0
+	 * @return bool True if all dependencies are met.
 	 */
-	private function init_hooks() {
-		// Load plugin textdomain.
-		add_action( 'init', array( $this, 'load_textdomain' ) );
+	private function check_dependencies() {
+		// Check if WooCommerce is active.
+		if ( ! $this->is_woocommerce_active() ) {
+			add_action( 'admin_notices', array( $this, 'woocommerce_missing_notice' ) );
+			return false;
+		}
 
-		// Add fees to cart.
-		add_action( 'woocommerce_cart_calculate_fees', array( $this, 'add_customs_fees' ) );
-
-		// Add plugin action links.
-		add_filter( 'plugin_action_links_' . CFWC_PLUGIN_BASENAME, array( $this, 'add_action_links' ) );
-
-		// HPOS compatibility.
-		add_action( 'before_woocommerce_init', array( $this, 'declare_hpos_compatibility' ) );
+		return true;
 	}
 
 	/**
-	 * Load dependencies.
+	 * Check if WooCommerce is active.
+	 *
+	 * @since 1.0.0
+	 * @return bool True if WooCommerce is active.
+	 */
+	private function is_woocommerce_active() {
+		return in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ), true )
+			|| ( is_multisite() && array_key_exists( 'woocommerce/woocommerce.php', get_site_option( 'active_sitewide_plugins', array() ) ) );
+	}
+
+	/**
+	 * Display admin notice if WooCommerce is not active.
 	 *
 	 * @since 1.0.0
 	 */
-	private function load_dependencies() {
-		// Load core classes.
-		require_once CFWC_PLUGIN_DIR . 'includes/class-cfwc-settings.php';
-		require_once CFWC_PLUGIN_DIR . 'includes/class-cfwc-calculator.php';
-		require_once CFWC_PLUGIN_DIR . 'includes/class-cfwc-products.php';
-		require_once CFWC_PLUGIN_DIR . 'includes/class-cfwc-display.php';
-		require_once CFWC_PLUGIN_DIR . 'includes/class-cfwc-emails.php';
+	public function woocommerce_missing_notice() {
+		?>
+		<div class="notice notice-error">
+			<p><?php esc_html_e( 'Customs Fees for WooCommerce requires WooCommerce to be installed and active.', 'customs-fees-for-woocommerce' ); ?></p>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Initialize the plugin.
+	 *
+	 * @since 1.0.0
+	 */
+	private function init() {
+		// Load the loader class.
 		require_once CFWC_PLUGIN_DIR . 'includes/class-cfwc-loader.php';
-		require_once CFWC_PLUGIN_DIR . 'includes/class-cfwc-templates.php';
 		
-		// Load admin classes if in admin.
-		if ( is_admin() ) {
-			require_once CFWC_PLUGIN_DIR . 'includes/admin/class-cfwc-admin.php';
-			$admin = new CFWC_Admin();
-			$admin->init();
-		}
-
-		// Initialize classes.
-		$settings = new CFWC_Settings();
-		$settings->init();
-
-		// Products class doesn't have init() - just instantiate it
-		$products = new CFWC_Products();
-
-		$display = new CFWC_Display();
-		$display->init();
-
-		$emails = new CFWC_Emails();
-		$emails->init();
-
-		$loader = new CFWC_Loader();
-		$loader->init();
-		
-			// Initialize templates to register AJAX handlers
-	$templates = new CFWC_Templates();
-	$templates->init();
+		// Initialize the loader.
+		$this->loader = CFWC_Loader::instance();
+		$this->loader->init();
 	}
 
 	/**
-	 * Load plugin textdomain.
+	 * Get the plugin loader.
 	 *
 	 * @since 1.0.0
-	 * @deprecated 1.0.1 WordPress automatically loads translations for plugins hosted on WordPress.org since 4.6
+	 * @return CFWC_Loader|null The loader instance.
 	 */
-	public function load_textdomain() {
-		// WordPress 4.6+ automatically loads translations for plugins hosted on WordPress.org.
-		// This method is kept empty for backward compatibility.
-		// Translations are loaded automatically by WordPress.
+	public function get_loader() {
+		return $this->loader;
 	}
 
 	/**
-	 * Declare HPOS compatibility.
+	 * Cloning is forbidden.
 	 *
 	 * @since 1.0.0
 	 */
-	public function declare_hpos_compatibility() {
-		if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
-			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility(
-				'custom_order_tables',
-				__FILE__,
-				true
-			);
-			
-			// Also declare cart/checkout blocks compatibility.
-			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility(
-				'cart_checkout_blocks',
-				__FILE__,
-				true
-			);
-		}
+	public function __clone() {
+		_doing_it_wrong( __FUNCTION__, esc_html__( 'Cloning is forbidden.', 'customs-fees-for-woocommerce' ), '1.0.0' );
 	}
 
 	/**
-	 * Add customs fees to cart.
+	 * Unserializing instances of this class is forbidden.
 	 *
 	 * @since 1.0.0
-	 * @param WC_Cart $cart Cart object.
 	 */
-	public function add_customs_fees( $cart ) {
-		// Don't add fees in admin or if cart is empty.
-		if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
-			return;
-		}
-
-		if ( $cart->is_empty() ) {
-			return;
-		}
-
-		// Get calculator instance.
-		$calculator = new CFWC_Calculator();
-		$calculator->init();
-
-		// Calculate fees.
-		$fees = $calculator->calculate_fees( $cart );
-
-		// Debug logging for calculated fees.
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
-			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug only
-			error_log( 'CFWC Calculated Fees: ' . wp_json_encode( $fees ) );
-		}
-
-		if ( empty( $fees ) ) {
-			// Clear the breakdown from session if no fees
-			WC()->session->set( 'cfwc_fees_breakdown', array() );
-			return;
-		}
-
-		// Use default translatable tooltip text.
-		if ( class_exists( 'CFWC_Settings' ) ) {
-			$tooltip_text = CFWC_Settings::get_default_help_text();
-			WC()->session->set( 'cfwc_tooltip_text', $tooltip_text );
-		}
-		
-		// Store the fee breakdown in session for display
-		WC()->session->set( 'cfwc_fees_breakdown', $fees );
-
-		// Calculate total customs fees
-		$total_amount = 0;
-		$any_taxable = false;
-		$tax_class = '';
-		
-		foreach ( $fees as $fee ) {
-			$total_amount += $fee['amount'];
-			if ( isset( $fee['taxable'] ) && $fee['taxable'] ) {
-				$any_taxable = true;
-			}
-			// Use the first tax class found
-			if ( empty( $tax_class ) && isset( $fee['tax_class'] ) ) {
-				$tax_class = $fee['tax_class'];
-			}
-		}
-
-		// Add a single combined fee for all customs
-		WC()->cart->add_fee(
-			__( 'Customs & Import Fees', 'customs-fees-for-woocommerce' ),
-			$total_amount,
-			$any_taxable,
-			$tax_class
-		);
-		
-		// Debug log
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
-			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug only
-			error_log( sprintf( 'CFWC Added Combined Fee: Total = %s, Breakdown count = %d', $total_amount, count( $fees ) ) );
-		}
+	public function __wakeup() {
+		_doing_it_wrong( __FUNCTION__, esc_html__( 'Unserializing instances of this class is forbidden.', 'customs-fees-for-woocommerce' ), '1.0.0' );
 	}
-
-	/**
-	 * Add plugin action links.
-	 *
-	 * @since 1.0.0
-	 * @param array $links Existing links.
-	 * @return array Modified links.
-	 */
-	public function add_action_links( $links ) {
-		$plugin_links = array(
-			'<a href="' . admin_url( 'admin.php?page=wc-settings&tab=tax&section=customs' ) . '">' . esc_html__( 'Settings', 'customs-fees-for-woocommerce' ) . '</a>',
-		);
-
-		return array_merge( $plugin_links, $links );
-	}
-
 }
 
 /**
- * Activation hook.
+ * Returns the main instance of Customs_Fees_WooCommerce.
+ *
+ * @since 1.0.0
+ * @return Customs_Fees_WooCommerce Main instance.
+ */
+function CFWC() {
+	return Customs_Fees_WooCommerce::instance();
+}
+
+// Global for backwards compatibility.
+$GLOBALS['customs_fees_woocommerce'] = CFWC();
+
+/**
+ * Plugin activation handler.
  *
  * @since 1.0.0
  */
 function cfwc_activate() {
 	// Set default options.
-	cfwc_set_default_options();
+	add_option( 'cfwc_rules', array() );
+	add_option( 'cfwc_version', CFWC_VERSION );
 
 	// Clear transients.
 	delete_transient( 'cfwc_rules_cache' );
@@ -305,20 +198,7 @@ function cfwc_activate() {
 register_activation_hook( __FILE__, 'cfwc_activate' );
 
 /**
- * Set default options.
- *
- * @since 1.0.0
- */
-function cfwc_set_default_options() {
-	// Main settings.
-	add_option( 'cfwc_rules', array() );
-
-	// Version tracking.
-	add_option( 'cfwc_version', CFWC_VERSION );
-}
-
-/**
- * Deactivation hook.
+ * Plugin deactivation handler.
  *
  * @since 1.0.0
  */
@@ -332,11 +212,18 @@ function cfwc_deactivate() {
 register_deactivation_hook( __FILE__, 'cfwc_deactivate' );
 
 /**
- * Uninstall hook.
+ * Plugin uninstall handler.
  *
  * @since 1.0.0
  */
 function cfwc_uninstall() {
+	// Check if we should remove data.
+	$remove_data = apply_filters( 'cfwc_uninstall_remove_data', true );
+	
+	if ( ! $remove_data ) {
+		return;
+	}
+
 	// Remove options.
 	delete_option( 'cfwc_rules' );
 	delete_option( 'cfwc_version' );
@@ -349,7 +236,7 @@ function cfwc_uninstall() {
 	// for uninstall operations which only run once when the plugin is deleted.
 	global $wpdb;
 	
-	// Remove HS code meta
+	// Remove HS code meta.
 	// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	// phpcs:disable WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 	$wpdb->delete(
@@ -359,7 +246,7 @@ function cfwc_uninstall() {
 	// phpcs:enable WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 	// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	
-	// Remove country of origin meta
+	// Remove country of origin meta.
 	// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	// phpcs:disable WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 	$wpdb->delete(
@@ -369,18 +256,14 @@ function cfwc_uninstall() {
 	// phpcs:enable WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 	// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	
-	// Clear any cached data
+	// Clear any cached data.
 	wp_cache_flush();
 }
 register_uninstall_hook( __FILE__, 'cfwc_uninstall' );
 
 /**
- * Initialize the plugin.
+ * Initialize the plugin on plugins_loaded.
  *
  * @since 1.0.0
  */
-function cfwc_init() {
-	Customs_Fees_WooCommerce::get_instance();
-}
-add_action( 'plugins_loaded', 'cfwc_init' );
-
+add_action( 'plugins_loaded', array( 'Customs_Fees_WooCommerce', 'instance' ), 10 );
