@@ -314,10 +314,11 @@ class CFWC_Admin {
 		);
 
 		// Enqueue admin JavaScript with dependencies.
+		// Include wp-data for snackbar notifications
 		wp_enqueue_script(
 			'cfwc-admin',
 			CFWC_PLUGIN_URL . 'assets/js/admin.js',
-			array( 'jquery', 'wc-enhanced-select', 'selectWoo' ),
+			array( 'jquery', 'wc-enhanced-select', 'selectWoo', 'wp-data', 'wp-notices' ),
 			CFWC_VERSION,
 			true
 		);

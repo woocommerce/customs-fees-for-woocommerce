@@ -113,7 +113,7 @@
         return;
       }
 
-      // Require confirmation
+      // Keep confirmation for Delete All (destructive action)
       if ($(this).hasClass("confirm-delete")) {
         // Second click - proceed
         var rules = [];
@@ -127,25 +127,31 @@
         );
         $(this)
           .removeClass("confirm-delete")
-          .text(strings.delete_all || "Delete All Rules");
+          .text(strings.delete_all || "Delete All Rules")
+          .css("background", "")
+          .css("color", "");
       } else {
-        // First click - show warning
+        // First click - show warning and style as danger
         showNotice(
           strings.delete_warning ||
-            "Warning: This will delete all existing rules. Click again to confirm.",
+            "⚠️ This will delete ALL rules. Click again to confirm.",
           "warning"
         );
         $(this)
           .addClass("confirm-delete")
-          .text(strings.confirm_delete || "Click to Confirm Delete");
+          .text(strings.confirm_delete || "Click to Confirm Delete")
+          .css("background", "#d63638")
+          .css("color", "#fff");
 
-        // Reset button after 5 seconds
+        // Reset button after 7 seconds (match warning notification duration)
         var $button = $(this);
         setTimeout(function () {
           $button
             .removeClass("confirm-delete")
-            .text(strings.delete_all || "Delete All Rules");
-        }, 5000);
+            .text(strings.delete_all || "Delete All Rules")
+            .css("background", "")
+            .css("color", "");
+        }, 7000);
       }
     });
 
@@ -169,16 +175,46 @@
             // Reset preset selector
             $("#cfwc-preset-select").val("");
             $("#cfwc-preset-description").hide();
-            // Show success message with save reminder
-            var message =
+
+            // Show preset success message (shorter duration)
+            var presetMessage =
               response.data.message ||
               strings.preset_applied ||
               "Preset applied successfully!";
-            message +=
-              " " +
-              (strings.save_reminder ||
-                'Remember to click "Save changes" to persist these rules.');
-            showNotice(message, "success");
+
+            // Use shorter duration for preset success
+            if (window.wp && window.wp.data && window.wp.data.dispatch) {
+              wp.data
+                .dispatch("core/notices")
+                .createNotice("success", presetMessage, {
+                  type: "snackbar",
+                  isDismissible: true,
+                  autoDismiss: 3000, // 3 seconds for preset success
+                });
+
+              // Show save reminder after a delay
+              setTimeout(function () {
+                var saveMessage =
+                  strings.save_reminder ||
+                  '💾 Remember to click "Save changes" to persist these rules.';
+                wp.data
+                  .dispatch("core/notices")
+                  .createNotice("info", saveMessage, {
+                    type: "snackbar",
+                    isDismissible: true,
+                    autoDismiss: 7000, // 7 seconds for save reminder
+                  });
+              }, 2500); // Show save reminder after 2.5 seconds
+            } else {
+              // Fallback for old WordPress
+              showNotice(
+                presetMessage +
+                  " " +
+                  (strings.save_reminder ||
+                    'Remember to click "Save changes" to persist these rules.'),
+                "success"
+              );
+            }
 
             // Enable save button using helper function
             enableSaveButton();
@@ -207,41 +243,43 @@
       });
     }
 
-    // Show admin notice - Fixed positioning
+    // Show admin notice using WooCommerce snackbar
     function showNotice(message, type) {
-      // Remove any existing notices
-      $(".cfwc-admin-notice").remove();
+      // Use WooCommerce snackbar if available
+      if (window.wp && window.wp.data && window.wp.data.dispatch) {
+        var noticeType = "info";
+        if (type === "notice-success" || type === "success") {
+          noticeType = "success";
+        } else if (type === "notice-error" || type === "error") {
+          noticeType = "error";
+        } else if (type === "notice-warning" || type === "warning") {
+          noticeType = "warning";
+        }
 
-      var noticeHtml =
-        '<div class="cfwc-admin-notice notice is-dismissible ' +
-        type +
-        '">' +
-        '<p class="notice-message">' +
-        message +
-        "</p>" +
-        '<button type="button" class="notice-dismiss"><span class="screen-reader-text">' +
-        (strings.dismiss_notice || "Dismiss this notice") +
-        "</span></button>" +
-        "</div>";
-
-      var $notice = $(noticeHtml);
-
-      // Insert after the preset loader section
-      $(".cfwc-preset-loader").after($notice);
-
-      // Dismiss on click
-      $notice.find(".notice-dismiss").on("click", function () {
-        $notice.fadeOut(300, function () {
-          $notice.remove();
+        // Use WooCommerce/WordPress snackbar notification
+        wp.data.dispatch("core/notices").createNotice(noticeType, message, {
+          type: "snackbar",
+          isDismissible: true,
+          // 5 seconds for success, 7 seconds for errors/warnings
+          autoDismiss: noticeType === "success" ? 5000 : 7000,
         });
-      });
-
-      // Auto-dismiss after 10 seconds (longer duration for better readability)
-      setTimeout(function () {
-        $notice.fadeOut(300, function () {
-          $notice.remove();
-        });
-      }, 10000);
+      } else {
+        // Fallback to basic notice for old WordPress versions
+        $(".cfwc-admin-notice").remove();
+        var noticeHtml =
+          '<div class="cfwc-admin-notice notice is-dismissible ' +
+          type +
+          '">' +
+          "<p>" +
+          message +
+          "</p></div>";
+        $(".cfwc-preset-loader").after(noticeHtml);
+        setTimeout(function () {
+          $(".cfwc-admin-notice").fadeOut(300, function () {
+            $(this).remove();
+          });
+        }, 5000);
+      }
     }
 
     // Build country options
@@ -293,30 +331,19 @@
       return html;
     }
 
+    // Store state for edit/add operations
+    var originalRules = null;
+    var editingIndex = null;
+    var isAddingNew = false;
+
     // Add new rule functionality
     $(".cfwc-add-rule").on("click", function (e) {
       e.preventDefault();
 
-      // Get existing rules
-      var rules = JSON.parse($("#cfwc_rules").val() || "[]");
-
-      // Create new empty rule
-      var newRule = {
-        label: "",
-        country: "",
-        origin_country: "",
-        type: "percentage",
-        rate: 0,
-        amount: 0,
-        taxable: true,
-        tax_class: "",
-      };
-
-      // Add to rules array
-      rules.push(newRule);
-
-      // Update hidden field
-      $("#cfwc_rules").val(JSON.stringify(rules));
+      // Save current state before adding
+      originalRules = JSON.parse($("#cfwc_rules").val() || "[]");
+      isAddingNew = true;
+      editingIndex = originalRules.length;
 
       // Create new row HTML (editable fields)
       var newRowHtml = '<tr class="cfwc-rule-row cfwc-rule-editing">';
@@ -424,7 +451,13 @@
       var $button = $(this);
       var $row = $button.closest("tr");
       var index = $button.data("index");
-      var rules = JSON.parse($("#cfwc_rules").val() || "[]");
+
+      // Save original state before editing
+      originalRules = JSON.parse($("#cfwc_rules").val() || "[]");
+      isAddingNew = false;
+      editingIndex = index;
+
+      var rules = originalRules;
       var rule = rules[index];
 
       // Create edit row HTML
@@ -556,15 +589,21 @@
       }
 
       // Update or add rule
-      if (index !== undefined) {
-        rules[index] = $.extend({}, rules[index], ruleData);
+      if (isAddingNew) {
+        // For new rules, add to array
+        rules.push(ruleData);
       } else {
-        // Find the new rule (last one)
-        rules[rules.length - 1] = ruleData;
+        // For existing rules, update at index
+        rules[index] = $.extend({}, rules[index], ruleData);
       }
 
       // Update hidden field
       $("#cfwc_rules").val(JSON.stringify(rules));
+
+      // Reset state
+      originalRules = null;
+      editingIndex = null;
+      isAddingNew = false;
 
       // Update table
       updateRulesTable(rules);
@@ -583,60 +622,46 @@
     $(document).on("click", ".cfwc-cancel-edit", function (e) {
       e.preventDefault();
 
+      // Restore original rules if we were editing/adding
+      if (originalRules !== null) {
+        $("#cfwc_rules").val(JSON.stringify(originalRules));
+      }
+
+      // Reset state
       var rules = JSON.parse($("#cfwc_rules").val() || "[]");
+      originalRules = null;
+      editingIndex = null;
+      isAddingNew = false;
+
       updateRulesTable(rules);
     });
 
-    // Delete rule functionality - CUSTOM CONFIRMATION
+    // Delete rule functionality - Instant delete like WooCommerce tax table
     $(document).on("click", ".cfwc-delete-rule", function (e) {
       e.preventDefault();
 
       var $button = $(this);
       var index = $button.data("index");
+      var rules = JSON.parse($("#cfwc_rules").val() || "[]");
 
-      // Double-click confirmation like Delete All
-      if ($button.hasClass("confirm-delete")) {
-        // Second click - proceed with deletion
-        var rules = JSON.parse($("#cfwc_rules").val() || "[]");
+      // Remove rule instantly
+      rules.splice(index, 1);
 
-        // Remove rule
-        rules.splice(index, 1);
+      // Update hidden field
+      $("#cfwc_rules").val(JSON.stringify(rules));
 
-        // Update hidden field
-        $("#cfwc_rules").val(JSON.stringify(rules));
+      // Update table
+      updateRulesTable(rules);
 
-        // Update table
-        updateRulesTable(rules);
+      // Enable save button
+      enableSaveButton();
 
-        // Enable save button
-        enableSaveButton();
-
-        // Show success message for deletion
-        showNotice(
-          strings.rule_deleted ||
-            'Rule deleted successfully. Remember to click "Save changes" to persist.',
-          "success"
-        );
-      } else {
-        // First click - show warning
-        showNotice(
-          strings.delete_confirm ||
-            "Click the delete button again to confirm deletion.",
-          "warning"
-        );
-        $button
-          .addClass("confirm-delete")
-          .css("background", "#d63638")
-          .css("color", "#fff");
-
-        // Reset button after 3 seconds
-        setTimeout(function () {
-          $button
-            .removeClass("confirm-delete")
-            .css("background", "")
-            .css("color", "");
-        }, 3000);
-      }
+      // Show success message for deletion
+      showNotice(
+        strings.rule_deleted ||
+          'Rule deleted. Remember to click "Save changes" to persist.',
+        "success"
+      );
     });
 
     // Update rules table

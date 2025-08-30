@@ -48,18 +48,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<hr>
 	
 	<!-- Rules Table -->
-	<div class="cfwc-rules-table">
-		<div class="cfwc-rules-header">
-			<div>
-				<h3><?php esc_html_e( 'All Rules', 'customs-fees-for-woocommerce' ); ?></h3>
-				<p><?php esc_html_e( 'Configure customs fee rules based on destination countries and product origins.', 'customs-fees-for-woocommerce' ); ?></p>
-			</div>
-			<button type="button" class="button cfwc-add-rule">
-				<?php esc_html_e( 'Add New Rule', 'customs-fees-for-woocommerce' ); ?>
-			</button>
+	<div class="cfwc-rules-header">
+		<div>
+			<h3><?php esc_html_e( 'All Rules', 'customs-fees-for-woocommerce' ); ?></h3>
+			<p><?php esc_html_e( 'Configure customs fee rules based on destination countries and product origins.', 'customs-fees-for-woocommerce' ); ?></p>
 		</div>
-		
-		<table class="widefat fixed striped">
+		<button type="button" class="button cfwc-add-rule">
+			<?php esc_html_e( 'Add New Rule', 'customs-fees-for-woocommerce' ); ?>
+		</button>
+	</div>
+	
+	<div class="cfwc-rules-table-wrapper">
+		<table class="widefat fixed striped cfwc-rules-table">
 			<thead>
 				<tr>
 					<th><?php esc_html_e( 'Label', 'customs-fees-for-woocommerce' ); ?></th>
@@ -115,7 +115,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<?php endif; ?>
 			</tbody>
 		</table>
-	</div>
+	</div><!-- .cfwc-rules-table-wrapper -->
 	
 	<!-- Hidden input for rules data -->
 	<input type="hidden" name="cfwc_rules" id="cfwc_rules" value='<?php echo esc_attr( wp_json_encode( $rules ) ); ?>' />
