@@ -228,6 +228,8 @@ class Customs_Fees_WooCommerce {
 		}
 
 		if ( empty( $fees ) ) {
+			// Clear the breakdown from session if no fees
+			WC()->session->set( 'cfwc_fees_breakdown', array() );
 			return;
 		}
 
@@ -237,41 +239,37 @@ class Customs_Fees_WooCommerce {
 			WC()->session->set( 'cfwc_tooltip_text', $tooltip_text );
 		}
 		
-		// Always show detailed breakdown - add each fee separately
-		// Make each fee truly unique by adding a counter to the label
-		$fee_counter = 0;
-		$fees_by_label = array();
+		// Store the fee breakdown in session for display
+		WC()->session->set( 'cfwc_fees_breakdown', $fees );
+
+		// Calculate total customs fees
+		$total_amount = 0;
+		$any_taxable = false;
+		$tax_class = '';
 		
-		// Group fees by label to handle duplicates
 		foreach ( $fees as $fee ) {
-			$base_label = $fee['label'];
-			if ( ! isset( $fees_by_label[ $base_label ] ) ) {
-				$fees_by_label[ $base_label ] = 0;
+			$total_amount += $fee['amount'];
+			if ( isset( $fee['taxable'] ) && $fee['taxable'] ) {
+				$any_taxable = true;
 			}
-			$fees_by_label[ $base_label ]++;
-			
-			// For duplicate labels, append a number
-			if ( $fees_by_label[ $base_label ] > 1 ) {
-				$unique_label = $base_label . ' (' . $fees_by_label[ $base_label ] . ')';
-			} else {
-				$unique_label = $base_label;
+			// Use the first tax class found
+			if ( empty( $tax_class ) && isset( $fee['tax_class'] ) ) {
+				$tax_class = $fee['tax_class'];
 			}
-			
-			$fee_counter++;
-			
-			// Add the fee with truly unique label
-			WC()->cart->add_fee(
-				$unique_label,
-				$fee['amount'],
-				isset( $fee['taxable'] ) ? $fee['taxable'] : true,
-				isset( $fee['tax_class'] ) ? $fee['tax_class'] : ''
-			);
-			
-			// Debug log each fee being added
-			if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
-				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug only
-				error_log( sprintf( 'CFWC Adding Fee #%d: %s = %s (base: %s)', $fee_counter, $unique_label, $fee['amount'], $base_label ) );
-			}
+		}
+
+		// Add a single combined fee for all customs
+		WC()->cart->add_fee(
+			__( 'Customs & Import Fees', 'customs-fees-for-woocommerce' ),
+			$total_amount,
+			$any_taxable,
+			$tax_class
+		);
+		
+		// Debug log
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug only
+			error_log( sprintf( 'CFWC Added Combined Fee: Total = %s, Breakdown count = %d', $total_amount, count( $fees ) ) );
 		}
 	}
 
