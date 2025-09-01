@@ -95,6 +95,9 @@ class CFWC_Onboarding {
 			return;
 		}
 		
+		// Check if plugin was just activated.
+		$just_activated = get_option( 'cfwc_activated' ) ? true : false;
+		
 		// Check if activated within last 10 minutes (show on all pages).
 		$activation_time = get_option( 'cfwc_activation_time' );
 		$show_everywhere = false;
