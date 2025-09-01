@@ -17,6 +17,7 @@ With the U.S. ending its de minimis exemption on **August 29, 2025**, all intern
 - **Origin-Based Rules**: Set different fees based on product origin countries.
 - **Smart Presets**: Quick setup with built-in presets for US, UK, EU, Canada, and Australia tariffs.
 - **Product-Level Settings**: Define origin country and HS codes for individual products.
+- **CSV Import/Export**: Bulk update product HS codes and countries of origin using WooCommerce's CSV tools (ID or SKU required for updates).
 - **Transparent Checkout**: Display detailed fee breakdown to customers.
 - **Flexible Rules**: Create unlimited custom rules for any country combination.
 - **HPOS Compatible**: Fully compatible with WooCommerce High-Performance Order Storage.
@@ -82,10 +83,11 @@ For accurate fee calculation, set the origin country for your products:
 4. The breakdown shows all applied rules with radio indicators. (Currently support only classic cart and checkout.)
 
 ![Plugin Settings](.github//media/settings.png)
-![Plugin Settings](.github//media/product-settings.png)
+![Product Settings](.github//media/product-settings.png)
 ![Classic cart](.github//media/cart.png)
 ![Classic checkout](.github//media/checkout.png)
 ![cart block](.github//media/cart-block.png)
+![Order Details](.github//media/order-details.png)
 
 ## How It Works
 

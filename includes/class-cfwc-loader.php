@@ -94,6 +94,8 @@ class CFWC_Loader {
 		// Load admin classes if in admin.
 		if ( is_admin() ) {
 			require_once CFWC_PLUGIN_DIR . 'includes/admin/class-cfwc-admin.php';
+			// Include export/import handler for CSV functionality.
+			require_once CFWC_PLUGIN_DIR . 'includes/class-cfwc-export-import.php';
 		}
 	}
 
@@ -126,6 +128,9 @@ class CFWC_Loader {
 		if ( is_admin() ) {
 			$admin = new CFWC_Admin();
 			$admin->init();
+			
+			// Initialize export/import handler.
+			new CFWC_Export_Import();
 		}
 
 		// Initialize calculator for later use.
