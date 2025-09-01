@@ -740,4 +740,55 @@
       }
     }
   });
+  // Quick edit support for HS Code and Country of Origin.
+  $(document).ready(function () {
+    if (typeof inlineEditPost !== "undefined") {
+      // Store the original quick edit function.
+      var $wp_inline_edit = inlineEditPost.edit;
+
+      // Override the function.
+      inlineEditPost.edit = function (id) {
+        // Call the original function.
+        $wp_inline_edit.apply(this, arguments);
+
+        // Get the post ID.
+        var $post_id = 0;
+        if (typeof id == "object") {
+          $post_id = parseInt(this.getId(id));
+        }
+
+        if ($post_id > 0) {
+          // Get the edit row.
+          var $edit_row = $("#edit-" + $post_id);
+
+          // Use AJAX to get the current values.
+          $.ajax({
+            url: ajaxurl,
+            type: "POST",
+            data: {
+              action: "cfwc_get_quick_edit_data",
+              product_id: $post_id,
+            },
+            success: function (response) {
+              if (response.success && response.data) {
+                // Set HS Code if available.
+                if (response.data.hs_code) {
+                  $('input[name="_cfwc_hs_code"]', $edit_row).val(
+                    response.data.hs_code
+                  );
+                }
+
+                // Set Country of Origin if available.
+                if (response.data.country_of_origin) {
+                  $('select[name="_cfwc_country_of_origin"]', $edit_row).val(
+                    response.data.country_of_origin
+                  );
+                }
+              }
+            },
+          });
+        }
+      };
+    }
+  });
 })(jQuery);

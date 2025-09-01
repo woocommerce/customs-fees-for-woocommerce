@@ -96,6 +96,8 @@ class CFWC_Loader {
 			require_once CFWC_PLUGIN_DIR . 'includes/admin/class-cfwc-admin.php';
 			// Include export/import handler for CSV functionality.
 			require_once CFWC_PLUGIN_DIR . 'includes/class-cfwc-export-import.php';
+			// Include onboarding handler.
+			require_once CFWC_PLUGIN_DIR . 'includes/admin/class-cfwc-onboarding.php';
 		}
 	}
 
@@ -131,6 +133,9 @@ class CFWC_Loader {
 			
 			// Initialize export/import handler.
 			new CFWC_Export_Import();
+			
+			// Initialize onboarding handler.
+			new CFWC_Onboarding();
 		}
 
 		// Initialize calculator for later use.

@@ -79,6 +79,9 @@ final class Customs_Fees_WooCommerce {
 			return;
 		}
 
+		// Handle activation on admin_init like AutomateWoo does.
+		add_action( 'admin_init', array( $this, 'maybe_activate' ), 20 );
+
 		// Initialize the plugin.
 		$this->init();
 	}
@@ -138,6 +141,29 @@ final class Customs_Fees_WooCommerce {
 	}
 
 	/**
+	 * Handle activation setup.
+	 *
+	 * @since 1.0.0
+	 */
+	public function maybe_activate() {
+		if ( get_option( 'cfwc_activated' ) ) {
+			// Set activation time for notice display.
+			update_option( 'cfwc_activation_time', time() );
+			
+			// Set default options.
+			if ( false === get_option( 'cfwc_rules' ) ) {
+				add_option( 'cfwc_rules', array() );
+			}
+			if ( false === get_option( 'cfwc_version' ) ) {
+				add_option( 'cfwc_version', CFWC_VERSION );
+			}
+			
+			// Clear the activation flag.
+			delete_option( 'cfwc_activated' );
+		}
+	}
+
+	/**
 	 * Get the plugin loader.
 	 *
 	 * @since 1.0.0
@@ -176,8 +202,23 @@ function CFWC() {
 	return Customs_Fees_WooCommerce::instance();
 }
 
-// Global for backwards compatibility.
-$GLOBALS['customs_fees_woocommerce'] = CFWC();
+// Initialize plugin on plugins_loaded to ensure WooCommerce is available.
+add_action( 'plugins_loaded', 'cfwc_init', 10 );
+
+/**
+ * Initialize the plugin.
+ *
+ * @since 1.0.0
+ */
+function cfwc_init() {
+	// Check if WooCommerce is active.
+	if ( ! class_exists( 'WooCommerce' ) ) {
+		return;
+	}
+	
+	// Global for backwards compatibility.
+	$GLOBALS['customs_fees_woocommerce'] = CFWC();
+}
 
 /**
  * Plugin activation handler.
@@ -185,15 +226,8 @@ $GLOBALS['customs_fees_woocommerce'] = CFWC();
  * @since 1.0.0
  */
 function cfwc_activate() {
-	// Set default options.
-	add_option( 'cfwc_rules', array() );
-	add_option( 'cfwc_version', CFWC_VERSION );
-
-	// Clear transients.
-	delete_transient( 'cfwc_rules_cache' );
-
-	// Flush rewrite rules.
-	flush_rewrite_rules();
+	// Just set activation flag - nothing else!
+	add_option( 'cfwc_activated', true );
 }
 register_activation_hook( __FILE__, 'cfwc_activate' );
 
@@ -203,11 +237,12 @@ register_activation_hook( __FILE__, 'cfwc_activate' );
  * @since 1.0.0
  */
 function cfwc_deactivate() {
-	// Clear transients.
+	// Clear activation time and dismissed notice.
+	delete_option( 'cfwc_activation_time' );
+	delete_option( 'cfwc_dismissed_setup_notice' );
+	
+	// Clear cache transient.
 	delete_transient( 'cfwc_rules_cache' );
-
-	// Clear scheduled events if any.
-	wp_clear_scheduled_hook( 'cfwc_daily_cleanup' );
 }
 register_deactivation_hook( __FILE__, 'cfwc_deactivate' );
 

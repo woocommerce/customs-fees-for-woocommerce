@@ -17,6 +17,32 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <div class="cfwc-rules-section">
 	
+	<?php
+	// Show setup status if needed.
+	if ( class_exists( 'CFWC_Onboarding' ) ) {
+		$onboarding = new CFWC_Onboarding();
+		$onboarding->render_setup_status();
+	}
+	?>
+	
+	<!-- Help Guide -->
+	<div class="cfwc-help-guide" style="background: #f0f8ff; border: 1px solid #c3c4c7; border-radius: 4px; padding: 15px; margin-bottom: 20px;">
+		<h3 style="margin-top: 0;">
+			<span class="dashicons dashicons-info" style="color: #2271b1;"></span>
+			<?php esc_html_e( 'How to Use it?', 'customs-fees-for-woocommerce' ); ?>
+		</h3>
+		<ol style="margin: 10px 0 5px 20px;">
+			<li><?php esc_html_e( 'Add Country of Origin to your products (Products → Edit Product → Product Data → Inventory tab).', 'customs-fees-for-woocommerce' ); ?></li>
+			<li><?php esc_html_e( 'Configure customs fee rules below or use Quick Start presets for common trade routes.', 'customs-fees-for-woocommerce' ); ?></li>
+			<li><?php esc_html_e( 'Rules automatically apply at checkout based on shipping destination and product origin.', 'customs-fees-for-woocommerce' ); ?></li>
+			<li><?php esc_html_e( 'Customers see a detailed breakdown of customs fees on cart and checkout pages.', 'customs-fees-for-woocommerce' ); ?></li>
+		</ol>
+		<p style="margin-bottom: 5px;">
+			<strong><?php esc_html_e( 'Tip:', 'customs-fees-for-woocommerce' ); ?></strong>
+			<?php esc_html_e( 'Use CSV import/export or WooCommerce Product Bulk Editor to bulk update Country of Origin and HS Codes for multiple products at once.', 'customs-fees-for-woocommerce' ); ?>
+		</p>
+	</div>
+	
 	<!-- Quick Preset Loader -->
 	<div class="cfwc-preset-loader">
 		<h3><?php esc_html_e( 'Quick Start with Presets', 'customs-fees-for-woocommerce' ); ?></h3>

@@ -51,23 +51,8 @@ class CFWC_Admin {
 	 * @since 1.0.0
 	 */
 	public function admin_notices() {
-		// Check if we just activated.
-		if ( get_transient( 'cfwc_activated' ) ) {
-			?>
-			<div class="notice notice-success is-dismissible">
-				<p>
-					<?php
-					printf(
-						/* translators: %s: Settings page URL */
-						esc_html__( 'Customs Fees for WooCommerce is activated! %s to configure your customs fee rules.', 'customs-fees-for-woocommerce' ),
-						'<a href="' . esc_url( admin_url( 'admin.php?page=wc-settings&tab=tax&section=customs' ) ) . '">' . esc_html__( 'Visit settings', 'customs-fees-for-woocommerce' ) . '</a>'
-					);
-					?>
-				</p>
-			</div>
-			<?php
-			delete_transient( 'cfwc_activated' );
-		}
+		// Activation notices are now handled by CFWC_Onboarding class.
+		// This prevents duplicate notices on activation.
 	}
 
 	/**
@@ -251,9 +236,28 @@ class CFWC_Admin {
 	 * @param string $hook Current admin page hook.
 	 */
 	public function enqueue_scripts( $hook ) {
+		global $post_type;
+		
+		// Load on product list page for quick/bulk edit support.
+		if ( 'edit.php' === $hook && 'product' === $post_type ) {
+			wp_enqueue_style(
+				'cfwc-admin',
+				CFWC_PLUGIN_URL . 'assets/css/admin.css',
+				array(),
+				CFWC_VERSION
+			);
+			
+			wp_enqueue_script(
+				'cfwc-admin',
+				CFWC_PLUGIN_URL . 'assets/js/admin.js',
+				array( 'jquery' ),
+				CFWC_VERSION,
+				true
+			);
+		}
+		
 		// Load on product pages for Select2.
 		if ( in_array( $hook, array( 'post.php', 'post-new.php' ), true ) ) {
-			global $post_type;
 			if ( 'product' === $post_type ) {
 				// Ensure WooCommerce Select2 (SelectWoo) is loaded.
 				wp_enqueue_script( 'wc-enhanced-select' );
