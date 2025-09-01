@@ -1,63 +1,56 @@
 /**
- * Customs Fees for WooCommerce - Frontend Styles
+ * Frontend Styles
  *
- * @package CustomsFeesForWooCommerce
+ * @package CustomsFeesWooCommerce
+ * @since   1.0.0
  */
 
 /* ==========================================================================
-   Tooltip Styles
+   Tooltips
    ========================================================================== */
 
 .cfwc-tooltip {
   position: relative;
   display: inline-block;
-  margin-left: 5px;
   cursor: help;
-  vertical-align: middle;
+  margin-left: 5px;
 }
 
-.cfwc-tooltip-icon {
-  display: inline-block !important;
-  width: 16px !important;
-  height: 16px !important;
-  line-height: 16px !important;
-  text-align: center !important;
-  background: #999 !important;
-  color: #fff !important;
-  border-radius: 50% !important;
-  font-size: 12px !important;
-  font-weight: bold !important;
+.cfwc-tooltip .cfwc-tooltip-icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  text-align: center;
+  background: #2271b1;
+  color: #fff;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: help;
 }
 
-.cfwc-tooltip-text,
-.cfwc-tooltiptext {
+.cfwc-tooltip .cfwc-tooltip-text {
   visibility: hidden;
   width: 250px;
   background-color: #333;
   color: #fff;
   text-align: left;
-  border-radius: 6px;
-  padding: 8px 10px;
+  border-radius: 4px;
+  padding: 10px;
   position: absolute;
-  z-index: 1000;
+  z-index: 999999;
   bottom: 125%;
   left: 50%;
   margin-left: -125px;
   opacity: 0;
-  transition: opacity 0.3s, visibility 0.3s;
+  transition: opacity 0.3s;
   font-size: 13px;
   line-height: 1.4;
-  pointer-events: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-.cfwc-tooltip:hover .cfwc-tooltip-text,
-.cfwc-tooltip:hover .cfwc-tooltiptext {
-  visibility: visible;
-  opacity: 1;
-}
-
-.cfwc-tooltip-text::after,
-.cfwc-tooltip .cfwc-tooltiptext::after {
+.cfwc-tooltip .cfwc-tooltip-text::after {
   content: "";
   position: absolute;
   top: 100%;
@@ -68,83 +61,63 @@
   border-color: #333 transparent transparent transparent;
 }
 
-/* Dashicons in tooltip */
-.cfwc-tooltip .dashicons {
-  font-size: 16px;
-  width: 16px;
-  height: 16px;
-  color: #999;
+.cfwc-tooltip:hover .cfwc-tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .cfwc-tooltip .cfwc-tooltip-text {
+    width: 200px;
+    margin-left: -100px;
+  }
 }
 
 /* ==========================================================================
-   Fee Display Styles
+   Fees Breakdown Display
    ========================================================================== */
 
-/* Fee row styling */
-.cfwc-fee-row th {
-  font-weight: normal;
+.cfwc-fees-summary {
+  margin: 10px 0;
+  padding: 10px;
+  background: #f5f5f5;
+  border-left: 3px solid #2271b1;
+  border-radius: 3px;
 }
 
-/* Fee breakdown display - like tax display */
 .cfwc-fees-breakdown,
-#cfwc_fees_breakdown {
-  margin: 0;
+.cfwc-fees-summary ul {
+  margin: 5px 0;
   padding: 0;
+  list-style: none;
 }
 
 .cfwc-fee-item {
+  padding: 5px 0;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin: 0 0 0.5em 0;
-  padding: 0;
-  line-height: 1.4;
+  border-bottom: 1px dotted #ddd;
 }
 
 .cfwc-fee-item:last-child {
-  margin-bottom: 0;
+  border-bottom: none;
 }
 
 .cfwc-fee-label {
+  color: #666;
   flex: 1;
-  padding-right: 1em;
 }
 
 .cfwc-fee-amount {
-  text-align: right;
-  white-space: nowrap;
-}
-
-.cfwc-fee-amount strong {
   font-weight: 600;
+  color: #333;
 }
 
-/* ==========================================================================
-   Product Display Styles
-   ========================================================================== */
-
-/* HS code display */
-.cfwc-hs-code {
-  display: block;
-  font-size: 0.875em;
-  color: #666;
-  margin-top: 4px;
-}
-
-/* Origin display */
-.cfwc-origin {
-  display: inline-block;
-  margin-left: 10px;
-}
-
-/* Cart page customs info */
-.cfwc-cart-customs {
-  color: #666;
-}
-
-/* Checkout page customs info */
-.cfwc-checkout-customs {
-  font-size: 0.85em;
+/* Cart and Checkout Display */
+.woocommerce-cart .cfwc-fees-breakdown,
+.woocommerce-checkout .cfwc-fees-breakdown {
+  font-size: 0.9em;
   color: #666;
 }
 
@@ -152,36 +125,142 @@
    Order Pages Styles
    ========================================================================== */
 
-/* Order fees section */
-.cfwc-order-fees {
-  margin-top: 20px;
-  padding: 15px;
-  background: #f7f7f7;
-  border-radius: 4px;
+/* Order received page */
+.woocommerce-order-received .cfwc-fees-breakdown {
+  background: #f9f9f9;
+  padding: 10px;
+  border-radius: 3px;
+  margin: 10px 0;
 }
 
-/* Fees breakdown on order pages */
+/* My Account order details */
+.woocommerce-MyAccount-content .cfwc-fees-breakdown {
+  background: transparent;
+  padding: 5px 0;
+}
+
+/* Order emails */
+.cfwc-email-fees {
+  background: #f5f5f5;
+  padding: 15px;
+  margin: 20px 0;
+  border-left: 3px solid #2271b1;
+}
+
+.cfwc-email-fees h3 {
+  margin-top: 0;
+  color: #2271b1;
+  font-size: 16px;
+}
+
+.cfwc-email-fees ul {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0;
+}
+
+.cfwc-email-fees li {
+  padding: 5px 0;
+  border-bottom: 1px dotted #ddd;
+}
+
+.cfwc-email-fees li:last-child {
+  border-bottom: none;
+  padding-top: 10px;
+  font-weight: bold;
+  border-top: 2px solid #ddd;
+  margin-top: 5px;
+}
+
+/* Fees breakdown on order pages - FIXED STYLING */
 .cfwc-fees-breakdown,
-.cfwc-fees-breakdown.woocommerce-order-overview {
+.cfwc-fees-breakdown.woocommerce-order-overview,
+ul.cfwc-fees-breakdown,
+.woocommerce-order-overview.cfwc-fees-breakdown,
+.woocommerce table.shop_table .cfwc-fees-breakdown {
   margin: 0 !important;
   padding: 0 !important;
   list-style: none !important;
+  list-style-type: none !important;
 }
 
 .cfwc-fees-breakdown li,
-.cfwc-fees-breakdown .cfwc-fee-item {
+.cfwc-fees-breakdown .cfwc-fee-item,
+ul.cfwc-fees-breakdown li.cfwc-fee-item,
+.woocommerce-order-overview .cfwc-fee-item,
+.woocommerce table.shop_table .cfwc-fee-item {
   margin: 0 0 0.25em 0 !important;
+  padding: 0 !important;
   list-style: none !important;
+  list-style-type: none !important;
+  background: none !important;
+  border: none !important;
+  display: block !important;
+}
+
+/* Remove any before/after pseudo-elements that might add bullets or styling */
+.cfwc-fees-breakdown li:before,
+.cfwc-fee-item:before,
+ul.cfwc-fees-breakdown li:before,
+.cfwc-fees-breakdown li:after,
+.cfwc-fee-item:after,
+.woocommerce table.shop_table .cfwc-fee-item:before,
+.woocommerce-MyAccount-content .cfwc-fee-item:before,
+.woocommerce-table--order-details .cfwc-fee-item:before {
+  content: none !important;
+  display: none !important;
 }
 
 .cfwc-fees-breakdown .cfwc-fee-label {
   color: #515151;
+  display: inline-block;
+  margin-right: 5px;
+}
+
+/* Ensure proper display in order totals table */
+.woocommerce table.shop_table .cfwc-fees-breakdown-wrapper {
+  display: block;
+  width: 100%;
+}
+
+.woocommerce-table--order-details .cfwc-fees-breakdown,
+.woocommerce-MyAccount-content .cfwc-fees-breakdown {
+  text-align: left !important;
 }
 
 /* Order item customs info */
 .cfwc-order-customs {
   color: #666;
   font-size: 0.9em;
+}
+
+/* Info box on order received page */
+.cfwc-order-info-box {
+  background-color: #f7f7f7;
+  border-left: 4px solid #0073aa;
+  padding: 20px;
+  margin: 30px 0;
+}
+
+.cfwc-order-info-box h3 {
+  margin: 0 0 10px;
+  color: #0073aa;
+  font-size: 18px;
+}
+
+.cfwc-order-info-box p {
+  margin: 0 0 10px;
+  color: #666;
+}
+
+.cfwc-order-info-box p:last-child {
+  margin-bottom: 0;
+}
+
+.cfwc-order-info-box .cfwc-disclaimer {
+  color: #999;
+  font-size: 12px;
+  font-style: italic;
 }
 
 /* Email breakdown list */
@@ -197,70 +276,19 @@
 }
 
 /* ==========================================================================
-   Disclaimer Styles
+   Responsive Design
    ========================================================================== */
 
-.cfwc-disclaimer {
-  font-size: 0.9em;
-  color: #666;
-  font-style: italic;
-}
-
-/* ==========================================================================
-   Responsive Styles
-   ========================================================================== */
-
-@media (max-width: 768px) {
-  .cfwc-tooltip-text,
-  .cfwc-tooltiptext {
-    width: 200px;
-    margin-left: -100px;
+@media (max-width: 600px) {
+  .cfwc-fee-item {
+    flex-direction: column;
   }
 
-  .cfwc-tooltip-text::after,
-  .cfwc-tooltiptext::after {
-    margin-left: -5px;
-  }
-}
-
-/* ==========================================================================
-   Accessibility & Theme Support
-   ========================================================================== */
-
-/* High contrast mode support */
-@media (prefers-contrast: high) {
-  .cfwc-tooltip .dashicons {
-    color: inherit;
+  .cfwc-fee-amount {
+    margin-top: 5px;
   }
 
-  .cfwc-tooltip-icon {
-    background: currentColor;
-    color: #fff;
-  }
-}
-
-/* RTL language support */
-.rtl .cfwc-tooltip {
-  margin-left: 0;
-  margin-right: 5px;
-}
-
-.rtl .cfwc-origin {
-  margin-left: 0;
-  margin-right: 10px;
-}
-
-/* Dark mode support (if theme supports it) */
-@media (prefers-color-scheme: dark) {
-  .cfwc-order-fees {
-    background: #2b2b2b;
-    color: #e0e0e0;
-  }
-
-  .cfwc-disclaimer,
-  .cfwc-cart-customs,
-  .cfwc-checkout-customs,
-  .cfwc-hs-code {
-    color: #b0b0b0;
+  .cfwc-fees-summary {
+    padding: 8px;
   }
 }

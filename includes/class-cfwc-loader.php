@@ -115,9 +115,8 @@ class CFWC_Loader {
 		// Initialize products (doesn't have init method).
 		new CFWC_Products();
 
-		// Initialize display.
-		$display = new CFWC_Display();
-		$display->init();
+		// Initialize display (constructor handles initialization).
+		new CFWC_Display();
 
 		// Initialize emails.
 		$emails = new CFWC_Emails();
