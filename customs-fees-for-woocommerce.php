@@ -190,6 +190,94 @@ final class Customs_Fees_WooCommerce {
 	public function __wakeup() {
 		_doing_it_wrong( __FUNCTION__, esc_html__( 'Unserializing instances of this class is forbidden.', 'customs-fees-for-woocommerce' ), '1.0.0' );
 	}
+
+	/**
+	 * Initialize the plugin on plugins_loaded.
+	 *
+	 * @since 1.0.0
+	 */
+	public static function plugin_init() {
+		// Check if WooCommerce is active.
+		if ( ! class_exists( 'WooCommerce' ) ) {
+			return;
+		}
+		
+		// Global for backwards compatibility.
+		$GLOBALS['customs_fees_woocommerce'] = self::instance();
+	}
+
+	/**
+	 * Plugin activation handler.
+	 *
+	 * @since 1.0.0
+	 */
+	public static function activate() {
+		// Just set activation flag - nothing else!
+		add_option( 'cfwc_activated', true );
+	}
+
+	/**
+	 * Plugin deactivation handler.
+	 *
+	 * @since 1.0.0
+	 */
+	public static function deactivate() {
+		// Clear activation time and dismissed notice.
+		delete_option( 'cfwc_activation_time' );
+		delete_option( 'cfwc_dismissed_setup_notice' );
+		
+		// Clear cache transient.
+		delete_transient( 'cfwc_rules_cache' );
+	}
+
+	/**
+	 * Plugin uninstall handler.
+	 *
+	 * @since 1.0.0
+	 */
+	public static function uninstall() {
+		// Check if we should remove data.
+		$remove_data = apply_filters( 'cfwc_uninstall_remove_data', true );
+		
+		if ( ! $remove_data ) {
+			return;
+		}
+
+		// Remove options.
+		delete_option( 'cfwc_rules' );
+		delete_option( 'cfwc_version' );
+
+		// Remove transients.
+		delete_transient( 'cfwc_rules_cache' );
+
+		// Remove product meta - using direct queries for complete cleanup during uninstall.
+		// Note: These queries use meta_key which can be slower, but this is acceptable
+		// for uninstall operations which only run once when the plugin is deleted.
+		global $wpdb;
+		
+		// Remove HS code meta.
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:disable WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+		$wpdb->delete(
+			$wpdb->postmeta,
+			array( 'meta_key' => '_cfwc_hs_code' ) // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+		);
+		// phpcs:enable WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		
+		// Remove country of origin meta.
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:disable WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+		$wpdb->delete(
+			$wpdb->postmeta,
+			array( 'meta_key' => '_cfwc_country_of_origin' ) // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+		);
+		// phpcs:enable WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		
+		// Clear any cached data.
+		wp_cache_flush();
+	}
 }
 
 /**
@@ -202,103 +290,9 @@ function CFWC() {
 	return Customs_Fees_WooCommerce::instance();
 }
 
-// Initialize plugin on plugins_loaded to ensure WooCommerce is available.
-add_action( 'plugins_loaded', 'cfwc_init', 10 );
-
-/**
- * Initialize the plugin.
- *
- * @since 1.0.0
- */
-function cfwc_init() {
-	// Check if WooCommerce is active.
-	if ( ! class_exists( 'WooCommerce' ) ) {
-		return;
-	}
-	
-	// Global for backwards compatibility.
-	$GLOBALS['customs_fees_woocommerce'] = CFWC();
-}
-
-/**
- * Plugin activation handler.
- *
- * @since 1.0.0
- */
-function cfwc_activate() {
-	// Just set activation flag - nothing else!
-	add_option( 'cfwc_activated', true );
-}
-register_activation_hook( __FILE__, 'cfwc_activate' );
-
-/**
- * Plugin deactivation handler.
- *
- * @since 1.0.0
- */
-function cfwc_deactivate() {
-	// Clear activation time and dismissed notice.
-	delete_option( 'cfwc_activation_time' );
-	delete_option( 'cfwc_dismissed_setup_notice' );
-	
-	// Clear cache transient.
-	delete_transient( 'cfwc_rules_cache' );
-}
-register_deactivation_hook( __FILE__, 'cfwc_deactivate' );
-
-/**
- * Plugin uninstall handler.
- *
- * @since 1.0.0
- */
-function cfwc_uninstall() {
-	// Check if we should remove data.
-	$remove_data = apply_filters( 'cfwc_uninstall_remove_data', true );
-	
-	if ( ! $remove_data ) {
-		return;
-	}
-
-	// Remove options.
-	delete_option( 'cfwc_rules' );
-	delete_option( 'cfwc_version' );
-
-	// Remove transients.
-	delete_transient( 'cfwc_rules_cache' );
-
-	// Remove product meta - using direct queries for complete cleanup during uninstall.
-	// Note: These queries use meta_key which can be slower, but this is acceptable
-	// for uninstall operations which only run once when the plugin is deleted.
-	global $wpdb;
-	
-	// Remove HS code meta.
-	// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-	// phpcs:disable WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-	$wpdb->delete(
-		$wpdb->postmeta,
-		array( 'meta_key' => '_cfwc_hs_code' ) // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-	);
-	// phpcs:enable WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-	// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-	
-	// Remove country of origin meta.
-	// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-	// phpcs:disable WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-	$wpdb->delete(
-		$wpdb->postmeta,
-		array( 'meta_key' => '_cfwc_country_of_origin' ) // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-	);
-	// phpcs:enable WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-	// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-	
-	// Clear any cached data.
-	wp_cache_flush();
-}
-register_uninstall_hook( __FILE__, 'cfwc_uninstall' );
-
-/**
- * Initialize the plugin on plugins_loaded.
- *
- * @since 1.0.0
- */
+// Hook registrations.
+add_action( 'plugins_loaded', array( 'Customs_Fees_WooCommerce', 'plugin_init' ), 10 );
 add_action( 'plugins_loaded', array( 'Customs_Fees_WooCommerce', 'instance' ), 10 );
+register_activation_hook( __FILE__, array( 'Customs_Fees_WooCommerce', 'activate' ) );
+register_deactivation_hook( __FILE__, array( 'Customs_Fees_WooCommerce', 'deactivate' ) );
+register_uninstall_hook( __FILE__, array( 'Customs_Fees_WooCommerce', 'uninstall' ) );
