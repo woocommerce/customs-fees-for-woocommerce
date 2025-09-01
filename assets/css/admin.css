@@ -185,20 +185,22 @@
 
 /* Product Edit Page - Country of Origin Select2 */
 #_cfwc_country_of_origin {
-  width: 50%;
-  min-width: 250px;
+  width: 250px;
 }
 
 /* Select2 Container for our field specifically */
 span[aria-labelledby="select2-_cfwc_country_of_origin-container"] {
-  width: 50% !important;
-  min-width: 250px !important;
-  max-width: 400px !important;
+  width: 250px !important;
 }
 
-/* The select2 dropdown itself */
-.select2-dropdown {
-  min-width: 250px !important;
+/* Select2 Container - alternative selector */
+#_cfwc_country_of_origin + .select2-container {
+  width: 250px !important;
+}
+
+/* The select2 dropdown for Country of Origin specifically */
+#select2-_cfwc_country_of_origin-results {
+  max-width: 250px !important;
 }
 
 /* WooCommerce Snackbar Container - Align with Save button */
@@ -377,7 +379,6 @@ span[aria-labelledby="select2-_cfwc_country_of_origin-container"] {
 
 /* Prevent Select2 dropdown from causing overflow */
 .select2-container--open .select2-dropdown {
-  width: auto !important;
   min-width: 200px !important;
   max-width: 400px !important;
 }
@@ -456,3 +457,32 @@ span[aria-labelledby="select2-_cfwc_country_of_origin-container"] {
 }
 
 /* Column widths are now defined above in the main table styles */
+
+/* Preset Button Styles */
+.cfwc-preset-loader button {
+  margin-right: 10px;
+  margin-bottom: 5px;
+}
+
+.cfwc-preset-loader .cfwc-replace-preset {
+  background: #2271b1;
+  border-color: #2271b1;
+  color: #fff;
+}
+
+.cfwc-preset-loader .cfwc-replace-preset:hover:not(.confirm-replace) {
+  background: #135e96;
+  border-color: #135e96;
+  color: #fff;
+}
+
+.cfwc-preset-loader .cfwc-replace-preset.confirm-replace {
+  background: #d63638 !important;
+  border-color: #d63638 !important;
+  color: #fff !important;
+}
+
+.cfwc-preset-loader select {
+  min-width: 250px;
+  margin-right: 10px;
+}

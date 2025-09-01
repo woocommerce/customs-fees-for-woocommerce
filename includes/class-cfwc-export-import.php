@@ -55,8 +55,8 @@ class CFWC_Export_Import {
 	 * @return array Modified columns.
 	 */
 	public function add_export_column_names( $columns ) {
-		$columns['cfwc_hs_code']            = __( 'HS Code', 'customs-fees-for-woocommerce' );
-		$columns['cfwc_country_of_origin']  = __( 'Country of Origin', 'customs-fees-for-woocommerce' );
+		$columns['cfwc_hs_code']           = __( 'HS Code', 'customs-fees-for-woocommerce' );
+		$columns['cfwc_country_of_origin'] = __( 'Country of Origin', 'customs-fees-for-woocommerce' );
 		return $columns;
 	}
 
@@ -68,8 +68,8 @@ class CFWC_Export_Import {
 	 * @return array Modified columns.
 	 */
 	public function add_export_columns( $columns ) {
-		$columns['cfwc_hs_code']            = __( 'HS Code', 'customs-fees-for-woocommerce' );
-		$columns['cfwc_country_of_origin']  = __( 'Country of Origin', 'customs-fees-for-woocommerce' );
+		$columns['cfwc_hs_code']           = __( 'HS Code', 'customs-fees-for-woocommerce' );
+		$columns['cfwc_country_of_origin'] = __( 'Country of Origin', 'customs-fees-for-woocommerce' );
 		return $columns;
 	}
 
@@ -97,14 +97,14 @@ class CFWC_Export_Import {
 	 */
 	public function export_country_column( $value, $product ) {
 		$country_code = get_post_meta( $product->get_id(), '_cfwc_country_of_origin', true );
-		
+
 		if ( empty( $country_code ) ) {
 			return '';
 		}
 
 		// Get country name from WooCommerce countries list.
 		$countries = WC()->countries->get_countries();
-		
+
 		// Return full country name if available, otherwise return the code.
 		return isset( $countries[ $country_code ] ) ? $countries[ $country_code ] : $country_code;
 	}
@@ -117,8 +117,8 @@ class CFWC_Export_Import {
 	 * @return array Modified options.
 	 */
 	public function add_import_mapping_options( $options ) {
-		$options['cfwc_hs_code']            = __( 'HS Code', 'customs-fees-for-woocommerce' );
-		$options['cfwc_country_of_origin']  = __( 'Country of Origin', 'customs-fees-for-woocommerce' );
+		$options['cfwc_hs_code']           = __( 'HS Code', 'customs-fees-for-woocommerce' );
+		$options['cfwc_country_of_origin'] = __( 'Country of Origin', 'customs-fees-for-woocommerce' );
 		return $options;
 	}
 
@@ -132,24 +132,24 @@ class CFWC_Export_Import {
 	 */
 	public function add_import_column_mapping( $columns ) {
 		// HS Code variations.
-		$columns[ __( 'HS Code', 'customs-fees-for-woocommerce' ) ]        = 'cfwc_hs_code';
-		$columns['HS Code']                                                 = 'cfwc_hs_code';
-		$columns['hs code']                                                 = 'cfwc_hs_code';
-		$columns['HS/Tariff Code']                                         = 'cfwc_hs_code';
-		$columns['Tariff Code']                                            = 'cfwc_hs_code';
-		$columns['HTS Code']                                               = 'cfwc_hs_code';
-		$columns['Harmonized Code']                                        = 'cfwc_hs_code';
-		
+		$columns[ __( 'HS Code', 'customs-fees-for-woocommerce' ) ] = 'cfwc_hs_code';
+		$columns['HS Code']         = 'cfwc_hs_code';
+		$columns['hs code']         = 'cfwc_hs_code';
+		$columns['HS/Tariff Code']  = 'cfwc_hs_code';
+		$columns['Tariff Code']     = 'cfwc_hs_code';
+		$columns['HTS Code']        = 'cfwc_hs_code';
+		$columns['Harmonized Code'] = 'cfwc_hs_code';
+
 		// Country of Origin variations.
 		$columns[ __( 'Country of Origin', 'customs-fees-for-woocommerce' ) ] = 'cfwc_country_of_origin';
-		$columns['Country of Origin']                                         = 'cfwc_country_of_origin';
-		$columns['country of origin']                                         = 'cfwc_country_of_origin';
-		$columns['Origin Country']                                            = 'cfwc_country_of_origin';
-		$columns['Origin']                                                   = 'cfwc_country_of_origin';
-		$columns['Made in']                                                  = 'cfwc_country_of_origin';
-		$columns['Country of Manufacture']                                   = 'cfwc_country_of_origin';
-		$columns['Manufacturing Country']                                    = 'cfwc_country_of_origin';
-		
+		$columns['Country of Origin']      = 'cfwc_country_of_origin';
+		$columns['country of origin']      = 'cfwc_country_of_origin';
+		$columns['Origin Country']         = 'cfwc_country_of_origin';
+		$columns['Origin']                 = 'cfwc_country_of_origin';
+		$columns['Made in']                = 'cfwc_country_of_origin';
+		$columns['Country of Manufacture'] = 'cfwc_country_of_origin';
+		$columns['Manufacturing Country']  = 'cfwc_country_of_origin';
+
 		return $columns;
 	}
 
@@ -177,11 +177,11 @@ class CFWC_Export_Import {
 		// Process Country of Origin.
 		if ( isset( $data['cfwc_country_of_origin'] ) ) {
 			$country_value = trim( $data['cfwc_country_of_origin'] );
-			
+
 			if ( ! empty( $country_value ) ) {
 				// Convert country name to code if necessary.
 				$country_code = $this->convert_country_to_code( $country_value );
-				
+
 				if ( $country_code ) {
 					$product->update_meta_data( '_cfwc_country_of_origin', $country_code );
 				}
@@ -205,14 +205,14 @@ class CFWC_Export_Import {
 	private function convert_country_to_code( $country_value ) {
 		// Clean up the input.
 		$country_value = trim( $country_value );
-		
+
 		if ( empty( $country_value ) ) {
 			return false;
 		}
 
 		// Get WooCommerce countries list.
 		$countries = WC()->countries->get_countries();
-		
+
 		// First, check if it's already a valid country code.
 		$upper_value = strtoupper( $country_value );
 		if ( strlen( $upper_value ) === 2 && isset( $countries[ $upper_value ] ) ) {
@@ -229,39 +229,39 @@ class CFWC_Export_Import {
 		// Common country name variations and abbreviations.
 		$country_aliases = array(
 			// United States variations.
-			'USA'                        => 'US',
-			'U.S.A.'                    => 'US',
-			'U.S.'                      => 'US',
-			'United States of America'  => 'US',
-			'America'                   => 'US',
-			
+			'USA'                         => 'US',
+			'U.S.A.'                      => 'US',
+			'U.S.'                        => 'US',
+			'United States of America'    => 'US',
+			'America'                     => 'US',
+
 			// United Kingdom variations.
-			'UK'                        => 'GB',
-			'U.K.'                      => 'GB',
-			'United Kingdom'            => 'GB',
-			'Great Britain'             => 'GB',
-			'England'                   => 'GB',
-			'Britain'                   => 'GB',
-			
+			'UK'                          => 'GB',
+			'U.K.'                        => 'GB',
+			'United Kingdom'              => 'GB',
+			'Great Britain'               => 'GB',
+			'England'                     => 'GB',
+			'Britain'                     => 'GB',
+
 			// China variations.
-			'PRC'                       => 'CN',
-			'P.R.C.'                   => 'CN',
+			'PRC'                         => 'CN',
+			'P.R.C.'                      => 'CN',
 			'People\'s Republic of China' => 'CN',
-			'Mainland China'            => 'CN',
-			
+			'Mainland China'              => 'CN',
+
 			// Other common variations.
-			'Nederland'                 => 'NL',
-			'Holland'                   => 'NL',
-			'Deutschland'               => 'DE',
-			'Nippon'                    => 'JP',
-			'ROK'                       => 'KR',
-			'Republic of Korea'         => 'KR',
-			'South Korea'               => 'KR',
-			'Czech Republic'            => 'CZ',
-			'Czechia'                   => 'CZ',
-			'UAE'                       => 'AE',
-			'U.A.E.'                   => 'AE',
-			'United Arab Emirates'      => 'AE',
+			'Nederland'                   => 'NL',
+			'Holland'                     => 'NL',
+			'Deutschland'                 => 'DE',
+			'Nippon'                      => 'JP',
+			'ROK'                         => 'KR',
+			'Republic of Korea'           => 'KR',
+			'South Korea'                 => 'KR',
+			'Czech Republic'              => 'CZ',
+			'Czechia'                     => 'CZ',
+			'UAE'                         => 'AE',
+			'U.A.E.'                      => 'AE',
+			'United Arab Emirates'        => 'AE',
 		);
 
 		// Check aliases (case-insensitive).

@@ -27,16 +27,16 @@ class CFWC_Emails {
 	 */
 	public function init() {
 		// REMOVED: add_filter for woocommerce_get_order_item_totals - handled by class-cfwc-display.php to avoid duplication.
-		
+
 		// Add HS Codes to order item names in emails.
 		add_filter( 'woocommerce_order_item_name', array( $this, 'add_hs_code_to_order_item' ), 10, 3 );
-		
+
 		// Add custom content to emails.
 		add_action( 'woocommerce_email_after_order_table', array( $this, 'add_customs_info_to_email' ), 15, 4 );
-		
+
 		// Admin email notifications.
 		add_action( 'woocommerce_email_order_meta', array( $this, 'add_admin_email_meta' ), 10, 3 );
-		
+
 		// Customize email styles.
 		add_filter( 'woocommerce_email_styles', array( $this, 'add_email_styles' ), 10, 2 );
 	}
@@ -52,33 +52,33 @@ class CFWC_Emails {
 	 */
 	public function add_fees_to_email_totals( $totals, $order, $tax_display = false ) {
 		$fees = $order->get_fees();
-		
+
 		if ( empty( $fees ) ) {
 			return $totals;
 		}
-		
+
 		// Collect all customs fees.
-		$customs_fees = array();
+		$customs_fees  = array();
 		$total_customs = 0;
-		
+
 		foreach ( $fees as $fee ) {
 			$fee_name = $fee->get_name();
 			// Check if this is a customs fee by looking for common patterns.
-			if ( strpos( strtolower( $fee_name ), 'customs' ) !== false || 
-			     strpos( strtolower( $fee_name ), 'import' ) !== false ||
-			     strpos( strtolower( $fee_name ), 'duty' ) !== false ) {
+			if ( strpos( strtolower( $fee_name ), 'customs' ) !== false ||
+				strpos( strtolower( $fee_name ), 'import' ) !== false ||
+				strpos( strtolower( $fee_name ), 'duty' ) !== false ) {
 				$customs_fees[] = array(
-					'name' => $fee_name,
+					'name'   => $fee_name,
 					'amount' => $fee->get_total(),
 				);
 				$total_customs += $fee->get_total();
 			}
 		}
-		
+
 		// If we have customs fees, add them before the order total.
 		if ( ! empty( $customs_fees ) ) {
 			$new_totals = array();
-			
+
 			foreach ( $totals as $key => $total ) {
 				// Add customs fees before order total.
 				if ( 'order_total' === $key && $total_customs > 0 ) {
@@ -99,16 +99,16 @@ class CFWC_Emails {
 						);
 					}
 				}
-				
+
 				$new_totals[ $key ] = $total;
 			}
-			
+
 			return $new_totals;
 		}
-		
+
 		return $totals;
 	}
-	
+
 	/**
 	 * Add HS Code to order item display in emails.
 	 *
@@ -123,52 +123,52 @@ class CFWC_Emails {
 		if ( ! is_a( $item, 'WC_Order_Item_Product' ) ) {
 			return $item_name;
 		}
-		
+
 		// Only for emails (check if we're in an email context).
 		if ( ! did_action( 'woocommerce_email_header' ) ) {
 			return $item_name;
 		}
-		
+
 		$product = $item->get_product();
 		if ( ! $product ) {
 			return $item_name;
 		}
-		
+
 		$product_id = $product->get_id();
-		$hs_code = get_post_meta( $product_id, '_cfwc_hs_code', true );
-		$origin = get_post_meta( $product_id, '_cfwc_country_of_origin', true );
-		
+		$hs_code    = get_post_meta( $product_id, '_cfwc_hs_code', true );
+		$origin     = get_post_meta( $product_id, '_cfwc_country_of_origin', true );
+
 		if ( $hs_code || $origin ) {
 			$customs_info = '<br><small style="color: #666; font-size: 0.9em;">';
-			
+
 			if ( $hs_code ) {
-				$customs_info .= sprintf( 
-					'%s: %s', 
+				$customs_info .= sprintf(
+					'%s: %s',
 					__( 'HS Code', 'customs-fees-for-woocommerce' ),
 					esc_html( $hs_code )
 				);
 			}
-			
+
 			if ( $origin ) {
 				// Display country code in uppercase.
 				$origin_display = strtoupper( substr( $origin, 0, 2 ) );
-				
+
 				if ( $hs_code ) {
 					$customs_info .= ' | ';
 				}
-				
+
 				$customs_info .= sprintf(
 					'%s: %s',
 					__( 'Origin', 'customs-fees-for-woocommerce' ),
 					esc_html( $origin_display )
 				);
 			}
-			
+
 			$customs_info .= '</small>';
-			
+
 			$item_name .= $customs_info;
 		}
-		
+
 		return $item_name;
 	}
 
@@ -187,17 +187,17 @@ class CFWC_Emails {
 			return;
 		}
 
-		$fees = $order->get_fees();
-		$has_customs = false;
+		$fees          = $order->get_fees();
+		$has_customs   = false;
 		$customs_total = 0;
-		
+
 		// Check for any customs-related fees.
 		foreach ( $fees as $fee ) {
 			$fee_name = strtolower( $fee->get_name() );
-			if ( strpos( $fee_name, 'customs' ) !== false || 
-			     strpos( $fee_name, 'import' ) !== false ||
-			     strpos( $fee_name, 'duty' ) !== false ) {
-				$has_customs = true;
+			if ( strpos( $fee_name, 'customs' ) !== false ||
+				strpos( $fee_name, 'import' ) !== false ||
+				strpos( $fee_name, 'duty' ) !== false ) {
+				$has_customs    = true;
 				$customs_total += $fee->get_total();
 			}
 		}
@@ -208,14 +208,14 @@ class CFWC_Emails {
 
 		// Get tooltip/help text.
 		$tooltip_text = class_exists( 'CFWC_Settings' ) ? CFWC_Settings::get_default_help_text() : '';
-		
+
 		if ( $plain_text ) {
 			echo "\n" . esc_html__( 'CUSTOMS & IMPORT INFORMATION', 'customs-fees-for-woocommerce' ) . "\n";
 			echo "----------------------------------------\n";
 			if ( $tooltip_text ) {
 				echo esc_html( $tooltip_text ) . "\n";
 			}
-			echo sprintf( 
+			echo sprintf(
 				/* translators: %s: Total customs fees amount */
 				esc_html__( 'Total customs fees applied: %s', 'customs-fees-for-woocommerce' ),
 				esc_html( wp_strip_all_tags( wc_price( $customs_total, array( 'currency' => $order->get_currency() ) ) ) )
@@ -235,12 +235,12 @@ class CFWC_Emails {
 				<?php endif; ?>
 				
 				<p style="margin: 10px 0; font-weight: bold; color: #333;">
-					<?php 
-					echo sprintf( 
+					<?php
+					printf(
 						/* translators: %s: Total customs fees amount */
 						esc_html__( 'Total customs fees: %s', 'customs-fees-for-woocommerce' ),
 						wp_kses_post( wc_price( $customs_total, array( 'currency' => $order->get_currency() ) ) )
-					); 
+					);
 					?>
 				</p>
 				
@@ -268,14 +268,14 @@ class CFWC_Emails {
 		$fees        = $order->get_fees();
 		$total_fees  = 0;
 		$fee_details = array();
-		
+
 		// Check for any customs-related fees.
 		foreach ( $fees as $fee ) {
 			$fee_name = strtolower( $fee->get_name() );
-			if ( strpos( $fee_name, 'customs' ) !== false || 
-			     strpos( $fee_name, 'import' ) !== false ||
-			     strpos( $fee_name, 'duty' ) !== false ) {
-				$total_fees += $fee->get_total();
+			if ( strpos( $fee_name, 'customs' ) !== false ||
+				strpos( $fee_name, 'import' ) !== false ||
+				strpos( $fee_name, 'duty' ) !== false ) {
+				$total_fees   += $fee->get_total();
 				$fee_details[] = array(
 					'name'   => $fee->get_name(),
 					'amount' => $fee->get_total(),
@@ -350,7 +350,7 @@ class CFWC_Emails {
 				padding-left: 20px;
 			}
 		';
-		
+
 		return $css . $additional_css;
 	}
 }

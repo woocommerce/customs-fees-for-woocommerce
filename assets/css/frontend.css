@@ -186,8 +186,14 @@
 
 /* Email breakdown list */
 .cfwc-email-breakdown {
-  margin: 0;
+  margin: 10px 0;
   padding-left: 20px;
+  list-style-type: disc;
+}
+
+.cfwc-email-breakdown li {
+  margin: 5px 0;
+  color: #515151;
 }
 
 /* ==========================================================================

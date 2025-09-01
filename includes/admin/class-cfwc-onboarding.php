@@ -27,18 +27,18 @@ class CFWC_Onboarding {
 		// Admin notices - simple like AutomateWoo.
 		add_action( 'admin_notices', array( $this, 'maybe_show_setup_notice' ), 10 );
 		add_action( 'wp_ajax_cfwc_dismiss_setup_notice', array( $this, 'ajax_dismiss_notice' ) );
-		
+
 		// Quick edit.
 		add_action( 'quick_edit_custom_box', array( $this, 'add_quick_edit_fields' ), 10, 2 );
 		add_action( 'save_post_product', array( $this, 'save_quick_edit_data' ) );
-		
+
 		// Bulk edit.
 		add_action( 'bulk_edit_custom_box', array( $this, 'add_bulk_edit_fields' ), 10, 2 );
 		add_action( 'woocommerce_product_bulk_edit_save', array( $this, 'save_bulk_edit_data' ) );
-		
+
 		// AJAX for quick edit data.
 		add_action( 'wp_ajax_cfwc_get_quick_edit_data', array( $this, 'ajax_get_quick_edit_data' ) );
-		
+
 		// Set activation time when activated.
 		add_action( 'admin_init', array( $this, 'maybe_set_activation_time' ) );
 	}
@@ -51,14 +51,14 @@ class CFWC_Onboarding {
 	 */
 	public function get_product_stats() {
 		global $wpdb;
-		
+
 		// Get total published products.
 		$total = (int) wp_count_posts( 'product' )->publish;
-		
+
 		// Check cache first.
-		$cache_key = 'cfwc_products_with_origin_count';
+		$cache_key   = 'cfwc_products_with_origin_count';
 		$with_origin = wp_cache_get( $cache_key, 'cfwc' );
-		
+
 		if ( false === $with_origin ) {
 			// Get products with country of origin.
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom query needed for performance.
@@ -71,15 +71,15 @@ class CFWC_Onboarding {
 				AND pm.meta_key = '_cfwc_country_of_origin'
 				AND pm.meta_value != ''"
 			);
-			
+
 			// Cache for 5 minutes.
 			wp_cache_set( $cache_key, $with_origin, 'cfwc', 300 );
 		}
-		
+
 		return array(
-			'total'        => $total,
-			'with_origin'  => $with_origin,
-			'missing'      => $total - $with_origin,
+			'total'       => $total,
+			'with_origin' => $with_origin,
+			'missing'     => $total - $with_origin,
 		);
 	}
 
@@ -93,54 +93,54 @@ class CFWC_Onboarding {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
-		
+
 		// Check if dismissed.
 		if ( get_option( 'cfwc_dismissed_setup_notice' ) ) {
 			return;
 		}
-		
+
 		// Don't show on the settings page.
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( isset( $_GET['tab'] ) && 'tax' === $_GET['tab'] && isset( $_GET['section'] ) && 'customs' === $_GET['section'] ) {
 			return;
 		}
-		
+
 		// Check if plugin was just activated.
 		$just_activated = get_option( 'cfwc_activated' ) ? true : false;
-		
+
 		// Check if activated within last 10 minutes (show on all pages).
 		$activation_time = get_option( 'cfwc_activation_time' );
 		$show_everywhere = false;
-		
+
 		if ( $activation_time && ( time() - $activation_time ) < 600 ) {
 			// Within 10 minutes of activation - show everywhere.
 			$show_everywhere = true;
 		}
-		
+
 		if ( ! $show_everywhere ) {
 			// After 10 minutes, only show on WooCommerce pages when needed.
 			$screen = get_current_screen();
 			if ( ! $screen || ( false === strpos( $screen->id, 'woocommerce' ) && 'product' !== $screen->post_type && 'shop_order' !== $screen->post_type ) ) {
 				return;
 			}
-			
+
 			// Check if products need origin data.
 			$stats = $this->get_product_stats();
-			if ( $stats['missing'] === 0 ) {
+			if ( 0 === $stats['missing'] ) {
 				return;
 			}
 		}
-		
+
 		$products_url = admin_url( 'edit.php?post_type=product' );
 		$settings_url = admin_url( 'admin.php?page=wc-settings&tab=tax&section=customs' );
-		
+
 		// Determine current page.
 		$on_products_page = false;
-		$screen = get_current_screen();
+		$screen           = get_current_screen();
 		if ( $screen && 'product' === $screen->post_type && 'edit' === $screen->base ) {
 			$on_products_page = true;
 		}
-		
+
 		// Get stats for proper messaging.
 		$stats = $this->get_product_stats();
 		?>
@@ -150,16 +150,18 @@ class CFWC_Onboarding {
 				<?php
 				if ( $stats['missing'] > 0 ) {
 					printf(
-						/* translators: %d: number of products */
-						esc_html( _n(
-							'%d product needs Country of Origin data to calculate customs fees correctly.',
-							'%d products need Country of Origin data to calculate customs fees correctly.',
-							$stats['missing'],
-							'customs-fees-for-woocommerce'
-											) ),
-					absint( $stats['missing'] )
-				);
-			} else {
+						esc_html(
+							/* translators: %d: number of products */
+							_n(
+								'%d product needs Country of Origin data to calculate customs fees correctly.',
+								'%d products need Country of Origin data to calculate customs fees correctly.',
+								$stats['missing'],
+								'customs-fees-for-woocommerce'
+							)
+						),
+						absint( $stats['missing'] )
+					);
+				} else {
 					esc_html_e( 'All products have Country of Origin data. Configure your customs rules to start calculating fees.', 'customs-fees-for-woocommerce' );
 				}
 				?>
@@ -171,7 +173,7 @@ class CFWC_Onboarding {
 					</a>
 				<?php endif; ?>
 				
-				<a href="<?php echo esc_url( $settings_url ); ?>" class="button <?php echo ( $on_products_page || $stats['missing'] === 0 ) ? 'button-primary' : ''; ?>">
+				<a href="<?php echo esc_url( $settings_url ); ?>" class="button <?php echo ( $on_products_page || 0 === $stats['missing'] ) ? 'button-primary' : ''; ?>">
 					<?php esc_html_e( 'Configure Rules', 'customs-fees-for-woocommerce' ); ?>
 				</a>
 				
@@ -193,7 +195,7 @@ class CFWC_Onboarding {
 		});
 		</script>
 		<?php
-		
+
 		// Clear activation transient AFTER displaying the notice.
 		if ( $just_activated ) {
 			delete_transient( 'cfwc_activated' );
@@ -207,14 +209,14 @@ class CFWC_Onboarding {
 	 */
 	public function ajax_dismiss_notice() {
 		check_ajax_referer( 'cfwc_dismiss_notice', 'nonce' );
-		
+
 		if ( current_user_can( 'manage_options' ) ) {
 			update_option( 'cfwc_dismissed_setup_notice', true );
 		}
-		
+
 		wp_die();
 	}
-	
+
 	/**
 	 * Maybe set activation time.
 	 *
@@ -280,28 +282,28 @@ class CFWC_Onboarding {
 		if ( ! current_user_can( 'edit_product', $post_id ) ) {
 			return;
 		}
-		
+
 		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
 			return;
 		}
-		
+
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- WooCommerce handles nonce for quick edit.
 		if ( isset( $_POST['_cfwc_hs_code'] ) ) {
 			// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput
 			$hs_code = sanitize_text_field( wp_unslash( $_POST['_cfwc_hs_code'] ) );
-			
+
 			if ( '' === $hs_code ) {
 				delete_post_meta( $post_id, '_cfwc_hs_code' );
 			} else {
 				update_post_meta( $post_id, '_cfwc_hs_code', $hs_code );
 			}
 		}
-		
+
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- WooCommerce handles nonce for quick edit.
 		if ( isset( $_POST['_cfwc_country_of_origin'] ) ) {
 			// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput
 			$value = sanitize_text_field( wp_unslash( $_POST['_cfwc_country_of_origin'] ) );
-			
+
 			if ( '' === $value ) {
 				delete_post_meta( $post_id, '_cfwc_country_of_origin' );
 			} else {
@@ -355,12 +357,12 @@ class CFWC_Onboarding {
 	 */
 	public function save_bulk_edit_data( $product ) {
 		$save_needed = false;
-		
+
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- WooCommerce handles nonce for bulk edit.
 		if ( isset( $_REQUEST['_cfwc_hs_code'] ) ) {
 			// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput
 			$hs_code = sanitize_text_field( wp_unslash( $_REQUEST['_cfwc_hs_code'] ) );
-			
+
 			if ( '_clear' === $hs_code ) {
 				$product->delete_meta_data( '_cfwc_hs_code' );
 				$save_needed = true;
@@ -369,12 +371,12 @@ class CFWC_Onboarding {
 				$save_needed = true;
 			}
 		}
-		
+
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- WooCommerce handles nonce for bulk edit.
 		if ( isset( $_REQUEST['_cfwc_country_of_origin'] ) ) {
 			// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput
 			$value = sanitize_text_field( wp_unslash( $_REQUEST['_cfwc_country_of_origin'] ) );
-			
+
 			if ( '_clear' === $value ) {
 				$product->delete_meta_data( '_cfwc_country_of_origin' );
 				$save_needed = true;
@@ -383,7 +385,7 @@ class CFWC_Onboarding {
 				$save_needed = true;
 			}
 		}
-		
+
 		if ( $save_needed ) {
 			$product->save();
 		}
@@ -399,23 +401,26 @@ class CFWC_Onboarding {
 		if ( ! isset( $_POST['product_id'] ) ) {
 			wp_send_json_error();
 		}
-		
+
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput -- Read-only AJAX operation.
 		$product_id = absint( $_POST['product_id'] );
-		
+
+		// phpcs:ignore WordPress.WP.Capabilities.Unknown -- edit_product is a standard WooCommerce capability.
 		if ( ! current_user_can( 'edit_product', $product_id ) ) {
 			wp_send_json_error();
 		}
-		
-		$hs_code = get_post_meta( $product_id, '_cfwc_hs_code', true );
+
+		$hs_code           = get_post_meta( $product_id, '_cfwc_hs_code', true );
 		$country_of_origin = get_post_meta( $product_id, '_cfwc_country_of_origin', true );
-		
-		wp_send_json_success( array(
-			'hs_code' => $hs_code,
-			'country_of_origin' => $country_of_origin,
-		) );
+
+		wp_send_json_success(
+			array(
+				'hs_code'           => $hs_code,
+				'country_of_origin' => $country_of_origin,
+			)
+		);
 	}
-	
+
 	/**
 	 * Render setup status for settings page.
 	 *
@@ -423,12 +428,12 @@ class CFWC_Onboarding {
 	 */
 	public function render_setup_status() {
 		$stats = $this->get_product_stats();
-		
+
 		// Only show if products are missing origin.
-		if ( $stats['missing'] === 0 ) {
+		if ( 0 === $stats['missing'] ) {
 			return;
 		}
-		
+
 		$products_url = admin_url( 'edit.php?post_type=product' );
 		?>
 		<div class="cfwc-setup-status notice notice-warning inline" style="margin: 0 0 20px 0;">
@@ -437,10 +442,10 @@ class CFWC_Onboarding {
 				<?php
 				printf(
 					/* translators: %1$d: number of products missing origin, %2$d: total products */
-									esc_html__( '%1$d of %2$d products need Country of Origin data.', 'customs-fees-for-woocommerce' ),
-				absint( $stats['missing'] ),
-				absint( $stats['total'] )
-			);
+					esc_html__( '%1$d of %2$d products need Country of Origin data.', 'customs-fees-for-woocommerce' ),
+					absint( $stats['missing'] ),
+					absint( $stats['total'] )
+				);
 				?>
 				<a href="<?php echo esc_url( $products_url ); ?>" style="margin-left: 10px;">
 					<?php esc_html_e( 'View Products', 'customs-fees-for-woocommerce' ); ?>

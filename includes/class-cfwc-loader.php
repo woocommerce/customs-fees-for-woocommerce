@@ -69,7 +69,7 @@ class CFWC_Loader {
 	public function init() {
 		// Load dependencies first.
 		$this->load_dependencies();
-		
+
 		// Initialize classes.
 		$this->init_classes();
 
@@ -85,12 +85,13 @@ class CFWC_Loader {
 	private function load_dependencies() {
 		// Load core classes.
 		require_once CFWC_PLUGIN_DIR . 'includes/class-cfwc-settings.php';
+		require_once CFWC_PLUGIN_DIR . 'includes/class-cfwc-rule-matcher.php';
 		require_once CFWC_PLUGIN_DIR . 'includes/class-cfwc-calculator.php';
 		require_once CFWC_PLUGIN_DIR . 'includes/class-cfwc-products.php';
 		require_once CFWC_PLUGIN_DIR . 'includes/class-cfwc-display.php';
 		require_once CFWC_PLUGIN_DIR . 'includes/class-cfwc-emails.php';
 		require_once CFWC_PLUGIN_DIR . 'includes/class-cfwc-templates.php';
-		
+
 		// Load admin classes if in admin.
 		if ( is_admin() ) {
 			require_once CFWC_PLUGIN_DIR . 'includes/admin/class-cfwc-admin.php';
@@ -130,10 +131,10 @@ class CFWC_Loader {
 		if ( is_admin() ) {
 			$admin = new CFWC_Admin();
 			$admin->init();
-			
+
 			// Initialize export/import handler.
 			new CFWC_Export_Import();
-			
+
 			// Initialize onboarding handler.
 			new CFWC_Onboarding();
 		}
@@ -152,10 +153,10 @@ class CFWC_Loader {
 		// Core plugin hooks.
 		add_action( 'init', array( $this, 'load_textdomain' ) );
 		add_action( 'before_woocommerce_init', array( $this, 'declare_compatibility' ) );
-		
+
 		// Cart calculation hooks.
 		add_action( 'woocommerce_cart_calculate_fees', array( $this, 'add_customs_fees' ) );
-		
+
 		// Plugin action links.
 		add_filter( 'plugin_action_links_' . CFWC_PLUGIN_BASENAME, array( $this, 'add_action_links' ) );
 
@@ -196,14 +197,14 @@ class CFWC_Loader {
 				CFWC_PLUGIN_FILE,
 				true
 			);
-			
+
 			// Cart/Checkout blocks compatibility.
 			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility(
 				'cart_checkout_blocks',
 				CFWC_PLUGIN_FILE,
 				true
 			);
-			
+
 			// Product block editor compatibility.
 			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility(
 				'product_block_editor',
@@ -246,15 +247,15 @@ class CFWC_Loader {
 			$tooltip_text = CFWC_Settings::get_default_help_text();
 			WC()->session->set( 'cfwc_tooltip_text', $tooltip_text );
 		}
-		
+
 		// Store the fee breakdown in session for display.
 		WC()->session->set( 'cfwc_fees_breakdown', $fees );
 
 		// Calculate total customs fees.
 		$total_amount = 0;
-		$any_taxable = false;
-		$tax_class = '';
-		
+		$any_taxable  = false;
+		$tax_class    = '';
+
 		foreach ( $fees as $fee ) {
 			$total_amount += $fee['amount'];
 			if ( isset( $fee['taxable'] ) && $fee['taxable'] ) {
@@ -273,12 +274,15 @@ class CFWC_Loader {
 			$any_taxable,
 			$tax_class
 		);
-		
+
 		// Debug log.
-		$this->debug_log( 'Added Combined Fee', array(
-			'total' => $total_amount,
-			'breakdown_count' => count( $fees ),
-		) );
+		$this->debug_log(
+			'Added Combined Fee',
+			array(
+				'total'           => $total_amount,
+				'breakdown_count' => count( $fees ),
+			)
+		);
 	}
 
 	/**
@@ -354,19 +358,19 @@ class CFWC_Loader {
 			'cfwc-admin',
 			'cfwc_admin',
 			array(
-				'ajax_url'     => admin_url( 'admin-ajax.php' ),
-				'nonce'        => wp_create_nonce( 'cfwc-admin' ),
-				'countries'    => WC()->countries->get_countries(),
-				'currency'     => get_woocommerce_currency_symbol(),
-				'templates'    => $this->get_available_templates(),
-				'i18n' => array(
-					'confirm_delete' => __( 'Are you sure you want to delete this rule?', 'customs-fees-for-woocommerce' ),
+				'ajax_url'  => admin_url( 'admin-ajax.php' ),
+				'nonce'     => wp_create_nonce( 'cfwc-admin' ),
+				'countries' => WC()->countries->get_countries(),
+				'currency'  => get_woocommerce_currency_symbol(),
+				'templates' => $this->get_available_templates(),
+				'i18n'      => array(
+					'confirm_delete'   => __( 'Are you sure you want to delete this rule?', 'customs-fees-for-woocommerce' ),
 					'confirm_template' => __( 'This will replace all existing rules. Continue?', 'customs-fees-for-woocommerce' ),
-					'saving'         => __( 'Saving...', 'customs-fees-for-woocommerce' ),
-					'saved'          => __( 'Settings saved!', 'customs-fees-for-woocommerce' ),
-					'error'          => __( 'An error occurred. Please try again.', 'customs-fees-for-woocommerce' ),
-					'add_rule'       => __( 'Add Rule', 'customs-fees-for-woocommerce' ),
-					'edit_rule'      => __( 'Edit Rule', 'customs-fees-for-woocommerce' ),
+					'saving'           => __( 'Saving...', 'customs-fees-for-woocommerce' ),
+					'saved'            => __( 'Settings saved!', 'customs-fees-for-woocommerce' ),
+					'error'            => __( 'An error occurred. Please try again.', 'customs-fees-for-woocommerce' ),
+					'add_rule'         => __( 'Add Rule', 'customs-fees-for-woocommerce' ),
+					'edit_rule'        => __( 'Edit Rule', 'customs-fees-for-woocommerce' ),
 				),
 			)
 		);
@@ -380,12 +384,12 @@ class CFWC_Loader {
 	 */
 	private function get_available_templates() {
 		return array(
-			'us_general'    => __( 'U.S. General Import (2025 rules)', 'customs-fees-for-woocommerce' ),
+			'us_general'     => __( 'U.S. General Import (2025 rules)', 'customs-fees-for-woocommerce' ),
 			'us_electronics' => __( 'U.S. Electronics Import', 'customs-fees-for-woocommerce' ),
-			'us_textiles'   => __( 'U.S. Textiles & Apparel', 'customs-fees-for-woocommerce' ),
-			'eu_to_us'      => __( 'EU to U.S. Standard', 'customs-fees-for-woocommerce' ),
-			'uk_to_us'      => __( 'UK to U.S. Standard', 'customs-fees-for-woocommerce' ),
-			'simplified'    => __( 'Simple 10% All Countries', 'customs-fees-for-woocommerce' ),
+			'us_textiles'    => __( 'U.S. Textiles & Apparel', 'customs-fees-for-woocommerce' ),
+			'eu_to_us'       => __( 'EU to U.S. Standard', 'customs-fees-for-woocommerce' ),
+			'uk_to_us'       => __( 'UK to U.S. Standard', 'customs-fees-for-woocommerce' ),
+			'simplified'     => __( 'Simple 10% All Countries', 'customs-fees-for-woocommerce' ),
 		);
 	}
 

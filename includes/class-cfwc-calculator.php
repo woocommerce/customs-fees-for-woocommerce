@@ -39,6 +39,19 @@ class CFWC_Calculator {
 	}
 
 	/**
+	 * Get all rules from settings.
+	 *
+	 * @since 1.2.0
+	 * @return array Array of rules.
+	 */
+	private function get_rules() {
+		if ( null === $this->rules_cache ) {
+			$this->rules_cache = get_option( 'cfwc_rules', array() );
+		}
+		return $this->rules_cache;
+	}
+
+	/**
 	 * Initialize the calculator.
 	 *
 	 * @since 1.0.0
@@ -63,96 +76,175 @@ class CFWC_Calculator {
 			return $fees;
 		}
 
-		// Get applicable rules for the destination country.
-		$rules = $this->get_rules_for_country( $destination_country );
+		// Get all rules (not filtered by country for new matching system).
+		$rules = $this->get_rules();
 		if ( empty( $rules ) ) {
 			return $fees;
 		}
 
-		// Group cart items by origin country.
-		$items_by_origin = $this->group_cart_items_by_origin( $cart );
-		
-		// Debug log the grouped items
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
-			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug only
-			error_log( 'CFWC Items by Origin: ' . wp_json_encode( array_keys( $items_by_origin ) ) );
-		}
-		
-		// Apply fees based on origin countries.
-		foreach ( $items_by_origin as $origin => $items ) {
-			// Skip if no shippable items in this origin group.
-			if ( empty( $items['shippable_items'] ) ) {
+		// Initialize rule matcher for advanced matching (v1.2.0).
+		$rule_matcher = new CFWC_Rule_Matcher();
+
+		// Log calculation start.
+		$this->log_debug(
+			sprintf(
+				'Starting customs fee calculation for destination: %s with %d rules configured',
+				$destination_country,
+				count( $rules )
+			)
+		);
+
+		// Calculate fees per product for accurate category/HS code matching.
+		$fees_by_label = array(); // Group fees by label for consolidation.
+
+		foreach ( $cart->get_cart() as $cart_item_key => $cart_item ) {
+			$product    = $cart_item['data'];
+			$product_id = $cart_item['variation_id'] ? $cart_item['variation_id'] : $cart_item['product_id'];
+
+			// Build product info for logging.
+			$product_info = sprintf(
+				'Product: "%s" (ID: %d, SKU: %s)',
+				$product->get_name(),
+				$product_id,
+				$product->get_sku() ? $product->get_sku() : 'N/A'
+			);
+
+			// Check and log if virtual/downloadable.
+			if ( $product->is_virtual() || $product->is_downloadable() ) {
+				$this->log_debug(
+					sprintf(
+						'  SKIPPED %s - Reason: %s product (no customs fees apply)',
+						$product_info,
+						$product->is_virtual() ? 'Virtual' : 'Downloadable'
+					)
+				);
 				continue;
 			}
-			
-			// Debug log
-			if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
-				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug only
-				error_log( sprintf( 'CFWC Processing origin %s with total %s', $origin, $items['total'] ) );
+
+			// Check and log if doesn't need shipping.
+			if ( ! $product->needs_shipping() ) {
+				$this->log_debug(
+					sprintf(
+						'  SKIPPED %s - Reason: Product does not require shipping',
+						$product_info
+					)
+				);
+				continue;
 			}
-			
-			// Collect ALL matching rules - both specific and general
-			$matching_rules = array();
-			
-			// First, get rules specific to this origin
-			$specific_rules = $this->get_rules_for_origin( $rules, $origin );
-			if ( ! empty( $specific_rules ) ) {
-				$matching_rules = array_merge( $matching_rules, $specific_rules );
+
+			// Get product origin.
+			$origin = get_post_meta( $product_id, '_cfwc_country_of_origin', true );
+
+			// Check and log if no origin set.
+			if ( empty( $origin ) ) {
+				$this->log_debug(
+					sprintf(
+						'  SKIPPED %s - Reason: No country of origin configured',
+						$product_info
+					)
+				);
+				continue;
 			}
-			
-			// Also get general rules (empty origin) that apply to all origins
-			$general_rules = $this->get_rules_for_origin( $rules, '' );
-			if ( ! empty( $general_rules ) ) {
-				// For general rules, we need to check they haven't already been added for this specific origin
-				foreach ( $general_rules as $general_rule ) {
-					// Only add if we don't have a specific rule with the same label for this origin
-					$already_added = false;
-					foreach ( $specific_rules as $specific_rule ) {
-						if ( $specific_rule['label'] === $general_rule['label'] ) {
-							$already_added = true;
-							break;
-						}
-					}
-					if ( ! $already_added ) {
-						$matching_rules[] = $general_rule;
-					}
-				}
+
+			// Get matching rules for this product.
+			$matching_rules = $rule_matcher->find_matching_rules(
+				$product,
+				$origin,
+				$destination_country,
+				$rules
+			);
+
+			// Calculate fees for this product.
+			$line_total = $cart_item['line_total'];
+
+			// Log product processing with enhanced details.
+			$hs_code = get_post_meta( $product_id, '_cfwc_hs_code', true );
+			$this->log_debug(
+				sprintf(
+					'  PROCESSING %s - Type: Physical, Origin: %s, HS Code: %s, Line Total: $%.2f',
+					$product_info,
+					$origin,
+					$hs_code ? $hs_code : 'Not set',
+					$line_total
+				)
+			);
+
+			if ( count( $matching_rules ) > 0 ) {
+				$this->log_debug(
+					sprintf(
+						'    → Found %d matching rule(s) for %s → %s',
+						count( $matching_rules ),
+						$origin,
+						$destination_country
+					)
+				);
+			} else {
+				$this->log_debug(
+					sprintf(
+						'    → No matching rules found for %s → %s',
+						$origin,
+						$destination_country
+					)
+				);
 			}
-			
-			// Debug log matching rules
-			if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
-				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug only
-				error_log( sprintf( 'CFWC Matching rules for origin %s: %d rules', $origin, count( $matching_rules ) ) );
-			}
-			
-			// Calculate fees for this origin group - apply ALL matching rules
+
+			// Process matching rules for this product.
 			foreach ( $matching_rules as $rule ) {
-				$fee = $this->calculate_single_fee( $rule, $items['total'] );
-				if ( $fee !== false && $fee > 0 ) {
+				$fee = $this->calculate_single_fee( $rule, $line_total );
+				if ( false !== $fee && $fee > 0 ) {
 					$base_label = $this->get_fee_label( $rule, $destination_country, $origin );
-					
-					// Add percentage rate in brackets only for percentage rules
+
+					// Add percentage rate in brackets only for percentage rules.
 					if ( isset( $rule['type'] ) && 'percentage' === $rule['type'] && ! empty( $rule['rate'] ) ) {
 						$label = sprintf( '%s (%s%%)', $base_label, $rule['rate'] );
 					} else {
-						// For flat rate, just use the base label
+						// For flat rate, just use the base label.
 						$label = $base_label;
 					}
-					
-					$fees[] = array(
-						'label'     => $label,
-						'amount'    => $fee,
-						'taxable'   => $this->is_fee_taxable( $rule ),
-						'tax_class' => $this->get_fee_tax_class( $rule ),
-					);
-					
-					// Debug log each fee
-					if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
-						// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug only
-						error_log( sprintf( 'CFWC Added fee: %s = %s for origin %s', $label, $fee, $origin ) );
+
+					// Group fees by label for consolidation.
+					if ( ! isset( $fees_by_label[ $label ] ) ) {
+						$fees_by_label[ $label ] = array(
+							'label'     => $label,
+							'amount'    => 0,
+							'taxable'   => $this->is_fee_taxable( $rule ),
+							'tax_class' => $this->get_fee_tax_class( $rule ),
+						);
 					}
+
+					$fees_by_label[ $label ]['amount'] += $fee;
+
+					// Log fee application.
+					$this->log_debug(
+						sprintf(
+							'      Applied: %s = $%.2f',
+							$label,
+							$fee
+						)
+					);
 				}
 			}
+		}
+
+		// Convert grouped fees to array.
+		$fees = array_values( $fees_by_label );
+
+		// Log summary.
+		if ( ! empty( $fees ) ) {
+			$this->log_debug( 'Calculation Summary:' );
+			foreach ( $fees as $fee ) {
+				$this->log_debug(
+					sprintf(
+						'  • %s: $%.2f',
+						$fee['label'],
+						$fee['amount']
+					)
+				);
+			}
+			$total_fees = array_sum( wp_list_pluck( $fees, 'amount' ) );
+			$this->log_debug( sprintf( 'Total Customs & Import Fees: $%.2f', $total_fees ) );
+		} else {
+			$this->log_debug( 'No customs fees applied to this cart.' );
 		}
 
 		// Allow filtering of calculated fees.
@@ -173,46 +265,46 @@ class CFWC_Calculator {
 	 */
 	private function group_cart_items_by_origin( $cart ) {
 		$groups = array();
-		
+
 		foreach ( $cart->get_cart() as $cart_item_key => $cart_item ) {
 			$product = $cart_item['data'];
-			
+
 			// Skip virtual and downloadable products.
 			if ( $product->is_virtual() || $product->is_downloadable() ) {
 				continue;
 			}
-			
+
 			// Get product origin.
 			$product_id = $cart_item['variation_id'] ? $cart_item['variation_id'] : $cart_item['product_id'];
-			$origin = get_post_meta( $product_id, '_cfwc_country_of_origin', true );
-			
+			$origin     = get_post_meta( $product_id, '_cfwc_country_of_origin', true );
+
 			// Default to 'unknown' if no origin set.
 			if ( empty( $origin ) ) {
 				$origin = 'unknown';
 			}
-			
+
 			// Initialize group if not exists.
 			if ( ! isset( $groups[ $origin ] ) ) {
 				$groups[ $origin ] = array(
-					'items' => array(),
+					'items'           => array(),
 					'shippable_items' => array(),
-					'total' => 0,
+					'total'           => 0,
 				);
 			}
-			
+
 			// Add item to group.
 			$groups[ $origin ]['items'][] = $cart_item;
-			
+
 			// Check if item needs shipping.
 			if ( $product->needs_shipping() ) {
 				$groups[ $origin ]['shippable_items'][] = $cart_item;
-				
+
 				// Add to total (including quantity).
-				$item_total = $cart_item['line_total'];
+				$item_total                  = $cart_item['line_total'];
 				$groups[ $origin ]['total'] += $item_total;
 			}
 		}
-		
+
 		// Include shipping in totals if applicable.
 		$include_shipping = apply_filters( 'cfwc_include_shipping_in_calculation', true );
 		if ( $include_shipping && $cart->get_shipping_total() > 0 ) {
@@ -221,18 +313,18 @@ class CFWC_Calculator {
 			foreach ( $groups as $origin => $data ) {
 				$total_shippable += $data['total'];
 			}
-			
+
 			if ( $total_shippable > 0 ) {
 				$shipping_total = $cart->get_shipping_total();
 				foreach ( $groups as $origin => &$data ) {
 					if ( $data['total'] > 0 ) {
-						$proportion = $data['total'] / $total_shippable;
+						$proportion     = $data['total'] / $total_shippable;
 						$data['total'] += ( $shipping_total * $proportion );
 					}
 				}
 			}
 		}
-		
+
 		return $groups;
 	}
 
@@ -246,29 +338,29 @@ class CFWC_Calculator {
 	 */
 	private function get_rules_for_origin( $rules, $origin ) {
 		$matching = array();
-		
+
 		foreach ( $rules as $rule ) {
 			$rule_origin = isset( $rule['origin_country'] ) ? $rule['origin_country'] : '';
-			
+
 			// Empty origin_country means applies to all origins.
 			if ( empty( $rule_origin ) ) {
 				$matching[] = $rule;
 				continue;
 			}
-			
+
 			// Exact match.
 			if ( $rule_origin === $origin ) {
 				$matching[] = $rule;
 				continue;
 			}
-			
+
 			// Check for EU countries.
 			if ( 'EU' === $rule_origin && $this->is_eu_country( $origin ) ) {
 				$matching[] = $rule;
 				continue;
 			}
 		}
-		
+
 		return $matching;
 	}
 
@@ -309,7 +401,7 @@ class CFWC_Calculator {
 			'ES', // Spain.
 			'SE', // Sweden.
 		);
-		
+
 		return in_array( $country, $eu_countries, true );
 	}
 
@@ -460,11 +552,11 @@ class CFWC_Calculator {
 		if ( ! empty( $rule['label'] ) ) {
 			return $rule['label'];
 		}
-		
+
 		// Otherwise, build a default label
-		$countries = WC()->countries->get_countries();
+		$countries    = WC()->countries->get_countries();
 		$country_name = isset( $countries[ $country ] ) ? $countries[ $country ] : $country;
-		
+
 		// Add origin to label if available.
 		if ( ! empty( $origin ) && 'unknown' !== $origin ) {
 			$origin_name = isset( $countries[ $origin ] ) ? $countries[ $origin ] : $origin;
@@ -475,7 +567,7 @@ class CFWC_Calculator {
 				$origin_name
 			);
 		}
-		
+
 		// Default label.
 		return sprintf(
 			/* translators: %s: country name */
@@ -519,6 +611,53 @@ class CFWC_Calculator {
 	}
 
 	/**
+	 * Enhanced debug logging for troubleshooting.
+	 *
+	 * @since 1.3.0
+	 * @param string $message Log message.
+	 * @param string $level   Log level (debug, info, notice, warning, error).
+	 */
+	private function log_debug( $message, $level = 'debug' ) {
+		// Check if debug mode is enabled.
+		if ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) {
+			return;
+		}
+
+		// Prefix all messages.
+		$prefixed_message = '[CFWC] ' . $message;
+
+		// Log to WordPress debug.log if enabled.
+		if ( defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug only
+			error_log( $prefixed_message );
+		}
+
+		// Also log to WooCommerce Status > Logs if available.
+		if ( function_exists( 'wc_get_logger' ) ) {
+			$logger  = wc_get_logger();
+			$context = array( 'source' => 'customs-fees-debug' );
+
+			switch ( $level ) {
+				case 'error':
+					$logger->error( $message, $context );
+					break;
+				case 'warning':
+					$logger->warning( $message, $context );
+					break;
+				case 'notice':
+					$logger->notice( $message, $context );
+					break;
+				case 'info':
+					$logger->info( $message, $context );
+					break;
+				default:
+					$logger->debug( $message, $context );
+					break;
+			}
+		}
+	}
+
+	/**
 	 * Log fee calculation for debugging.
 	 *
 	 * @since 1.0.0
@@ -538,7 +677,7 @@ class CFWC_Calculator {
 			return;
 		}
 
-		$logger = wc_get_logger();
+		$logger  = wc_get_logger();
 		$context = array( 'source' => 'customs-fees' );
 
 		// Log calculation details.
@@ -571,10 +710,10 @@ class CFWC_Calculator {
 	 */
 	public function clear_cache() {
 		$this->rules_cache = null;
-		
+
 		// Clear any transients.
 		delete_transient( 'cfwc_rules_cache' );
-		
+
 		// Trigger action for other caching mechanisms.
 		do_action( 'cfwc_cache_cleared' );
 	}
@@ -589,15 +728,15 @@ class CFWC_Calculator {
 	 */
 	private function get_cart_total( $cart, $origin_country = '' ) {
 		$total = 0;
-		
+
 		foreach ( $cart->get_cart_contents() as $cart_item_key => $cart_item ) {
 			$product = $cart_item['data'];
-			
+
 			// Skip virtual and downloadable products.
 			if ( ! $product || $product->is_virtual() || $product->is_downloadable() ) {
 				continue;
 			}
-			
+
 			// If an origin_country is specified, only include products matching that origin.
 			if ( ! empty( $origin_country ) ) {
 				$product_origin = get_post_meta( $product->get_id(), '_cfwc_country_of_origin', true );
@@ -605,22 +744,22 @@ class CFWC_Calculator {
 					continue;
 				}
 			}
-			
+
 			$total += $cart_item['line_total'];
 		}
-		
+
 		// Option to include shipping in calculation.
 		$include_shipping = apply_filters( 'cfwc_include_shipping_in_calculation', true );
 		if ( $include_shipping ) {
 			$total += $cart->get_shipping_total();
 		}
-		
+
 		// Option to include taxes in calculation.
 		$include_taxes = apply_filters( 'cfwc_include_taxes_in_calculation', false );
 		if ( $include_taxes ) {
 			$total += $cart->get_taxes_total();
 		}
-		
+
 		return (float) $total;
 	}
 }

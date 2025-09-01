@@ -1,4 +1,6 @@
 <?php
+// phpcs:disable WordPress.Files.FileName.InvalidClassFileName -- Main plugin file requires different naming.
+// phpcs:disable Generic.Files.OneObjectStructurePerFile.MultipleFound -- Helper function required for backward compatibility.
 /**
  * Plugin Name:       Customs Fees for WooCommerce
  * Plugin URI:        https://woocommerce.com
@@ -37,6 +39,7 @@ define( 'CFWC_PLUGIN_FILE', __FILE__ );
  *
  * @since 1.0.0
  */
+// phpcs:ignore WordPress.Files.FileName.InvalidClassFileName -- Main plugin file doesn't follow class naming convention.
 final class Customs_Fees_WooCommerce {
 
 	/**
@@ -134,7 +137,7 @@ final class Customs_Fees_WooCommerce {
 	private function init() {
 		// Load the loader class.
 		require_once CFWC_PLUGIN_DIR . 'includes/class-cfwc-loader.php';
-		
+
 		// Initialize the loader.
 		$this->loader = CFWC_Loader::instance();
 		$this->loader->init();
@@ -149,7 +152,7 @@ final class Customs_Fees_WooCommerce {
 		if ( get_option( 'cfwc_activated' ) ) {
 			// Set activation time for notice display.
 			update_option( 'cfwc_activation_time', time() );
-			
+
 			// Set default options.
 			if ( false === get_option( 'cfwc_rules' ) ) {
 				add_option( 'cfwc_rules', array() );
@@ -157,7 +160,7 @@ final class Customs_Fees_WooCommerce {
 			if ( false === get_option( 'cfwc_version' ) ) {
 				add_option( 'cfwc_version', CFWC_VERSION );
 			}
-			
+
 			// Clear the activation flag.
 			delete_option( 'cfwc_activated' );
 		}
@@ -201,7 +204,7 @@ final class Customs_Fees_WooCommerce {
 		if ( ! class_exists( 'WooCommerce' ) ) {
 			return;
 		}
-		
+
 		// Global for backwards compatibility.
 		$GLOBALS['customs_fees_woocommerce'] = self::instance();
 	}
@@ -225,7 +228,7 @@ final class Customs_Fees_WooCommerce {
 		// Clear activation time and dismissed notice.
 		delete_option( 'cfwc_activation_time' );
 		delete_option( 'cfwc_dismissed_setup_notice' );
-		
+
 		// Clear cache transient.
 		delete_transient( 'cfwc_rules_cache' );
 	}
@@ -238,7 +241,7 @@ final class Customs_Fees_WooCommerce {
 	public static function uninstall() {
 		// Check if we should remove data.
 		$remove_data = apply_filters( 'cfwc_uninstall_remove_data', true );
-		
+
 		if ( ! $remove_data ) {
 			return;
 		}
@@ -254,7 +257,7 @@ final class Customs_Fees_WooCommerce {
 		// Note: These queries use meta_key which can be slower, but this is acceptable
 		// for uninstall operations which only run once when the plugin is deleted.
 		global $wpdb;
-		
+
 		// Remove HS code meta.
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		// phpcs:disable WordPress.DB.SlowDBQuery.slow_db_query_meta_key
@@ -264,7 +267,7 @@ final class Customs_Fees_WooCommerce {
 		);
 		// phpcs:enable WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		
+
 		// Remove country of origin meta.
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		// phpcs:disable WordPress.DB.SlowDBQuery.slow_db_query_meta_key
@@ -274,7 +277,7 @@ final class Customs_Fees_WooCommerce {
 		);
 		// phpcs:enable WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		
+
 		// Clear any cached data.
 		wp_cache_flush();
 	}
@@ -286,7 +289,8 @@ final class Customs_Fees_WooCommerce {
  * @since 1.0.0
  * @return Customs_Fees_WooCommerce Main instance.
  */
-function CFWC() {
+// phpcs:ignore Generic.Files.OneObjectStructurePerFile.MultipleFound, WordPress.NamingConventions.ValidFunctionName.FunctionNameInvalid -- Helper function needed for plugin access, legacy name kept for backward compatibility.
+function cfwc() {
 	return Customs_Fees_WooCommerce::instance();
 }
 
