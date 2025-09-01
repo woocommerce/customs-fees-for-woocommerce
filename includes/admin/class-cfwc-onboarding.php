@@ -55,16 +55,26 @@ class CFWC_Onboarding {
 		// Get total published products.
 		$total = (int) wp_count_posts( 'product' )->publish;
 		
-		// Get products with country of origin.
-		$with_origin = (int) $wpdb->get_var(
-			"SELECT COUNT(DISTINCT p.ID) 
-			FROM {$wpdb->posts} p
-			INNER JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id
-			WHERE p.post_type = 'product' 
-			AND p.post_status = 'publish'
-			AND pm.meta_key = '_cfwc_country_of_origin'
-			AND pm.meta_value != ''"
-		);
+		// Check cache first.
+		$cache_key = 'cfwc_products_with_origin_count';
+		$with_origin = wp_cache_get( $cache_key, 'cfwc' );
+		
+		if ( false === $with_origin ) {
+			// Get products with country of origin.
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom query needed for performance.
+			$with_origin = (int) $wpdb->get_var(
+				"SELECT COUNT(DISTINCT p.ID) 
+				FROM {$wpdb->posts} p
+				INNER JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id
+				WHERE p.post_type = 'product' 
+				AND p.post_status = 'publish'
+				AND pm.meta_key = '_cfwc_country_of_origin'
+				AND pm.meta_value != ''"
+			);
+			
+			// Cache for 5 minutes.
+			wp_cache_set( $cache_key, $with_origin, 'cfwc', 300 );
+		}
 		
 		return array(
 			'total'        => $total,
@@ -146,10 +156,10 @@ class CFWC_Onboarding {
 							'%d products need Country of Origin data to calculate customs fees correctly.',
 							$stats['missing'],
 							'customs-fees-for-woocommerce'
-						) ),
-						$stats['missing']
-					);
-				} else {
+											) ),
+					absint( $stats['missing'] )
+				);
+			} else {
 					esc_html_e( 'All products have Country of Origin data. Configure your customs rules to start calculating fees.', 'customs-fees-for-woocommerce' );
 				}
 				?>
@@ -175,9 +185,9 @@ class CFWC_Onboarding {
 			$('.cfwc-dismiss-notice').on('click', function(e) {
 				e.preventDefault();
 				$.post(ajaxurl, {
-					action: 'cfwc_dismiss_setup_notice',
-					nonce: '<?php echo wp_create_nonce( 'cfwc_dismiss_notice' ); ?>'
-				});
+									action: 'cfwc_dismiss_setup_notice',
+				nonce: '<?php echo esc_js( wp_create_nonce( 'cfwc_dismiss_notice' ) ); ?>'
+			});
 				$(this).closest('.notice').fadeOut();
 			});
 		});
@@ -346,9 +356,9 @@ class CFWC_Onboarding {
 	public function save_bulk_edit_data( $product ) {
 		$save_needed = false;
 		
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- WooCommerce handles nonce for bulk edit.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- WooCommerce handles nonce for bulk edit.
 		if ( isset( $_REQUEST['_cfwc_hs_code'] ) ) {
-			// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput
 			$hs_code = sanitize_text_field( wp_unslash( $_REQUEST['_cfwc_hs_code'] ) );
 			
 			if ( '_clear' === $hs_code ) {
@@ -360,9 +370,9 @@ class CFWC_Onboarding {
 			}
 		}
 		
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- WooCommerce handles nonce for bulk edit.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- WooCommerce handles nonce for bulk edit.
 		if ( isset( $_REQUEST['_cfwc_country_of_origin'] ) ) {
-			// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput
 			$value = sanitize_text_field( wp_unslash( $_REQUEST['_cfwc_country_of_origin'] ) );
 			
 			if ( '_clear' === $value ) {
@@ -385,12 +395,12 @@ class CFWC_Onboarding {
 	 * @since 1.1.0
 	 */
 	public function ajax_get_quick_edit_data() {
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only operation.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only AJAX operation for Quick Edit data retrieval.
 		if ( ! isset( $_POST['product_id'] ) ) {
 			wp_send_json_error();
 		}
 		
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput -- Read-only AJAX operation.
 		$product_id = absint( $_POST['product_id'] );
 		
 		if ( ! current_user_can( 'edit_product', $product_id ) ) {
@@ -427,10 +437,10 @@ class CFWC_Onboarding {
 				<?php
 				printf(
 					/* translators: %1$d: number of products missing origin, %2$d: total products */
-					esc_html__( '%1$d of %2$d products need Country of Origin data.', 'customs-fees-for-woocommerce' ),
-					$stats['missing'],
-					$stats['total']
-				);
+									esc_html__( '%1$d of %2$d products need Country of Origin data.', 'customs-fees-for-woocommerce' ),
+				absint( $stats['missing'] ),
+				absint( $stats['total'] )
+			);
 				?>
 				<a href="<?php echo esc_url( $products_url ); ?>" style="margin-left: 10px;">
 					<?php esc_html_e( 'View Products', 'customs-fees-for-woocommerce' ); ?>
