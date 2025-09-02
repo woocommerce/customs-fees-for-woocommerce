@@ -2,6 +2,27 @@
 
 This document provides comprehensive testing scenarios to ensure the plugin functions correctly in various use cases.
 
+## Plugin Features Overview
+
+### Supported Features ✅
+
+- **Rule Types:** Percentage-based customs fees
+- **Rule Matching:** By origin country, destination country, product category, HS codes
+- **Stacking Modes:** Add, Override, Exclusive
+- **Product Types:** Physical products only (virtual/downloadable excluded)
+- **Display:** Fee breakdown in cart, checkout, orders, and emails
+- **Presets:** Pre-configured rules for common trade routes
+- **Logging:** Debug logging for troubleshooting
+
+### Not Currently Supported ❌
+
+- **Flat Fees:** Only percentage-based fees
+- **Threshold Rules:** No minimum order amount settings
+- **Bulk Actions:** No bulk origin setting for products
+- **CSV Import/Export:** Manual rule entry only (except presets)
+- **Per-Variation Origins:** Variations inherit parent product origin
+- **Built-in Currency Conversion:** Relies on WooCommerce currency
+
 ## Test Environment Setup
 
 ### Prerequisites
@@ -118,59 +139,58 @@ Total Customs Fees: $0.00
 
 ---
 
-### Test Case 4: Threshold-Based Rules
+### Test Case 4: Category-Based Rules
 
-**Scenario:** Fees apply only above certain order values
+**Scenario:** Different fees for different product categories
 
 **Setup:**
 
-1. Create threshold rule:
-   - Minimum order: $150
-   - Rate: 10%
-2. Test three orders:
-   - Order A: $100
-   - Order B: $200
-   - Order C: $149.99
+1. Create category rules:
+   - Electronics: 15%
+   - Clothing: 12%
+   - Books: 5%
+2. Test products from each category
+3. Shipping to United States
 
 **Expected Results:**
 
 ```
-Order A ($100): No customs fees
-Order B ($200): $20.00 customs fee
-Order C ($149.99): No customs fees
+Electronics ($200): $30.00 customs fee
+Clothing ($100): $12.00 customs fee
+Books ($50): $2.50 customs fee
 ```
 
 **Verification Points:**
 
-- ✓ Threshold strictly enforced
-- ✓ Applies to subtotal (before shipping)
-- ✓ Clear messaging when no fees apply
+- ✓ Category rules apply correctly
+- ✓ Multiple categories in cart handled
+- ✓ Breakdown shows by category
 
 ---
 
-### Test Case 5: Percentage vs Flat Fees
+### Test Case 5: HS Code-Based Rules
 
-**Scenario:** Testing different fee calculation types
+**Scenario:** Testing HS code pattern matching
 
 **Setup:**
 
-1. Rule 1: China → US = 25% (percentage)
-2. Rule 2: Processing fee = $10 (flat)
-3. Cart with $100 product from China
+1. Rule 1: HS Code 61\* (Clothing) = 20%
+2. Rule 2: HS Code 8471\* (Computers) = 5%
+3. Products with matching HS codes
 
 **Expected Results:**
 
 ```
-Percentage fee: $100 × 25% = $25.00
-Flat fee: $10.00
-Total Customs Fees: $35.00
+T-shirt (HS 6109.10): $100 × 20% = $20.00
+Laptop (HS 8471.30): $500 × 5% = $25.00
+Product without HS code: No fee based on HS rule
 ```
 
 **Verification Points:**
 
-- ✓ Both fee types calculate correctly
-- ✓ Flat fees don't scale with quantity
-- ✓ Percentage fees scale with price
+- ✓ Wildcard patterns work
+- ✓ Exact matches work
+- ✓ Products without HS codes skip HS rules
 
 ---
 
@@ -265,27 +285,26 @@ Total Customs Fees: $5.00
 
 ### Test Case 10: Product Variations
 
-**Scenario:** Variable products with different origins
+**Scenario:** Variable products with shared origin
 
 **Setup:**
 
-1. T-shirt with variations:
-   - Small (origin: China): $20
-   - Medium (origin: Vietnam): $22
-   - Large (origin: Bangladesh): $24
-2. Rules:
-   - China → US: 25%
-   - Vietnam → US: 15%
-   - Bangladesh → US: 12%
+1. T-shirt with variations (all share parent product origin: China):
+   - Small: $20
+   - Medium: $22
+   - Large: $24
+2. Rule: China → US: 25%
 
 **Expected Results:**
 
 ```
 Small: $20 × 25% = $5.00
-Medium: $22 × 15% = $3.30
-Large: $24 × 12% = $2.88
-Total: $11.18
+Medium: $22 × 25% = $5.50
+Large: $24 × 25% = $6.00
+Total: $16.50
 ```
+
+**Note:** Variations inherit origin from parent product. Each variation cannot have a different origin.
 
 ---
 
@@ -309,24 +328,27 @@ Customs fee: $80 × 25% = $20.00
 
 ---
 
-### Test Case 12: Multi-Currency
+### Test Case 12: Multi-Currency (Requires Additional Plugin)
 
 **Scenario:** Customer shopping in different currency
 
 **Setup:**
 
 1. Store base currency: USD
-2. Customer currency: EUR
-3. Product: $100 USD from China
-4. Rule: 25% customs
+2. Multi-currency plugin active (e.g., WooCommerce Multi-Currency)
+3. Customer currency: EUR
+4. Product: $100 USD from China
+5. Rule: 25% customs
 
 **Expected Results:**
 
 ```
 Product in EUR: €85 (example rate)
 Customs in EUR: €21.25
-(Fees convert to customer currency)
+(Fees automatically convert with WooCommerce currency)
 ```
+
+**Note:** Currency conversion handled by WooCommerce, not by this plugin
 
 ---
 
@@ -351,40 +373,42 @@ Total: $135
 
 ---
 
-### Test Case 14: Bulk Actions
+### Test Case 14: Manual Product Origin Setting
 
-**Scenario:** Setting origin for multiple products
+**Scenario:** Setting origin for products individually
 
 **Setup:**
 
-1. Select 20 products in admin
-2. Bulk action: Set origin to "China"
-3. Verify all products updated
+1. Edit product in WooCommerce admin
+2. Find "Customs & Import Settings" metabox
+3. Set Country of Origin and HS Code
+4. Save product
 
 **Expected Results:**
 
-- All 20 products show China as origin
-- Fees calculate correctly for all
+- Product shows selected origin
+- HS code saved if provided
+- Fees calculate based on origin
 
 ---
 
-### Test Case 15: CSV Import/Export
+### Test Case 15: Preset Import
 
-**Scenario:** Bulk rule management
+**Scenario:** Using preset rule templates
 
 **Setup:**
 
-1. Export current rules to CSV
-2. Modify in spreadsheet
-3. Import back
-4. Verify rules updated
+1. Go to Customs & Import Fees settings
+2. Select a preset (e.g., "United States Tariffs - China")
+3. Click "Import" or "Add to Existing Rules"
+4. Save settings
 
 **Expected Results:**
 
-- Export contains all rule fields
-- Import validates data
-- Invalid rows reported
-- Valid rows imported successfully
+- Preset rules imported successfully
+- Rules appear in rules table
+- Can combine multiple presets
+- Stacking modes work as configured
 
 ---
 
@@ -419,6 +443,11 @@ Total: $135
 
 **Test:** Refund one product from order with customs
 **Expected:** Customs fee remains on order (manual adjustment needed)
+
+### Edge Case 7: Same Origin as Destination
+
+**Test:** Product origin same as shipping country
+**Expected:** No customs fees applied (domestic shipping)
 
 ---
 
@@ -474,17 +503,16 @@ Total: $135
 
 ### Load Testing
 
-1. Add 100+ products to cart
-2. Configure 50+ rules
+1. Add 20-30 products to cart
+2. Configure 10-20 rules
 3. Measure page load time
 4. Should complete in < 2 seconds
 
-### Stress Testing
+### Reasonable Limits
 
-1. Concurrent users: 100+
-2. Products per cart: 50+
-3. Rules configured: 100+
-4. Expected: No crashes, < 3s response
+1. Products per cart: Up to 50
+2. Rules configured: Up to 30
+3. Expected: Smooth operation without delays
 
 ---
 

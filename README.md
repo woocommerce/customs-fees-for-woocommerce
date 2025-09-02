@@ -2,37 +2,37 @@
 
 Automatically calculate and display customs fees, import duties, and tariffs at checkout based on product origin and destination countries.
 
-## 🎯 Purpose
+## Purpose
 
 With the U.S. ending its de minimis exemption on **August 29, 2025**, all international shipments will require customs duties regardless of value. This plugin helps merchants:
 
-- **Add transparency** to international orders
-- **Prevent cart abandonment** from surprise fees at delivery
-- **Build customer trust** with upfront total costs
-- **Stay compliant** with changing international regulations
+- **Add transparency** to international orders.
+- **Prevent cart abandonment** from surprise fees at delivery.
+- **Build customer trust** with upfront total costs.
+- **Stay compliant** with changing international regulations.
 
-## ✨ Features
+## Features
 
 ### Core Functionality
 
-- **Automated Fee Calculation**: Calculate customs fees based on percentage or flat rates
-- **Origin-Based Rules**: Set different fees based on product origin countries
-- **Smart Presets**: Quick setup with 25+ built-in presets for major countries
-- **Product-Level Settings**: Define origin country and HS codes for individual products
-- **CSV Import/Export**: Bulk manage rules and product data
-- **Transparent Checkout**: Display detailed fee breakdown to customers
-- **Flexible Rules**: Create unlimited custom rules for any country combination
-- **HPOS Compatible**: Full support for WooCommerce High-Performance Order Storage
+- **Automated Fee Calculation**: Calculate customs fees based on percentage or flat rates.
+- **Origin-Based Rules**: Set different fees based on product origin countries.
+- **Smart Presets**: Quick setup with 25+ built-in presets for major countries.
+- **Product-Level Settings**: Define origin country and HS codes for individual products.
+- **CSV Import/Export**: Bulk manage rules and product data.
+- **Transparent Checkout**: Display detailed fee breakdown to customers.
+- **Flexible Rules**: Create unlimited custom rules for any country combination.
+- **HPOS Compatible**: Full support for WooCommerce High-Performance Order Storage.
 
 ### Advanced Features
 
-- **Stacking Rules**: Control how multiple fees combine (add, override, or exclusive)
-- **Threshold-Based Fees**: Apply fees only above/below certain order values
-- **Category-Specific Rules**: Different rates for different product categories
-- **Multi-Currency Support**: Works with WooCommerce multi-currency stores
-- **Developer Friendly**: Extensive hooks and filters for customization
+- **Stacking Rules**: Control how multiple fees combine (add, override, or exclusive).
+- **Threshold-Based Fees**: Apply fees only above/below certain order values.
+- **Category-Specific Rules**: Different rates for different product categories.
+- **Multi-Currency Support**: Works with WooCommerce multi-currency stores.
+- **Developer Friendly**: Extensive hooks and filters for customization.
 
-## 📦 Installation
+## Installation
 
 ### Requirements
 
@@ -42,38 +42,37 @@ With the U.S. ending its de minimis exemption on **August 29, 2025**, all intern
 
 ### Installation Steps
 
-1. Upload the plugin files to `/wp-content/plugins/customs-fees-for-woocommerce/`
-2. Activate the plugin through the 'Plugins' menu in WordPress
-3. Navigate to **WooCommerce > Settings > Tax > Customs Fees** to configure
+1. Upload the plugin files to `/wp-content/plugins/customs-fees-for-woocommerce/`.
+2. Activate the plugin through the 'Plugins' menu in WordPress.
+3. Navigate to **WooCommerce > Settings > Tax > Customs Fees** to configure.
 
-## 🚀 Quick Start Guide
+## Quick Start Guide
 
-### Step 1: Enable Customs Fees
+### Step 1: Add Customs Fees Rules
 
 1. Go to **WooCommerce > Settings > Tax > Customs & Import Fees**
-2. Enable the customs fees feature
-3. Choose your setup method:
+2. Choose your setup method:
 
 #### Option A: Use Presets (Recommended)
 
-1. Find the "Quick Start with Presets" section
-2. Select a preset (e.g., "US Tariffs - General Import")
-3. Click "Add Preset Rules"
-4. Save changes
+1. Find the "Quick Start with Presets" section.
+2. Select a preset (e.g., "US Tariffs - General Import").
+3. Click "Add Preset Rules".
+4. Save changes.
 
 **Available Presets:**
 
-- **US Tariffs**: General, China (25%), EU, Canada (USMCA), Mexico, Japan
-- **UK Import**: VAT (20%) and standard duties
-- **EU Common Customs**: Standard EU tariff rates
-- **Canadian**: GST and import duties
-- **Australian**: GST (10%) and import duties
+- **US Tariffs**: General, China (25%), EU, Canada (USMCA), Mexico, Japan.
+- **UK Import**: VAT (20%) and standard duties.
+- **EU Common Customs**: Standard EU tariff rates.
+- **Canadian**: GST and import duties.
+- **Australian**: GST (10%) and import duties.
 
 #### Option B: Create Custom Rules
 
-1. Click "Add New Rule"
+1. Click "Add New Rule".
 2. Configure:
-   - **Label**: Display name (e.g., "Import Duty from China")
+   - **Label**: Display name (e.g., "Import Duty from China").
    - **Destination**: Where products ship to
    - **Origin**: Where products come from
    - **Type**: Percentage or Flat fee
@@ -85,27 +84,35 @@ With the U.S. ending its de minimis exemption on **August 29, 2025**, all intern
 
 #### Individual Products
 
-1. Edit any product
-2. Go to **Product Data > Inventory**
-3. Find **"Customs & Import Information"**
-4. Set **Country of Origin**
-5. Optionally add **HS Code**
-6. Update product
+1. Edit any product.
+2. Go to **Product Data > Inventory**.
+3. Find **"Customs & Import Information"**.
+4. Set **Country of Origin**.
+5. Optionally add **HS Code**.
+6. Update product.
 
 #### Bulk Update
 
-1. **Method 1**: Select products → Bulk Edit → Set origin country
-2. **Method 2**: Export products CSV → Add origin data → Re-import
-3. **Method 3**: Use provided bulk actions in products list
+1. **Method 1**: Select products → Bulk Edit → Set origin country.
+2. **Method 2**: Export products CSV → Add origin data → Re-import.
+3. **Method 3**: Use provided bulk actions in products list.
 
 ### Step 3: Test Your Setup
 
-1. Add products to cart
-2. Go to checkout
-3. Verify "Customs & Import Fees" appears
-4. Check fee breakdown is correct
+1. Add products to cart.
+2. Go to checkout.
+3. Verify "Customs & Import Fees" appears.
+4. Check fee breakdown is correct.
 
-## 🧪 Testing Scenarios
+![Settings](.github/media/settings.png)
+![Product Settings](.github/media/product-settings.png)
+![Classic Cart](.github/media/cart.png)
+![Classic Checkout](.github/media/checkout.png)
+![Block Cart](.github/media/cart-block.png)
+![Order Details](.github/media/order-details.png)
+![Email](.github/media/email.png)
+
+## Testing Scenarios
 
 ### Scenario 1: Mixed Origin Cart
 
@@ -212,7 +219,7 @@ Textile products: Only 12% applies (exclusive rule stops processing)
 Non-textile from China: 25% applies
 ```
 
-## 📊 Display Examples
+## Display Examples
 
 ### Cart Page (Classic)
 
@@ -237,11 +244,11 @@ Customs Fees      $23.50 ⓘ
 Total           $203.50
 ```
 
-## 🛠 Configuration Examples
+## Configuration Examples
 
 ### Example 1: US Store with Global Suppliers
 
-```php
+```
 // Preset: US General Import
 Rules:
 - China → US: 25% (tariff)
@@ -253,7 +260,7 @@ Rules:
 
 ### Example 2: EU Store
 
-```php
+```
 // Preset: EU Common Customs
 Rules:
 - Non-EU → EU: 20% VAT + varying duties
@@ -263,7 +270,7 @@ Rules:
 
 ### Example 3: Multi-Channel Setup
 
-```php
+```
 // Different rules per sales channel
 add_filter('cfwc_fee_rules', function($rules, $context) {
     if (is_wholesale_customer()) {
@@ -274,11 +281,11 @@ add_filter('cfwc_fee_rules', function($rules, $context) {
 }, 10, 2);
 ```
 
-## 🔧 Developer Guide
+## Developer Guide
 
 ### Hooks and Filters
 
-```php
+```
 // Modify calculated fees
 add_filter('cfwc_calculated_fee', function($fee, $rule, $product, $context) {
     // Custom logic here
@@ -311,7 +318,7 @@ add_filter('cfwc_product_origin', function($origin, $product_id) {
 
 ### Custom Rule Conditions
 
-```php
+```
 // Add custom matching logic
 add_filter('cfwc_rule_matches', function($matches, $rule, $product, $context) {
     // Check custom conditions
@@ -324,7 +331,7 @@ add_filter('cfwc_rule_matches', function($matches, $rule, $product, $context) {
 
 ### Database Structure
 
-```sql
+```
 -- Rules stored in wp_options
 option_name: cfwc_rules
 option_value: JSON array of rule objects
@@ -334,11 +341,11 @@ meta_key: _country_of_origin (2-letter country code)
 meta_key: _hs_code (Harmonized System code)
 ```
 
-## 🧩 Integration Examples
+## Integration Examples
 
 ### With Multi-Currency Plugins
 
-```php
+```
 // Fees automatically convert to displayed currency
 add_filter('cfwc_fee_amount', function($amount) {
     if (function_exists('convert_to_current_currency')) {
@@ -350,7 +357,7 @@ add_filter('cfwc_fee_amount', function($amount) {
 
 ### With Shipping Plugins
 
-```php
+```
 // Combine with shipping calculations
 add_action('woocommerce_shipping_calculated', function() {
     // Recalculate customs based on shipping destination
@@ -358,86 +365,50 @@ add_action('woocommerce_shipping_calculated', function() {
 });
 ```
 
-## 📈 Performance
+## Performance
 
-- **Lightweight**: < 500KB total size
-- **Optimized**: Caches calculations per session
-- **Scalable**: Handles unlimited products and rules
-- **Fast**: Average calculation time < 50ms
+- **Lightweight**: < 500KB total size.
+- **Optimized**: Caches calculations per session.
+- **Scalable**: Handles unlimited products and rules.
+- **Fast**: Average calculation time < 50ms.
 
-## 🔒 Security
+## Security
 
-- All inputs sanitized and validated
-- SQL queries use prepared statements
-- Nonce verification on all AJAX requests
-- Capability checks for admin functions
-- No external API calls (privacy-friendly)
-- PHPCS WordPress-Extra compliant
+- All inputs sanitized and validated.
+- SQL queries use prepared statements.
+- Nonce verification on all AJAX requests.
+- Capability checks for admin functions.
+- No external API calls (privacy-friendly).
+- PHPCS WordPress-Extra compliant.
 
-## 📝 Troubleshooting
+## Troubleshooting
 
 ### Fees Not Showing
 
-1. ✓ Check customs fees are enabled
-2. ✓ Verify active rules exist
-3. ✓ Ensure products have origin countries
-4. ✓ Confirm shipping destination matches rules
-5. ✓ Check products aren't virtual/downloadable
+1. ✓ Check customs fees are enabled.
+2. ✓ Verify active rules exist.
+3. ✓ Ensure products have origin countries.
+4. ✓ Confirm shipping destination matches rules.
+5. ✓ Check products aren't virtual/downloadable.
 
 ### Incorrect Calculations
 
-1. ✓ Review rule configurations
-2. ✓ Check stacking settings
-3. ✓ Verify percentage vs flat fee
-4. ✓ Look for conflicting rules
-5. ✓ Test with simple single-rule setup
+1. ✓ Review rule configurations.
+2. ✓ Check stacking settings.
+3. ✓ Verify percentage vs flat fee.
+4. ✓ Look for conflicting rules.
+5. ✓ Test with simple single-rule setup.
 
 ### Performance Issues
 
-1. ✓ Reduce number of rules
-2. ✓ Use rule caching (enabled by default)
-3. ✓ Optimize rule conditions
-4. ✓ Check for plugin conflicts
+1. ✓ Reduce number of rules.
+2. ✓ Use rule caching (enabled by default).
+3. ✓ Optimize rule conditions.
+4. ✓ Check for plugin conflicts.
 
-## 📚 Documentation
-
-- [Installation Guide](docs/installation.md)
-- [Configuration Guide](docs/configuration.md)
-- [Developer Docs](docs/developer.md)
-- [Testing Guide](docs/testing.md)
-- [Changelog](CHANGELOG.md)
-
-## 🤝 Contributing
-
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
-
-### Development Setup
-
-```bash
-# Clone repository
-git clone https://github.com/woocommerce/customs-fees-for-woocommerce.git
-
-# Install dependencies
-composer install
-npm install
-
-# Run tests
-composer test
-npm test
-
-# Build assets
-npm run build
-```
-
-## 📄 License
+## License
 
 GPL v2 or later. See [LICENSE](LICENSE) for details.
-
-## 🙏 Credits
-
-- Developed by WooCommerce Team
-- Icons by [Heroicons](https://heroicons.com)
-- Inspired by community feedback
 
 ## ⚠️ Disclaimer
 
@@ -451,16 +422,9 @@ This plugin provides **estimated** customs fees for display purposes. Actual cus
 
 Always verify with official customs authorities for accurate fee information.
 
-## 🔗 Links
-
-- [WordPress.org Plugin Page](https://wordpress.org/plugins/customs-fees-for-woocommerce/)
-- [GitHub Repository](https://github.com/woocommerce/customs-fees-for-woocommerce)
-- [Support Forum](https://wordpress.org/support/plugin/customs-fees-for-woocommerce/)
-- [WooCommerce Marketplace](https://woocommerce.com/products/customs-fees/)
-
 ---
 
-**Need Help?** Create an issue on GitHub or post in the WordPress.org support forum.
+**Need Help?** Create an issue on GitHub or contact WooCommere.com support.
 
 **Found a Bug?** Please report it with steps to reproduce.
 
@@ -468,4 +432,4 @@ Always verify with official customs authorities for accurate fee information.
 
 ---
 
-Made with ❤️ by the WooCommerce Team
+Made with ❤️ by the Happiness Engineers Team
