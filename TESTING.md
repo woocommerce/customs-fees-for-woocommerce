@@ -23,16 +23,6 @@ This document provides comprehensive testing scenarios to ensure the plugin func
 - **Per-Variation Origins:** Variations inherit parent product origin
 - **Built-in Currency Conversion:** Relies on WooCommerce currency
 
-## Test Environment Setup
-
-### Prerequisites
-
-- WordPress 6.0+
-- WooCommerce 9.0+
-- Sample products with different origins
-- Test customer accounts
-- Multiple shipping zones configured
-
 ### Recommended Test Data
 
 1. Create at least 10 products with different origin countries
