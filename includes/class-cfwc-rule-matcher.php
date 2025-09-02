@@ -35,9 +35,9 @@ class CFWC_Rule_Matcher {
 	/**
 	 * Stacking modes for rules.
 	 */
-	const STACK_ADD       = 'add';        // Add to other rules (default)
-	const STACK_OVERRIDE  = 'override'; // Replace lower priority rules
-	const STACK_EXCLUSIVE = 'exclusive'; // Only this rule applies
+	const STACK_ADD       = 'add';        // Add to other rules (default).
+	const STACK_OVERRIDE  = 'override'; // Replace lower priority rules.
+	const STACK_EXCLUSIVE = 'exclusive'; // Only this rule applies.
 
 	/**
 	 * Find matching rules for a product.
@@ -247,22 +247,40 @@ class CFWC_Rule_Matcher {
 
 		$pattern = $rule['hs_code_pattern'];
 
-		// Handle different pattern types.
-		if ( strpos( $pattern, '*' ) !== false ) {
-			// Wildcard pattern (e.g., "6109*" matches "6109.10.00").
-			$regex_pattern = str_replace( '*', '.*', preg_quote( $pattern, '/' ) );
-			return preg_match( '/^' . $regex_pattern . '$/i', $hs_code );
-		} elseif ( strpos( $pattern, ',' ) !== false ) {
-			// Multiple patterns (e.g., "61,62" matches codes starting with 61 or 62).
+		// Handle comma-separated patterns FIRST (may contain wildcards).
+		if ( strpos( $pattern, ',' ) !== false ) {
+			// Multiple patterns (e.g., "61,62" or "72*,73*").
 			$patterns = array_map( 'trim', explode( ',', $pattern ) );
 			foreach ( $patterns as $p ) {
-				if ( strpos( $hs_code, $p ) === 0 ) {
+				// Check each pattern individually (may contain wildcards).
+				if ( $this->match_single_hs_pattern( $p, $hs_code ) ) {
 					return true;
 				}
 			}
 			return false;
+		}
+
+		// Single pattern (may contain wildcard).
+		return $this->match_single_hs_pattern( $pattern, $hs_code );
+	}
+
+	/**
+	 * Match a single HS code pattern against an HS code.
+	 *
+	 * @since 1.3.0
+	 * @param string $pattern Single HS code pattern (may contain wildcard).
+	 * @param string $hs_code HS code to match against.
+	 * @return bool True if pattern matches.
+	 */
+	private function match_single_hs_pattern( $pattern, $hs_code ) {
+		if ( strpos( $pattern, '*' ) !== false ) {
+			// Wildcard pattern (e.g., "72*" matches "7216", "7201.10", etc.).
+			// Replace * with .* for regex and escape other special chars.
+			$regex_pattern = str_replace( '\*', '.*', preg_quote( $pattern, '/' ) );
+			// Match from start of string.
+			return (bool) preg_match( '/^' . $regex_pattern . '/i', $hs_code );
 		} else {
-			// Exact match or prefix match.
+			// Exact match or prefix match (no wildcard).
 			return $hs_code === $pattern || strpos( $hs_code, $pattern ) === 0;
 		}
 	}
