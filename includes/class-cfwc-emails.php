@@ -31,8 +31,8 @@ class CFWC_Emails {
 		// Add HS Codes to order item names in emails.
 		add_filter( 'woocommerce_order_item_name', array( $this, 'add_hs_code_to_order_item' ), 10, 3 );
 
-		// Add custom content to emails.
-		add_action( 'woocommerce_email_after_order_table', array( $this, 'add_customs_info_to_email' ), 15, 4 );
+		// REMOVED: Custom content to emails - handled by class-cfwc-display.php to avoid duplication.
+		// add_action( 'woocommerce_email_after_order_table', array( $this, 'add_customs_info_to_email' ), 15, 4 );
 
 		// Admin email notifications.
 		add_action( 'woocommerce_email_order_meta', array( $this, 'add_admin_email_meta' ), 10, 3 );

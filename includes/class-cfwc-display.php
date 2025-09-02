@@ -30,51 +30,59 @@ class CFWC_Display {
 	 * @since 1.0.0
 	 */
 	public function init_hooks() {
-		// Hook into order totals display (for thankyou page, my account, and emails).
-		add_filter( 'woocommerce_get_order_item_totals', array( $this, 'add_fees_to_order_totals' ), 10, 3 );
+		// Override the default fee display on cart/checkout.
+		add_filter( 'woocommerce_cart_totals_fee_html', array( $this, 'customize_fee_display' ), 10, 2 );
+
+				// Hook into order totals display to show breakdown instead of plain total.
+		add_filter( 'woocommerce_get_order_item_totals', array( $this, 'add_fees_to_order_totals' ), 20, 3 );
 
 		// Add HS Codes to order item names on order pages (non-email).
 		add_filter( 'woocommerce_order_item_name', array( $this, 'add_hs_code_to_order_item_display' ), 10, 3 );
 
-		// Display info box on order received page.
+		// Display info box on order received page (NOT the fee itself).
 		add_action( 'woocommerce_thankyou', array( $this, 'display_order_received_info' ), 15 );
 
-		// Email info box display (fees are already in order totals).
+		// Email info box display (NOT the fee itself - fee is in totals).
 		add_action( 'woocommerce_email_after_order_table', array( $this, 'display_customs_info_in_email' ), 10, 4 );
 
 		// Save fee breakdown to order when order is created.
 		add_action( 'woocommerce_checkout_create_order', array( $this, 'save_fee_breakdown_to_order' ), 10, 2 );
+		add_action( 'woocommerce_checkout_create_order_fee_item', array( $this, 'save_fee_breakdown_to_fee_item' ), 10, 4 );
 
 		// Enqueue frontend assets for tooltips.
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_tooltip_assets' ) );
 	}
 
 	/**
-	 * Customize fee display to show breakdown.
+	 * Customize fee display on cart/checkout to show breakdown.
 	 *
 	 * @since 1.0.0
-	 * @param WC_Cart_Fees $fee     Fee object.
-	 * @param WC_Cart      $cart    Cart object.
-	 * @return string Modified fee HTML.
+	 * @param string       $cart_totals_fee_html The HTML for the fee amount.
+	 * @param WC_Cart_Fees $fee                  The fee object.
+	 * @return string Modified HTML.
 	 */
-	public function customize_fee_display( $fee, $cart ) {
+	public function customize_fee_display( $cart_totals_fee_html, $fee ) {
+		// Only customize our customs fees.
 		if ( __( 'Customs & Import Fees', 'customs-fees-for-woocommerce' ) !== $fee->name ) {
-			return;
+			return $cart_totals_fee_html;
 		}
 
-		// Get breakdown from session.
+		// Get the breakdown from session.
 		$breakdown = WC()->session->get( 'cfwc_fees_breakdown', array() );
-
 		if ( empty( $breakdown ) ) {
-			return;
+			return $cart_totals_fee_html;
 		}
 
-		$html  = '<div id="cfwc_fees_breakdown" class="cfwc-fees-breakdown">';
-		$html .= '<ul>';
+		// Build the breakdown display.
+		$html = '<div id="cfwc_fees_breakdown" class="cfwc-fees-breakdown">';
+
 		foreach ( $breakdown as $fee_item ) {
-			$html .= '<li>' . esc_html( $fee_item['label'] ) . ': ' . wc_price( $fee_item['amount'] ) . '</li>';
+			$html .= '<div class="cfwc-fee-item">';
+			$html .= '<span class="cfwc-fee-label">' . esc_html( $fee_item['label'] ) . '</span>';
+			$html .= '<span class="cfwc-fee-amount"><strong>' . wc_price( $fee_item['amount'] ) . '</strong></span>';
+			$html .= '</div>';
 		}
-		$html .= '</ul>';
+
 		$html .= '</div>';
 
 		return $html;
@@ -86,9 +94,14 @@ class CFWC_Display {
 	 * @since 1.0.0
 	 */
 	public function enqueue_tooltip_assets() {
-		if ( is_checkout() || is_cart() ) {
-			wp_enqueue_script( 'cfwc-frontend', plugin_dir_url( __DIR__ ) . 'assets/js/frontend.js', array( 'jquery' ), '1.0.0', true );
+		// Load on cart, checkout, order received, and my account pages.
+		// Also load if we're on any WooCommerce page.
+		if ( is_checkout() || is_cart() || is_order_received_page() || is_account_page() || is_woocommerce() ) {
 			wp_enqueue_style( 'cfwc-frontend', plugin_dir_url( __DIR__ ) . 'assets/css/frontend.css', array(), '1.0.0' );
+			// Only load JS on cart/checkout for tooltips.
+			if ( is_checkout() || is_cart() ) {
+				wp_enqueue_script( 'cfwc-frontend', plugin_dir_url( __DIR__ ) . 'assets/js/frontend.js', array( 'jquery' ), '1.0.0', true );
+			}
 		}
 	}
 
@@ -107,7 +120,31 @@ class CFWC_Display {
 	}
 
 	/**
-	 * Add fees to order totals display.
+	 * Save fee breakdown to fee item meta.
+	 *
+	 * @since 1.0.0
+	 * @param WC_Order_Item_Fee $item    Fee item object.
+	 * @param int               $fee_key Fee key.
+	 * @param object            $fee     Fee object.
+	 * @param WC_Order          $order   Order object.
+	 */
+	public function save_fee_breakdown_to_fee_item( $item, $fee_key, $fee, $order ) {
+		// Only process our customs fees.
+		if ( __( 'Customs & Import Fees', 'customs-fees-for-woocommerce' ) !== $fee->name ) {
+			return;
+		}
+
+		$breakdown = WC()->session->get( 'cfwc_fees_breakdown', array() );
+		if ( ! empty( $breakdown ) ) {
+			// Save breakdown to the fee item itself as well.
+			$item->add_meta_data( '_cfwc_breakdown', $breakdown );
+			// Also ensure it's on the order.
+			$order->update_meta_data( '_cfwc_fees_breakdown', $breakdown );
+		}
+	}
+
+	/**
+	 * Add fees to order totals display with breakdown.
 	 *
 	 * @since 1.0.0
 	 * @param array    $totals Order totals.
@@ -115,36 +152,43 @@ class CFWC_Display {
 	 * @param bool     $tax_display Whether to display tax.
 	 * @return array Modified totals.
 	 */
-	public function add_fees_to_order_totals( $totals, $order, $tax_display = false ) {
-		$fees = $order->get_fees();
-
-		foreach ( $fees as $fee ) {
-			if ( strpos( $fee->get_name(), __( 'Customs & Import Fees', 'customs-fees-for-woocommerce' ) ) !== false ) {
+	public function add_fees_to_order_totals( $totals, $order, $tax_display = false ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- Required by hook signature.
+		// Look for our customs fee and replace its display with breakdown.
+		foreach ( $totals as $key => $total ) {
+			// Check if this is a fee row and if it's our customs fee.
+			if ( isset( $total['label'] ) && strpos( $total['label'], __( 'Customs & Import Fees', 'customs-fees-for-woocommerce' ) ) !== false ) {
 				// Get the breakdown if available.
 				$breakdown = $order->get_meta( '_cfwc_fees_breakdown', true );
 
-				$value_html = '';
 				if ( ! empty( $breakdown ) && is_array( $breakdown ) ) {
-					// Show breakdown with proper formatting.
-					$value_html  = '<div class="cfwc-fees-breakdown-wrapper">';
-					$value_html .= '<ul class="cfwc-fees-breakdown woocommerce-order-overview" style="list-style: none !important; margin: 0 !important; padding: 0 !important;">';
-					foreach ( $breakdown as $fee_item ) {
-						$value_html .= '<li class="cfwc-fee-item" style="list-style: none !important; margin: 0 0 5px 0 !important; padding: 0 !important;">';
-						$value_html .= '<span class="cfwc-fee-label">' . esc_html( $fee_item['label'] ) . ':</span> ';
-						$value_html .= '<strong>' . wc_price( $fee_item['amount'], array( 'currency' => $order->get_currency() ) ) . '</strong>';
-						$value_html .= '</li>';
-					}
-					$value_html .= '</ul>';
-					$value_html .= '</div>';
-				} else {
-					// Fallback to simple total.
-					$value_html = wc_price( $fee->get_total(), array( 'currency' => $order->get_currency() ) );
-				}
+					// Check if we're in email context.
+					$is_email = did_action( 'woocommerce_email_header' ) > 0;
 
-				$totals['customs_fees'] = array(
-					'label' => $fee->get_name() . ':',
-					'value' => $value_html,
-				);
+					if ( $is_email ) {
+						// Email-specific formatting without bullets.
+						$value_html = '<table cellspacing="0" cellpadding="0" style="width: 100%; border: none;">';
+						foreach ( $breakdown as $fee_item ) {
+							$value_html .= '<tr>';
+							$value_html .= '<td style="padding: 2px 0; border: none; text-align: left;">' . esc_html( $fee_item['label'] ) . ':</td>';
+							$value_html .= '<td style="padding: 2px 0 2px 10px; border: none; text-align: right;"><strong>' . wc_price( $fee_item['amount'], array( 'currency' => $order->get_currency() ) ) . '</strong></td>';
+							$value_html .= '</tr>';
+						}
+						$value_html .= '</table>';
+					} else {
+						// Regular display for web pages.
+						$value_html = '<div class="cfwc-fees-breakdown-wrapper" style="display: block;">';
+						foreach ( $breakdown as $fee_item ) {
+							$value_html .= '<div class="cfwc-fee-item" style="display: block; margin: 0 0 5px 0; padding: 0;">';
+							$value_html .= '<span class="cfwc-fee-label">' . esc_html( $fee_item['label'] ) . ':</span> ';
+							$value_html .= '<strong>' . wc_price( $fee_item['amount'], array( 'currency' => $order->get_currency() ) ) . '</strong>';
+							$value_html .= '</div>';
+						}
+						$value_html .= '</div>';
+					}
+
+					// Update the existing fee display with our breakdown.
+					$totals[ $key ]['value'] = $value_html;
+				}
 			}
 		}
 
@@ -152,7 +196,7 @@ class CFWC_Display {
 	}
 
 	/**
-	 * Display customs info box in order emails.
+	 * Display customs info box in order emails (NOT the fees - those are in totals).
 	 *
 	 * @since 1.0.0
 	 * @param WC_Order $order         Order object.
@@ -187,9 +231,9 @@ class CFWC_Display {
 				echo esc_html__( 'These are estimated fees based on current rates. Actual fees may vary depending on customs regulations and carrier handling charges.', 'customs-fees-for-woocommerce' ) . "\n";
 				echo "\n";
 			} else {
-				// HTML info box.
+				// HTML info box with blue background.
 				echo '<table cellspacing="0" cellpadding="0" style="width: 100%; margin: 30px 0;">';
-				echo '<tr><td style="background-color: #f7f7f7; border-left: 4px solid #0073aa; padding: 20px;">';
+				echo '<tr><td style="background-color: #e8f4f8; border-left: 4px solid #0073aa; padding: 20px;">';
 				echo '<h3 style="margin: 0 0 10px; color: #0073aa; font-size: 16px;">' . esc_html__( 'Customs & Import Information', 'customs-fees-for-woocommerce' ) . '</h3>';
 				echo '<p style="margin: 0 0 10px; color: #666; font-size: 14px;">' . esc_html__( 'Estimated import duties and taxes based on destination country.', 'customs-fees-for-woocommerce' ) . '</p>';
 				echo '<p style="margin: 0 0 10px; color: #333; font-size: 14px;"><strong>' . esc_html__( 'Total customs fees:', 'customs-fees-for-woocommerce' ) . '</strong> ' . wp_kses_post( wc_price( $total_customs, array( 'currency' => $order->get_currency() ) ) ) . '</p>';
@@ -199,8 +243,6 @@ class CFWC_Display {
 			}
 		}
 	}
-
-
 
 	/**
 	 * Add HS Code and Origin to order item display on order pages.
@@ -263,7 +305,7 @@ class CFWC_Display {
 	 * @param WC_Order $order     Order object.
 	 * @return array Modified arguments.
 	 */
-	public function add_hs_code_to_email_item( $args, $item, $order ) {
+	public function add_hs_code_to_email_item( $args, $item, $order ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- Required by hook signature.
 		// Only process product line items.
 		if ( ! is_a( $item, 'WC_Order_Item_Product' ) ) {
 			return $args;

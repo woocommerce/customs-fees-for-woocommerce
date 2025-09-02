@@ -177,7 +177,9 @@
 .cfwc-fees-breakdown.woocommerce-order-overview,
 ul.cfwc-fees-breakdown,
 .woocommerce-order-overview.cfwc-fees-breakdown,
-.woocommerce table.shop_table .cfwc-fees-breakdown {
+.woocommerce table.shop_table .cfwc-fees-breakdown,
+.woocommerce-order .cfwc-fees-breakdown,
+.woocommerce-account .cfwc-fees-breakdown {
   margin: 0 !important;
   padding: 0 !important;
   list-style: none !important;
@@ -188,7 +190,9 @@ ul.cfwc-fees-breakdown,
 .cfwc-fees-breakdown .cfwc-fee-item,
 ul.cfwc-fees-breakdown li.cfwc-fee-item,
 .woocommerce-order-overview .cfwc-fee-item,
-.woocommerce table.shop_table .cfwc-fee-item {
+.woocommerce table.shop_table .cfwc-fee-item,
+.woocommerce-order .cfwc-fee-item,
+.woocommerce-account .cfwc-fee-item {
   margin: 0 0 0.25em 0 !important;
   padding: 0 !important;
   list-style: none !important;
@@ -206,7 +210,9 @@ ul.cfwc-fees-breakdown li:before,
 .cfwc-fee-item:after,
 .woocommerce table.shop_table .cfwc-fee-item:before,
 .woocommerce-MyAccount-content .cfwc-fee-item:before,
-.woocommerce-table--order-details .cfwc-fee-item:before {
+.woocommerce-table--order-details .cfwc-fee-item:before,
+.woocommerce-order .cfwc-fee-item:before,
+.woocommerce-account .cfwc-fee-item:before {
   content: none !important;
   display: none !important;
 }
@@ -218,14 +224,58 @@ ul.cfwc-fees-breakdown li:before,
 }
 
 /* Ensure proper display in order totals table */
-.woocommerce table.shop_table .cfwc-fees-breakdown-wrapper {
+.woocommerce table.shop_table .cfwc-fees-breakdown-wrapper,
+.woocommerce-order .cfwc-fees-breakdown-wrapper,
+.woocommerce-account .cfwc-fees-breakdown-wrapper {
   display: block;
   width: 100%;
 }
 
 .woocommerce-table--order-details .cfwc-fees-breakdown,
-.woocommerce-MyAccount-content .cfwc-fees-breakdown {
+.woocommerce-MyAccount-content .cfwc-fees-breakdown,
+.woocommerce-order .cfwc-fees-breakdown,
+.woocommerce-account .cfwc-fees-breakdown {
   text-align: left !important;
+}
+
+/* Cart/Checkout Breakdown */
+.cfwc-fees-breakdown .cfwc-fee-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+  border-bottom: 1px dotted #ddd;
+}
+
+.cfwc-fees-breakdown .cfwc-fee-item:last-child {
+  border-bottom: none;
+}
+
+/* Order totals table specific styling - compact display */
+.woocommerce table.shop_table .cfwc-fees-breakdown-wrapper .cfwc-fee-item,
+.woocommerce-order .cfwc-fees-breakdown-wrapper .cfwc-fee-item,
+.woocommerce-account .cfwc-fees-breakdown-wrapper .cfwc-fee-item,
+.woocommerce-checkout .cfwc-fees-breakdown-wrapper .cfwc-fee-item {
+  display: block !important;
+  margin: 0 0 5px 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+}
+
+.woocommerce table.shop_table .cfwc-fees-breakdown-wrapper .cfwc-fee-label,
+.woocommerce-order .cfwc-fees-breakdown-wrapper .cfwc-fee-label,
+.woocommerce-account .cfwc-fees-breakdown-wrapper .cfwc-fee-label,
+.woocommerce-checkout .cfwc-fees-breakdown-wrapper .cfwc-fee-label {
+  display: inline !important;
+  flex: none !important;
+  margin-right: 5px !important;
+}
+
+.woocommerce table.shop_table .cfwc-fees-breakdown-wrapper strong,
+.woocommerce-order .cfwc-fees-breakdown-wrapper strong,
+.woocommerce-account .cfwc-fees-breakdown-wrapper strong,
+.woocommerce-checkout .cfwc-fees-breakdown-wrapper strong {
+  display: inline !important;
+  margin-left: 0 !important;
 }
 
 /* Order item customs info */
