@@ -160,7 +160,8 @@ class CFWC_Loader {
 		add_action( 'woocommerce_cart_calculate_fees', array( $this, 'add_customs_fees' ) );
 
 		// Plugin action links.
-		add_filter( 'plugin_action_links_' . CFWC_PLUGIN_BASENAME, array( $this, 'add_action_links' ) );
+		$plugin_basename = defined( 'CFWC_PLUGIN_BASENAME' ) ? CFWC_PLUGIN_BASENAME : 'customs-fees-for-woocommerce/customs-fees-for-woocommerce.php';
+		add_filter( 'plugin_action_links_' . $plugin_basename, array( $this, 'add_action_links' ) );
 
 		// Admin hooks.
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
