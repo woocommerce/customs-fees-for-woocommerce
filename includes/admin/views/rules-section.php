@@ -142,18 +142,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 				</h4>
 				<div style="font-size: 13px; line-height: 1.6;">
 					<div style="margin-bottom: 8px;">
-						<span class="dashicons dashicons-plus-alt" style="color: #46b450; font-size: 16px; vertical-align: middle;"></span>
-						<strong><?php esc_html_e( 'Stack:', 'customs-fees-for-woocommerce' ); ?></strong>
+						<span style="display: inline-block; padding: 3px 8px; background: #46b450; color: #fff; border-radius: 3px; font-size: 11px; font-weight: 600; line-height: 1; vertical-align: middle;"><?php esc_html_e( 'Stack', 'customs-fees-for-woocommerce' ); ?></span>
 						<?php esc_html_e( 'Adds with other matching rules', 'customs-fees-for-woocommerce' ); ?>
 					</div>
 					<div style="margin-bottom: 8px;">
-						<span class="dashicons dashicons-update" style="color: #f0ad4e; font-size: 16px; vertical-align: middle;"></span>
-						<strong><?php esc_html_e( 'Override:', 'customs-fees-for-woocommerce' ); ?></strong>
+						<span style="display: inline-block; padding: 3px 8px; background: #f0ad4e; color: #fff; border-radius: 3px; font-size: 11px; font-weight: 600; line-height: 1; vertical-align: middle;"><?php esc_html_e( 'Override', 'customs-fees-for-woocommerce' ); ?></span>
 						<?php esc_html_e( 'Replaces lower priority rules', 'customs-fees-for-woocommerce' ); ?>
 					</div>
 					<div>
-						<span class="dashicons dashicons-dismiss" style="color: #dc3232; font-size: 16px; vertical-align: middle;"></span>
-						<strong><?php esc_html_e( 'Exclusive:', 'customs-fees-for-woocommerce' ); ?></strong>
+						<span style="display: inline-block; padding: 3px 8px; background: #dc3232; color: #fff; border-radius: 3px; font-size: 11px; font-weight: 600; line-height: 1; vertical-align: middle;"><?php esc_html_e( 'Exclusive', 'customs-fees-for-woocommerce' ); ?></span>
 						<?php esc_html_e( 'Only this rule applies, ignores all others', 'customs-fees-for-woocommerce' ); ?>
 					</div>
 				</div>
@@ -509,17 +506,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 								<?php
 								$stacking_mode = $rule['stacking_mode'] ?? 'add';
 
-								// Match JavaScript rendering exactly
-								$stacking_icons = array(
-									'add'       => '<span class="dashicons dashicons-plus-alt" style="color: #46b450;"></span>',
-									'override'  => '<span class="dashicons dashicons-update" style="color: #f0ad4e;"></span>',
-									'exclusive' => '<span class="dashicons dashicons-dismiss" style="color: #dc3232;"></span>',
-								);
-
+								// Use WooCommerce-style status badges
 								$stacking_labels = array(
 									'add'       => __( 'Stack', 'customs-fees-for-woocommerce' ),
 									'override'  => __( 'Override', 'customs-fees-for-woocommerce' ),
 									'exclusive' => __( 'Exclusive', 'customs-fees-for-woocommerce' ),
+								);
+								
+								$stacking_colors = array(
+									'add'       => '#46b450',
+									'override'  => '#f0ad4e',
+									'exclusive' => '#dc3232',
 								);
 
 								$stacking_descriptions = array(
@@ -528,10 +525,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 									'exclusive' => __( 'Only this rule applies', 'customs-fees-for-woocommerce' ),
 								);
 
-								// Output the icon and label (match JavaScript format)
-								echo wp_kses_post( $stacking_icons[ $stacking_mode ] ?? $stacking_icons['add'] );
-								echo ' <span title="' . esc_attr( $stacking_descriptions[ $stacking_mode ] ?? $stacking_descriptions['add'] ) . '">';
-								echo esc_html( $stacking_labels[ $stacking_mode ] ?? $stacking_labels['add'] );
+								// Output WooCommerce-style badge
+								$badge_color = $stacking_colors[ $stacking_mode ] ?? $stacking_colors['add'];
+								$badge_label = $stacking_labels[ $stacking_mode ] ?? $stacking_labels['add'];
+								$badge_title = $stacking_descriptions[ $stacking_mode ] ?? $stacking_descriptions['add'];
+								
+								echo '<span style="display: inline-block; padding: 3px 8px; background: ' . esc_attr( $badge_color ) . '; color: #fff; border-radius: 3px; font-size: 11px; font-weight: 600; line-height: 1;" title="' . esc_attr( $badge_title ) . '">';
+								echo esc_html( $badge_label );
 								echo '</span>';
 								?>
 							</td>

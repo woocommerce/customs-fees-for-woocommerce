@@ -102,24 +102,65 @@
       var $row = $(this).closest("tr");
       var $categorySelect = $row.find(".cfwc-category-select");
       var $hsCodeInput = $row.find(".cfwc-hs-code");
+      var $requiredIndicator = $row.find(".cfwc-field-required");
+      var $spacer = $row.find(".cfwc-field-spacer");
 
-      // Hide all first
-      $categorySelect.hide();
-      $hsCodeInput.hide();
-
-      // Show based on match type
-      if (matchType === "category" || matchType === "combined") {
-        $categorySelect.show();
+      // Show fields based on match type
+      if (matchType === "all") {
+        // All Products - hide both category and HS code fields, show "Not required"
+        $categorySelect.hide().removeAttr("required");
+        $hsCodeInput.hide().removeAttr("required");
+        $spacer.hide();
+        $requiredIndicator.show().html("Not required");
+        $categorySelect.attr("data-placeholder", "Select categories...");
+        $hsCodeInput.attr("placeholder", "HS Code (e.g., 6109* or 61,62)");
+      } else if (matchType === "category") {
+        // By Category - show only category field, hide HS code
+        $categorySelect.show().attr("required", "required");
+        $hsCodeInput.hide().removeAttr("required");
+        $spacer.hide();
+        $requiredIndicator.show().html("Required *");
+        $categorySelect.attr("data-placeholder", "Select categories...");
+        $hsCodeInput.attr("placeholder", "HS Code (e.g., 6109* or 61,62)");
+      } else if (matchType === "hs_code") {
+        // By HS Code - show both fields but category is not required
+        $categorySelect.show().removeAttr("required");
+        $spacer.show().css("display", "block"); // Show spacer between fields
+        $hsCodeInput.show().attr("required", "required");
+        $requiredIndicator
+          .show()
+          .html("Category: Not required<br>HS Code: Required *");
+        $categorySelect.attr(
+          "data-placeholder",
+          "Select categories (optional)"
+        );
+        $hsCodeInput.attr("placeholder", "HS Code (e.g., 6109* or 61,62)");
+      } else if (matchType === "combined") {
+        // Category + HS Code - show both fields with spacing
+        $categorySelect.show().attr("required", "required");
+        $spacer.show().css("display", "block"); // Show spacer between fields
+        $hsCodeInput.show().attr("required", "required");
+        $requiredIndicator.show().html("Both required *");
+        $categorySelect.attr("data-placeholder", "Select categories...");
+        $hsCodeInput.attr("placeholder", "HS Code (e.g., 6109* or 61,62)");
       }
-      if (matchType === "hs_code" || matchType === "combined") {
-        $hsCodeInput.show();
+
+      // Re-initialize WooCommerce Select2/SelectWoo if needed
+      if ($categorySelect.hasClass("wc-enhanced-select")) {
+        // For WooCommerce enhanced selects, trigger proper update
+        if ($categorySelect.data("select2")) {
+          $categorySelect.trigger("change.select2");
+        } else if ($.fn.selectWoo) {
+          // Reinitialize if SelectWoo is available
+          $categorySelect.selectWoo();
+        }
       }
     });
 
     // Handle stacking mode changes to show appropriate help text
     $(document).on("change", ".cfwc-stacking-select", function () {
       var stackingMode = $(this).val();
-      var $helpContainer = $(this).siblings(".cfwc-stacking-help");
+      var $helpContainer = $(this).siblings(".description");
 
       // Hide all help texts
       $helpContainer.find("span").hide();
@@ -140,7 +181,6 @@
       }
 
       // No confirmation needed for adding - just like WooCommerce tax rates
-      showNotice(strings.adding_preset || "Adding preset rules...", "info");
       applyPreset(presetId, true); // true = add to existing
     });
 
@@ -174,14 +214,11 @@
       }
 
       // Clear existing rules and apply preset
-      showNotice(
-        strings.replacing_rules || "Replacing all rules with preset...",
-        "info"
-      );
       applyPreset(presetId, false); // false = replace all
     });
 
-    // Delete all rules
+    // Delete all rules with improved notification handling
+    var deleteButtonTimeout = null;
     $(".cfwc-delete-all").on("click", function () {
       // Check if there are existing rules
       var existingRules = $(".cfwc-rules-table tbody tr").not(
@@ -192,50 +229,98 @@
         return;
       }
 
+      var $button = $(this);
+
       // Keep confirmation for Delete All (destructive action)
-      if ($(this).hasClass("confirm-delete")) {
-        // Second click - proceed
+      if ($button.hasClass("confirm-delete")) {
+        // Second click - proceed with deletion
+
+        // Clear any pending timeout immediately
+        if (deleteButtonTimeout) {
+          clearTimeout(deleteButtonTimeout);
+          deleteButtonTimeout = null;
+        }
+
+        // Remove inline warning message immediately
+        $button.next(".cfwc-delete-warning").remove();
+
+        // Clear any existing notifications first to prevent overlap
+        if (window.wp && window.wp.data && window.wp.data.dispatch) {
+          wp.data.dispatch("core/notices").removeNotices();
+        }
+
+        // Delete the rules
         var rules = [];
         $("#cfwc_rules").val(JSON.stringify(rules));
         updateRulesTable(rules);
         enableSaveButton();
-        showNotice(
-          strings.all_deleted ||
-            'All rules deleted. Remember to click "Save changes" to persist.',
-          "success"
-        );
-        $(this)
+
+        // Reset button immediately (before showing success)
+        $button
           .removeClass("confirm-delete")
           .text(strings.delete_all || "Delete All Rules")
           .css("background", "")
           .css("color", "");
+
+        // Show success notice after button reset
+        setTimeout(function () {
+          showNotice(
+            strings.all_deleted ||
+              'All rules deleted. Remember to click "Save changes" to persist.',
+            "success"
+          );
+        }, 100); // Small delay to ensure clean transition
       } else {
-        // First click - show warning and style as danger
-        showNotice(
-          strings.delete_warning ||
-            "⚠️ This will delete ALL rules. Click again to confirm.",
-          "warning"
-        );
-        $(this)
+        // First click - show inline warning text instead of blocking notification
+        $button
           .addClass("confirm-delete")
           .text(strings.confirm_delete || "Click to Confirm Delete")
           .css("background", "#d63638")
           .css("color", "#fff");
 
-        // Reset button after 5 seconds (match notification duration)
-        var $button = $(this);
-        setTimeout(function () {
+        // Add inline warning message next to button if not already present
+        if (!$button.next(".cfwc-delete-warning").length) {
+          $button.after(
+            '<span class="cfwc-delete-warning" style="color: #d63638; margin-left: 10px; font-weight: 600;">' +
+              "⚠️ This will delete ALL rules. Click again to confirm." +
+              "</span>"
+          );
+        }
+
+        // Reset button and remove warning after 5 seconds if not clicked again
+        deleteButtonTimeout = setTimeout(function () {
           $button
             .removeClass("confirm-delete")
             .text(strings.delete_all || "Delete All Rules")
             .css("background", "")
             .css("color", "");
+          $button.next(".cfwc-delete-warning").fadeOut(300, function () {
+            $(this).remove();
+          });
         }, 5000);
       }
     });
 
     // Apply preset via AJAX
     function applyPreset(presetId, append) {
+      // Show loading notification with unique ID
+      if (window.wp && window.wp.data && window.wp.data.dispatch) {
+        wp.data.dispatch("core/notices").removeNotices(); // Clear any existing
+        wp.data
+          .dispatch("core/notices")
+          .createNotice(
+            "info",
+            append
+              ? strings.adding_preset || "Adding preset rules..."
+              : strings.replacing_rules || "Replacing all rules with preset...",
+            {
+              type: "snackbar",
+              isDismissible: false,
+              id: "cfwc-preset-loading", // Unique ID for loading notification
+            }
+          );
+      }
+
       $.ajax({
         url: ajaxurl,
         type: "POST",
@@ -255,39 +340,36 @@
             $("#cfwc-preset-select").val("");
             $("#cfwc-preset-description").hide();
 
-            // Show preset success message (shorter duration)
+            // Prepare success message
             var presetMessage =
               response.data.message ||
               strings.preset_applied ||
-              "Preset applied successfully!";
+              "Preset imported successfully!";
 
-            // Use shorter duration for preset success
+            // Clear loading notification and show success
             if (window.wp && window.wp.data && window.wp.data.dispatch) {
-              // Clear existing notices first
-              wp.data.dispatch("core/notices").removeNotices();
-
-              // Show success and save reminder in ONE notice
-              var fullMessage =
-                presetMessage +
-                "\n\n" +
-                (strings.save_reminder ||
-                  '💾 Remember to click "Save changes" to persist these rules.');
-
+              // Remove the loading notification specifically
               wp.data
                 .dispatch("core/notices")
-                .createNotice("success", fullMessage, {
-                  type: "snackbar",
-                  isDismissible: true,
-                  autoDismiss: 5000, // 5 seconds total
-                  actions: [
+                .removeNotice("cfwc-preset-loading");
+
+              // Small delay to ensure smooth transition
+              setTimeout(function () {
+                // Show success message
+                wp.data
+                  .dispatch("core/notices")
+                  .createNotice(
+                    "success",
+                    presetMessage +
+                      ' Remember to click "Save changes" to persist.',
                     {
-                      label: "Dismiss",
-                      onClick: function () {
-                        wp.data.dispatch("core/notices").removeNotices();
-                      },
-                    },
-                  ],
-                });
+                      type: "snackbar",
+                      isDismissible: true,
+                      autoDismiss: 4000, // 4 seconds for success
+                      id: "cfwc-preset-success",
+                    }
+                  );
+              }, 100);
             } else {
               // Fallback for old WordPress
               showNotice(
@@ -302,6 +384,12 @@
             // Enable save button using helper function
             enableSaveButton();
           } else {
+            // Remove loading notification on error
+            if (window.wp && window.wp.data && window.wp.data.dispatch) {
+              wp.data
+                .dispatch("core/notices")
+                .removeNotice("cfwc-preset-loading");
+            }
             showNotice(
               response.data.message ||
                 strings.preset_failed ||
@@ -311,6 +399,12 @@
           }
         },
         error: function (xhr, status, error) {
+          // Remove loading notification on AJAX error
+          if (window.wp && window.wp.data && window.wp.data.dispatch) {
+            wp.data
+              .dispatch("core/notices")
+              .removeNotice("cfwc-preset-loading");
+          }
           console.error("CFWC Preset Error:", status, error);
           console.error("Response:", xhr.responseText);
           var errorMsg =
@@ -328,7 +422,12 @@
 
     // Show admin notice using WooCommerce snackbar
     var noticeTimeout = null;
-    function showNotice(message, type) {
+    function showNotice(message, type, clearPrevious) {
+      // Default clearPrevious to true for better UX
+      if (clearPrevious === undefined) {
+        clearPrevious = true;
+      }
+
       // Clear any pending notice timeout
       if (noticeTimeout) {
         clearTimeout(noticeTimeout);
@@ -336,8 +435,10 @@
 
       // Use WooCommerce snackbar if available
       if (window.wp && window.wp.data && window.wp.data.dispatch) {
-        // Clear ALL existing notices first to prevent stacking
-        wp.data.dispatch("core/notices").removeNotices();
+        // Clear existing notices if requested (default behavior)
+        if (clearPrevious) {
+          wp.data.dispatch("core/notices").removeNotices();
+        }
 
         var noticeType = "info";
         if (type === "notice-success" || type === "success") {
@@ -352,8 +453,8 @@
         wp.data.dispatch("core/notices").createNotice(noticeType, message, {
           type: "snackbar",
           isDismissible: true,
-          // 5 seconds for all notifications for consistency
-          autoDismiss: 5000,
+          // Shorter duration for success messages, normal for warnings
+          autoDismiss: noticeType === "success" ? 3000 : 5000,
           id: "cfwc-notice-" + Date.now(), // Unique ID to prevent duplicates
         });
       } else {
@@ -447,27 +548,26 @@
         '<input type="text" name="cfwc_rule_label" class="cfwc-rule-field" data-field="label" value="" placeholder="' +
         (strings.fee_label || "Fee label") +
         '" style="width: 100%; margin-bottom: 5px;" />' +
-        '<div style="display: flex; align-items: center; gap: 5px;">' +
-        '<label style="font-size: 11px; color: #666; margin: 0;">Priority:</label>' +
-        '<input type="number" name="cfwc_rule_priority" class="cfwc-rule-field" data-field="priority" value="0" title="Higher priority rules are checked first (0-100)" style="width: 60px;" min="0" max="100" />' +
-        '<span class="dashicons dashicons-info" style="font-size: 16px; color: #999; cursor: help;" title="Higher numbers = higher priority. Rules with higher priority are applied first."></span>' +
-        "</div>" +
+        '<input type="number" name="cfwc_rule_priority" class="cfwc-rule-field" data-field="priority" value="0" placeholder="Priority (0-100)" title="Higher priority rules are checked first (0-100)" style="width: 100%;" min="0" max="100" />' +
+        '<span style="font-size: 11px; color: #666; margin-top: 2px; display: inline-block;">Higher numbers = higher priority</span>' +
         "</td>";
 
-      // Countries column (From → To)
+      // Countries column (From and To)
       newRowHtml += "<td>";
       newRowHtml +=
         '<select name="cfwc_rule_from_country" class="cfwc-rule-field cfwc-country-select wc-enhanced-select" data-field="from_country" data-placeholder="' +
         (strings.from_country || "From (any)") +
-        '" style="width: 48%;">';
+        '" style="width: 47%;">';
       newRowHtml +=
         '<option value="">Any Origin</option>' + getCountryOptions("");
       newRowHtml += "</select>";
-      newRowHtml += " → ";
+      // Add spacing between dropdowns
+      newRowHtml +=
+        '<span style="display: inline-block; width: 10px;">&nbsp;</span>';
       newRowHtml +=
         '<select name="cfwc_rule_to_country" class="cfwc-rule-field cfwc-country-select wc-enhanced-select" data-field="to_country" data-placeholder="' +
         (strings.to_country || "To (any)") +
-        '" style="width: 48%;">';
+        '" style="width: 47%;">';
       newRowHtml +=
         '<option value="">Any Destination</option>' + getCountryOptions("");
       newRowHtml += "</select></td>";
@@ -481,7 +581,7 @@
       newRowHtml += '<option value="hs_code">By HS Code</option>';
       newRowHtml += '<option value="combined">Category + HS Code</option>';
       newRowHtml += "</select>";
-      // Category selector (hidden by default)
+      // Category selector (hidden by default - only show for category/combined)
       newRowHtml +=
         '<select name="cfwc_rule_categories" class="cfwc-rule-field cfwc-category-select wc-enhanced-select" data-field="category_ids" multiple="multiple" style="width: 100%; display: none; margin-bottom: 5px;" data-placeholder="Select categories...">';
       if (cfwc_admin.categories) {
@@ -490,9 +590,15 @@
         });
       }
       newRowHtml += "</select>";
-      // HS Code pattern input (hidden by default)
+      // Add spacer between category and HS code fields
+      newRowHtml +=
+        '<span class="cfwc-field-spacer" style="display: none; height: 5px; width: 100%;">&nbsp;</span>';
+      // HS Code pattern input (hidden by default - only show for hs_code/combined)
       newRowHtml +=
         '<input type="text" name="cfwc_rule_hs_code" class="cfwc-rule-field cfwc-hs-code" data-field="hs_code_pattern" placeholder="HS Code (e.g., 6109* or 61,62)" style="width: 100%; display: none;" />';
+      // Add required indicator (hidden by default, shows "Not required" by default)
+      newRowHtml +=
+        '<span class="cfwc-field-required" style="display: block; font-size: 11px; color: #999; margin-top: 2px;">Not required</span>';
       newRowHtml += "</td>";
 
       // Type selector
@@ -508,7 +614,8 @@
 
       // Rate/Amount input
       newRowHtml +=
-        '<td><input type="number" name="cfwc_rule_rate" class="cfwc-rule-field" data-field="rate" value="0" step="0.01" style="width: 80px;" /></td>';
+        '<td><input type="number" name="cfwc_rule_rate" class="cfwc-rule-field" data-field="rate" value="0" step="0.01" style="width: 80px;" required />' +
+        '<span style="font-size: 11px; color: #999; display: block; margin-top: 2px;">Required *</span></td>';
 
       // Stacking mode
       newRowHtml += "<td>";
@@ -521,14 +628,14 @@
         '<option value="exclusive">Exclusive (Only this fee)</option>';
       newRowHtml += "</select>";
       newRowHtml +=
-        '<div class="cfwc-stacking-help" style="font-size: 11px; color: #666; margin-top: 5px;">';
+        '<span class="description" style="font-size: 11px; color: #666; margin-top: 5px; display: block;">';
       newRowHtml +=
-        '<span class="stacking-help-add" style="display: block;"><span class="dashicons dashicons-plus-alt" style="color: #46b450; font-size: 14px;"></span> Adds with other matching rules</span>';
+        '<span class="stacking-help-add">Adds with other matching rules</span>';
       newRowHtml +=
-        '<span class="stacking-help-override" style="display: none;"><span class="dashicons dashicons-update" style="color: #f0ad4e; font-size: 14px;"></span> Replaces lower priority rules</span>';
+        '<span class="stacking-help-override" style="display: none;">Replaces lower priority rules</span>';
       newRowHtml +=
-        '<span class="stacking-help-exclusive" style="display: none;"><span class="dashicons dashicons-dismiss" style="color: #dc3232; font-size: 14px;"></span> No other rules apply</span>';
-      newRowHtml += "</div>";
+        '<span class="stacking-help-exclusive" style="display: none;">No other rules apply</span>';
+      newRowHtml += "</span>";
       newRowHtml += "</td>";
 
       // Actions
@@ -623,32 +730,31 @@
         '" placeholder="' +
         (strings.fee_label || "Fee label") +
         '" style="width: 100%; margin-bottom: 5px;" />' +
-        '<div style="display: flex; align-items: center; gap: 5px;">' +
-        '<label style="font-size: 11px; color: #666; margin: 0;">Priority:</label>' +
         '<input type="number" name="cfwc_rule_priority" class="cfwc-rule-field" data-field="priority" value="' +
         (rule.priority || 0) +
-        '" title="Higher priority rules are checked first (0-100)" style="width: 60px;" min="0" max="100" />' +
-        '<span class="dashicons dashicons-info" style="font-size: 16px; color: #999; cursor: help;" title="Higher numbers = higher priority. Rules with higher priority are applied first."></span>' +
-        "</div>" +
+        '" placeholder="Priority (0-100)" title="Higher priority rules are checked first (0-100)" style="width: 100%;" min="0" max="100" />' +
+        '<span style="font-size: 11px; color: #666; margin-top: 2px; display: inline-block;">Higher numbers = higher priority</span>' +
         "</td>";
 
-      // Countries column (From → To)
+      // Countries column (From and To)
       editRowHtml += "<td>";
       editRowHtml +=
         '<select name="cfwc_rule_from_country" class="cfwc-rule-field cfwc-country-select wc-enhanced-select" data-field="from_country" data-placeholder="' +
         (strings.from_country || "From (any)") +
-        '" style="width: 48%;">';
+        '" style="width: 47%;">';
       editRowHtml +=
         '<option value="">Any Origin</option>' +
         getCountryOptions(
           rule.from_country || rule.origin_country || rule.country || ""
         );
       editRowHtml += "</select>";
-      editRowHtml += " → ";
+      // Add spacing between dropdowns
+      editRowHtml +=
+        '<span style="display: inline-block; width: 10px;">&nbsp;</span>';
       editRowHtml +=
         '<select name="cfwc_rule_to_country" class="cfwc-rule-field cfwc-country-select wc-enhanced-select" data-field="to_country" data-placeholder="' +
         (strings.to_country || "To (any)") +
-        '" style="width: 48%;">';
+        '" style="width: 47%;">';
       editRowHtml +=
         '<option value="">Any Destination</option>' +
         getCountryOptions(rule.to_country || rule.country || "");
@@ -676,13 +782,19 @@
         ">Category + HS Code</option>";
       editRowHtml += "</select>";
 
-      // Category selector (show/hide based on match_type)
-      var showCategories =
-        rule.match_type === "category" || rule.match_type === "combined";
+      // Category selector (show for category/hs_code/combined)
+      // Default to hidden only for "all" products
+      var showCategories = rule.match_type !== "all";
+      var categoryPlaceholder =
+        rule.match_type === "hs_code"
+          ? "Select categories (optional)"
+          : "Select categories...";
       editRowHtml +=
         '<select name="cfwc_rule_categories" class="cfwc-rule-field cfwc-category-select wc-enhanced-select" data-field="category_ids" multiple="multiple" style="width: 100%; margin-bottom: 5px;' +
         (showCategories ? "" : " display: none;") +
-        '" data-placeholder="Select categories...">';
+        '" data-placeholder="' +
+        categoryPlaceholder +
+        '">';
       if (cfwc_admin.categories) {
         var selectedCats = rule.category_ids || [];
         $.each(cfwc_admin.categories, function (id, name) {
@@ -693,7 +805,15 @@
       }
       editRowHtml += "</select>";
 
-      // HS Code pattern input (show/hide based on match_type)
+      // Add spacer between category and HS code fields
+      var showSpacer =
+        rule.match_type === "combined" || rule.match_type === "hs_code";
+      editRowHtml +=
+        '<span class="cfwc-field-spacer" style="' +
+        (showSpacer ? "display: block;" : "display: none;") +
+        ' height: 5px; width: 100%;">&nbsp;</span>';
+
+      // HS Code pattern input (show only for hs_code/combined)
       var showHsCode =
         rule.match_type === "hs_code" || rule.match_type === "combined";
       editRowHtml +=
@@ -701,7 +821,22 @@
         (rule.hs_code_pattern || "") +
         '" placeholder="HS Code (e.g., 6109* or 61,62)" style="width: 100%;' +
         (showHsCode ? "" : " display: none;") +
-        '" />';
+        '"' +
+        (showHsCode ? " required" : "") +
+        " />";
+      // Add required indicator with dynamic text based on match type
+      var requiredText = "Not required";
+      if (rule.match_type === "category") {
+        requiredText = "Required *";
+      } else if (rule.match_type === "hs_code") {
+        requiredText = "Category: Not required<br>HS Code: Required *";
+      } else if (rule.match_type === "combined") {
+        requiredText = "Both required *";
+      }
+      editRowHtml +=
+        '<span class="cfwc-field-required" style="display: block; font-size: 11px; color: #999; margin-top: 2px;">' +
+        requiredText +
+        "</span>";
       editRowHtml += "</td>";
 
       // Type selector
@@ -729,7 +864,8 @@
         rateField +
         '" value="' +
         rateValue +
-        '" step="0.01" style="width: 80px;" /></td>';
+        '" step="0.01" style="width: 80px;" required />' +
+        '<span style="font-size: 11px; color: #999; display: block; margin-top: 2px;">Required *</span></td>';
 
       // Stacking mode
       editRowHtml += "<td>";
@@ -749,21 +885,21 @@
         ">Exclusive (Only this fee)</option>";
       editRowHtml += "</select>";
       editRowHtml +=
-        '<div class="cfwc-stacking-help" style="font-size: 11px; color: #666; margin-top: 5px;">';
+        '<span class="description" style="font-size: 11px; color: #666; margin-top: 5px; display: block;">';
       var currentMode = rule.stacking_mode || "add";
       editRowHtml +=
         '<span class="stacking-help-add" style="' +
-        (currentMode === "add" ? "display: block;" : "display: none;") +
-        '"><span class="dashicons dashicons-plus-alt" style="color: #46b450; font-size: 14px;"></span> Adds with other matching rules</span>';
+        (currentMode === "add" ? "" : "display: none;") +
+        '">Adds with other matching rules</span>';
       editRowHtml +=
         '<span class="stacking-help-override" style="' +
-        (currentMode === "override" ? "display: block;" : "display: none;") +
-        '"><span class="dashicons dashicons-update" style="color: #f0ad4e; font-size: 14px;"></span> Replaces lower priority rules</span>';
+        (currentMode === "override" ? "" : "display: none;") +
+        '">Replaces lower priority rules</span>';
       editRowHtml +=
         '<span class="stacking-help-exclusive" style="' +
-        (currentMode === "exclusive" ? "display: block;" : "display: none;") +
-        '"><span class="dashicons dashicons-dismiss" style="color: #dc3232; font-size: 14px;"></span> No other rules apply</span>';
-      editRowHtml += "</div>";
+        (currentMode === "exclusive" ? "" : "display: none;") +
+        '">No other rules apply</span>';
+      editRowHtml += "</span>";
       editRowHtml += "</td>";
 
       // Actions
