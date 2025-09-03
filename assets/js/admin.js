@@ -17,6 +17,16 @@
     var presetData = cfwc_admin.templates || {};
     var strings = cfwc_admin.strings || {};
 
+    // Initialize Select2 for preset dropdown
+    if ($.fn.select2) {
+      $("#cfwc-preset-select").select2({
+        placeholder: strings.select_preset || "-- Select a preset --",
+        allowClear: true,
+        width: "resolve",
+        minimumResultsForSearch: 10,
+      });
+    }
+
     // No need for tooltip handlers - browser handles title attributes natively
 
     // Helper function to escape HTML
@@ -337,7 +347,7 @@
             // Dynamically update the table without reload
             updateRulesTable(response.data.rules);
             // Reset preset selector
-            $("#cfwc-preset-select").val("");
+            $("#cfwc-preset-select").val("").trigger("change");
             $("#cfwc-preset-description").hide();
 
             // Prepare success message
@@ -1204,38 +1214,41 @@
             row += "<td>" + currency_symbol + (rule.amount || 0) + "</td>";
           }
 
-          // Stacking mode
+          // Stacking mode - Use WooCommerce-style badges to match PHP rendering
           var stackingMode = rule.stacking_mode || "add";
-          var stackingIcons = {
-            add: '<span class="dashicons dashicons-plus-alt" style="color: #46b450;"></span>',
-            override:
-              '<span class="dashicons dashicons-update" style="color: #f0ad4e;"></span>',
-            exclusive:
-              '<span class="dashicons dashicons-dismiss" style="color: #dc3232;"></span>',
-          };
           var stackingLabels = {
-            add: "Stack",
-            override: "Override",
-            exclusive: "Exclusive",
+            add: strings.stack || "Stack",
+            override: strings.override || "Override",
+            exclusive: strings.exclusive || "Exclusive",
+          };
+          var stackingColors = {
+            add: "#46b450",
+            override: "#f0ad4e",
+            exclusive: "#dc3232",
           };
           var stackingDescriptions = {
-            add: "Adds with other matching rules",
-            override: "Replaces lower priority rules",
-            exclusive: "Only this rule applies",
+            add: strings.stack_desc || "Adds with other matching rules",
+            override: strings.override_desc || "Replaces lower priority rules",
+            exclusive: strings.exclusive_desc || "Only this rule applies",
           };
-          // Always default to 'add' if not set
-          var iconToShow = stackingIcons[stackingMode] || stackingIcons.add;
-          var labelToShow = stackingLabels[stackingMode] || stackingLabels.add;
-          var descToShow =
+
+          // Get values with defaults
+          var badgeColor = stackingColors[stackingMode] || stackingColors.add;
+          var badgeLabel = stackingLabels[stackingMode] || stackingLabels.add;
+          var badgeTitle =
             stackingDescriptions[stackingMode] || stackingDescriptions.add;
+
+          // Render WooCommerce-style badge matching PHP output
           row +=
             "<td>" +
-            iconToShow +
-            ' <span title="' +
-            descToShow +
+            '<span style="display: inline-block; padding: 3px 8px; background: ' +
+            badgeColor +
+            '; color: #fff; border-radius: 3px; font-size: 11px; font-weight: 600; line-height: 1;" title="' +
+            badgeTitle +
             '">' +
-            labelToShow +
-            "</span></td>";
+            badgeLabel +
+            "</span>" +
+            "</td>";
 
           // Actions
           row += "<td>";

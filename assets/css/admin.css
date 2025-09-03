@@ -33,15 +33,19 @@
 
 /* Preset Loader Section */
 .cfwc-preset-loader {
-  background: #f9f9f9;
-  border: 1px solid #ddd;
-  padding: 15px;
-  margin-bottom: 20px;
-  border-radius: 4px;
+  /* Removed background, border, and padding for cleaner look */
+  margin-top: 40px;
+  margin-bottom: 30px;
 }
 
 .cfwc-preset-loader h3 {
   margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 1.3em;
+}
+
+.cfwc-preset-loader p {
+  margin-bottom: 20px;
 }
 
 /* Admin Notice Styles - Fixed positioning and width */
@@ -114,28 +118,7 @@
 }
 
 /* Delete All Button Styles */
-.cfwc-delete-all {
-  margin-left: 10px;
-  color: #a00;
-  border-color: #a00;
-}
-
-.cfwc-delete-all:hover {
-  color: #dc3232;
-  border-color: #dc3232;
-}
-
-.cfwc-delete-all.confirm-delete {
-  background: #d63638;
-  border-color: #d63638;
-  color: #fff;
-}
-
-.cfwc-delete-all.confirm-delete:hover {
-  background: #b32d2e;
-  border-color: #b32d2e;
-  color: #fff;
-}
+/* Delete all button styles moved to line 495 */
 
 /* Delete Button Hover State */
 .cfwc-delete-rule:hover {
@@ -263,7 +246,7 @@ span[aria-labelledby="select2-_cfwc_country_of_origin-container"] {
 .cfwc-rules-table-wrapper {
   max-width: 100%;
   overflow-x: auto;
-  margin: 10px 0;
+  margin: 0 0 10px 0;
   /* Prevent viewport overflow */
   position: relative;
 }
@@ -443,18 +426,90 @@ span[aria-labelledby="select2-_cfwc_country_of_origin-container"] {
 .cfwc-rules-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
+  align-items: flex-start;
+  margin-top: 30px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 15px;
 }
 
 .cfwc-rules-header h3 {
-  margin: 0 0 5px 0;
+  margin: 0;
+  font-size: 1.3em;
 }
 
 .cfwc-rules-header p {
   margin: 0;
   color: #666;
+  font-size: 14px;
 }
+
+.cfwc-help-link-under {
+  color: #2271b1;
+  text-decoration: none;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.cfwc-help-link-under:hover {
+  color: #135e96;
+  text-decoration: none;
+}
+
+.cfwc-help-link-under:hover .cfwc-help-text {
+  text-decoration: underline;
+}
+
+/* Add New Rule and Delete All Buttons when beside title */
+.cfwc-add-rule,
+.cfwc-delete-all {
+  white-space: nowrap;
+}
+
+.cfwc-add-rule:hover {
+  background: #f0f0f1;
+  border-color: #0a4b78;
+  color: #0a4b78;
+}
+
+/* Delete All button styling */
+.cfwc-delete-all {
+  color: #d63638;
+  border-color: #d63638;
+}
+
+.cfwc-delete-all:hover:not(.confirm-delete) {
+  background: #fbeaea;
+  border-color: #d63638;
+  color: #d63638;
+}
+
+.cfwc-delete-all.confirm-delete {
+  background: #d63638 !important;
+  border-color: #d63638 !important;
+  color: #fff !important;
+}
+
+/* Inline delete warning message */
+.cfwc-delete-warning {
+  margin-left: 10px;
+  color: #d63638;
+  font-weight: 600;
+  font-size: 13px;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Help link icon removed for cleaner look */
 
 /* Column widths are now defined above in the main table styles */
 
@@ -482,7 +537,130 @@ span[aria-labelledby="select2-_cfwc_country_of_origin-container"] {
   color: #fff !important;
 }
 
-.cfwc-preset-loader select {
-  min-width: 250px;
+.cfwc-preset-loader select,
+.cfwc-preset-loader .select2-container {
+  min-width: 280px;
   margin-right: 10px;
+}
+
+/* Style the Select2 container to match WooCommerce */
+.cfwc-preset-loader .select2-container .select2-selection--single {
+  height: 32px;
+  line-height: 30px;
+}
+
+.cfwc-preset-loader
+  .select2-container--default
+  .select2-selection--single
+  .select2-selection__rendered {
+  padding-left: 8px;
+  padding-right: 20px;
+  line-height: 30px;
+}
+
+.cfwc-preset-loader
+  .select2-container--default
+  .select2-selection--single
+  .select2-selection__arrow {
+  height: 30px;
+}
+
+/* Mobile Responsive Styles */
+@media screen and (max-width: 768px) {
+  /* Default Product Origin Section */
+  #cfwc_default_origin_select {
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-top: 10px;
+  }
+
+  /* Rules Header - Stack on mobile */
+  .cfwc-rules-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cfwc-add-rule,
+  .cfwc-delete-all {
+    width: auto;
+    min-width: 100px;
+    font-size: 13px;
+    padding: 3px 8px;
+  }
+
+  /* Preset buttons responsive */
+  .cfwc-preset-loader {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .cfwc-preset-loader select,
+  .cfwc-preset-loader .select2-container {
+    width: 100% !important;
+    min-width: 0;
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+
+  .cfwc-preset-loader button {
+    width: 100%;
+    margin-right: 0;
+  }
+
+  /* Rules table - make it scrollable on mobile */
+  .cfwc-rules-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .cfwc-rules-table {
+    min-width: 700px; /* Maintain minimum width for readability */
+  }
+
+  /* Modal full screen on mobile */
+  .cfwc-modal-content {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    border-radius: 0;
+    transform: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+  }
+
+  /* Form fields in rules */
+  .cfwc-rule-form input[type="text"],
+  .cfwc-rule-form input[type="number"],
+  .cfwc-rule-form select {
+    width: 100%;
+    margin-bottom: 5px;
+  }
+
+  .cfwc-stacking-select {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  /* Even smaller screens */
+  .cfwc-rules-table {
+    font-size: 12px;
+  }
+
+  .cfwc-rules-table th,
+  .cfwc-rules-table td {
+    padding: 5px;
+  }
+
+  .cfwc-help-link-under {
+    font-size: 12px;
+  }
+
+  .button {
+    padding: 5px 10px;
+    font-size: 13px;
+  }
 }
