@@ -57,12 +57,13 @@ class CFWC_Display {
 	 * Customize fee display on cart/checkout to show breakdown.
 	 *
 	 * @since 1.0.0
-	 * @param string       $cart_totals_fee_html The HTML for the fee amount.
-	 * @param WC_Cart_Fees $fee                  The fee object.
+	 * @param string   $cart_totals_fee_html The HTML for the fee amount.
+	 * @param stdClass $fee                  The fee object with properties: name, amount, taxable, tax_class.
 	 * @return string Modified HTML.
 	 */
 	public function customize_fee_display( $cart_totals_fee_html, $fee ) {
 		// Only customize our customs fees.
+		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- WooCommerce uses 'name' property.
 		if ( __( 'Customs & Import Fees', 'customs-fees-for-woocommerce' ) !== $fee->name ) {
 			return $cart_totals_fee_html;
 		}

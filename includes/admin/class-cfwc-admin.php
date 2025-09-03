@@ -292,16 +292,16 @@ class CFWC_Admin {
 		if ( 'edit.php' === $hook && 'product' === $post_type ) {
 			wp_enqueue_style(
 				'cfwc-admin',
-				CFWC_PLUGIN_URL . 'assets/css/admin.css',
+				( defined( 'CFWC_PLUGIN_URL' ) ? CFWC_PLUGIN_URL : plugin_dir_url( dirname( __DIR__ ) ) ) . 'assets/css/admin.css',
 				array(),
-				CFWC_VERSION
+				( defined( 'CFWC_VERSION' ) ? CFWC_VERSION : '1.0.0' )
 			);
 
 			wp_enqueue_script(
 				'cfwc-admin',
-				CFWC_PLUGIN_URL . 'assets/js/admin.js',
+				( defined( 'CFWC_PLUGIN_URL' ) ? CFWC_PLUGIN_URL : plugin_dir_url( dirname( __DIR__ ) ) ) . 'assets/js/admin.js',
 				array( 'jquery' ),
-				CFWC_VERSION,
+				( defined( 'CFWC_VERSION' ) ? CFWC_VERSION : '1.0.0' ),
 				true
 			);
 		}
@@ -316,9 +316,9 @@ class CFWC_Admin {
 				// Also load our admin CSS for proper select2 styling.
 				wp_enqueue_style(
 					'cfwc-admin',
-					CFWC_PLUGIN_URL . 'assets/css/admin.css',
+					( defined( 'CFWC_PLUGIN_URL' ) ? CFWC_PLUGIN_URL : plugin_dir_url( dirname( __DIR__ ) ) ) . 'assets/css/admin.css',
 					array( 'woocommerce_admin_styles' ),
-					CFWC_VERSION
+					( defined( 'CFWC_VERSION' ) ? CFWC_VERSION : '1.0.0' )
 				);
 
 				// Initialize Select2 on our country field - trigger WooCommerce's native enhancement.
@@ -365,26 +365,26 @@ class CFWC_Admin {
 		// Enqueue admin CSS.
 		wp_enqueue_style(
 			'cfwc-admin',
-			CFWC_PLUGIN_URL . 'assets/css/admin.css',
+			( defined( 'CFWC_PLUGIN_URL' ) ? CFWC_PLUGIN_URL : plugin_dir_url( dirname( __DIR__ ) ) ) . 'assets/css/admin.css',
 			array( 'woocommerce_admin_styles' ),
-			CFWC_VERSION
+			( defined( 'CFWC_VERSION' ) ? CFWC_VERSION : '1.0.0' )
 		);
 
 		// Enqueue UI improvements CSS.
 		wp_enqueue_style(
 			'cfwc-admin-improvements',
-			CFWC_PLUGIN_URL . 'assets/css/admin-improvements.css',
+			( defined( 'CFWC_PLUGIN_URL' ) ? CFWC_PLUGIN_URL : plugin_dir_url( dirname( __DIR__ ) ) ) . 'assets/css/admin-improvements.css',
 			array( 'cfwc-admin' ),
-			CFWC_VERSION
+			( defined( 'CFWC_VERSION' ) ? CFWC_VERSION : '1.0.0' )
 		);
 
 		// Enqueue admin JavaScript with dependencies.
 		// Include wp-data for snackbar notifications
 		wp_enqueue_script(
 			'cfwc-admin',
-			CFWC_PLUGIN_URL . 'assets/js/admin.js',
+			( defined( 'CFWC_PLUGIN_URL' ) ? CFWC_PLUGIN_URL : plugin_dir_url( dirname( __DIR__ ) ) ) . 'assets/js/admin.js',
 			array( 'jquery', 'wc-enhanced-select', 'selectWoo', 'wp-data', 'wp-notices' ),
-			CFWC_VERSION,
+			( defined( 'CFWC_VERSION' ) ? CFWC_VERSION : '1.0.0' ),
 			true
 		);
 
@@ -523,11 +523,15 @@ class CFWC_Admin {
 	 * @return string
 	 */
 	public function format_meta_key( $display_key, $meta, $item ) {
-		if ( 'cfwc_hs_code' === $meta->key ) {
+		// Use get_data() method for proper access to meta data properties.
+		$meta_data = $meta->get_data();
+		$meta_key  = isset( $meta_data['key'] ) ? $meta_data['key'] : '';
+
+		if ( 'cfwc_hs_code' === $meta_key ) {
 			return __( 'HS Code', 'customs-fees-for-woocommerce' );
 		}
 
-		if ( 'cfwc_origin' === $meta->key ) {
+		if ( 'cfwc_origin' === $meta_key ) {
 			return __( 'Origin', 'customs-fees-for-woocommerce' );
 		}
 
@@ -544,7 +548,11 @@ class CFWC_Admin {
 	 * @return string
 	 */
 	public function format_meta_value( $display_value, $meta, $item ) {
-		if ( 'cfwc_origin' === $meta->key ) {
+		// Use get_data() method for proper access to meta data properties.
+		$meta_data = $meta->get_data();
+		$meta_key  = isset( $meta_data['key'] ) ? $meta_data['key'] : '';
+
+		if ( 'cfwc_origin' === $meta_key ) {
 			return strtoupper( $display_value );
 		}
 

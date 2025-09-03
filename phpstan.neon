@@ -1,0 +1,31 @@
+includes:
+	# The WordPress extension is automatically included via phpstan/extension-installer
+	# - vendor/szepeviktor/phpstan-wordpress/extension.neon
+
+parameters:
+	level: 0
+	paths:
+		- .
+		- customs-fees-for-woocommerce.php
+		- includes/
+	excludePaths:
+		- vendor/
+		- node_modules (?)
+		- tests (?)
+		- build (?)
+		- languages/
+		- assets/
+	
+	# WordPress-specific settings
+	bootstrapFiles:
+		- phpstan-bootstrap.php
+		# Include WooCommerce stubs for function definitions
+		- vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php
+	
+	# Treat unknown types as mixed (useful for WordPress hooks)
+	treatPhpDocTypesAsCertain: false
+	
+	# Common WordPress-specific ignores
+	ignoreErrors:
+		# Ignore WooCommerce internal class not found (HPOS related)
+		- '#Class Automattic\\WooCommerce\\Internal\\DataStores\\Orders\\CustomOrdersTableController not found#'

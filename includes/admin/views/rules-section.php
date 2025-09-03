@@ -61,8 +61,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 				$base_country_parts = explode( ':', $base_country );
 				$store_country      = $base_country_parts[0];
 				$store_country_name = WC()->countries->countries[ $store_country ] ?? $store_country;
-				$default_origin     = get_option( 'cfwc_default_origin', 'store' );
-				$custom_origin      = get_option( 'cfwc_custom_default_origin', '' );
+				$default_origin     = sanitize_text_field( get_option( 'cfwc_default_origin', 'store' ) );
+				$custom_origin      = sanitize_text_field( get_option( 'cfwc_custom_default_origin', '' ) );
 				?>
 				
 				<div style="margin-bottom: 10px;">
@@ -87,7 +87,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 						<input type="radio" name="cfwc_default_origin_type" value="custom" <?php checked( $default_origin, 'custom' ); ?> />
 						<strong><?php esc_html_e( 'Different country', 'customs-fees-for-woocommerce' ); ?></strong>
 					</label>
-									<div id="cfwc_custom_origin_wrapper" style="<?php echo ( 'custom' !== $default_origin ) ? 'display: none;' : ''; ?> margin-left: 25px;">
+									<div id="cfwc_custom_origin_wrapper" style="<?php echo esc_attr( ( 'custom' !== $default_origin ) ? 'display: none;' : '' ); ?> margin-left: 25px;">
 					<select name="cfwc_custom_default_origin" id="cfwc_custom_default_origin" class="wc-enhanced-select" style="width: 350px;">
 					<option value=""><?php esc_html_e( '— Select Country —', 'customs-fees-for-woocommerce' ); ?></option>
 					<?php

@@ -372,6 +372,48 @@ add_action('woocommerce_shipping_calculated', function() {
 - **Scalable**: Handles unlimited products and rules.
 - **Fast**: Average calculation time < 50ms.
 
+## Development
+
+### Testing & Quality Assurance
+
+#### Running Tests
+
+```
+# PHPStan Analysis (Level 0)
+vendor/bin/phpstan analyse
+
+# PHPCS WordPress Standards
+phpcs --standard=WordPress-Extra --extensions=php .
+
+# Auto-fix PHPCS issues
+phpcbf --standard=WordPress-Extra --extensions=php .
+
+# Security Audit
+# Check for XSS, SQL injection, nonce verification
+grep -r "\$_POST\|\$_GET\|\$_REQUEST" --include="*.php" .
+```
+
+#### Development Setup
+
+```
+# Install development dependencies
+composer install --dev
+
+# Required packages (already in composer.json)
+- phpstan/phpstan
+- szepeviktor/phpstan-wordpress
+- php-stubs/woocommerce-stubs
+- squizlabs/php_codesniffer
+- wp-coding-standards/wpcs
+```
+
+### Code Standards
+
+- **PHPStan**: Level 0 compliance with WordPress & WooCommerce stubs
+- **PHPCS**: WordPress-Extra standard
+- **Security**: All inputs sanitized, outputs escaped, nonces verified
+- **HPOS**: Fully compatible with WooCommerce High-Performance Order Storage
+
 ## Security
 
 - All inputs sanitized and validated.

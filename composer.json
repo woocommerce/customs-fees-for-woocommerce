@@ -1,0 +1,13 @@
+{
+    "require-dev": {
+        "szepeviktor/phpstan-wordpress": "*",
+        "phpstan/phpstan": "*",
+        "phpstan/extension-installer": "*",
+        "php-stubs/woocommerce-stubs": "^10.1"
+    },
+    "config": {
+        "allow-plugins": {
+            "phpstan/extension-installer": true
+        }
+    }
+}

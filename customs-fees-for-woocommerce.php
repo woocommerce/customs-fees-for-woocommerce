@@ -296,7 +296,8 @@ function cfwc() {
 
 // Hook registrations.
 add_action( 'plugins_loaded', array( 'Customs_Fees_WooCommerce', 'plugin_init' ), 10 );
-add_action( 'plugins_loaded', array( 'Customs_Fees_WooCommerce', 'instance' ), 10 );
+// Remove the instance() call from action hook as it returns an object, which actions shouldn't return.
+// The instance is already created inside plugin_init().
 register_activation_hook( __FILE__, array( 'Customs_Fees_WooCommerce', 'activate' ) );
 register_deactivation_hook( __FILE__, array( 'Customs_Fees_WooCommerce', 'deactivate' ) );
 register_uninstall_hook( __FILE__, array( 'Customs_Fees_WooCommerce', 'uninstall' ) );

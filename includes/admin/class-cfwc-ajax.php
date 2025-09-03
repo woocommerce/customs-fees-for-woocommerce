@@ -275,8 +275,9 @@ class CFWC_Ajax {
 		}
 
 		// Parse CSV.
-		$lines     = explode( "\n", $csv_content );
-		$headers   = str_getcsv( array_shift( $lines ) );
+		$lines = explode( "\n", $csv_content );
+		// Add escape parameter (backslash) for PHP 8.4+ compatibility.
+		$headers   = str_getcsv( array_shift( $lines ), ',', '"', '\\' );
 		$new_rules = array();
 
 		foreach ( $lines as $line ) {
@@ -284,7 +285,8 @@ class CFWC_Ajax {
 				continue;
 			}
 
-			$data = str_getcsv( $line );
+			// Add escape parameter (backslash) for PHP 8.4+ compatibility.
+			$data = str_getcsv( $line, ',', '"', '\\' );
 			if ( count( $data ) === count( $headers ) ) {
 				$new_rules[] = array(
 					'country'   => sanitize_text_field( $data[0] ),
@@ -357,15 +359,52 @@ class CFWC_Ajax {
 			);
 		}
 
-		// Calculate fees.
+		// Calculate fees by simulating a cart.
+		// Since calculate_fees_for_country doesn't exist, we need to simulate the calculation.
 		$calculator = new CFWC_Calculator();
-		$fees       = $calculator->calculate_fees_for_country( $country, $cart_total );
+
+		// Get rules and filter by country to simulate the calculation.
+		$all_rules  = get_option( 'cfwc_rules', array() );
+		$fees       = array();
+		$total_fees = 0;
+
+		// Filter rules for the specified country.
+		foreach ( $all_rules as $rule ) {
+			if ( isset( $rule['country'] ) && $rule['country'] === $country ) {
+				$fee_amount = 0;
+
+				// Calculate based on rule type.
+				if ( 'percentage' === $rule['type'] ) {
+					$fee_amount = ( $cart_total * $rule['rate'] ) / 100;
+				} elseif ( 'flat' === $rule['type'] ) {
+					$fee_amount = $rule['amount'];
+				}
+
+				// Apply minimum/maximum limits if set.
+				if ( isset( $rule['minimum'] ) && $rule['minimum'] > 0 && $fee_amount < $rule['minimum'] ) {
+					$fee_amount = $rule['minimum'];
+				}
+				if ( isset( $rule['maximum'] ) && $rule['maximum'] > 0 && $fee_amount > $rule['maximum'] ) {
+					$fee_amount = $rule['maximum'];
+				}
+
+				if ( $fee_amount > 0 ) {
+					$fees[]      = array(
+						'label'  => isset( $rule['label'] ) ? $rule['label'] : __( 'Customs Fee', 'customs-fees-for-woocommerce' ),
+						'amount' => $fee_amount,
+						'type'   => $rule['type'],
+						'rate'   => isset( $rule['rate'] ) ? $rule['rate'] : 0,
+					);
+					$total_fees += $fee_amount;
+				}
+			}
+		}
 
 		wp_send_json_success(
 			array(
 				'message' => __( 'Calculation complete.', 'customs-fees-for-woocommerce' ),
 				'fees'    => $fees,
-				'total'   => array_sum( array_column( $fees, 'amount' ) ),
+				'total'   => $total_fees,
 			)
 		);
 	}

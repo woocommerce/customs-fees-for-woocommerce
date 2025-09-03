@@ -83,22 +83,25 @@ class CFWC_Loader {
 	 * @since 1.0.0
 	 */
 	private function load_dependencies() {
+		// Get plugin directory with defensive check for PHPStan.
+		$plugin_dir = defined( 'CFWC_PLUGIN_DIR' ) ? CFWC_PLUGIN_DIR : plugin_dir_path( __DIR__ );
+
 		// Load core classes.
-		require_once CFWC_PLUGIN_DIR . 'includes/class-cfwc-settings.php';
-		require_once CFWC_PLUGIN_DIR . 'includes/class-cfwc-rule-matcher.php';
-		require_once CFWC_PLUGIN_DIR . 'includes/class-cfwc-calculator.php';
-		require_once CFWC_PLUGIN_DIR . 'includes/class-cfwc-products.php';
-		require_once CFWC_PLUGIN_DIR . 'includes/class-cfwc-display.php';
-		require_once CFWC_PLUGIN_DIR . 'includes/class-cfwc-emails.php';
-		require_once CFWC_PLUGIN_DIR . 'includes/class-cfwc-templates.php';
+		require_once $plugin_dir . 'includes/class-cfwc-settings.php';
+		require_once $plugin_dir . 'includes/class-cfwc-rule-matcher.php';
+		require_once $plugin_dir . 'includes/class-cfwc-calculator.php';
+		require_once $plugin_dir . 'includes/class-cfwc-products.php';
+		require_once $plugin_dir . 'includes/class-cfwc-display.php';
+		require_once $plugin_dir . 'includes/class-cfwc-emails.php';
+		require_once $plugin_dir . 'includes/class-cfwc-templates.php';
 
 		// Load admin classes if in admin.
 		if ( is_admin() ) {
-			require_once CFWC_PLUGIN_DIR . 'includes/admin/class-cfwc-admin.php';
+			require_once $plugin_dir . 'includes/admin/class-cfwc-admin.php';
 			// Include export/import handler for CSV functionality.
-			require_once CFWC_PLUGIN_DIR . 'includes/class-cfwc-export-import.php';
+			require_once $plugin_dir . 'includes/class-cfwc-export-import.php';
 			// Include onboarding handler.
-			require_once CFWC_PLUGIN_DIR . 'includes/admin/class-cfwc-onboarding.php';
+			require_once $plugin_dir . 'includes/admin/class-cfwc-onboarding.php';
 		}
 	}
 

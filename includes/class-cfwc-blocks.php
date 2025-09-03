@@ -66,6 +66,11 @@ class CFWC_Blocks {
 
 			// Store HS codes and origin for each item (for order details/emails).
 			foreach ( $order->get_items() as $item ) {
+				// Ensure the item is a product line item before calling get_product().
+				if ( ! $item instanceof WC_Order_Item_Product ) {
+					continue;
+				}
+
 				$product = $item->get_product();
 				if ( $product ) {
 					$hs_code = get_post_meta( $product->get_id(), '_cfwc_hs_code', true );
