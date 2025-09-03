@@ -211,7 +211,7 @@ class CFWC_Templates {
 						'from_country'    => 'CN',
 						'to_country'      => 'US',
 						'match_type'      => 'hs_code',
-						'hs_code_pattern' => '8418*,8450*,8451*',  // Refrigerators, washers, dryers.
+						'hs_code_pattern' => '8418*,8419*,8450*,8451*',  // Refrigerators, machinery, washers, dryers.
 						'type'            => 'percentage',
 						'rate'            => 25,  // Section 232 steel derivative items.
 						'priority'        => 25,
@@ -231,6 +231,20 @@ class CFWC_Templates {
 						'priority'        => 20,
 						'stacking_mode'   => 'exclusive',
 						'label'           => __( 'China Footwear (Section 301)', 'customs-fees-for-woocommerce' ),
+						'taxable'         => true,
+						'tax_class'       => '',
+					),
+					// Leather goods and bags - 25%
+					array(
+						'from_country'    => 'CN',
+						'to_country'      => 'US',
+						'match_type'      => 'hs_code',
+						'hs_code_pattern' => '4202*',  // Trunks, bags, cases, wallets, etc.
+						'type'            => 'percentage',
+						'rate'            => 25,
+						'priority'        => 25,
+						'stacking_mode'   => 'exclusive',
+						'label'           => __( 'China Leather Goods & Bags', 'customs-fees-for-woocommerce' ),
 						'taxable'         => true,
 						'tax_class'       => '',
 					),

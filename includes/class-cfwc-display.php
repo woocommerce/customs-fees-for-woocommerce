@@ -95,12 +95,19 @@ class CFWC_Display {
 	 * @since 1.0.0
 	 */
 	public function enqueue_tooltip_assets() {
-		// Load on cart, checkout, order received, and my account pages.
+		// Check if we're on a page with checkout shortcode.
+		global $post;
+		$has_checkout_shortcode = false;
+		if ( is_object( $post ) && has_shortcode( $post->post_content, 'woocommerce_checkout' ) ) {
+			$has_checkout_shortcode = true;
+		}
+
+		// Load on cart, checkout (including shortcode), order received, and my account pages.
 		// Also load if we're on any WooCommerce page.
-		if ( is_checkout() || is_cart() || is_order_received_page() || is_account_page() || is_woocommerce() ) {
+		if ( is_checkout() || is_cart() || is_order_received_page() || is_account_page() || is_woocommerce() || $has_checkout_shortcode ) {
 			wp_enqueue_style( 'cfwc-frontend', plugin_dir_url( __DIR__ ) . 'assets/css/frontend.css', array(), '1.0.0' );
 			// Only load JS on cart/checkout for tooltips.
-			if ( is_checkout() || is_cart() ) {
+			if ( is_checkout() || is_cart() || $has_checkout_shortcode ) {
 				wp_enqueue_script( 'cfwc-frontend', plugin_dir_url( __DIR__ ) . 'assets/js/frontend.js', array( 'jquery' ), '1.0.0', true );
 			}
 		}
