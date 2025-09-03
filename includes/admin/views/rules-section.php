@@ -18,29 +18,45 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div class="cfwc-rules-section">
 	
 	<?php
+	// Collect all notices in one area
+	$notices = array();
+	
 	// Check if WooCommerce tax is enabled
 	$tax_enabled = wc_tax_enabled();
-	if ( ! $tax_enabled ) :
-		?>
-		<div class="notice notice-warning" style="margin-bottom: 20px;">
-			<p>
-				<strong><?php esc_html_e( '⚠️ Tax is disabled in WooCommerce!', 'customs-fees-for-woocommerce' ); ?></strong>
-				<?php
-				printf(
-					/* translators: %s: Link to WooCommerce tax settings */
-					esc_html__( 'Customs fees are added as taxable fees. Please %s to use this plugin.', 'customs-fees-for-woocommerce' ),
-					'<a href="' . esc_url( admin_url( 'admin.php?page=wc-settings&tab=general' ) ) . '">' . esc_html__( 'enable taxes in WooCommerce settings', 'customs-fees-for-woocommerce' ) . '</a>'
-				);
-				?>
-			</p>
-		</div>
-	<?php endif; ?>
+	if ( ! $tax_enabled ) {
+		$tax_notice = '<strong>' . esc_html__( '⚠️ Tax is disabled in WooCommerce!', 'customs-fees-for-woocommerce' ) . '</strong> ';
+		$tax_notice .= sprintf(
+			/* translators: %s: Link to WooCommerce tax settings */
+			esc_html__( 'Customs fees are added as taxable fees. Please %s to use this plugin.', 'customs-fees-for-woocommerce' ),
+			'<a href="' . esc_url( admin_url( 'admin.php?page=wc-settings&tab=general' ) ) . '">' . esc_html__( 'enable taxes in WooCommerce settings', 'customs-fees-for-woocommerce' ) . '</a>'
+		);
+		$notices[] = array(
+			'type' => 'warning',
+			'content' => $tax_notice,
+		);
+	}
 	
-	<?php
-	// Show setup status if needed.
+	// Check setup status
 	if ( class_exists( 'CFWC_Onboarding' ) ) {
 		$onboarding = new CFWC_Onboarding();
-		$onboarding->render_setup_status();
+		$stats = $onboarding->get_product_stats();
+		
+		if ( $stats['missing'] > 0 ) {
+			$products_url = admin_url( 'edit.php?post_type=product' );
+			$setup_notice = '<strong>' . esc_html__( 'Setup Status:', 'customs-fees-for-woocommerce' ) . '</strong> ';
+			$setup_notice .= sprintf(
+				/* translators: %1$d: number of products missing origin, %2$d: total products */
+				esc_html__( '%1$d of %2$d products need Country of Origin data.', 'customs-fees-for-woocommerce' ),
+				absint( $stats['missing'] ),
+				absint( $stats['total'] )
+			);
+			$setup_notice .= ' <a href="' . esc_url( $products_url ) . '">' . esc_html__( 'View Products', 'customs-fees-for-woocommerce' ) . '</a>';
+			
+			$notices[] = array(
+				'type' => 'warning',
+				'content' => $setup_notice,
+			);
+		}
 	}
 	?>
 	
@@ -250,26 +266,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 			}
 		}
 	}
-	?>
 	
-	<?php if ( $has_stacking_risk ) : ?>
-	<div class="notice notice-warning" style="margin: 20px 0;">
-		<p>
-			<strong><?php esc_html_e( '⚠️ Potential Rule Stacking', 'customs-fees-for-woocommerce' ); ?></strong><br>
-			<?php
-			$country_names = array();
-			foreach ( array_keys( $stacking_countries ) as $code ) {
-				$country_names[] = WC()->countries->countries[ $code ] ?? $code;
-			}
-			printf(
-				/* translators: %s: list of countries */
-				esc_html__( 'You have multiple rules with "Add" stacking mode for %s. These fees will be combined. Consider using "Exclusive" mode if you want only the highest priority rule to apply.', 'customs-fees-for-woocommerce' ),
-				esc_html( implode( ', ', $country_names ) )
-			);
-			?>
-		</p>
-	</div>
-	<?php endif; ?>
+	// We'll handle stacking risk together with mixed rules below for a more comprehensive notice
+	?>
 	
 	<!-- Quick Preset Loader -->
 	<div class="cfwc-preset-loader">
@@ -337,16 +336,46 @@ if ( ! defined( 'ABSPATH' ) ) {
 		}
 	}
 
-	if ( $has_general_add_rules && $has_specific_add_rules ) :
+	// Check for any rule stacking scenarios (combined notice for both mixed types and multiple rules)
+	if ( $has_stacking_risk || ( $has_general_add_rules && $has_specific_add_rules ) ) {
+		$stacking_notice = '<strong>' . esc_html__( '⚠️ Rule Stacking Detected', 'customs-fees-for-woocommerce' ) . '</strong><br>';
+		
+		// Check if we have mixed rule types
+		if ( $has_general_add_rules && $has_specific_add_rules ) {
+			$stacking_notice .= esc_html__( 'You have both general (Any → Country) and specific (Country → Country) rules with "Add" stacking mode. These will combine unless you set them to "Exclusive" or "Override" mode.', 'customs-fees-for-woocommerce' ) . ' ';
+			$stacking_notice .= esc_html__( 'Example: A general "Any → US 10%" rule will add to "China → US 25%" if both are in "Add" mode.', 'customs-fees-for-woocommerce' );
+		} elseif ( $has_stacking_risk ) {
+			// Just multiple rules for same destination
+			$country_names = array();
+			foreach ( array_keys( $stacking_countries ) as $code ) {
+				$country_names[] = WC()->countries->countries[ $code ] ?? $code;
+			}
+			$stacking_notice .= sprintf(
+				/* translators: %s: list of countries */
+				esc_html__( 'You have multiple rules with "Add" stacking mode for %s. These fees will be combined. Consider using "Exclusive" or "Override" mode if you want only the highest priority rule to apply.', 'customs-fees-for-woocommerce' ),
+				esc_html( implode( ', ', $country_names ) )
+			);
+		}
+		
+		$notices[] = array(
+			'type' => 'warning',
+			'content' => $stacking_notice,
+		);
+	}
+	
+	// Display all collected notices in one area
+	if ( ! empty( $notices ) ) :
 		?>
-		<div class="notice notice-info" style="margin: 20px 0;">
-			<p>
-				<strong><?php esc_html_e( 'ℹ️ Mixed Rule Types Detected', 'customs-fees-for-woocommerce' ); ?></strong><br>
-				<?php esc_html_e( 'You have both general (Any → Country) and specific (Country → Country) rules with "Add" stacking mode. These will combine unless you set them to "Exclusive" or "Override" mode.', 'customs-fees-for-woocommerce' ); ?>
-				<?php esc_html_e( 'Example: A general "Any → US 10%" rule will add to "China → US 25%" if both are in "Add" mode.', 'customs-fees-for-woocommerce' ); ?>
-			</p>
+		<div class="cfwc-notices-container" style="margin-bottom: 20px;">
+			<?php foreach ( $notices as $notice ) : ?>
+				<div class="notice notice-<?php echo esc_attr( $notice['type'] ); ?>" style="margin-bottom: 10px;">
+					<p><?php echo wp_kses_post( $notice['content'] ); ?></p>
+				</div>
+			<?php endforeach; ?>
 		</div>
-	<?php endif; ?>
+		<?php
+	endif;
+	?>
 	
 	<!-- Rules Table -->
 	<div class="cfwc-rules-header">

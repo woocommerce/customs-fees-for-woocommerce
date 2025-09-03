@@ -423,36 +423,16 @@ class CFWC_Onboarding {
 
 	/**
 	 * Render setup status for settings page.
+	 * Note: This method is kept for backward compatibility but no longer renders anything.
+	 * The setup status is now displayed in the consolidated notices area at the top of the rules section.
 	 *
 	 * @since 1.1.0
+	 * @deprecated Since notices consolidation - functionality moved to rules-section.php
 	 */
 	public function render_setup_status() {
-		$stats = $this->get_product_stats();
-
-		// Only show if products are missing origin.
-		if ( 0 === $stats['missing'] ) {
-			return;
-		}
-
-		$products_url = admin_url( 'edit.php?post_type=product' );
-		?>
-		<div class="cfwc-setup-status notice notice-warning inline" style="margin: 0 0 20px 0;">
-			<p>
-				<strong><?php esc_html_e( 'Setup Status:', 'customs-fees-for-woocommerce' ); ?></strong>
-				<?php
-				printf(
-					/* translators: %1$d: number of products missing origin, %2$d: total products */
-					esc_html__( '%1$d of %2$d products need Country of Origin data.', 'customs-fees-for-woocommerce' ),
-					absint( $stats['missing'] ),
-					absint( $stats['total'] )
-				);
-				?>
-				<a href="<?php echo esc_url( $products_url ); ?>" style="margin-left: 10px;">
-					<?php esc_html_e( 'View Products', 'customs-fees-for-woocommerce' ); ?>
-				</a>
-			</p>
-		</div>
-		<?php
+		// This method is now deprecated.
+		// Setup status is displayed in the consolidated notices area in rules-section.php
+		return;
 	}
 }
 
