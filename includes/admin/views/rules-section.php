@@ -92,12 +92,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<option value=""><?php esc_html_e( '— Select Country —', 'customs-fees-for-woocommerce' ); ?></option>
 					<?php
 					foreach ( WC()->countries->get_countries() as $code => $name ) {
-						printf(
-							'<option value="%s" %s>%s</option>',
-							esc_attr( $code ),
-							selected( $custom_origin, $code, false ),
-							esc_html( $name )
-						);
+						?>
+						<option value="<?php echo esc_attr( $code ); ?>" <?php selected( $custom_origin, $code ); ?>>
+							<?php echo esc_html( $name ); ?>
+						</option>
+						<?php
 					}
 					?>
 					</select>
