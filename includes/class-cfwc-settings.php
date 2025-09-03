@@ -146,7 +146,10 @@ class CFWC_Settings {
 			<h2><?php esc_html_e( 'Customs & Import Fees Settings', 'customs-fees-for-woocommerce' ); ?></h2>
 			
 			<!-- Include the rules template -->
-			<?php include CFWC_PLUGIN_DIR . 'includes/admin/views/rules-section.php'; ?>
+			<?php 
+			$plugin_dir = defined( 'CFWC_PLUGIN_DIR' ) ? CFWC_PLUGIN_DIR : plugin_dir_path( dirname( __FILE__ ) );
+			include $plugin_dir . 'includes/admin/views/rules-section.php'; 
+			?>
 		</div>
 		<?php
 	}
