@@ -63,8 +63,8 @@ class CFWC_Display {
 	 */
 	public function customize_fee_display( $cart_totals_fee_html, $fee ) {
 		// Only customize our customs fees.
-		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- WooCommerce uses 'name' property.
-		if ( __( 'Customs & Import Fees', 'customs-fees-for-woocommerce' ) !== $fee->name ) {
+		// Check if fee has name property (it's a stdClass from WooCommerce).
+		if ( ! isset( $fee->name ) || __( 'Customs & Import Fees', 'customs-fees-for-woocommerce' ) !== $fee->name ) {
 			return $cart_totals_fee_html;
 		}
 
