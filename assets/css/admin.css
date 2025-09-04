@@ -7,114 +7,114 @@
 
 /* Rules Table General Styles */
 .cfwc-rules-table {
-  width: 100%;
-  margin-top: 20px;
+	width: 100%;
+	margin-top: 20px;
 }
 
 .cfwc-rules-table th {
-  text-align: left;
+	text-align: left;
 }
 
 .cfwc-rules-table .button-small {
-  margin: 0 5px;
+	margin: 0 5px;
 }
 
 /* Template Selector */
 .cfwc-template-selector {
-  margin: 20px 0;
-  padding: 15px;
-  background: #f7f7f7;
-  border-radius: 4px;
+	margin: 20px 0;
+	padding: 15px;
+	background: #f7f7f7;
+	border-radius: 4px;
 }
 
 .cfwc-template-selector select {
-  min-width: 300px;
+	min-width: 300px;
 }
 
 /* Preset Loader Section */
 .cfwc-preset-loader {
-  /* Removed background, border, and padding for cleaner look */
-  margin-top: 40px;
-  margin-bottom: 30px;
+	/* Removed background, border, and padding for cleaner look */
+	margin-top: 40px;
+	margin-bottom: 30px;
 }
 
 .cfwc-preset-loader h3 {
-  margin-top: 0;
-  margin-bottom: 15px;
-  font-size: 1.3em;
+	margin-top: 0;
+	margin-bottom: 15px;
+	font-size: 1.3em;
 }
 
 .cfwc-preset-loader p {
-  margin-bottom: 20px;
+	margin-bottom: 20px;
 }
 
 /* Admin Notice Styles - Fixed positioning and width */
 .cfwc-admin-notice {
-  position: relative;
-  margin: 5px 0 15px;
-  padding: 12px 40px 12px 12px;
-  border: 1px solid transparent;
-  border-left-width: 4px;
-  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.1);
-  background: #fff;
-  display: block;
+	position: relative;
+	margin: 5px 0 15px;
+	padding: 12px 40px 12px 12px;
+	border: 1px solid transparent;
+	border-left-width: 4px;
+	box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.1);
+	background: #fff;
+	display: block;
 }
 
 .cfwc-admin-notice.error {
-  border-left-color: #dc3232;
+	border-left-color: #dc3232;
 }
 
 .cfwc-admin-notice.warning {
-  border-left-color: #ffb900;
+	border-left-color: #ffb900;
 }
 
 .cfwc-admin-notice.info {
-  border-left-color: #00a0d2;
+	border-left-color: #00a0d2;
 }
 
 .cfwc-admin-notice.success {
-  border-left-color: #46b450;
+	border-left-color: #46b450;
 }
 
 .cfwc-admin-notice .notice-message {
-  margin: 0;
-  padding: 0;
+	margin: 0;
+	padding: 0;
 }
 
 .cfwc-admin-notice button.notice-dismiss {
-  position: absolute;
-  top: 0;
-  right: 1px;
-  border: none;
-  margin: 0;
-  padding: 9px;
-  background: none;
-  color: #b4b9be;
-  cursor: pointer;
-  width: 36px;
-  height: 36px;
-  text-align: center;
+	position: absolute;
+	top: 0;
+	right: 1px;
+	border: none;
+	margin: 0;
+	padding: 9px;
+	background: none;
+	color: #b4b9be;
+	cursor: pointer;
+	width: 36px;
+	height: 36px;
+	text-align: center;
 }
 
 .cfwc-admin-notice button.notice-dismiss:before {
-  content: "\f153";
-  font: normal 16px/20px dashicons;
-  speak: never;
-  display: block;
-  width: 20px;
-  height: 20px;
-  text-align: center;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+	content: "\f153";
+	font: normal 16px/20px dashicons;
+	speak: never;
+	display: block;
+	width: 20px;
+	height: 20px;
+	text-align: center;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 .cfwc-admin-notice button.notice-dismiss:hover {
-  color: #c00;
+	color: #c00;
 }
 
 .cfwc-admin-notice button.notice-dismiss:focus {
-  outline: none;
-  box-shadow: 0 0 0 1px #5b9dd9, 0 0 2px 1px rgba(30, 140, 190, 0.8);
+	outline: none;
+	box-shadow: 0 0 0 1px #5b9dd9, 0 0 2px 1px rgba(30, 140, 190, 0.8);
 }
 
 /* Delete All Button Styles */
@@ -122,391 +122,391 @@
 
 /* Delete Button Hover State */
 .cfwc-delete-rule:hover {
-  color: #d63638;
-  border-color: #d63638;
+	color: #d63638;
+	border-color: #d63638;
 }
 
 /* Table Row Fade Effect */
 .cfwc-rules-table tbody tr {
-  transition: opacity 0.3s;
+	transition: opacity 0.3s;
 }
 
 /* Table Styling Improvements */
 .cfwc-rules-table table {
-  table-layout: fixed;
+	table-layout: fixed;
 }
 
 .cfwc-rules-table th,
 .cfwc-rules-table td {
-  padding: 10px;
-  vertical-align: middle;
+	padding: 10px;
+	vertical-align: middle;
 }
 
 /* Editing Row Styles */
 .cfwc-rule-editing {
-  background: #f0f8ff;
-  border: 1px solid #0073aa;
+	background: #f0f8ff;
+	border: 1px solid #0073aa;
 }
 
 .cfwc-rule-editing td {
-  padding: 10px 5px;
+	padding: 10px 5px;
 }
 
 .cfwc-rule-field {
-  width: 100%;
-  max-width: 100%;
+	width: 100%;
+	max-width: 100%;
 }
 
 /* WooCommerce Native Select2 Styling - Match WooCommerce exactly */
 .cfwc-rule-editing .wc-enhanced-select,
 .cfwc-country-select,
 .cfwc-origin-select {
-  min-width: 150px !important;
-  max-width: 100% !important;
-  width: 100% !important;
+	min-width: 150px !important;
+	max-width: 100% !important;
+	width: 100% !important;
 }
 
 /* Product Edit Page - Country of Origin Select2 */
 #_cfwc_country_of_origin {
-  width: 250px;
+	width: 250px;
 }
 
 /* Select2 Container for our field specifically */
 span[aria-labelledby="select2-_cfwc_country_of_origin-container"] {
-  width: 250px !important;
+	width: 250px !important;
 }
 
 /* Select2 Container - alternative selector */
 #_cfwc_country_of_origin + .select2-container {
-  width: 250px !important;
+	width: 250px !important;
 }
 
 /* The select2 dropdown for Country of Origin specifically */
 #select2-_cfwc_country_of_origin-results {
-  max-width: 250px !important;
+	max-width: 250px !important;
 }
 
 /* WooCommerce Snackbar Container - Align with Save button */
 .components-snackbar-list {
-  position: fixed;
-  bottom: 20px;
-  left: 180px; /* Align with Save changes button */
-  right: 20px;
-  display: flex;
-  justify-content: flex-start; /* Align to left like save button */
-  gap: 15px; /* Space between multiple notifications */
-  z-index: 100001; /* Above WP admin elements */
-  pointer-events: none; /* Allow clicking through container */
+	position: fixed;
+	bottom: 20px;
+	left: 180px; /* Align with Save changes button */
+	right: 20px;
+	display: flex;
+	justify-content: flex-start; /* Align to left like save button */
+	gap: 15px; /* Space between multiple notifications */
+	z-index: 100001; /* Above WP admin elements */
+	pointer-events: none; /* Allow clicking through container */
 }
 
 /* Adjust for collapsed admin menu */
 .folded .components-snackbar-list {
-  left: 56px; /* Collapsed menu width + padding */
+	left: 56px; /* Collapsed menu width + padding */
 }
 
 /* Mobile responsive */
 @media screen and (max-width: 782px) {
-  .components-snackbar-list {
-    left: 10px; /* Small padding on mobile */
-    right: 10px;
-  }
+	.components-snackbar-list {
+	left: 10px; /* Small padding on mobile */
+	right: 10px;
+	}
 }
 
 /* Auto-collapsed menu (960px-782px) */
 @media screen and (max-width: 960px) and (min-width: 783px) {
-  .auto-fold .components-snackbar-list {
-    left: 56px; /* Auto-collapsed menu width + padding */
-  }
+	.auto-fold .components-snackbar-list {
+	left: 56px; /* Auto-collapsed menu width + padding */
+	}
 }
 
 .components-snackbar-list .components-snackbar {
-  pointer-events: auto; /* But allow clicking snackbar itself */
-  max-width: 600px; /* Limit width for readability */
-  margin: 0; /* Reset any default margins */
+	pointer-events: auto; /* But allow clicking snackbar itself */
+	max-width: 600px; /* Limit width for readability */
+	margin: 0; /* Reset any default margins */
 }
 
 /* Ensure snackbar doesn't interfere with save button */
 .woocommerce-save-button {
-  position: relative;
-  z-index: 10;
+	position: relative;
+	z-index: 10;
 }
 
 /* Preset Select Styling */
 #cfwc-preset-select {
-  min-width: 200px;
+	min-width: 200px;
 }
 
 /* Rules Table - Stable Layout Solution */
 .cfwc-rules-section {
-  max-width: 100%;
-  overflow: visible;
+	max-width: 100%;
+	overflow: visible;
 }
 
 /* Table wrapper */
 .cfwc-rules-table-wrapper {
-  max-width: 100%;
-  overflow-x: auto;
-  margin: 0 0 10px 0;
-  /* Prevent viewport overflow */
-  position: relative;
+	max-width: 100%;
+	overflow-x: auto;
+	margin: 0 0 10px 0;
+	/* Prevent viewport overflow */
+	position: relative;
 }
 
 /* Main table styling */
 .cfwc-rules-table {
-  width: 100%;
-  table-layout: fixed; /* Critical: prevents column width changes */
-  border-collapse: collapse;
-  min-width: 700px; /* Minimum for readability */
+	width: 100%;
+	table-layout: fixed; /* Critical: prevents column width changes */
+	border-collapse: collapse;
+	min-width: 700px; /* Minimum for readability */
 }
 
 /* Fixed column widths - same for view and edit modes */
 .cfwc-rules-table th,
 .cfwc-rules-table td {
-  padding: 8px;
-  vertical-align: middle;
+	padding: 8px;
+	vertical-align: middle;
 }
 
 .cfwc-rules-table th:nth-child(1),
 .cfwc-rules-table td:nth-child(1) {
-  width: 18%; /* Label */
-  min-width: 120px;
+	width: 18%; /* Label */
+	min-width: 120px;
 }
 
 .cfwc-rules-table th:nth-child(2),
 .cfwc-rules-table td:nth-child(2) {
-  width: 18%; /* Destination */
-  min-width: 120px;
+	width: 18%; /* Destination */
+	min-width: 120px;
 }
 
 .cfwc-rules-table th:nth-child(3),
 .cfwc-rules-table td:nth-child(3) {
-  width: 18%; /* Origin */
-  min-width: 120px;
+	width: 18%; /* Origin */
+	min-width: 120px;
 }
 
 .cfwc-rules-table th:nth-child(4),
 .cfwc-rules-table td:nth-child(4) {
-  width: 12%; /* Type */
-  min-width: 90px;
+	width: 12%; /* Type */
+	min-width: 90px;
 }
 
 .cfwc-rules-table th:nth-child(5),
 .cfwc-rules-table td:nth-child(5) {
-  width: 14%; /* Rate/Amount */
-  min-width: 100px;
+	width: 14%; /* Rate/Amount */
+	min-width: 100px;
 }
 
 .cfwc-rules-table th:nth-child(6),
 .cfwc-rules-table td:nth-child(6) {
-  width: 20%; /* Actions */
-  min-width: 160px;
+	width: 20%; /* Actions */
+	min-width: 160px;
 }
 
 /* Normal row styling */
 .cfwc-rule-row td {
-  background: #fff;
-  transition: background-color 0.2s;
+	background: #fff;
+	transition: background-color 0.2s;
 }
 
 .cfwc-rule-row:hover td {
-  background: #f8f9fa;
+	background: #f8f9fa;
 }
 
 /* Edit row styling - prevent overflow */
 .cfwc-rule-editing {
-  background: #f0f6fc !important;
+	background: #f0f6fc !important;
 }
 
 .cfwc-rule-editing td {
-  padding: 6px 4px;
-  position: relative;
-  overflow: visible; /* Allow dropdowns to show */
+	padding: 6px 4px;
+	position: relative;
+	overflow: visible; /* Allow dropdowns to show */
 }
 
 /* Input fields - contained within cells */
 .cfwc-rule-editing input[type="text"],
 .cfwc-rule-editing input[type="number"] {
-  width: calc(100% - 4px);
-  max-width: 100%;
-  box-sizing: border-box;
-  padding: 4px 6px;
-  font-size: 13px;
-  border: 1px solid #8c8f94;
-  margin: 0;
+	width: calc(100% - 4px);
+	max-width: 100%;
+	box-sizing: border-box;
+	padding: 4px 6px;
+	font-size: 13px;
+	border: 1px solid #8c8f94;
+	margin: 0;
 }
 
 /* Regular select elements */
 .cfwc-rule-editing select:not(.select2-hidden-accessible) {
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-  padding: 4px;
-  font-size: 13px;
-  border: 1px solid #8c8f94;
+	width: 100%;
+	max-width: 100%;
+	box-sizing: border-box;
+	padding: 4px;
+	font-size: 13px;
+	border: 1px solid #8c8f94;
 }
 
 /* Select2 specific fixes */
 .cfwc-rule-editing .select2-container {
-  width: 100% !important;
-  max-width: 100% !important;
-  display: block !important;
-  box-sizing: border-box !important;
+	width: 100% !important;
+	max-width: 100% !important;
+	display: block !important;
+	box-sizing: border-box !important;
 }
 
 .cfwc-rule-editing .select2-container--default .select2-selection--single {
-  height: 28px;
-  line-height: 26px;
-  padding: 0 20px 0 5px;
-  font-size: 13px;
+	height: 28px;
+	line-height: 26px;
+	padding: 0 20px 0 5px;
+	font-size: 13px;
 }
 
 /* Prevent Select2 dropdown from causing overflow */
 .select2-container--open .select2-dropdown {
-  min-width: 200px !important;
-  max-width: 400px !important;
+	min-width: 200px !important;
+	max-width: 400px !important;
 }
 
 /* Custom class for our dropdowns */
 .cfwc-select2-dropdown {
-  max-width: 400px !important;
+	max-width: 400px !important;
 }
 
 /* Actions column */
 .cfwc-actions {
-  white-space: nowrap;
+	white-space: nowrap;
 }
 
 .cfwc-actions button {
-  margin: 0 2px;
-  padding: 3px 8px;
-  font-size: 12px;
+	margin: 0 2px;
+	padding: 3px 8px;
+	font-size: 12px;
 }
 
 /* Prevent layout shift when switching modes */
 .cfwc-rules-table tbody tr {
-  height: 38px; /* Fixed height to prevent jumping */
+	height: 38px; /* Fixed height to prevent jumping */
 }
 
 .cfwc-rule-editing {
-  height: auto; /* Allow edit row to be taller if needed */
+	height: auto; /* Allow edit row to be taller if needed */
 }
 
 /* No results row */
 .no-rules td {
-  text-align: center;
-  padding: 20px;
-  color: #646970;
-  font-style: italic;
+	text-align: center;
+	padding: 20px;
+	color: #646970;
+	font-style: italic;
 }
 
 /* Responsive behavior */
 @media screen and (max-width: 1024px) {
-  .cfwc-rules-table {
-    font-size: 12px;
-  }
+	.cfwc-rules-table {
+	font-size: 12px;
+	}
 
-  .cfwc-rules-table th,
-  .cfwc-rules-table td {
-    padding: 6px 4px;
-  }
+	.cfwc-rules-table th,
+	.cfwc-rules-table td {
+	padding: 6px 4px;
+	}
 
-  .cfwc-rule-editing input,
-  .cfwc-rule-editing select {
-    font-size: 12px;
-  }
+	.cfwc-rule-editing input,
+	.cfwc-rule-editing select {
+	font-size: 12px;
+	}
 }
 
 /* Preset Description */
 #cfwc-preset-description {
-  margin-top: 10px;
-  display: none;
+	margin-top: 10px;
+	display: none;
 }
 
 /* Rules Header Layout */
 .cfwc-rules-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-top: 30px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-  gap: 15px;
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	margin-top: 30px;
+	margin-bottom: 20px;
+	flex-wrap: wrap;
+	gap: 15px;
 }
 
 .cfwc-rules-header h3 {
-  margin: 0;
-  font-size: 1.3em;
+	margin: 0;
+	font-size: 1.3em;
 }
 
 .cfwc-rules-header p {
-  margin: 0;
-  color: #666;
-  font-size: 14px;
+	margin: 0;
+	color: #666;
+	font-size: 14px;
 }
 
 .cfwc-help-link-under {
-  color: #2271b1;
-  text-decoration: none;
-  font-size: 13px;
-  display: inline-flex;
-  align-items: center;
+	color: #2271b1;
+	text-decoration: none;
+	font-size: 13px;
+	display: inline-flex;
+	align-items: center;
 }
 
 .cfwc-help-link-under:hover {
-  color: #135e96;
-  text-decoration: none;
+	color: #135e96;
+	text-decoration: none;
 }
 
 .cfwc-help-link-under:hover .cfwc-help-text {
-  text-decoration: underline;
+	text-decoration: underline;
 }
 
 /* Add New Rule and Delete All Buttons when beside title */
 .cfwc-add-rule,
 .cfwc-delete-all {
-  white-space: nowrap;
+	white-space: nowrap;
 }
 
 .cfwc-add-rule:hover {
-  background: #f0f0f1;
-  border-color: #0a4b78;
-  color: #0a4b78;
+	background: #f0f0f1;
+	border-color: #0a4b78;
+	color: #0a4b78;
 }
 
 /* Delete All button styling */
 .cfwc-delete-all {
-  color: #d63638;
-  border-color: #d63638;
+	color: #d63638;
+	border-color: #d63638;
 }
 
 .cfwc-delete-all:hover:not(.confirm-delete) {
-  background: #fbeaea;
-  border-color: #d63638;
-  color: #d63638;
+	background: #fbeaea;
+	border-color: #d63638;
+	color: #d63638;
 }
 
 .cfwc-delete-all.confirm-delete {
-  background: #d63638 !important;
-  border-color: #d63638 !important;
-  color: #fff !important;
+	background: #d63638 !important;
+	border-color: #d63638 !important;
+	color: #fff !important;
 }
 
 /* Inline delete warning message */
 .cfwc-delete-warning {
-  margin-left: 10px;
-  color: #d63638;
-  font-weight: 600;
-  font-size: 13px;
-  animation: fadeIn 0.3s ease-in;
+	margin-left: 10px;
+	color: #d63638;
+	font-weight: 600;
+	font-size: 13px;
+	animation: fadeIn 0.3s ease-in;
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+	from {
+	opacity: 0;
+	}
+	to {
+	opacity: 1;
+	}
 }
 
 /* Help link icon removed for cleaner look */
@@ -515,152 +515,152 @@ span[aria-labelledby="select2-_cfwc_country_of_origin-container"] {
 
 /* Preset Button Styles */
 .cfwc-preset-loader button {
-  margin-right: 10px;
-  margin-bottom: 5px;
+	margin-right: 10px;
+	margin-bottom: 5px;
 }
 
 .cfwc-preset-loader .cfwc-replace-preset {
-  background: #2271b1;
-  border-color: #2271b1;
-  color: #fff;
+	background: #2271b1;
+	border-color: #2271b1;
+	color: #fff;
 }
 
 .cfwc-preset-loader .cfwc-replace-preset:hover:not(.confirm-replace) {
-  background: #135e96;
-  border-color: #135e96;
-  color: #fff;
+	background: #135e96;
+	border-color: #135e96;
+	color: #fff;
 }
 
 .cfwc-preset-loader .cfwc-replace-preset.confirm-replace {
-  background: #d63638 !important;
-  border-color: #d63638 !important;
-  color: #fff !important;
+	background: #d63638 !important;
+	border-color: #d63638 !important;
+	color: #fff !important;
 }
 
 .cfwc-preset-loader select,
 .cfwc-preset-loader .select2-container {
-  min-width: 280px;
-  margin-right: 10px;
+	min-width: 280px;
+	margin-right: 10px;
 }
 
 /* Style the Select2 container to match WooCommerce */
 .cfwc-preset-loader .select2-container .select2-selection--single {
-  height: 32px;
-  line-height: 30px;
+	height: 32px;
+	line-height: 30px;
 }
 
 .cfwc-preset-loader
-  .select2-container--default
-  .select2-selection--single
-  .select2-selection__rendered {
-  padding-left: 8px;
-  padding-right: 20px;
-  line-height: 30px;
+	.select2-container--default
+	.select2-selection--single
+	.select2-selection__rendered {
+	padding-left: 8px;
+	padding-right: 20px;
+	line-height: 30px;
 }
 
 .cfwc-preset-loader
-  .select2-container--default
-  .select2-selection--single
-  .select2-selection__arrow {
-  height: 30px;
+	.select2-container--default
+	.select2-selection--single
+	.select2-selection__arrow {
+	height: 30px;
 }
 
 /* Mobile Responsive Styles */
 @media screen and (max-width: 768px) {
-  /* Default Product Origin Section */
-  #cfwc_default_origin_select {
-    width: 100% !important;
-    margin-left: 0 !important;
-    margin-top: 10px;
-  }
+	/* Default Product Origin Section */
+	#cfwc_default_origin_select {
+	width: 100% !important;
+	margin-left: 0 !important;
+	margin-top: 10px;
+	}
 
-  /* Rules Header - Stack on mobile */
-  .cfwc-rules-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
+	/* Rules Header - Stack on mobile */
+	.cfwc-rules-header {
+	flex-direction: column;
+	align-items: flex-start;
+	}
 
-  .cfwc-add-rule,
-  .cfwc-delete-all {
-    width: auto;
-    min-width: 100px;
-    font-size: 13px;
-    padding: 3px 8px;
-  }
+	.cfwc-add-rule,
+	.cfwc-delete-all {
+	width: auto;
+	min-width: 100px;
+	font-size: 13px;
+	padding: 3px 8px;
+	}
 
-  /* Preset buttons responsive */
-  .cfwc-preset-loader {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
+	/* Preset buttons responsive */
+	.cfwc-preset-loader {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	}
 
-  .cfwc-preset-loader select,
-  .cfwc-preset-loader .select2-container {
-    width: 100% !important;
-    min-width: 0;
-    margin-right: 0;
-    margin-bottom: 10px;
-  }
+	.cfwc-preset-loader select,
+	.cfwc-preset-loader .select2-container {
+	width: 100% !important;
+	min-width: 0;
+	margin-right: 0;
+	margin-bottom: 10px;
+	}
 
-  .cfwc-preset-loader button {
-    width: 100%;
-    margin-right: 0;
-  }
+	.cfwc-preset-loader button {
+	width: 100%;
+	margin-right: 0;
+	}
 
-  /* Rules table - make it scrollable on mobile */
-  .cfwc-rules-table-wrapper {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
+	/* Rules table - make it scrollable on mobile */
+	.cfwc-rules-table-wrapper {
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+	}
 
-  .cfwc-rules-table {
-    min-width: 700px; /* Maintain minimum width for readability */
-  }
+	.cfwc-rules-table {
+	min-width: 700px; /* Maintain minimum width for readability */
+	}
 
-  /* Modal full screen on mobile */
-  .cfwc-modal-content {
-    width: 100%;
-    height: 100%;
-    max-width: none;
-    max-height: none;
-    border-radius: 0;
-    transform: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-  }
+	/* Modal full screen on mobile */
+	.cfwc-modal-content {
+	width: 100%;
+	height: 100%;
+	max-width: none;
+	max-height: none;
+	border-radius: 0;
+	transform: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	}
 
-  /* Form fields in rules */
-  .cfwc-rule-form input[type="text"],
-  .cfwc-rule-form input[type="number"],
-  .cfwc-rule-form select {
-    width: 100%;
-    margin-bottom: 5px;
-  }
+	/* Form fields in rules */
+	.cfwc-rule-form input[type="text"],
+	.cfwc-rule-form input[type="number"],
+	.cfwc-rule-form select {
+	width: 100%;
+	margin-bottom: 5px;
+	}
 
-  .cfwc-stacking-select {
-    width: 100%;
-  }
+	.cfwc-stacking-select {
+	width: 100%;
+	}
 }
 
 @media screen and (max-width: 480px) {
-  /* Even smaller screens */
-  .cfwc-rules-table {
-    font-size: 12px;
-  }
+	/* Even smaller screens */
+	.cfwc-rules-table {
+	font-size: 12px;
+	}
 
-  .cfwc-rules-table th,
-  .cfwc-rules-table td {
-    padding: 5px;
-  }
+	.cfwc-rules-table th,
+	.cfwc-rules-table td {
+	padding: 5px;
+	}
 
-  .cfwc-help-link-under {
-    font-size: 12px;
-  }
+	.cfwc-help-link-under {
+	font-size: 12px;
+	}
 
-  .button {
-    padding: 5px 10px;
-    font-size: 13px;
-  }
+	.button {
+	padding: 5px 10px;
+	font-size: 13px;
+	}
 }

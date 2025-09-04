@@ -56,6 +56,8 @@ class CFWC_Blocks {
 	 * @return void
 	 */
 	public function update_order_from_request( $order, $request ) {
+		// $request is required by the hook signature but is not used here.
+		unset( $request );
 		// Get customs fees from session.
 		$customs_fees = WC()->session->get( 'cfwc_customs_fees', array() );
 

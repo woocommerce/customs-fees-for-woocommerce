@@ -80,7 +80,7 @@ class CFWC_Templates {
 				'name'        => __( 'China to US Import Tariffs (2025)', 'customs-fees-for-woocommerce' ),
 				'description' => __( '⚠️ COMPLETE PRESET: Clear existing rules before applying! This preset includes ALL China→US tariffs (Section 301, 232, fentanyl). No additional US import rules needed.', 'customs-fees-for-woocommerce' ),
 				'rules'       => array(
-					// Apparel/Clothing - 7.5% to 70% (Section 301 + baseline, particularly high ~69%)
+					// Apparel/Clothing - 7.5% to 70% (Section 301 + baseline, particularly high ~69%).
 					array(
 						'from_country'    => 'CN',
 						'to_country'      => 'US',
@@ -94,7 +94,7 @@ class CFWC_Templates {
 						'taxable'         => true,
 						'tax_class'       => '',
 					),
-					// Electronics - 0% to 50% (some exemptions apply)
+					// Electronics - 0% to 50% (some exemptions apply).
 					array(
 						'from_country'    => 'CN',
 						'to_country'      => 'US',
@@ -108,7 +108,7 @@ class CFWC_Templates {
 						'taxable'         => true,
 						'tax_class'       => '',
 					),
-					// Solar Cells/Equipment & Semiconductors - 50%
+					// Solar Cells/Equipment & Semiconductors - 50%.
 					array(
 						'from_country'    => 'CN',
 						'to_country'      => 'US',
@@ -122,7 +122,7 @@ class CFWC_Templates {
 						'taxable'         => true,
 						'tax_class'       => '',
 					),
-					// Electric Vehicles - 100%
+					// Electric Vehicles - 100%.
 					array(
 						'from_country'    => 'CN',
 						'to_country'      => 'US',
@@ -136,7 +136,7 @@ class CFWC_Templates {
 						'taxable'         => true,
 						'tax_class'       => '',
 					),
-					// Auto Parts - 25%
+					// Auto Parts - 25%.
 					array(
 						'from_country'    => 'CN',
 						'to_country'      => 'US',
@@ -150,7 +150,7 @@ class CFWC_Templates {
 						'taxable'         => true,
 						'tax_class'       => '',
 					),
-					// Steel Products - 25% to 50% (Section 232)
+					// Steel Products - 25% to 50% (Section 232).
 					array(
 						'from_country'    => 'CN',
 						'to_country'      => 'US',
@@ -164,7 +164,7 @@ class CFWC_Templates {
 						'taxable'         => true,
 						'tax_class'       => '',
 					),
-					// Aluminum Products - 25% to 50% (Section 232)
+					// Aluminum Products - 25% to 50% (Section 232).
 					array(
 						'from_country'    => 'CN',
 						'to_country'      => 'US',
@@ -178,7 +178,7 @@ class CFWC_Templates {
 						'taxable'         => true,
 						'tax_class'       => '',
 					),
-					// Batteries (Non-lithium and Lithium) - 25%
+					// Batteries (Non-lithium and Lithium) - 25%.
 					array(
 						'from_country'    => 'CN',
 						'to_country'      => 'US',
@@ -192,7 +192,7 @@ class CFWC_Templates {
 						'taxable'         => true,
 						'tax_class'       => '',
 					),
-					// Medical Devices - Syringes/Needles 50%, Medical Gloves 25%
+					// Medical Devices - Syringes/Needles 50%, Medical Gloves 25%.
 					array(
 						'from_country'    => 'CN',
 						'to_country'      => 'US',
@@ -206,7 +206,7 @@ class CFWC_Templates {
 						'taxable'         => true,
 						'tax_class'       => '',
 					),
-					// Consumer Appliances - 25% to 50%
+					// Consumer Appliances - 25% to 50%.
 					array(
 						'from_country'    => 'CN',
 						'to_country'      => 'US',
@@ -220,7 +220,7 @@ class CFWC_Templates {
 						'taxable'         => true,
 						'tax_class'       => '',
 					),
-					// Footwear - 7.5% to 15%
+					// Footwear - 7.5% to 15%.
 					array(
 						'from_country'    => 'CN',
 						'to_country'      => 'US',
@@ -234,7 +234,7 @@ class CFWC_Templates {
 						'taxable'         => true,
 						'tax_class'       => '',
 					),
-					// Leather goods and bags - 25%
+					// Leather goods and bags - 25%.
 					array(
 						'from_country'    => 'CN',
 						'to_country'      => 'US',
@@ -248,7 +248,7 @@ class CFWC_Templates {
 						'taxable'         => true,
 						'tax_class'       => '',
 					),
-					// Toys and Games - 7.5% to 25%
+					// Toys and Games - 7.5% to 25%.
 					array(
 						'from_country'    => 'CN',
 						'to_country'      => 'US',
@@ -262,7 +262,7 @@ class CFWC_Templates {
 						'taxable'         => true,
 						'tax_class'       => '',
 					),
-					// Chemical Products - 25%
+					// Chemical Products - 25%.
 					array(
 						'from_country'    => 'CN',
 						'to_country'      => 'US',
@@ -276,7 +276,7 @@ class CFWC_Templates {
 						'taxable'         => true,
 						'tax_class'       => '',
 					),
-					// General baseline (MFN) - ~7% (fallback for unspecified products)
+					// General baseline (MFN) - ~7% (fallback for unspecified products).
 					array(
 						'from_country'  => 'CN',
 						'to_country'    => 'US',
@@ -292,7 +292,7 @@ class CFWC_Templates {
 				),
 			),
 
-			// US Reciprocal Tariffs - Major Trading Partners
+			// US Reciprocal Tariffs - Major Trading Partners.
 			'us_india_tariff'          => array(
 				'name'        => __( 'India to US (25%)', 'customs-fees-for-woocommerce' ),
 				'description' => __( 'US reciprocal tariff for goods from India - 25%', 'customs-fees-for-woocommerce' ),
@@ -311,12 +311,12 @@ class CFWC_Templates {
 				),
 			),
 
-			// EU-US Trade Agreement (August 2025) - All 27 EU Member States
+			// EU-US Trade Agreement (August 2025) - All 27 EU Member States.
 			'eu_all_to_us'             => array(
 				'name'        => __( 'EU to US Import Tariffs (2025 Agreement)', 'customs-fees-for-woocommerce' ),
 				'description' => __( '⚠️ COMPLETE EU PRESET: 15% tariff on all 27 EU member states per Aug 2025 trade agreement. Special handling for cars, semiconductors, pharmaceuticals. Aircraft parts and generic pharma exempt.', 'customs-fees-for-woocommerce' ),
 				'rules'       => array(
-					// Germany
+					// Germany.
 					array(
 						'from_country'  => 'DE',
 						'to_country'    => 'US',
@@ -328,7 +328,7 @@ class CFWC_Templates {
 						'label'         => __( 'US-EU Tariff (Germany)', 'customs-fees-for-woocommerce' ),
 						'taxable'       => true,
 					),
-					// France
+					// France.
 					array(
 						'from_country'  => 'FR',
 						'to_country'    => 'US',
@@ -340,7 +340,7 @@ class CFWC_Templates {
 						'label'         => __( 'US-EU Tariff (France)', 'customs-fees-for-woocommerce' ),
 						'taxable'       => true,
 					),
-					// Italy
+					// Italy.
 					array(
 						'from_country'  => 'IT',
 						'to_country'    => 'US',
@@ -352,7 +352,7 @@ class CFWC_Templates {
 						'label'         => __( 'US-EU Tariff (Italy)', 'customs-fees-for-woocommerce' ),
 						'taxable'       => true,
 					),
-					// Spain
+					// Spain.
 					array(
 						'from_country'  => 'ES',
 						'to_country'    => 'US',
@@ -364,7 +364,7 @@ class CFWC_Templates {
 						'label'         => __( 'US-EU Tariff (Spain)', 'customs-fees-for-woocommerce' ),
 						'taxable'       => true,
 					),
-					// Netherlands
+					// Netherlands.
 					array(
 						'from_country'  => 'NL',
 						'to_country'    => 'US',
@@ -376,7 +376,7 @@ class CFWC_Templates {
 						'label'         => __( 'US-EU Tariff (Netherlands)', 'customs-fees-for-woocommerce' ),
 						'taxable'       => true,
 					),
-					// Belgium
+					// Belgium.
 					array(
 						'from_country'  => 'BE',
 						'to_country'    => 'US',
@@ -388,7 +388,7 @@ class CFWC_Templates {
 						'label'         => __( 'US-EU Tariff (Belgium)', 'customs-fees-for-woocommerce' ),
 						'taxable'       => true,
 					),
-					// Poland
+					// Poland.
 					array(
 						'from_country'  => 'PL',
 						'to_country'    => 'US',
@@ -400,7 +400,7 @@ class CFWC_Templates {
 						'label'         => __( 'US-EU Tariff (Poland)', 'customs-fees-for-woocommerce' ),
 						'taxable'       => true,
 					),
-					// Austria
+					// Austria.
 					array(
 						'from_country'  => 'AT',
 						'to_country'    => 'US',
@@ -412,7 +412,7 @@ class CFWC_Templates {
 						'label'         => __( 'US-EU Tariff (Austria)', 'customs-fees-for-woocommerce' ),
 						'taxable'       => true,
 					),
-					// Sweden
+					// Sweden.
 					array(
 						'from_country'  => 'SE',
 						'to_country'    => 'US',
@@ -424,7 +424,7 @@ class CFWC_Templates {
 						'label'         => __( 'US-EU Tariff (Sweden)', 'customs-fees-for-woocommerce' ),
 						'taxable'       => true,
 					),
-					// Denmark
+					// Denmark.
 					array(
 						'from_country'  => 'DK',
 						'to_country'    => 'US',
@@ -436,7 +436,7 @@ class CFWC_Templates {
 						'label'         => __( 'US-EU Tariff (Denmark)', 'customs-fees-for-woocommerce' ),
 						'taxable'       => true,
 					),
-					// Finland
+					// Finland.
 					array(
 						'from_country'  => 'FI',
 						'to_country'    => 'US',
@@ -448,7 +448,7 @@ class CFWC_Templates {
 						'label'         => __( 'US-EU Tariff (Finland)', 'customs-fees-for-woocommerce' ),
 						'taxable'       => true,
 					),
-					// Ireland
+					// Ireland.
 					array(
 						'from_country'  => 'IE',
 						'to_country'    => 'US',
@@ -460,7 +460,7 @@ class CFWC_Templates {
 						'label'         => __( 'US-EU Tariff (Ireland)', 'customs-fees-for-woocommerce' ),
 						'taxable'       => true,
 					),
-					// Portugal
+					// Portugal.
 					array(
 						'from_country'  => 'PT',
 						'to_country'    => 'US',
@@ -472,7 +472,7 @@ class CFWC_Templates {
 						'label'         => __( 'US-EU Tariff (Portugal)', 'customs-fees-for-woocommerce' ),
 						'taxable'       => true,
 					),
-					// Greece
+					// Greece.
 					array(
 						'from_country'  => 'GR',
 						'to_country'    => 'US',
@@ -484,7 +484,7 @@ class CFWC_Templates {
 						'label'         => __( 'US-EU Tariff (Greece)', 'customs-fees-for-woocommerce' ),
 						'taxable'       => true,
 					),
-					// Czech Republic
+					// Czech Republic.
 					array(
 						'from_country'  => 'CZ',
 						'to_country'    => 'US',
@@ -496,7 +496,7 @@ class CFWC_Templates {
 						'label'         => __( 'US-EU Tariff (Czech Rep.)', 'customs-fees-for-woocommerce' ),
 						'taxable'       => true,
 					),
-					// Hungary
+					// Hungary.
 					array(
 						'from_country'  => 'HU',
 						'to_country'    => 'US',
@@ -508,7 +508,7 @@ class CFWC_Templates {
 						'label'         => __( 'US-EU Tariff (Hungary)', 'customs-fees-for-woocommerce' ),
 						'taxable'       => true,
 					),
-					// Romania
+					// Romania.
 					array(
 						'from_country'  => 'RO',
 						'to_country'    => 'US',
@@ -520,7 +520,7 @@ class CFWC_Templates {
 						'label'         => __( 'US-EU Tariff (Romania)', 'customs-fees-for-woocommerce' ),
 						'taxable'       => true,
 					),
-					// Bulgaria
+					// Bulgaria.
 					array(
 						'from_country'  => 'BG',
 						'to_country'    => 'US',
@@ -532,7 +532,7 @@ class CFWC_Templates {
 						'label'         => __( 'US-EU Tariff (Bulgaria)', 'customs-fees-for-woocommerce' ),
 						'taxable'       => true,
 					),
-					// Slovakia
+					// Slovakia.
 					array(
 						'from_country'  => 'SK',
 						'to_country'    => 'US',
@@ -544,7 +544,7 @@ class CFWC_Templates {
 						'label'         => __( 'US-EU Tariff (Slovakia)', 'customs-fees-for-woocommerce' ),
 						'taxable'       => true,
 					),
-					// Croatia
+					// Croatia.
 					array(
 						'from_country'  => 'HR',
 						'to_country'    => 'US',
@@ -556,7 +556,7 @@ class CFWC_Templates {
 						'label'         => __( 'US-EU Tariff (Croatia)', 'customs-fees-for-woocommerce' ),
 						'taxable'       => true,
 					),
-					// Slovenia
+					// Slovenia.
 					array(
 						'from_country'  => 'SI',
 						'to_country'    => 'US',
@@ -568,7 +568,7 @@ class CFWC_Templates {
 						'label'         => __( 'US-EU Tariff (Slovenia)', 'customs-fees-for-woocommerce' ),
 						'taxable'       => true,
 					),
-					// Lithuania
+					// Lithuania.
 					array(
 						'from_country'  => 'LT',
 						'to_country'    => 'US',
@@ -580,7 +580,7 @@ class CFWC_Templates {
 						'label'         => __( 'US-EU Tariff (Lithuania)', 'customs-fees-for-woocommerce' ),
 						'taxable'       => true,
 					),
-					// Latvia
+					// Latvia.
 					array(
 						'from_country'  => 'LV',
 						'to_country'    => 'US',
@@ -592,7 +592,7 @@ class CFWC_Templates {
 						'label'         => __( 'US-EU Tariff (Latvia)', 'customs-fees-for-woocommerce' ),
 						'taxable'       => true,
 					),
-					// Estonia
+					// Estonia.
 					array(
 						'from_country'  => 'EE',
 						'to_country'    => 'US',
@@ -604,7 +604,7 @@ class CFWC_Templates {
 						'label'         => __( 'US-EU Tariff (Estonia)', 'customs-fees-for-woocommerce' ),
 						'taxable'       => true,
 					),
-					// Luxembourg
+					// Luxembourg.
 					array(
 						'from_country'  => 'LU',
 						'to_country'    => 'US',
@@ -616,7 +616,7 @@ class CFWC_Templates {
 						'label'         => __( 'US-EU Tariff (Luxembourg)', 'customs-fees-for-woocommerce' ),
 						'taxable'       => true,
 					),
-					// Cyprus
+					// Cyprus.
 					array(
 						'from_country'  => 'CY',
 						'to_country'    => 'US',
@@ -628,7 +628,7 @@ class CFWC_Templates {
 						'label'         => __( 'US-EU Tariff (Cyprus)', 'customs-fees-for-woocommerce' ),
 						'taxable'       => true,
 					),
-					// Malta
+					// Malta.
 					array(
 						'from_country'  => 'MT',
 						'to_country'    => 'US',
@@ -712,7 +712,7 @@ class CFWC_Templates {
 				),
 			),
 
-			// Southeast Asian Countries
+			// Southeast Asian Countries.
 			'us_vietnam_tariff'        => array(
 				'name'        => __( 'Vietnam to US (20%)', 'customs-fees-for-woocommerce' ),
 				'description' => __( 'US reciprocal tariff for goods from Vietnam - 20%', 'customs-fees-for-woocommerce' ),
@@ -765,7 +765,7 @@ class CFWC_Templates {
 				),
 			),
 
-			// South Asian Countries
+			// South Asian Countries.
 			'us_bangladesh_tariff'     => array(
 				'name'        => __( 'Bangladesh to US (20%)', 'customs-fees-for-woocommerce' ),
 				'description' => __( 'US reciprocal tariff for goods from Bangladesh - 20%', 'customs-fees-for-woocommerce' ),
@@ -801,7 +801,7 @@ class CFWC_Templates {
 				),
 			),
 
-			// East Asian Countries
+			// East Asian Countries.
 			'us_south_korea_tariff'    => array(
 				'name'        => __( 'South Korea to US (15%)', 'customs-fees-for-woocommerce' ),
 				'description' => __( 'US reciprocal tariff for goods from South Korea - 15%', 'customs-fees-for-woocommerce' ),
@@ -837,7 +837,7 @@ class CFWC_Templates {
 				),
 			),
 
-			// Middle Eastern Countries
+			// Middle Eastern Countries.
 			'us_turkey_tariff'         => array(
 				'name'        => __( 'Turkey to US (15%)', 'customs-fees-for-woocommerce' ),
 				'description' => __( 'US reciprocal tariff for goods from Turkey - 15%', 'customs-fees-for-woocommerce' ),
@@ -873,7 +873,7 @@ class CFWC_Templates {
 				),
 			),
 
-			// African Countries
+			// African Countries.
 			'us_south_africa_tariff'   => array(
 				'name'        => __( 'South Africa to US (30%)', 'customs-fees-for-woocommerce' ),
 				'description' => __( 'US reciprocal tariff for goods from South Africa - 30%', 'customs-fees-for-woocommerce' ),
@@ -909,7 +909,7 @@ class CFWC_Templates {
 				),
 			),
 
-			// Pacific Countries
+			// Pacific Countries.
 			'us_new_zealand_tariff'    => array(
 				'name'        => __( 'New Zealand to US (15%)', 'customs-fees-for-woocommerce' ),
 				'description' => __( 'US reciprocal tariff for goods from New Zealand - 15%', 'customs-fees-for-woocommerce' ),
@@ -934,7 +934,7 @@ class CFWC_Templates {
 				'rules'       => array(
 					array(
 						'country'        => 'GB',
-						'origin_country' => '',  // Applies to all origins
+						'origin_country' => '',  // Applies to all origins.
 						'type'           => 'percentage',
 						'rate'           => 20,
 						'amount'         => 0,
@@ -944,7 +944,7 @@ class CFWC_Templates {
 					),
 					array(
 						'country'        => 'GB',
-						'origin_country' => '',  // Applies to all origins
+						'origin_country' => '',  // Applies to all origins.
 						'type'           => 'percentage',
 						'rate'           => 5,
 						'amount'         => 0,
@@ -960,7 +960,7 @@ class CFWC_Templates {
 				'rules'       => array(
 					array(
 						'country'        => 'CA',
-						'origin_country' => '',  // Applies to all origins
+						'origin_country' => '',  // Applies to all origins.
 						'type'           => 'percentage',
 						'rate'           => 5,
 						'amount'         => 0,
@@ -970,7 +970,7 @@ class CFWC_Templates {
 					),
 					array(
 						'country'        => 'CA',
-						'origin_country' => '',  // Applies to all origins
+						'origin_country' => '',  // Applies to all origins.
 						'type'           => 'percentage',
 						'rate'           => 8,
 						'amount'         => 0,
@@ -981,7 +981,7 @@ class CFWC_Templates {
 				),
 			),
 
-			// Multi-Country Groups
+			// Multi-Country Groups.
 			'us_high_tariff_countries' => array(
 				'name'        => __( 'US High Tariff Countries (30%+)', 'customs-fees-for-woocommerce' ),
 				'description' => __( 'Countries with 30% or higher US reciprocal tariffs', 'customs-fees-for-woocommerce' ),
@@ -989,7 +989,7 @@ class CFWC_Templates {
 					array(
 						'from_country' => 'CH',
 
-						'to_country'   => 'US',  // Switzerland - 39%
+						'to_country'   => 'US',  // Switzerland - 39%.
 						'type'         => 'percentage',
 						'rate'         => 39,
 						'amount'       => 0,
@@ -1000,7 +1000,7 @@ class CFWC_Templates {
 					array(
 						'from_country' => 'SY',
 
-						'to_country'   => 'US',  // Syria - 41%
+						'to_country'   => 'US',  // Syria - 41%.
 						'type'         => 'percentage',
 						'rate'         => 41,
 						'amount'       => 0,
@@ -1011,7 +1011,7 @@ class CFWC_Templates {
 					array(
 						'from_country' => 'MM',
 
-						'to_country'   => 'US',  // Myanmar - 40%
+						'to_country'   => 'US',  // Myanmar - 40%.
 						'type'         => 'percentage',
 						'rate'         => 40,
 						'amount'       => 0,
@@ -1022,7 +1022,7 @@ class CFWC_Templates {
 					array(
 						'from_country' => 'LA',
 
-						'to_country'   => 'US',  // Laos - 40%
+						'to_country'   => 'US',  // Laos - 40%.
 						'type'         => 'percentage',
 						'rate'         => 40,
 						'amount'       => 0,
@@ -1033,7 +1033,7 @@ class CFWC_Templates {
 					array(
 						'from_country' => 'IQ',
 
-						'to_country'   => 'US',  // Iraq - 35%
+						'to_country'   => 'US',  // Iraq - 35%.
 						'type'         => 'percentage',
 						'rate'         => 35,
 						'amount'       => 0,
@@ -1044,7 +1044,7 @@ class CFWC_Templates {
 					array(
 						'from_country' => 'RS',
 
-						'to_country'   => 'US',  // Serbia - 35%
+						'to_country'   => 'US',  // Serbia - 35%.
 						'type'         => 'percentage',
 						'rate'         => 35,
 						'amount'       => 0,
@@ -1055,7 +1055,7 @@ class CFWC_Templates {
 					array(
 						'from_country' => 'DZ',
 
-						'to_country'   => 'US',  // Algeria - 30%
+						'to_country'   => 'US',  // Algeria - 30%.
 						'type'         => 'percentage',
 						'rate'         => 30,
 						'amount'       => 0,
@@ -1066,7 +1066,7 @@ class CFWC_Templates {
 					array(
 						'from_country' => 'BA',
 
-						'to_country'   => 'US',  // Bosnia and Herzegovina - 30%
+						'to_country'   => 'US',  // Bosnia and Herzegovina - 30%.
 						'type'         => 'percentage',
 						'rate'         => 30,
 						'amount'       => 0,
@@ -1077,7 +1077,7 @@ class CFWC_Templates {
 					array(
 						'from_country' => 'LY',
 
-						'to_country'   => 'US',  // Libya - 30%
+						'to_country'   => 'US',  // Libya - 30%.
 						'type'         => 'percentage',
 						'rate'         => 30,
 						'amount'       => 0,
@@ -1095,7 +1095,7 @@ class CFWC_Templates {
 					array(
 						'from_country' => 'VN',
 
-						'to_country'   => 'US',  // Vietnam - 20%
+						'to_country'   => 'US',  // Vietnam - 20%.
 						'type'         => 'percentage',
 						'rate'         => 20,
 						'amount'       => 0,
@@ -1106,7 +1106,7 @@ class CFWC_Templates {
 					array(
 						'from_country' => 'TH',
 
-						'to_country'   => 'US',  // Thailand - 19%
+						'to_country'   => 'US',  // Thailand - 19%.
 						'type'         => 'percentage',
 						'rate'         => 19,
 						'amount'       => 0,
@@ -1117,7 +1117,7 @@ class CFWC_Templates {
 					array(
 						'from_country' => 'MY',
 
-						'to_country'   => 'US',  // Malaysia - 19%
+						'to_country'   => 'US',  // Malaysia - 19%.
 						'type'         => 'percentage',
 						'rate'         => 19,
 						'amount'       => 0,
@@ -1128,7 +1128,7 @@ class CFWC_Templates {
 					array(
 						'from_country' => 'ID',
 
-						'to_country'   => 'US',  // Indonesia - 19%
+						'to_country'   => 'US',  // Indonesia - 19%.
 						'type'         => 'percentage',
 						'rate'         => 19,
 						'amount'       => 0,
@@ -1139,7 +1139,7 @@ class CFWC_Templates {
 					array(
 						'from_country' => 'PH',
 
-						'to_country'   => 'US',  // Philippines - 19%
+						'to_country'   => 'US',  // Philippines - 19%.
 						'type'         => 'percentage',
 						'rate'         => 19,
 						'amount'       => 0,
@@ -1150,7 +1150,7 @@ class CFWC_Templates {
 					array(
 						'from_country' => 'KH',
 
-						'to_country'   => 'US',  // Cambodia - 19%
+						'to_country'   => 'US',  // Cambodia - 19%.
 						'type'         => 'percentage',
 						'rate'         => 19,
 						'amount'       => 0,
@@ -1161,7 +1161,7 @@ class CFWC_Templates {
 					array(
 						'from_country' => 'BN',
 
-						'to_country'   => 'US',  // Brunei - 25%
+						'to_country'   => 'US',  // Brunei - 25%.
 						'type'         => 'percentage',
 						'rate'         => 25,
 						'amount'       => 0,
@@ -1178,7 +1178,7 @@ class CFWC_Templates {
 				'rules'       => array(
 					array(
 						'country'        => 'AU',
-						'origin_country' => '',  // Applies to all origins
+						'origin_country' => '',  // Applies to all origins.
 						'type'           => 'percentage',
 						'rate'           => 10,
 						'amount'         => 0,
@@ -1248,7 +1248,7 @@ class CFWC_Templates {
 		$duplicate_count = 0;
 
 		if ( $append ) {
-			// Check for duplicates when appending
+			// Check for duplicates when appending.
 			$rules = $existing_rules;
 
 			foreach ( $template['rules'] as $new_rule ) {
@@ -1270,7 +1270,7 @@ class CFWC_Templates {
 					$existing_match_type = $existing_rule['match_type'] ?? 'all';
 					$new_match_type      = $new_rule['match_type'] ?? 'all';
 
-					// Check for exact duplicate
+					// Check for exact duplicate.
 					if ( $existing_from === $new_from &&
 						$existing_to === $new_to &&
 						$existing_rule['label'] === $new_rule['label'] ) {
@@ -1279,11 +1279,11 @@ class CFWC_Templates {
 						break;
 					}
 
-					// Check for conflicting general rules (both applying to all products from all origins)
+					// Check for conflicting general rules (both applying to all products from all origins).
 					if ( empty( $existing_from ) && empty( $new_from ) &&
 						$new_to === $existing_to &&
 						'all' === $existing_match_type && 'all' === $new_match_type ) {
-						// Two general rules for the same destination - skip the new one
+						// Two general rules for the same destination - skip the new one.
 						$is_duplicate = true;
 						++$duplicate_count;
 						break;
@@ -1296,7 +1296,7 @@ class CFWC_Templates {
 				}
 			}
 		} else {
-			// Replace all rules
+			// Replace all rules.
 			$rules       = $template['rules'];
 			$added_count = count( $template['rules'] );
 		}
@@ -1334,7 +1334,7 @@ class CFWC_Templates {
 		$result = $this->apply_template( $template_id, $append );
 
 		if ( $result && is_array( $result ) ) {
-			// Build appropriate message based on results
+			// Build appropriate message based on results.
 			$message = '';
 
 			if ( $append ) {

@@ -6,170 +6,170 @@
  */
 
 /* ==========================================================================
-   Tooltips
-   ========================================================================== */
+	Tooltips
+	========================================================================== */
 
 .cfwc-tooltip {
-  position: relative;
-  display: inline-block;
-  cursor: help;
-  margin-left: 5px;
+	position: relative;
+	display: inline-block;
+	cursor: help;
+	margin-left: 5px;
 }
 
 .cfwc-tooltip .cfwc-tooltip-icon {
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  line-height: 16px;
-  text-align: center;
-  background: #2271b1;
-  color: #fff;
-  border-radius: 50%;
-  font-size: 11px;
-  font-weight: bold;
-  cursor: help;
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	line-height: 16px;
+	text-align: center;
+	background: #2271b1;
+	color: #fff;
+	border-radius: 50%;
+	font-size: 11px;
+	font-weight: bold;
+	cursor: help;
 }
 
 .cfwc-tooltip .cfwc-tooltip-text {
-  visibility: hidden;
-  width: 250px;
-  background-color: #333;
-  color: #fff;
-  text-align: left;
-  border-radius: 4px;
-  padding: 10px;
-  position: absolute;
-  z-index: 999999;
-  bottom: 125%;
-  left: 50%;
-  margin-left: -125px;
-  opacity: 0;
-  transition: opacity 0.3s;
-  font-size: 13px;
-  line-height: 1.4;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+	visibility: hidden;
+	width: 250px;
+	background-color: #333;
+	color: #fff;
+	text-align: left;
+	border-radius: 4px;
+	padding: 10px;
+	position: absolute;
+	z-index: 999999;
+	bottom: 125%;
+	left: 50%;
+	margin-left: -125px;
+	opacity: 0;
+	transition: opacity 0.3s;
+	font-size: 13px;
+	line-height: 1.4;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .cfwc-tooltip .cfwc-tooltip-text::after {
-  content: "";
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  margin-left: -5px;
-  border-width: 5px;
-  border-style: solid;
-  border-color: #333 transparent transparent transparent;
+	content: "";
+	position: absolute;
+	top: 100%;
+	left: 50%;
+	margin-left: -5px;
+	border-width: 5px;
+	border-style: solid;
+	border-color: #333 transparent transparent transparent;
 }
 
 .cfwc-tooltip:hover .cfwc-tooltip-text {
-  visibility: visible;
-  opacity: 1;
+	visibility: visible;
+	opacity: 1;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-  .cfwc-tooltip .cfwc-tooltip-text {
-    width: 200px;
-    margin-left: -100px;
-  }
+	.cfwc-tooltip .cfwc-tooltip-text {
+	width: 200px;
+	margin-left: -100px;
+	}
 }
 
 /* ==========================================================================
-   Fees Breakdown Display
-   ========================================================================== */
+	Fees Breakdown Display
+	========================================================================== */
 
 .cfwc-fees-summary {
-  margin: 10px 0;
-  padding: 10px;
-  background: #f5f5f5;
-  border-left: 3px solid #2271b1;
-  border-radius: 3px;
+	margin: 10px 0;
+	padding: 10px;
+	background: #f5f5f5;
+	border-left: 3px solid #2271b1;
+	border-radius: 3px;
 }
 
 .cfwc-fees-breakdown,
 .cfwc-fees-summary ul {
-  margin: 5px 0;
-  padding: 0;
-  list-style: none;
+	margin: 5px 0;
+	padding: 0;
+	list-style: none;
 }
 
 .cfwc-fee-item {
-  padding: 5px 0;
-  display: flex;
-  justify-content: space-between;
-  border-bottom: 1px dotted #ddd;
+	padding: 5px 0;
+	display: flex;
+	justify-content: space-between;
+	border-bottom: 1px dotted #ddd;
 }
 
 .cfwc-fee-item:last-child {
-  border-bottom: none;
+	border-bottom: none;
 }
 
 .cfwc-fee-label {
-  color: #666;
-  flex: 1;
+	color: #666;
+	flex: 1;
 }
 
 .cfwc-fee-amount {
-  font-weight: 600;
-  color: #333;
+	font-weight: 600;
+	color: #333;
 }
 
 /* Cart and Checkout Display */
 .woocommerce-cart .cfwc-fees-breakdown,
 .woocommerce-checkout .cfwc-fees-breakdown {
-  font-size: 0.9em;
-  color: #666;
+	font-size: 0.9em;
+	color: #666;
 }
 
 /* ==========================================================================
-   Order Pages Styles
-   ========================================================================== */
+	Order Pages Styles
+	========================================================================== */
 
 /* Order received page */
 .woocommerce-order-received .cfwc-fees-breakdown {
-  background: #f9f9f9;
-  padding: 10px;
-  border-radius: 3px;
-  margin: 10px 0;
+	background: #f9f9f9;
+	padding: 10px;
+	border-radius: 3px;
+	margin: 10px 0;
 }
 
 /* My Account order details */
 .woocommerce-MyAccount-content .cfwc-fees-breakdown {
-  background: transparent;
-  padding: 5px 0;
+	background: transparent;
+	padding: 5px 0;
 }
 
 /* Order emails */
 .cfwc-email-fees {
-  background: #f5f5f5;
-  padding: 15px;
-  margin: 20px 0;
-  border-left: 3px solid #2271b1;
+	background: #f5f5f5;
+	padding: 15px;
+	margin: 20px 0;
+	border-left: 3px solid #2271b1;
 }
 
 .cfwc-email-fees h3 {
-  margin-top: 0;
-  color: #2271b1;
-  font-size: 16px;
+	margin-top: 0;
+	color: #2271b1;
+	font-size: 16px;
 }
 
 .cfwc-email-fees ul {
-  list-style: none;
-  padding: 0;
-  margin: 10px 0;
+	list-style: none;
+	padding: 0;
+	margin: 10px 0;
 }
 
 .cfwc-email-fees li {
-  padding: 5px 0;
-  border-bottom: 1px dotted #ddd;
+	padding: 5px 0;
+	border-bottom: 1px dotted #ddd;
 }
 
 .cfwc-email-fees li:last-child {
-  border-bottom: none;
-  padding-top: 10px;
-  font-weight: bold;
-  border-top: 2px solid #ddd;
-  margin-top: 5px;
+	border-bottom: none;
+	padding-top: 10px;
+	font-weight: bold;
+	border-top: 2px solid #ddd;
+	margin-top: 5px;
 }
 
 /* Fees breakdown on order pages - FIXED STYLING */
@@ -180,10 +180,10 @@ ul.cfwc-fees-breakdown,
 .woocommerce table.shop_table .cfwc-fees-breakdown,
 .woocommerce-order .cfwc-fees-breakdown,
 .woocommerce-account .cfwc-fees-breakdown {
-  margin: 0 !important;
-  padding: 0 !important;
-  list-style: none !important;
-  list-style-type: none !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	list-style: none !important;
+	list-style-type: none !important;
 }
 
 .cfwc-fees-breakdown li,
@@ -193,13 +193,13 @@ ul.cfwc-fees-breakdown li.cfwc-fee-item,
 .woocommerce table.shop_table .cfwc-fee-item,
 .woocommerce-order .cfwc-fee-item,
 .woocommerce-account .cfwc-fee-item {
-  margin: 0 0 0.25em 0 !important;
-  padding: 0 !important;
-  list-style: none !important;
-  list-style-type: none !important;
-  background: none !important;
-  border: none !important;
-  display: block !important;
+	margin: 0 0 0.25em 0 !important;
+	padding: 0 !important;
+	list-style: none !important;
+	list-style-type: none !important;
+	background: none !important;
+	border: none !important;
+	display: block !important;
 }
 
 /* Remove any before/after pseudo-elements that might add bullets or styling */
@@ -213,41 +213,41 @@ ul.cfwc-fees-breakdown li:before,
 .woocommerce-table--order-details .cfwc-fee-item:before,
 .woocommerce-order .cfwc-fee-item:before,
 .woocommerce-account .cfwc-fee-item:before {
-  content: none !important;
-  display: none !important;
+	content: none !important;
+	display: none !important;
 }
 
 .cfwc-fees-breakdown .cfwc-fee-label {
-  color: #515151;
-  display: inline-block;
-  margin-right: 5px;
+	color: #515151;
+	display: inline-block;
+	margin-right: 5px;
 }
 
 /* Ensure proper display in order totals table */
 .woocommerce table.shop_table .cfwc-fees-breakdown-wrapper,
 .woocommerce-order .cfwc-fees-breakdown-wrapper,
 .woocommerce-account .cfwc-fees-breakdown-wrapper {
-  display: block;
-  width: 100%;
+	display: block;
+	width: 100%;
 }
 
 .woocommerce-table--order-details .cfwc-fees-breakdown,
 .woocommerce-MyAccount-content .cfwc-fees-breakdown,
 .woocommerce-order .cfwc-fees-breakdown,
 .woocommerce-account .cfwc-fees-breakdown {
-  text-align: left !important;
+	text-align: left !important;
 }
 
 /* Cart/Checkout Breakdown */
 .cfwc-fees-breakdown .cfwc-fee-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 5px 0;
-  border-bottom: 1px dotted #ddd;
+	display: flex;
+	justify-content: space-between;
+	padding: 5px 0;
+	border-bottom: 1px dotted #ddd;
 }
 
 .cfwc-fees-breakdown .cfwc-fee-item:last-child {
-  border-bottom: none;
+	border-bottom: none;
 }
 
 /* Order totals table specific styling - compact display */
@@ -255,90 +255,90 @@ ul.cfwc-fees-breakdown li:before,
 .woocommerce-order .cfwc-fees-breakdown-wrapper .cfwc-fee-item,
 .woocommerce-account .cfwc-fees-breakdown-wrapper .cfwc-fee-item,
 .woocommerce-checkout .cfwc-fees-breakdown-wrapper .cfwc-fee-item {
-  display: block !important;
-  margin: 0 0 5px 0 !important;
-  padding: 0 !important;
-  width: 100% !important;
+	display: block !important;
+	margin: 0 0 5px 0 !important;
+	padding: 0 !important;
+	width: 100% !important;
 }
 
 .woocommerce table.shop_table .cfwc-fees-breakdown-wrapper .cfwc-fee-label,
 .woocommerce-order .cfwc-fees-breakdown-wrapper .cfwc-fee-label,
 .woocommerce-account .cfwc-fees-breakdown-wrapper .cfwc-fee-label,
 .woocommerce-checkout .cfwc-fees-breakdown-wrapper .cfwc-fee-label {
-  display: inline !important;
-  flex: none !important;
-  margin-right: 5px !important;
+	display: inline !important;
+	flex: none !important;
+	margin-right: 5px !important;
 }
 
 .woocommerce table.shop_table .cfwc-fees-breakdown-wrapper strong,
 .woocommerce-order .cfwc-fees-breakdown-wrapper strong,
 .woocommerce-account .cfwc-fees-breakdown-wrapper strong,
 .woocommerce-checkout .cfwc-fees-breakdown-wrapper strong {
-  display: inline !important;
-  margin-left: 0 !important;
+	display: inline !important;
+	margin-left: 0 !important;
 }
 
 /* Order item customs info */
 .cfwc-order-customs {
-  color: #666;
-  font-size: 0.9em;
+	color: #666;
+	font-size: 0.9em;
 }
 
 /* Info box on order received page */
 .cfwc-order-info-box {
-  background-color: #f7f7f7;
-  border-left: 4px solid #0073aa;
-  padding: 20px;
-  margin: 30px 0;
+	background-color: #f7f7f7;
+	border-left: 4px solid #0073aa;
+	padding: 20px;
+	margin: 30px 0;
 }
 
 .cfwc-order-info-box h3 {
-  margin: 0 0 10px;
-  color: #0073aa;
-  font-size: 18px;
+	margin: 0 0 10px;
+	color: #0073aa;
+	font-size: 18px;
 }
 
 .cfwc-order-info-box p {
-  margin: 0 0 10px;
-  color: #666;
+	margin: 0 0 10px;
+	color: #666;
 }
 
 .cfwc-order-info-box p:last-child {
-  margin-bottom: 0;
+	margin-bottom: 0;
 }
 
 .cfwc-order-info-box .cfwc-disclaimer {
-  color: #999;
-  font-size: 12px;
-  font-style: italic;
+	color: #999;
+	font-size: 12px;
+	font-style: italic;
 }
 
 /* Email breakdown list */
 .cfwc-email-breakdown {
-  margin: 10px 0;
-  padding-left: 20px;
-  list-style-type: disc;
+	margin: 10px 0;
+	padding-left: 20px;
+	list-style-type: disc;
 }
 
 .cfwc-email-breakdown li {
-  margin: 5px 0;
-  color: #515151;
+	margin: 5px 0;
+	color: #515151;
 }
 
 /* ==========================================================================
-   Responsive Design
-   ========================================================================== */
+	Responsive Design
+	========================================================================== */
 
 @media (max-width: 600px) {
-  .cfwc-fee-item {
-    flex-direction: column;
-  }
+	.cfwc-fee-item {
+	flex-direction: column;
+	}
 
-  .cfwc-fee-amount {
-    margin-top: 5px;
-  }
+	.cfwc-fee-amount {
+	margin-top: 5px;
+	}
 
-  .cfwc-fees-summary {
-    padding: 8px;
-  }
+	.cfwc-fees-summary {
+	padding: 8px;
+	}
 }

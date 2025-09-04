@@ -7,245 +7,245 @@
 
 /* Responsive layout for settings */
 @media (max-width: 768px) {
-  .cfwc-settings-row {
-    flex-direction: column !important;
-  }
+	.cfwc-settings-row {
+	flex-direction: column !important;
+	}
 }
 
 /* Rule table improvements */
 .cfwc-rules-table {
-  border-collapse: collapse;
+	border-collapse: collapse;
 }
 
 .cfwc-rules-table tbody tr:hover {
-  background-color: #f6f7f7;
+	background-color: #f6f7f7;
 }
 
 .cfwc-rules-table tbody tr.cfwc-rule-editing {
-  background-color: #f0f8ff;
-  border: 2px solid #2271b1;
+	background-color: #f0f8ff;
+	border: 2px solid #2271b1;
 }
 
 .cfwc-rules-table tbody tr.cfwc-rule-editing td {
-  padding: 15px 10px;
-  vertical-align: top;
+	padding: 15px 10px;
+	vertical-align: top;
 }
 
 /* Priority field styling */
 .cfwc-priority-field {
-  display: flex;
-  align-items: center;
-  gap: 5px;
+	display: flex;
+	align-items: center;
+	gap: 5px;
 }
 
 .cfwc-priority-field label {
-  font-size: 11px;
-  color: #666;
-  margin: 0;
+	font-size: 11px;
+	color: #666;
+	margin: 0;
 }
 
 .cfwc-priority-field input {
-  width: 60px;
+	width: 60px;
 }
 
 /* Stacking mode styling */
 .cfwc-stacking-help {
-  font-size: 11px;
-  color: #666;
-  margin-top: 5px;
-  line-height: 1.4;
+	font-size: 11px;
+	color: #666;
+	margin-top: 5px;
+	line-height: 1.4;
 }
 
 .cfwc-stacking-help .dashicons {
-  font-size: 14px;
-  vertical-align: middle;
-  margin-right: 2px;
+	font-size: 14px;
+	vertical-align: middle;
+	margin-right: 2px;
 }
 
 /* Enhanced select styling */
 .cfwc-rules-table .select2-container {
-  width: 100% !important;
+	width: 100% !important;
 }
 
 .cfwc-rules-table .select2-container--default .select2-selection--single,
 .cfwc-rules-table .select2-container--default .select2-selection--multiple {
-  min-height: 30px;
-  border-color: #8c8f94;
+	min-height: 30px;
+	border-color: #8c8f94;
 }
 
 /* Fix Select2 search box */
 .select2-container--default .select2-search--dropdown .select2-search__field {
-  width: 100% !important;
-  box-sizing: border-box;
+	width: 100% !important;
+	box-sizing: border-box;
 }
 
 /* Fix country arrow icon position */
 .cfwc-rules-table td .dashicons-arrow-right-alt {
-  vertical-align: middle;
-  margin: 0 5px;
-  color: #666;
+	vertical-align: middle;
+	margin: 0 5px;
+	color: #666;
 }
 
 /* Force the custom origin Select2 dropdown to match the select width */
 #cfwc_custom_default_origin + .select2-container {
-  width: 350px !important;
+	width: 350px !important;
 }
 
 #cfwc_custom_origin_wrapper .select2-container {
-  width: 200px !important;
+	width: 200px !important;
 }
 
 /* Fix Select2 dropdown z-index to prevent overlap */
 .select2-container--open {
-  z-index: 999999 !important;
+	z-index: 999999 !important;
 }
 
 /* Product Edit Page - HS Code help text styling */
 .cfwc-hs-code-help {
-  font-style: italic;
+	font-style: italic;
 }
 
 .cfwc-hs-code-help a {
-  text-decoration: none;
-  font-weight: 600;
+	text-decoration: none;
+	font-weight: 600;
 }
 
 .cfwc-hs-code-help a:hover {
-  text-decoration: underline;
+	text-decoration: underline;
 }
 
 /* Country of Origin dropdown styling is now in admin.css */
 
 .select2-dropdown {
-  z-index: 999999 !important;
+	z-index: 999999 !important;
 }
 
 /* Remove custom tooltip - use browser default */
 .cfwc-rules-table .dashicons-info {
-  cursor: help;
+	cursor: help;
 }
 
 /* Ensure priority tooltip is interactive */
 .cfwc-rules-table input[name="cfwc_rule_priority"],
 .cfwc-rules-table .dashicons-info {
-  position: relative;
-  z-index: 1;
+	position: relative;
+	z-index: 1;
 }
 
 /* Make sure the info icon is visible and hoverable */
 .cfwc-rules-table td .dashicons-info[title] {
-  cursor: help !important;
-  pointer-events: auto !important;
-  position: relative !important;
-  z-index: 10 !important;
-  display: inline-block !important;
+	cursor: help !important;
+	pointer-events: auto !important;
+	position: relative !important;
+	z-index: 10 !important;
+	display: inline-block !important;
 }
 
 /* Ensure the parent containers don't block tooltips */
 .cfwc-rules-table td {
-  overflow: visible !important;
+	overflow: visible !important;
 }
 
 /* Make sure priority input doesn't block the tooltip */
 .cfwc-rules-table input[name="cfwc_rule_priority"] {
-  position: relative;
-  z-index: 1;
+	position: relative;
+	z-index: 1;
 }
 
 /* Fix select dropdown overlap and text visibility */
 .cfwc-rules-table select {
-  padding-right: 25px !important;
-  min-width: 100px;
+	padding-right: 25px !important;
+	min-width: 100px;
 }
 
 .cfwc-rules-table select[name="cfwc_rule_type"],
 .cfwc-rules-table select[name="cfwc_rule_stacking"] {
-  width: 100% !important;
-  padding-right: 25px !important;
+	width: 100% !important;
+	padding-right: 25px !important;
 }
 
 /* Button improvements */
 .cfwc-rules-table .button {
-  padding: 4px 12px;
-  font-size: 13px;
-  line-height: 1.5;
+	padding: 4px 12px;
+	font-size: 13px;
+	line-height: 1.5;
 }
 
 .cfwc-rules-table .button-primary {
-  background: #2271b1;
-  border-color: #2271b1;
+	background: #2271b1;
+	border-color: #2271b1;
 }
 
 .cfwc-rules-table .button-primary:hover {
-  background: #135e96;
-  border-color: #135e96;
+	background: #135e96;
+	border-color: #135e96;
 }
 
 /* Category and HS code display */
 .cfwc-product-criteria {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
 }
 
 .cfwc-product-criteria .dashicons {
-  font-size: 14px;
-  vertical-align: middle;
-  margin-right: 4px;
+	font-size: 14px;
+	vertical-align: middle;
+	margin-right: 4px;
 }
 
 /* Settings panel improvements */
 .cfwc-global-settings,
 .cfwc-help-guide {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .cfwc-global-settings h3,
 .cfwc-help-guide h3 {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
 }
 
 /* Pro tips box */
 .cfwc-pro-tips {
-  margin-top: 20px;
-  padding: 10px;
-  background: #fff;
-  border-left: 3px solid #2271b1;
-  font-size: 13px;
+	margin-top: 20px;
+	padding: 10px;
+	background: #fff;
+	border-left: 3px solid #2271b1;
+	font-size: 13px;
 }
 
 /* No rules message */
 .cfwc-rules-table .no-rules td {
-  text-align: center;
-  padding: 40px 20px;
-  color: #666;
-  font-style: italic;
+	text-align: center;
+	padding: 40px 20px;
+	color: #666;
+	font-style: italic;
 }
 
 /* Loading state */
 .cfwc-loading {
-  opacity: 0.6;
-  pointer-events: none;
+	opacity: 0.6;
+	pointer-events: none;
 }
 
 .cfwc-loading::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 20px;
-  height: 20px;
-  margin: -10px 0 0 -10px;
-  border: 2px solid #2271b1;
-  border-radius: 50%;
-  border-top-color: transparent;
-  animation: cfwc-spin 1s linear infinite;
+	content: "";
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 20px;
+	height: 20px;
+	margin: -10px 0 0 -10px;
+	border: 2px solid #2271b1;
+	border-radius: 50%;
+	border-top-color: transparent;
+	animation: cfwc-spin 1s linear infinite;
 }
 
 @keyframes cfwc-spin {
-  to {
-    transform: rotate(360deg);
-  }
+	to {
+	transform: rotate(360deg);
+	}
 }

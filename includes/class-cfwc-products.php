@@ -42,16 +42,18 @@ class CFWC_Products {
 	 * @since 1.0.0
 	 * @param string $product_name Product name HTML.
 	 * @param array  $cart_item Cart item data.
-	 * @param string $cart_item_key Cart item key.
+	 * @param string $_cart_item_key Cart item key.
 	 * @return string Modified product name.
 	 */
-	public function display_hs_code_in_cart( $product_name, $cart_item, $cart_item_key ) {
+	public function display_hs_code_in_cart( $product_name, $cart_item, $_cart_item_key ) {
+		// Unused parameter is required by filter signature.
+		unset( $_cart_item_key );
 		// Only on cart page, NOT checkout (checkout handled separately by display_hs_code_in_checkout).
 		if ( ! is_cart() ) {
 			return $product_name;
 		}
 
-		// Don't add to blocks cart (handled by JavaScript)
+		// Don't add to blocks cart (handled by JavaScript).
 		if ( has_block( 'woocommerce/cart' ) ) {
 			return $product_name;
 		}
@@ -61,7 +63,7 @@ class CFWC_Products {
 		$origin     = get_post_meta( $product_id, '_cfwc_country_of_origin', true );
 
 		if ( $hs_code || $origin ) {
-			// Use a break tag to ensure it appears on a new line right after product name
+			// Use a break tag to ensure it appears on a new line right after product name.
 			$customs_info = '<br/><small class="cfwc-cart-customs">';
 
 			if ( $hs_code ) {
@@ -101,16 +103,18 @@ class CFWC_Products {
 	 * @since 1.0.0
 	 * @param string $quantity_html Quantity HTML.
 	 * @param array  $cart_item Cart item data.
-	 * @param string $cart_item_key Cart item key.
+	 * @param string $_cart_item_key Cart item key.
 	 * @return string Modified quantity HTML.
 	 */
-	public function display_hs_code_in_checkout( $quantity_html, $cart_item, $cart_item_key ) {
+	public function display_hs_code_in_checkout( $quantity_html, $cart_item, $_cart_item_key ) {
+		// Unused parameter is required by filter signature.
+		unset( $_cart_item_key );
 		// Only on checkout page.
 		if ( ! is_checkout() ) {
 			return $quantity_html;
 		}
 
-		// Don't add to blocks checkout (handled by JavaScript)
+		// Don't add to blocks checkout (handled by JavaScript).
 		if ( has_block( 'woocommerce/checkout' ) ) {
 			return $quantity_html;
 		}

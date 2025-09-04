@@ -195,7 +195,7 @@ class CFWC_Admin {
 			)
 		);
 
-		// Add help text with link after HS Code field
+		// Add help text with link after HS Code field.
 		echo '<p class="cfwc-hs-code-help" style="margin-left: 154px; margin-top: -10px; margin-bottom: 10px; font-size: 12px; color: #666;">';
 		echo esc_html__( 'You can ', 'customs-fees-for-woocommerce' );
 		echo '<a href="https://hts.usitc.gov/" target="_blank" rel="noopener noreferrer">';
@@ -220,7 +220,7 @@ class CFWC_Admin {
 				// Use custom default country.
 				$origin_value = get_option( 'cfwc_custom_default_origin', '' );
 			}
-			// If 'none', leave empty.
+			// If none, leave empty.
 		}
 
 		woocommerce_wp_select(
@@ -379,7 +379,6 @@ class CFWC_Admin {
 		);
 
 		// Enqueue admin JavaScript with dependencies.
-		// Include wp-data for snackbar notifications
 		wp_enqueue_script(
 			'cfwc-admin',
 			( defined( 'CFWC_PLUGIN_URL' ) ? CFWC_PLUGIN_URL : plugin_dir_url( dirname( __DIR__ ) ) ) . 'assets/js/admin.js',
@@ -524,6 +523,7 @@ class CFWC_Admin {
 	 */
 	public function format_meta_key( $display_key, $meta, $item ) {
 		// Use get_data() method for proper access to meta data properties.
+		unset( $item );
 		$meta_data = $meta->get_data();
 		$meta_key  = isset( $meta_data['key'] ) ? $meta_data['key'] : '';
 
@@ -549,6 +549,7 @@ class CFWC_Admin {
 	 */
 	public function format_meta_value( $display_value, $meta, $item ) {
 		// Use get_data() method for proper access to meta data properties.
+		unset( $item );
 		$meta_data = $meta->get_data();
 		$meta_key  = isset( $meta_data['key'] ) ? $meta_data['key'] : '';
 

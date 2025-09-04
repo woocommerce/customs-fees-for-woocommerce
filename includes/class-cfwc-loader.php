@@ -340,7 +340,7 @@ class CFWC_Loader {
 		}
 
 		// Get plugin URL with defensive check for PHPStan.
-		$plugin_url = defined( 'CFWC_PLUGIN_URL' ) ? CFWC_PLUGIN_URL : plugin_dir_url( dirname( __FILE__ ) );
+		$plugin_url = defined( 'CFWC_PLUGIN_URL' ) ? CFWC_PLUGIN_URL : plugin_dir_url( __DIR__ );
 		$version    = defined( 'CFWC_VERSION' ) ? CFWC_VERSION : '1.0.0';
 
 		// Enqueue styles.

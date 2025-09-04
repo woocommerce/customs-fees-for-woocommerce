@@ -146,9 +146,9 @@ class CFWC_Settings {
 			<h2><?php esc_html_e( 'Customs & Import Fees Settings', 'customs-fees-for-woocommerce' ); ?></h2>
 			
 			<!-- Include the rules template -->
-			<?php 
-			$plugin_dir = defined( 'CFWC_PLUGIN_DIR' ) ? CFWC_PLUGIN_DIR : plugin_dir_path( dirname( __FILE__ ) );
-			include $plugin_dir . 'includes/admin/views/rules-section.php'; 
+			<?php
+			$plugin_dir = defined( 'CFWC_PLUGIN_DIR' ) ? CFWC_PLUGIN_DIR : plugin_dir_path( __DIR__ );
+			include $plugin_dir . 'includes/admin/views/rules-section.php';
 			?>
 		</div>
 		<?php
@@ -209,7 +209,7 @@ class CFWC_Settings {
 			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 			$rules_json = wp_unslash( $_POST['cfwc_rules'] );
 
-			// Handle if it's already an array (shouldn't happen but safe check)
+			// Handle if it's already an array (shouldn't happen but safe check).
 			if ( is_array( $rules_json ) ) {
 				$posted_rules = $rules_json;
 			} else {
@@ -234,7 +234,7 @@ class CFWC_Settings {
 						'label'           => isset( $rule['label'] ) ? sanitize_text_field( $rule['label'] ) : '',
 						'taxable'         => isset( $rule['taxable'] ) ? (bool) $rule['taxable'] : true,
 						'tax_class'       => isset( $rule['tax_class'] ) ? sanitize_text_field( $rule['tax_class'] ) : '',
-						// New fields for advanced matching (v1.2.0)
+						// New fields for advanced matching (v1.2.0).
 						'from_country'    => isset( $rule['from_country'] ) ? sanitize_text_field( $rule['from_country'] ) : '',
 						'to_country'      => isset( $rule['to_country'] ) ? sanitize_text_field( $rule['to_country'] ) : '',
 						'match_type'      => isset( $rule['match_type'] ) ? sanitize_text_field( $rule['match_type'] ) : 'all',
@@ -244,7 +244,7 @@ class CFWC_Settings {
 						'stacking_mode'   => isset( $rule['stacking_mode'] ) ? sanitize_text_field( $rule['stacking_mode'] ) : 'add',
 					);
 
-					// Only add if either old country field or new to_country field is set
+					// Only add if either old country field or new to_country field is set.
 					if ( ! empty( $sanitized_rule['country'] ) || ! empty( $sanitized_rule['to_country'] ) ) {
 						$rules[] = $sanitized_rule;
 					}
@@ -264,7 +264,7 @@ class CFWC_Settings {
 		// Clear all caches.
 		wp_cache_flush();
 
-		// Don't add settings error here - let WooCommerce handle the success message
+		// Don't add settings error here - let WooCommerce handle the success message.
 		// to avoid conflicts with their redirect process.
 	}
 
