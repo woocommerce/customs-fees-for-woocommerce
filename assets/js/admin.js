@@ -30,16 +30,22 @@
 				);
 			}
 
-			// No need for tooltip handlers - browser handles title attributes natively.
-
-			// Helper function to escape HTML.
-			function escapeHtml(str) {
-				if ( ! str) {
-					return "";
+			// Helper: Create an element with attributes, styles, and text/HTML.
+			function el(tag, attrs, css, text, html) {
+				var $e = $( "<" + tag + ">" );
+				if (attrs) {
+					$e.attr( attrs );
 				}
-				var div = document.createElement( "div" );
-				div.appendChild( document.createTextNode( str ) );
-				return div.innerHTML;
+				if (css) {
+					$e.css( css );
+				}
+				if (text !== undefined && text !== null) {
+					$e.text( text );
+				}
+				if (html !== undefined && html !== null) {
+					$e.html( html );
+				}
+				return $e;
 			}
 
 			// Helper function to enable the WooCommerce save button.
@@ -74,9 +80,9 @@
 
 				// Pulse animation to draw attention.
 				$saveButtons
-				.first()
-				.animate( { opacity: 0.5 }, 200 )
-				.animate( { opacity: 1 }, 200 );
+					.first()
+					.animate( { opacity: 0.5 }, 200 )
+					.animate( { opacity: 1 }, 200 );
 			}
 
 			// Initialize Select2 using WooCommerce's native enhanced select.
@@ -89,12 +95,11 @@
 							minimumResultsForSearch: 10,
 							allowClear: true,
 							placeholder:
-							$( selector ).data( "placeholder" ) ||
-							wc_enhanced_select_params.i18n_no_matches,
+							$( selector ).data( "placeholder" ) || wc_enhanced_select_params.i18n_no_matches,
 							width: "100%",
 						}
 					)
-					.addClass( "enhanced" );
+						.addClass( "enhanced" );
 				} else if ($.fn.select2) {
 					// Fallback to regular select2.
 					$( selector ).select2(
@@ -156,13 +161,8 @@
 						$categorySelect.show().removeAttr( "required" );
 						$spacer.show().css( "display", "block" ); // Show spacer between fields.
 						$hsCodeInput.show().attr( "required", "required" );
-						$requiredIndicator
-						.show()
-						.html( "Category: Not required<br>HS Code: Required *" );
-						$categorySelect.attr(
-							"data-placeholder",
-							"Select categories (optional)"
-						);
+						$requiredIndicator.show().html( "Category: Not required<br>HS Code: Required *" );
+						$categorySelect.attr( "data-placeholder", "Select categories (optional)" );
 						$hsCodeInput.attr( "placeholder", "HS Code (e.g., 6109* or 61,62)" );
 					} else if (matchType === "combined") {
 						// Category + HS Code - show both fields with spacing.
@@ -203,75 +203,16 @@
 				}
 			);
 
-			// Add preset rules (primary action - adds to existing like WooCommerce tax rates).
-			$( ".cfwc-add-preset" ).on(
-				"click",
-				function () {
-					var presetId = $( "#cfwc-preset-select" ).val();
-					if ( ! presetId) {
-						showNotice(
-							strings.select_preset_first || "Please select a preset first.",
-							"error"
-						);
-						return;
-					}
-
-					// No confirmation needed for adding - just like WooCommerce tax rates.
-					applyPreset( presetId, true ); // true = add to existing.
-				}
-			);
-
-			// Replace all rules with preset (clear and apply).
-			$( ".cfwc-replace-preset" ).on(
-				"click",
-				function () {
-					var presetId = $( "#cfwc-preset-select" ).val();
-					if ( ! presetId) {
-						showNotice(
-							strings.select_preset_first || "Please select a preset first.",
-							"error"
-						);
-						return;
-					}
-
-					// Confirm replacement since it's destructive.
-					if ( ! $( this ).hasClass( "confirm-replace" )) {
-						$( this )
-						.addClass( "confirm-replace" )
-						.text( strings.confirm_replace || "Click again to confirm" )
-						.css( "background", "#d63638" );
-
-						// Reset after 5 seconds.
-						var $btn = $( this );
-						setTimeout(
-							function () {
-								$btn
-								.removeClass( "confirm-replace" )
-								.text( strings.replace_all || "Replace All Rules" )
-								.css( "background", "" );
-							},
-							5000
-						);
-						return;
-					}
-
-					// Clear existing rules and apply preset.
-					applyPreset( presetId, false ); // false = replace all.
-				}
-			);
-
 			// Delete all rules with improved notification handling.
 			var deleteButtonTimeout = null;
 			$( ".cfwc-delete-all" ).on(
 				"click",
 				function () {
 					// Check if there are existing rules.
-					var existingRules = $( ".cfwc-rules-table tbody tr" ).not(
-						".no-rules"
-					).length;
+					var existingRules = $( ".cfwc-rules-table tbody tr" ).not( ".no-rules" ).length;
 					if (existingRules === 0) {
-							showNotice( strings.no_rules_delete || "No rules to delete.", "warning" );
-							return;
+						showNotice( strings.no_rules_delete || "No rules to delete.", "warning" );
+						return;
 					}
 
 					var $button = $( this );
@@ -290,9 +231,7 @@
 						$button.next( ".cfwc-delete-warning" ).remove();
 
 						// Clear any existing notifications first to prevent overlap.
-						if (window.wp && window.wp.data && window.wp.data.dispatch) {
-							wp.data.dispatch( "core/notices" ).removeNotices();
-						}
+						cfwcClearSnackbars();
 
 						// Delete the rules.
 						var rules = [];
@@ -329,9 +268,12 @@
 						// Add inline warning message next to button if not already present.
 						if ( ! $button.next( ".cfwc-delete-warning" ).length) {
 							$button.after(
-								'<span class="cfwc-delete-warning" style="color: #d63638; margin-left: 10px; font-weight: 600;">' +
-								"⚠️ This will delete ALL rules. Click again to confirm." +
-								"</span>"
+								el(
+									"span",
+									{ class: "cfwc-delete-warning" },
+									{ color: "#d63638", "margin-left": "10px", "font-weight": 600 },
+									"⚠️ This will delete ALL rules. Click again to confirm."
+								)
 							);
 						}
 
@@ -358,21 +300,21 @@
 
 			// Apply preset via AJAX.
 			function applyPreset(presetId, append) {
-					// Show loading notification with unique ID.
+				// Show loading notification with unique ID.
 				if (window.wp && window.wp.data && window.wp.data.dispatch) {
-					wp.data.dispatch( "core/notices" ).removeNotices(); // Clear any existing.
+					cfwcClearSnackbars(); // Clear any existing.
 					wp.data
 					.dispatch( "core/notices" )
 					.createNotice(
 						"info",
 						append
-						? strings.adding_preset || "Adding preset rules..."
-						: strings.replacing_rules || "Replacing all rules with preset...",
+							? strings.adding_preset || "Adding preset rules..."
+							: strings.replacing_rules || "Replacing all rules with preset...",
 						{
 							type: "snackbar",
 							isDismissible: false,
 							id: "cfwc-preset-loading", // Unique ID for loading notification.
-						}
+							}
 					);
 				}
 
@@ -405,9 +347,7 @@
 								// Clear loading notification and show success.
 								if (window.wp && window.wp.data && window.wp.data.dispatch) {
 									// Remove the loading notification specifically.
-									wp.data
-									.dispatch( "core/notices" )
-									.removeNotice( "cfwc-preset-loading" );
+									wp.data.dispatch( "core/notices" ).removeNotice( "cfwc-preset-loading" );
 
 									// Small delay to ensure smooth transition.
 									setTimeout(
@@ -417,8 +357,7 @@
 											.dispatch( "core/notices" )
 											.createNotice(
 												"success",
-												presetMessage +
-												' Remember to click "Save changes" to persist.',
+												presetMessage + ' Remember to click "Save changes" to persist.',
 												{
 													type: "snackbar",
 													isDismissible: true,
@@ -445,12 +384,10 @@
 							} else {
 								// Remove loading notification on error.
 								if (window.wp && window.wp.data && window.wp.data.dispatch) {
-									wp.data
-									.dispatch( "core/notices" )
-									.removeNotice( "cfwc-preset-loading" );
+									wp.data.dispatch( "core/notices" ).removeNotice( "cfwc-preset-loading" );
 								}
 								showNotice(
-									response.data.message ||
+									(response.data && response.data.message) ||
 									strings.preset_failed ||
 									"Failed to apply preset.",
 									"error"
@@ -460,19 +397,14 @@
 						error: function (xhr, status, error) {
 							// Remove loading notification on AJAX error.
 							if (window.wp && window.wp.data && window.wp.data.dispatch) {
-								wp.data
-								.dispatch( "core/notices" )
-								.removeNotice( "cfwc-preset-loading" );
+								wp.data.dispatch( "core/notices" ).removeNotice( "cfwc-preset-loading" );
 							}
 							console.error( "CFWC Preset Error:", status, error );
 							console.error( "Response:", xhr.responseText );
 							var errorMsg =
-							strings.preset_error ||
-							"An error occurred while applying the preset.";
+							strings.preset_error || "An error occurred while applying the preset.";
 							if (xhr.responseText) {
-								errorMsg +=
-								" " +
-								(strings.check_console || "Check browser console for details.");
+								errorMsg += " " + (strings.check_console || "Check browser console for details.");
 							}
 							showNotice( errorMsg, "error" );
 						},
@@ -482,6 +414,22 @@
 
 			// Show admin notice using WooCommerce snackbar.
 			var noticeTimeout = null;
+
+			// Safe helper to clear snackbar notices (avoid WP core error on undefined contexts).
+			function cfwcClearSnackbars() {
+				try {
+					if (window.wp && window.wp.data && window.wp.data.dispatch) {
+						var dispatcher = wp.data.dispatch( "core/notices" );
+						if (dispatcher && typeof dispatcher.removeNotices === "function") {
+							// Clear only snackbar notices to avoid removing other admin notices.
+							dispatcher.removeNotices( ["snackbar"] );
+						}
+					}
+				} catch (e) {
+					// Silently ignore if API differs on older WP versions.
+				}
+			}
+
 			function showNotice(message, type, clearPrevious) {
 				// Default clearPrevious to true for better UX.
 				if (clearPrevious === undefined) {
@@ -497,7 +445,7 @@
 				if (window.wp && window.wp.data && window.wp.data.dispatch) {
 					// Clear existing notices if requested (default behavior).
 					if (clearPrevious) {
-						wp.data.dispatch( "core/notices" ).removeNotices();
+						cfwcClearSnackbars();
 					}
 
 					var noticeType = "info";
@@ -524,14 +472,12 @@
 				} else {
 					// Fallback to basic notice for old WordPress versions.
 					$( ".cfwc-admin-notice" ).remove();
-					var noticeHtml =
-					'<div class="cfwc-admin-notice notice is-dismissible ' +
-					type +
-					'">' +
-					"<p>" +
-					message +
-					"</p></div>";
-					$( ".cfwc-preset-loader" ).after( noticeHtml );
+					var $notice = el(
+						"div",
+						{ class: "cfwc-admin-notice notice is-dismissible " + type },
+						null
+					).append( el( "p", null, null, message ) );
+					$( ".cfwc-preset-loader" ).after( $notice );
 					noticeTimeout = setTimeout(
 						function () {
 							$( ".cfwc-admin-notice" ).fadeOut(
@@ -546,59 +492,462 @@
 				}
 			}
 
-			// Build country options.
-			function getCountryOptions(selectedCountry) {
-				var html =
-				'<option value="">' +
-				(strings.select_country_placeholder || "Select country...") +
-				"</option>";
+			// -------- DOM Builders (reduce manual HTML strings) --------
+
+			function buildCountrySelect(opts) {
+				// opts: { name, field, placeholder, selected, widthPercent ('47%' default) }
+				var width = opts.widthPercent || "47%";
+				var $sel  = el(
+					"select",
+					{
+						name: opts.name,
+						class: "cfwc-rule-field cfwc-country-select wc-enhanced-select",
+						"data-field": opts.field,
+						"data-placeholder": opts.placeholder,
+					},
+					{ width: width }
+				);
+				// First option
+				var firstText =
+					opts.firstOptionText ||
+					(opts.field === "from_country"
+					? strings.any_origin || "Any Origin"
+					: strings.any_destination || "Any Destination");
+				$sel.append( el( "option", { value: "" }, null, firstText ) );
+
 				for (var code in countries) {
-					html +=
-					'<option value="' +
-					code +
-					'"' +
-					(code === selectedCountry ? " selected" : "") +
-					">" +
-					countries[code] +
-					"</option>";
+					var $opt = el( "option", { value: code }, null, countries[code] );
+					if (code === (opts.selected || "")) {
+						$opt.prop( "selected", true );
+					}
+					$sel.append( $opt );
 				}
-				return html;
+				return $sel;
 			}
 
-			// Build origin country options (including special options).
-			function getOriginOptions(selectedOrigin) {
-				var html =
-				'<option value="">' +
-				(strings.all_origins || "All Origins") +
-				"</option>";
-				html    +=
-				'<option value="EU"' +
-				(selectedOrigin === "EU" ? " selected" : "") +
-				">" +
-				(strings.eu_countries || "EU Countries") +
-				"</option>";
-				html    +=
-				'<optgroup label="' +
-				(strings.specific_country || "Specific Country") +
-				'">';
-				for (var code in countries) {
-					html +=
-					'<option value="' +
-					code +
-					'"' +
-					(code === selectedOrigin ? " selected" : "") +
-					">" +
-					countries[code] +
-					"</option>";
+			function buildCategorySelect(selectedIds, show, placeholderText) {
+				var $sel = el(
+					"select",
+					{
+						name: "cfwc_rule_categories",
+						class: "cfwc-rule-field cfwc-category-select wc-enhanced-select",
+						"data-field": "category_ids",
+						multiple: "multiple",
+						"data-placeholder": placeholderText || "Select categories...",
+					},
+					{ width: "100%", "margin-bottom": "5px", display: show ? "" : "none" }
+				);
+
+				if (cfwc_admin.categories) {
+					$.each(
+						cfwc_admin.categories,
+						function (id, name) {
+							var selected =
+							(Array.isArray( selectedIds ) ? selectedIds : []).includes( parseInt( id, 10 ) );
+							$sel.append( el( "option", { value: id, selected: selected ? "selected" : null }, null, name ) );
+						}
+					);
 				}
-				html += "</optgroup>";
-				return html;
+				return $sel;
+			}
+
+			function buildMatchTypeSelect(selected) {
+				var $sel    = el(
+					"select",
+					{
+						name: "cfwc_rule_match_type",
+						class: "cfwc-rule-field cfwc-match-type",
+						"data-field": "match_type",
+					},
+					{ width: "100%", "margin-bottom": "5px" }
+				);
+				var options = [
+					{ v: "all", l: "All Products" },
+					{ v: "category", l: "By Category" },
+					{ v: "hs_code", l: "By HS Code" },
+					{ v: "combined", l: "Category + HS Code" },
+				];
+				options.forEach(
+					function (o) {
+						$sel.append( el( "option", { value: o.v, selected: selected === o.v ? "selected" : null }, null, o.l ) );
+					}
+				);
+				return $sel;
+			}
+
+			function buildTypeSelect(selected) {
+				var $sel = el( "select", { name: "cfwc_rule_type", class: "cfwc-rule-field", "data-field": "type" } );
+				$sel.append(
+					el(
+						"option",
+						{ value: "percentage", selected: selected === "percentage" ? "selected" : null },
+						null,
+						strings.percentage || "Percentage"
+					)
+				);
+				$sel.append(
+					el( "option", { value: "flat", selected: selected === "flat" ? "selected" : null }, null, strings.flat || "Flat" )
+				);
+				return $sel;
+			}
+
+			function buildStackingSelect(selected) {
+				var $sel    = el(
+					"select",
+					{
+						name: "cfwc_rule_stacking",
+						class: "cfwc-rule-field cfwc-stacking-select",
+						"data-field": "stacking_mode",
+					},
+					{ width: "100%" }
+				);
+				var options = [
+					{ v: "add", l: "Stack (Add to other fees)" },
+					{ v: "override", l: "Override (Replace lower priority)" },
+					{ v: "exclusive", l: "Exclusive (Only this fee)" },
+				];
+				options.forEach(
+					function (o) {
+						$sel.append( el( "option", { value: o.v, selected: (selected || "add") === o.v ? "selected" : null }, null, o.l ) );
+					}
+				);
+				return $sel;
+			}
+
+			function buildStackingHelp(mode) {
+				var $desc = el(
+					"span",
+					{ class: "description" },
+					{ "font-size": "11px", color: "#666", "margin-top": "5px", display: "block" }
+				);
+				$desc.append(
+					el( "span", { class: "stacking-help-add", style: mode === "add" ? "" : "display: none;" }, null, "Adds with other matching rules" )
+				);
+				$desc.append(
+					el(
+						"span",
+						{ class: "stacking-help-override", style: mode === "override" ? "" : "display: none;" },
+						null,
+						"Replaces lower priority rules"
+					)
+				);
+				$desc.append(
+					el(
+						"span",
+						{ class: "stacking-help-exclusive", style: mode === "exclusive" ? "" : "display: none;" },
+						null,
+						"No other rules apply"
+					)
+				);
+				return $desc;
+			}
+
+			function buildRequiredIndicator(text) {
+				return el(
+					"span",
+					{ class: "cfwc-field-required" },
+					{ display: "block", "font-size": "11px", color: "#999", "margin-top": "2px" },
+					null,
+					text || "Not required"
+				);
+			}
+
+			function buildFieldSpacer(show) {
+				return el(
+					"span",
+					{ class: "cfwc-field-spacer" },
+					{ display: show ? "block" : "none", height : "5px", width : "100%" },
+					null,
+					"&nbsp;"
+				);
+			}
+
+			function buildRuleEditRow(rule, index, isNew) {
+				var matchType           = rule.match_type || "all";
+				var showCategories      = matchType !== "all";
+				var showHsCode          = matchType === "hs_code" || matchType === "combined";
+				var categoryPlaceholder = matchType === "hs_code" ? "Select categories (optional)" : "Select categories...";
+
+				var $tr = el( "tr", { class: "cfwc-rule-row cfwc-rule-editing" } );
+
+				// Column: Label + Priority
+				var $tdLabel = el( "td" );
+				$tdLabel.append(
+					el(
+						"input",
+						{
+							type: "text",
+							name: "cfwc_rule_label",
+							class: "cfwc-rule-field",
+							"data-field": "label",
+							value: rule.label || "",
+							placeholder: strings.fee_label || "Fee label",
+						},
+						{ width: "100%", "margin-bottom": "5px" }
+					)
+				);
+				$tdLabel.append(
+					el(
+						"input",
+						{
+							type: "number",
+							name: "cfwc_rule_priority",
+							class: "cfwc-rule-field",
+							"data-field": "priority",
+							value: rule.priority || 0,
+							placeholder: "Priority (0-100)",
+							title: "Higher priority rules are checked first (0-100)",
+							min: 0,
+							max: 100,
+						},
+						{ width: "100%" }
+					)
+				);
+				$tdLabel.append(
+					el(
+						"span",
+						null,
+						{ "font-size": "11px", color: "#666", "margin-top": "2px", display: "inline-block" },
+						"Higher numbers = higher priority"
+					)
+				);
+				$tr.append( $tdLabel );
+
+				// Column: Countries (From and To)
+				var $tdCountries = el( "td" );
+				$tdCountries.append(
+					buildCountrySelect(
+						{
+							name: "cfwc_rule_from_country",
+							field: "from_country",
+							placeholder: strings.from_country || "From (any)",
+							selected: rule.from_country || rule.origin_country || "",
+							widthPercent: "47%",
+							firstOptionText: "Any Origin",
+						}
+					)
+				);
+				$tdCountries.append( el( "span", null, { display: "inline-block", width: "10px" }, null, "&nbsp;" ) );
+				$tdCountries.append(
+					buildCountrySelect(
+						{
+							name: "cfwc_rule_to_country",
+							field: "to_country",
+							placeholder: strings.to_country || "To (any)",
+							selected: rule.to_country || rule.country || "",
+							widthPercent: "47%",
+							firstOptionText: "Any Destination",
+						}
+					)
+				);
+				$tr.append( $tdCountries );
+
+				// Column: Products (Categories & HS Code)
+				var $tdProducts = el( "td" );
+
+				$tdProducts.append( buildMatchTypeSelect( matchType ) );
+
+				$tdProducts.append( buildCategorySelect( rule.category_ids || [], showCategories, categoryPlaceholder ) );
+
+				$tdProducts.append( buildFieldSpacer( matchType === "combined" || matchType === "hs_code" ) );
+
+				var $hs = el(
+					"input",
+					{
+						type: "text",
+						name: "cfwc_rule_hs_code",
+						class: "cfwc-rule-field cfwc-hs-code",
+						"data-field": "hs_code_pattern",
+						value: rule.hs_code_pattern || "",
+						placeholder: "HS Code (e.g., 6109* or 61,62)",
+					},
+					{ width: "100%", display: showHsCode ? "" : "none" }
+				);
+				if (showHsCode) {
+					$hs.attr( "required", "required" );
+				}
+				$tdProducts.append( $hs );
+
+				var requiredText = "Not required";
+				if (matchType === "category") {
+					requiredText = "Required *";
+				} else if (matchType === "hs_code") {
+					requiredText = "Category: Not required<br>HS Code: Required *";
+				} else if (matchType === "combined") {
+					requiredText = "Both required *";
+				}
+				$tdProducts.append( buildRequiredIndicator( requiredText ) );
+				$tr.append( $tdProducts );
+
+				// Column: Type
+				var $tdType = el( "td" );
+				$tdType.append( buildTypeSelect( rule.type || "percentage" ) );
+				$tr.append( $tdType );
+
+				// Column: Rate/Amount
+				var rateField = (rule.type || "percentage") === "percentage" ? "rate" : "amount";
+				var rateValue =
+				(rule.type || "percentage") === "percentage" ? rule.rate || 0 : rule.amount || 0;
+
+				var $tdRate = el( "td" );
+				$tdRate.append(
+					el(
+						"input",
+						{
+							type: "number",
+							name: "cfwc_rule_rate",
+							class: "cfwc-rule-field",
+							"data-field": rateField,
+							value: rateValue,
+							step: "0.01",
+							required: "required",
+						},
+						{ width: "80px" }
+					)
+				);
+				$tdRate.append(
+					el(
+						"span",
+						null,
+						{ "font-size": "11px", color: "#999", display: "block", "margin-top": "2px" },
+						"Required *"
+					)
+				);
+				$tr.append( $tdRate );
+
+				// Column: Stacking
+				var $tdStacking = el( "td" );
+				var mode        = rule.stacking_mode || "add";
+				$tdStacking.append( buildStackingSelect( mode ) );
+				$tdStacking.append( buildStackingHelp( mode ) );
+				$tr.append( $tdStacking );
+
+				// Column: Actions
+				var $tdActions = el( "td" );
+				var $save      = el( "button", { type: "button", class: "button button-primary cfwc-save-rule" }, null, strings.save || "Save" );
+				if ( ! isNew) {
+					$save.attr( "data-index", index );
+				}
+				var $cancel = el( "button", { type: "button", class: "button cfwc-cancel-edit" }, null, strings.cancel || "Cancel" );
+				$tdActions.append( $save ).append( " " ).append( $cancel );
+				$tr.append( $tdActions );
+
+				// Initialize enhanced selects for this row after a tick
+				setTimeout(
+					function () {
+						initCountrySelect( $tr.find( ".cfwc-country-select" ) );
+						initCountrySelect( $tr.find( ".cfwc-category-select" ) );
+					},
+					0
+				);
+
+				// Type change handler to toggle data-field and placeholder.
+				$tr.find( 'select[name="cfwc_rule_type"]' ).on(
+					"change",
+					function () {
+						var type   = $( this ).val();
+						var $input = $tr.find( 'input[name="cfwc_rule_rate"]' );
+						if (type === "percentage") {
+							$input.attr( "data-field", "rate" ).attr( "placeholder", "%" );
+						} else {
+							$input.attr( "data-field", "amount" ).attr( "placeholder", currency_symbol );
+						}
+					}
+				);
+
+				return $tr;
+			}
+
+			function buildStackingBadge(stackingMode) {
+				var mode                 = stackingMode || "add";
+				var stackingLabels       = {
+					add: strings.stack || "Stack",
+					override: strings.override || "Override",
+					exclusive: strings.exclusive || "Exclusive",
+				};
+				var stackingColors       = {
+					add: "#46b450",
+					override: "#f0ad4e",
+					exclusive: "#dc3232",
+				};
+				var stackingDescriptions = {
+					add: strings.stack_desc || "Adds with other matching rules",
+					override: strings.override_desc || "Replaces lower priority rules",
+					exclusive: strings.exclusive_desc || "Only this rule applies",
+				};
+
+				return el(
+					"span",
+					{
+						title: stackingDescriptions[mode],
+					},
+					{
+						display: "inline-block",
+						padding: "3px 8px",
+						background: stackingColors[mode],
+						color: "#fff",
+						"border-radius": "3px",
+						"font-size": "11px",
+						"font-weight": 600,
+						"line-height": 1,
+					},
+					stackingLabels[mode]
+				);
 			}
 
 			// Store state for edit/add operations.
 			var originalRules = null;
 			var editingIndex  = null;
 			var isAddingNew   = false;
+
+			// Add preset rules (primary action - adds to existing like WooCommerce tax rates).
+			$( ".cfwc-add-preset" ).on(
+				"click",
+				function () {
+					var presetId = $( "#cfwc-preset-select" ).val();
+					if ( ! presetId) {
+						showNotice( strings.select_preset_first || "Please select a preset first.", "error" );
+						return;
+					}
+					applyPreset( presetId, true ); // true = add to existing.
+				}
+			);
+
+			// Replace all rules with preset (clear and apply).
+			$( ".cfwc-replace-preset" ).on(
+				"click",
+				function () {
+					var presetId = $( "#cfwc-preset-select" ).val();
+					if ( ! presetId) {
+						showNotice( strings.select_preset_first || "Please select a preset first.", "error" );
+						return;
+					}
+
+					// Confirm replacement since it's destructive.
+					if ( ! $( this ).hasClass( "confirm-replace" )) {
+						$( this )
+						.addClass( "confirm-replace" )
+						.text( strings.confirm_replace || "Click again to confirm" )
+						.css( "background", "#d63638" );
+
+						// Reset after 5 seconds.
+						var $btn = $( this );
+						setTimeout(
+							function () {
+								$btn
+								.removeClass( "confirm-replace" )
+								.text( strings.replace_all || "Replace All Rules" )
+								.css( "background", "" );
+							},
+							5000
+						);
+						return;
+					}
+
+					// Clear existing rules and apply preset.
+					applyPreset( presetId, false ); // false = replace all.
+				}
+			);
 
 			// Add new rule functionality.
 			$( ".cfwc-add-rule" ).on(
@@ -611,140 +960,25 @@
 					isAddingNew   = true;
 					editingIndex  = originalRules.length;
 
-					// Create new row HTML (editable fields).
-					var newRowHtml = '<tr class="cfwc-rule-row cfwc-rule-editing">';
-
-					// Label input with priority (first column).
-					newRowHtml +=
-					"<td>" +
-					'<input type="text" name="cfwc_rule_label" class="cfwc-rule-field" data-field="label" value="" placeholder="' +
-					(strings.fee_label || "Fee label") +
-					'" style="width: 100%; margin-bottom: 5px;" />' +
-					'<input type="number" name="cfwc_rule_priority" class="cfwc-rule-field" data-field="priority" value="0" placeholder="Priority (0-100)" title="Higher priority rules are checked first (0-100)" style="width: 100%;" min="0" max="100" />' +
-					'<span style="font-size: 11px; color: #666; margin-top: 2px; display: inline-block;">Higher numbers = higher priority</span>' +
-					"</td>";
-
-					// Countries column (From and To).
-					newRowHtml += "<td>";
-					newRowHtml +=
-					'<select name="cfwc_rule_from_country" class="cfwc-rule-field cfwc-country-select wc-enhanced-select" data-field="from_country" data-placeholder="' +
-					(strings.from_country || "From (any)") +
-					'" style="width: 47%;">';
-					newRowHtml +=
-					'<option value="">Any Origin</option>' + getCountryOptions( "" );
-					newRowHtml += "</select>";
-					// Add spacing between dropdowns.
-					newRowHtml +=
-					'<span style="display: inline-block; width: 10px;">&nbsp;</span>';
-					newRowHtml +=
-					'<select name="cfwc_rule_to_country" class="cfwc-rule-field cfwc-country-select wc-enhanced-select" data-field="to_country" data-placeholder="' +
-					(strings.to_country || "To (any)") +
-					'" style="width: 47%;">';
-					newRowHtml +=
-					'<option value="">Any Destination</option>' + getCountryOptions( "" );
-					newRowHtml += "</select></td>";
-
-					// Products column (Categories & HS Code).
-					newRowHtml += "<td>";
-					newRowHtml +=
-					'<select name="cfwc_rule_match_type" class="cfwc-rule-field cfwc-match-type" data-field="match_type" style="width: 100%; margin-bottom: 5px;">';
-					newRowHtml += '<option value="all">All Products</option>';
-					newRowHtml += '<option value="category">By Category</option>';
-					newRowHtml += '<option value="hs_code">By HS Code</option>';
-					newRowHtml += '<option value="combined">Category + HS Code</option>';
-					newRowHtml += "</select>";
-					// Category selector (hidden by default - only show for category/combined).
-					newRowHtml +=
-					'<select name="cfwc_rule_categories" class="cfwc-rule-field cfwc-category-select wc-enhanced-select" data-field="category_ids" multiple="multiple" style="width: 100%; display: none; margin-bottom: 5px;" data-placeholder="Select categories...">';
-					if (cfwc_admin.categories) {
-						$.each(
-							cfwc_admin.categories,
-							function (id, name) {
-								newRowHtml += '<option value="' + id + '">' + name + "</option>";
-							}
-						);
-					}
-					newRowHtml += "</select>";
-					// Add spacer between category and HS code fields.
-					newRowHtml +=
-					'<span class="cfwc-field-spacer" style="display: none; height: 5px; width: 100%;">&nbsp;</span>';
-					// HS Code pattern input (hidden by default - only show for hs_code/combined).
-					newRowHtml +=
-					'<input type="text" name="cfwc_rule_hs_code" class="cfwc-rule-field cfwc-hs-code" data-field="hs_code_pattern" placeholder="HS Code (e.g., 6109* or 61,62)" style="width: 100%; display: none;" />';
-					// Add required indicator (hidden by default, shows "Not required" by default).
-					newRowHtml +=
-					'<span class="cfwc-field-required" style="display: block; font-size: 11px; color: #999; margin-top: 2px;">Not required</span>';
-					newRowHtml += "</td>";
-
-					// Type selector.
-					newRowHtml +=
-					'<td><select name="cfwc_rule_type" class="cfwc-rule-field" data-field="type">';
-					newRowHtml +=
-					'<option value="percentage">' +
-					(strings.percentage || "Percentage") +
-					"</option>";
-					newRowHtml +=
-					'<option value="flat">' + (strings.flat || "Flat") + "</option>";
-					newRowHtml += "</select></td>";
-
-					// Rate/Amount input.
-					newRowHtml +=
-					'<td><input type="number" name="cfwc_rule_rate" class="cfwc-rule-field" data-field="rate" value="0" step="0.01" style="width: 80px;" required />' +
-					'<span style="font-size: 11px; color: #999; display: block; margin-top: 2px;">Required *</span></td>';
-
-					// Stacking mode.
-					newRowHtml += "<td>";
-					newRowHtml +=
-					'<select name="cfwc_rule_stacking" class="cfwc-rule-field cfwc-stacking-select" data-field="stacking_mode" style="width: 100%;">';
-					newRowHtml += '<option value="add">Stack (Add to other fees)</option>';
-					newRowHtml +=
-					'<option value="override">Override (Replace lower priority)</option>';
-					newRowHtml +=
-					'<option value="exclusive">Exclusive (Only this fee)</option>';
-					newRowHtml += "</select>";
-					newRowHtml +=
-					'<span class="description" style="font-size: 11px; color: #666; margin-top: 5px; display: block;">';
-					newRowHtml +=
-					'<span class="stacking-help-add">Adds with other matching rules</span>';
-					newRowHtml +=
-					'<span class="stacking-help-override" style="display: none;">Replaces lower priority rules</span>';
-					newRowHtml +=
-					'<span class="stacking-help-exclusive" style="display: none;">No other rules apply</span>';
-					newRowHtml += "</span>";
-					newRowHtml += "</td>";
-
-					// Actions.
-					newRowHtml += "<td>";
-					newRowHtml +=
-					'<button type="button" class="button button-primary cfwc-save-rule">' +
-					(strings.save || "Save") +
-					"</button> ";
-					newRowHtml +=
-					'<button type="button" class="button cfwc-cancel-edit">' +
-					(strings.cancel || "Cancel") +
-					"</button>";
-					newRowHtml += "</td>";
-
-					newRowHtml += "</tr>";
-
 					// Remove "no rules" row if exists.
 					$( ".cfwc-rules-table tbody .no-rules" ).remove();
 
-					// Add new row to table.
-					$( ".cfwc-rules-table tbody" ).append( newRowHtml );
+					var newRuleDefaults = {
+						label: "",
+						priority: 0,
+						from_country: "",
+						to_country: "",
+						match_type: "all",
+						category_ids: [],
+						hs_code_pattern: "",
+						type: "percentage",
+						rate: 0,
+						amount: 0,
+						stacking_mode: "add",
+					};
 
-					// Initialize Select2 on new selects with delay for proper rendering.
-					setTimeout(
-						function () {
-							initCountrySelect(
-								".cfwc-rules-table tbody tr:last .cfwc-country-select"
-							);
-							initCountrySelect(
-								".cfwc-rules-table tbody tr:last .cfwc-category-select"
-							);
-						},
-						100
-					);
+					var $row = buildRuleEditRow( newRuleDefaults, editingIndex, true );
+					$( ".cfwc-rules-table tbody" ).append( $row );
 
 					// Scroll to new row.
 					$( "html, body" ).animate(
@@ -755,30 +989,7 @@
 					);
 
 					// Focus on label field.
-					$(
-						'.cfwc-rules-table tbody tr:last input[name="cfwc_rule_label"]'
-					).focus();
-
-					// Handle type change.
-					$( '.cfwc-rules-table tbody tr:last select[name="cfwc_rule_type"]' ).on(
-						"change",
-						function () {
-							var $row = $( this ).closest( "tr" );
-							var type = $( this ).val();
-
-							if (type === "percentage") {
-								$row
-								.find( 'input[name="cfwc_rule_rate"]' )
-								.attr( "data-field", "rate" )
-								.attr( "placeholder", "%" );
-							} else {
-								$row
-								.find( 'input[name="cfwc_rule_rate"]' )
-								.attr( "data-field", "amount" )
-								.attr( "placeholder", currency_symbol );
-							}
-						}
-					);
+					$( '.cfwc-rules-table tbody tr:last input[name="cfwc_rule_label"]' ).focus();
 				}
 			);
 
@@ -801,254 +1012,8 @@
 					var rules = originalRules;
 					var rule  = rules[index];
 
-					// Create edit row HTML matching the new structure.
-					var editRowHtml = "";
-
-					// Label input with priority (first column).
-					editRowHtml +=
-					"<td>" +
-					'<input type="text" name="cfwc_rule_label" class="cfwc-rule-field" data-field="label" value="' +
-					(rule.label || "") +
-					'" placeholder="' +
-					(strings.fee_label || "Fee label") +
-					'" style="width: 100%; margin-bottom: 5px;" />' +
-					'<input type="number" name="cfwc_rule_priority" class="cfwc-rule-field" data-field="priority" value="' +
-					(rule.priority || 0) +
-					'" placeholder="Priority (0-100)" title="Higher priority rules are checked first (0-100)" style="width: 100%;" min="0" max="100" />' +
-					'<span style="font-size: 11px; color: #666; margin-top: 2px; display: inline-block;">Higher numbers = higher priority</span>' +
-					"</td>";
-
-					// Countries column (From and To).
-					editRowHtml += "<td>";
-					editRowHtml +=
-					'<select name="cfwc_rule_from_country" class="cfwc-rule-field cfwc-country-select wc-enhanced-select" data-field="from_country" data-placeholder="' +
-					(strings.from_country || "From (any)") +
-					'" style="width: 47%;">';
-					editRowHtml +=
-					'<option value="">Any Origin</option>' +
-					getCountryOptions(
-						rule.from_country || rule.origin_country || rule.country || ""
-					);
-					editRowHtml += "</select>";
-					// Add spacing between dropdowns.
-					editRowHtml +=
-					'<span style="display: inline-block; width: 10px;">&nbsp;</span>';
-					editRowHtml +=
-					'<select name="cfwc_rule_to_country" class="cfwc-rule-field cfwc-country-select wc-enhanced-select" data-field="to_country" data-placeholder="' +
-					(strings.to_country || "To (any)") +
-					'" style="width: 47%;">';
-					editRowHtml +=
-					'<option value="">Any Destination</option>' +
-					getCountryOptions( rule.to_country || rule.country || "" );
-					editRowHtml += "</select></td>";
-
-					// Products column (Categories & HS Code).
-					editRowHtml += "<td>";
-					editRowHtml +=
-					'<select name="cfwc_rule_match_type" class="cfwc-rule-field cfwc-match-type" data-field="match_type" style="width: 100%; margin-bottom: 5px;">';
-					editRowHtml +=
-					'<option value="all"' +
-					((rule.match_type || "all") === "all" ? " selected" : "") +
-					">All Products</option>";
-					editRowHtml +=
-					'<option value="category"' +
-					(rule.match_type === "category" ? " selected" : "") +
-					">By Category</option>";
-					editRowHtml +=
-					'<option value="hs_code"' +
-					(rule.match_type === "hs_code" ? " selected" : "") +
-					">By HS Code</option>";
-					editRowHtml +=
-					'<option value="combined"' +
-					(rule.match_type === "combined" ? " selected" : "") +
-					">Category + HS Code</option>";
-					editRowHtml += "</select>";
-
-					// Category selector (show for category/hs_code/combined).
-					// Default to hidden only for "all" products.
-					var showCategories      = rule.match_type !== "all";
-					var categoryPlaceholder =
-					rule.match_type === "hs_code"
-					? "Select categories (optional)"
-					: "Select categories...";
-					editRowHtml            +=
-					'<select name="cfwc_rule_categories" class="cfwc-rule-field cfwc-category-select wc-enhanced-select" data-field="category_ids" multiple="multiple" style="width: 100%; margin-bottom: 5px;' +
-					(showCategories ? "" : " display: none;") +
-					'" data-placeholder="' +
-					categoryPlaceholder +
-					'">';
-					if (cfwc_admin.categories) {
-							var selectedCats = rule.category_ids || [];
-							$.each(
-								cfwc_admin.categories,
-								function (id, name) {
-									var selected = selectedCats.includes( parseInt( id ) ) ? " selected" : "";
-									editRowHtml +=
-									'<option value="' + id + '"' + selected + ">" + name + "</option>";
-								}
-							);
-					}
-					editRowHtml += "</select>";
-
-					// Add spacer between category and HS code fields.
-					var showSpacer =
-					rule.match_type === "combined" || rule.match_type === "hs_code";
-					editRowHtml   +=
-					'<span class="cfwc-field-spacer" style="' +
-					(showSpacer ? "display: block;" : "display: none;") +
-					' height: 5px; width: 100%;">&nbsp;</span>';
-
-					// HS Code pattern input (show only for hs_code/combined).
-					var showHsCode =
-					rule.match_type === "hs_code" || rule.match_type === "combined";
-					editRowHtml   +=
-					'<input type="text" name="cfwc_rule_hs_code" class="cfwc-rule-field cfwc-hs-code" data-field="hs_code_pattern" value="' +
-					(rule.hs_code_pattern || "") +
-					'" placeholder="HS Code (e.g., 6109* or 61,62)" style="width: 100%;' +
-					(showHsCode ? "" : " display: none;") +
-					'"' +
-					(showHsCode ? " required" : "") +
-					" />";
-					// Add required indicator with dynamic text based on match type.
-					var requiredText = "Not required";
-					if (rule.match_type === "category") {
-						requiredText = "Required *";
-					} else if (rule.match_type === "hs_code") {
-						requiredText = "Category: Not required<br>HS Code: Required *";
-					} else if (rule.match_type === "combined") {
-						requiredText = "Both required *";
-					}
-					editRowHtml +=
-					'<span class="cfwc-field-required" style="display: block; font-size: 11px; color: #999; margin-top: 2px;">' +
-					requiredText +
-					"</span>";
-					editRowHtml += "</td>";
-
-					// Type selector.
-					editRowHtml +=
-					'<td><select name="cfwc_rule_type" class="cfwc-rule-field" data-field="type">';
-					editRowHtml +=
-					'<option value="percentage"' +
-					(rule.type === "percentage" ? " selected" : "") +
-					">" +
-					(strings.percentage || "Percentage") +
-					"</option>";
-					editRowHtml +=
-					'<option value="flat"' +
-					(rule.type === "flat" ? " selected" : "") +
-					">" +
-					(strings.flat || "Flat") +
-					"</option>";
-					editRowHtml += "</select></td>";
-
-					// Rate/Amount input.
-					var rateField = rule.type === "percentage" ? "rate" : "amount";
-					var rateValue = rule.type === "percentage" ? rule.rate : rule.amount;
-					editRowHtml  +=
-					'<td><input type="number" name="cfwc_rule_rate" class="cfwc-rule-field" data-field="' +
-					rateField +
-					'" value="' +
-					rateValue +
-					'" step="0.01" style="width: 80px;" required />' +
-					'<span style="font-size: 11px; color: #999; display: block; margin-top: 2px;">Required *</span></td>';
-
-					// Stacking mode.
-					editRowHtml    += "<td>";
-					editRowHtml    +=
-					'<select name="cfwc_rule_stacking" class="cfwc-rule-field cfwc-stacking-select" data-field="stacking_mode" style="width: 100%;">';
-					editRowHtml    +=
-					'<option value="add"' +
-					((rule.stacking_mode || "add") === "add" ? " selected" : "") +
-					">Stack (Add to other fees)</option>";
-					editRowHtml    +=
-					'<option value="override"' +
-					(rule.stacking_mode === "override" ? " selected" : "") +
-					">Override (Replace lower priority)</option>";
-					editRowHtml    +=
-					'<option value="exclusive"' +
-					(rule.stacking_mode === "exclusive" ? " selected" : "") +
-					">Exclusive (Only this fee)</option>";
-					editRowHtml    += "</select>";
-					editRowHtml    +=
-					'<span class="description" style="font-size: 11px; color: #666; margin-top: 5px; display: block;">';
-					var currentMode = rule.stacking_mode || "add";
-					editRowHtml    +=
-					'<span class="stacking-help-add" style="' +
-					(currentMode === "add" ? "" : "display: none;") +
-					'">Adds with other matching rules</span>';
-					editRowHtml    +=
-					'<span class="stacking-help-override" style="' +
-					(currentMode === "override" ? "" : "display: none;") +
-					'">Replaces lower priority rules</span>';
-					editRowHtml    +=
-					'<span class="stacking-help-exclusive" style="' +
-					(currentMode === "exclusive" ? "" : "display: none;") +
-					'">No other rules apply</span>';
-					editRowHtml    += "</span>";
-					editRowHtml    += "</td>";
-
-					// Actions.
-					editRowHtml += "<td>";
-					editRowHtml +=
-					'<button type="button" class="button button-primary cfwc-save-rule" data-index="' +
-					index +
-					'">' +
-					(strings.save || "Save") +
-					"</button> ";
-					editRowHtml +=
-					'<button type="button" class="button cfwc-cancel-edit">' +
-					(strings.cancel || "Cancel") +
-					"</button>";
-					editRowHtml += "</td>";
-
-					// Replace row content.
-					$row.addClass( "cfwc-rule-editing" ).html( editRowHtml );
-
-					// Initialize Select2 on selects.
-					initCountrySelect( $row.find( ".cfwc-country-select" ) );
-					initCountrySelect( $row.find( ".cfwc-category-select" ) );
-
-					// Handle match type change to show/hide fields.
-					$row.find( ".cfwc-match-type" ).on(
-						"change",
-						function () {
-							var matchType       = $( this ).val();
-							var $categorySelect = $row.find( ".cfwc-category-select" );
-							var $hsCodeInput    = $row.find( ".cfwc-hs-code" );
-
-							// Hide all first.
-							$categorySelect.hide();
-							$hsCodeInput.hide();
-
-							// Show based on match type.
-							if (matchType === "category" || matchType === "combined") {
-								$categorySelect.show();
-							}
-							if (matchType === "hs_code" || matchType === "combined") {
-								$hsCodeInput.show();
-							}
-						}
-					);
-
-					// Handle type change.
-					$row.find( 'select[name="cfwc_rule_type"]' ).on(
-						"change",
-						function () {
-							var type = $( this ).val();
-
-							if (type === "percentage") {
-								$row
-								.find( 'input[name="cfwc_rule_rate"]' )
-								.attr( "data-field", "rate" )
-								.attr( "placeholder", "%" );
-							} else {
-								$row
-								.find( 'input[name="cfwc_rule_rate"]' )
-								.attr( "data-field", "amount" )
-								.attr( "placeholder", currency_symbol );
-							}
-						}
-					);
+					var $editRow = buildRuleEditRow( rule, index, false );
+					$row.replaceWith( $editRow );
 				}
 			);
 
@@ -1073,16 +1038,16 @@
 
 							// Handle different field types.
 							if (field === "rate" || field === "amount") {
-									value = parseFloat( value ) || 0;
+								value = parseFloat( value ) || 0;
 							} else if (field === "priority") {
-								value = parseInt( value ) || 0;
+								value = parseInt( value, 10 ) || 0;
 							} else if (field === "category_ids") {
 								// For multi-select categories.
 								value = $( this ).val() || [];
 								if (value.length > 0) {
 									value = value.map(
 										function (v) {
-											return parseInt( v );
+											return parseInt( v, 10 );
 										}
 									);
 								}
@@ -1093,13 +1058,12 @@
 					);
 
 					// Ensure all required fields are present.
-					ruleData.taxable   =
-					ruleData.taxable !== undefined ? ruleData.taxable : true;
+					ruleData.taxable   = ruleData.taxable !== undefined ? ruleData.taxable : true;
 					ruleData.tax_class = ruleData.tax_class || "";
 
 					// For new rules, ensure amount field exists even if type is percentage.
 					if ( ! ruleData.hasOwnProperty( "amount" )) {
-							ruleData.amount = 0;
+						ruleData.amount = 0;
 					}
 					if ( ! ruleData.hasOwnProperty( "rate" )) {
 						ruleData.rate = 0;
@@ -1129,8 +1093,7 @@
 					enableSaveButton();
 
 					showNotice(
-						strings.rule_saved ||
-						'Rule saved. Remember to click "Save changes" to persist.',
+						strings.rule_saved || 'Rule saved. Remember to click "Save changes" to persist.',
 						"success"
 					);
 				}
@@ -1187,8 +1150,7 @@
 					deleteNoticeTimer = setTimeout(
 						function () {
 							showNotice(
-								strings.rule_deleted ||
-								'Rule deleted successfully. Remember to click "Save changes" to persist.',
+								strings.rule_deleted || 'Rule deleted successfully. Remember to click "Save changes" to persist.',
 								"success"
 							);
 						},
@@ -1199,187 +1161,191 @@
 
 			// Update rules table.
 			function updateRulesTable(rules) {
-					var tbody = $( "#cfwc-rules-tbody" );
-					tbody.empty();
+				var $tbody = $( "#cfwc-rules-tbody" );
+				$tbody.empty();
 
-					// Update the "Add to Existing Rules" button text based on whether rules exist.
-					var addPresetBtn = $( ".cfwc-add-preset" );
+				// Update the "Add to Existing Rules" button text based on whether rules exist.
+				var addPresetBtn = $( ".cfwc-add-preset" );
 				if (rules.length === 0) {
 					// No rules - show "Import Preset Rules".
 					addPresetBtn.text( strings.import_preset || "Import Preset Rules" );
-					tbody.append(
-						'<tr class="no-rules"><td colspan="7">' +
-						(strings.no_rules ||
-						"No rules configured. Use the preset loader above or add rules manually.") +
-						"</td></tr>"
+
+					var $no = el( "tr", { class: "no-rules" } );
+					$no.append(
+						el(
+							"td",
+							{ colspan: 7 },
+							null,
+							strings.no_rules ||
+							"No rules configured. Use the preset loader above or add rules manually."
+						)
 					);
-				} else {
-					// Has rules - show "Add to Existing Rules".
-					addPresetBtn.text( strings.add_to_existing || "Add to Existing Rules" );
-					$.each(
-						rules,
-						function (index, rule) {
-							var row = "<tr>";
-
-							// Label with priority (first column).
-							row += "<td>" + escapeHtml( rule.label || "" );
-							if (rule.priority && rule.priority > 0) {
-								row +=
-								' <span style="color: #666; font-size: 11px;">(' +
-								rule.priority +
-								' <span class="dashicons dashicons-info" style="font-size: 14px; vertical-align: middle; cursor: help;" ' +
-								'title="Higher priority rules are checked first (0-100)"></span>)</span>';
-							}
-							row += "</td>";
-
-							// Countries (From → To).
-							// Handle both old and new formats.
-							var from = rule.from_country || "";
-							var to   = rule.to_country || "";
-
-							// If old format (only 'country' field exists), it's the destination.
-							if ( ! from && ! to && rule.country) {
-								from = ""; // Any origin.
-								to   = rule.country; // The 'country' field is the destination in old format.
-							}
-
-							if ( ! from && ! to) {
-								row += "<td><em>All → All</em></td>";
-							} else if ( ! from) {
-								var toName = countries[to] || to;
-								row       += "<td>Any → " + toName + "</td>";
-							} else if ( ! to) {
-								var fromName = countries[from] || from;
-								row         += "<td>" + fromName + " → Any</td>";
-							} else {
-								var fromName = countries[from] || from;
-								var toName   = countries[to] || to;
-								row         += "<td>" + fromName + " → " + toName + "</td>";
-							}
-
-							// Products (Categories & HS Code).
-							row          += "<td>";
-							var matchType = rule.match_type || "all";
-							if (matchType === "all") {
-								row += "<em>All Products</em>";
-							} else {
-								var criteria = [];
-
-								// Categories.
-								if (rule.category_ids && rule.category_ids.length > 0) {
-									var catNames = [];
-									var catIds   = Array.isArray( rule.category_ids )
-									? rule.category_ids
-									: JSON.parse( rule.category_ids || "[]" );
-									$.each(
-										catIds.slice( 0, 2 ),
-										function (i, catId) {
-											if (cfwc_admin.categories && cfwc_admin.categories[catId]) {
-													catNames.push( cfwc_admin.categories[catId] );
-											}
-										}
-									);
-									if (catIds.length > 2) {
-												catNames.push( "+" + (catIds.length - 2) + " more" );
-									}
-									if (catNames.length > 0) {
-										criteria.push(
-											'<span class="dashicons dashicons-category" style="font-size: 14px;"></span> ' +
-											catNames.join( ", " )
-										);
-									}
-								}
-
-								// HS Code.
-								if (rule.hs_code_pattern) {
-									criteria.push(
-										'<span class="dashicons dashicons-tag" style="font-size: 14px;"></span> HS: ' +
-										rule.hs_code_pattern
-									);
-								}
-
-								row +=
-								criteria.length > 0
-								? criteria.join( "<br>" )
-								: "<em>All Products</em>";
-							}
-							row += "</td>";
-
-							// Type.
-							row +=
-							"<td>" +
-							(rule.type === "percentage"
-							? strings.percentage || "Percentage"
-							: strings.flat || "Flat") +
-							"</td>";
-
-							// Rate/Amount.
-							if (rule.type === "percentage") {
-								row += "<td>" + (rule.rate || 0) + "%</td>";
-							} else {
-								row += "<td>" + currency_symbol + (rule.amount || 0) + "</td>";
-							}
-
-							// Stacking mode - Use WooCommerce-style badges to match PHP rendering.
-							var stackingMode         = rule.stacking_mode || "add";
-							var stackingLabels       = {
-								add: strings.stack || "Stack",
-								override: strings.override || "Override",
-								exclusive: strings.exclusive || "Exclusive",
-							};
-							var stackingColors       = {
-								add: "#46b450",
-								override: "#f0ad4e",
-								exclusive: "#dc3232",
-							};
-							var stackingDescriptions = {
-								add: strings.stack_desc || "Adds with other matching rules",
-								override: strings.override_desc || "Replaces lower priority rules",
-								exclusive: strings.exclusive_desc || "Only this rule applies",
-							};
-
-							// Get values with defaults.
-							var badgeColor = stackingColors[stackingMode] || stackingColors.add;
-							var badgeLabel = stackingLabels[stackingMode] || stackingLabels.add;
-							var badgeTitle =
-							stackingDescriptions[stackingMode] || stackingDescriptions.add;
-
-							// Render WooCommerce-style badge matching PHP output.
-							row +=
-							"<td>" +
-							'<span style="display: inline-block; padding: 3px 8px; background: ' +
-							badgeColor +
-							'; color: #fff; border-radius: 3px; font-size: 11px; font-weight: 600; line-height: 1;" title="' +
-							badgeTitle +
-							'">' +
-							badgeLabel +
-							"</span>" +
-							"</td>";
-
-							// Actions.
-							row += "<td>";
-							row +=
-							'<button type="button" class="button cfwc-edit-rule" data-index="' +
-							index +
-							'">' +
-							(strings.edit || "Edit") +
-							"</button> ";
-							row +=
-							'<button type="button" class="button cfwc-delete-rule" data-index="' +
-							index +
-							'">' +
-							(strings.delete || "Delete") +
-							"</button>";
-							row += "</td>";
-
-							row += "</tr>";
-							tbody.append( row );
-						}
-					);
+					$tbody.append( $no );
+					return;
 				}
+
+				// Has rules - show "Add to Existing Rules".
+				addPresetBtn.text( strings.add_to_existing || "Add to Existing Rules" );
+
+				$.each(
+					rules,
+					function (index, rule) {
+						var $tr = el( "tr" );
+
+						// Label with priority (first column).
+						var $tdLabel = el( "td" );
+						$tdLabel.append( document.createTextNode( rule.label || "" ) );
+						if (rule.priority && rule.priority > 0) {
+							var $wrap = el(
+								"span",
+								null,
+								{ color: "#666", "font-size": "11px" },
+								null,
+								"(" + rule.priority + " "
+							);
+							var $ico  = el(
+								"span",
+								{
+									class: "dashicons dashicons-info",
+									title: "Higher priority rules are checked first (0-100)",
+								},
+								{ "font-size": "14px", "vertical-align": "middle", cursor: "help" }
+							);
+							$wrap.append( $ico ).append( ")" );
+							$tdLabel.append( " " ).append( $wrap );
+						}
+						$tr.append( $tdLabel );
+
+						// Countries (From → To).
+						var $tdCountries = el( "td" );
+						var from         = rule.from_country || "";
+						var to           = rule.to_country || "";
+						// Handle legacy 'country' field (destination).
+						if ( ! from && ! to && rule.country) {
+							from = "";
+							to   = rule.country;
+						}
+
+						if ( ! from && ! to) {
+							$tdCountries.append( el( "em", null, null, "All → All" ) );
+						} else if ( ! from) {
+							$tdCountries.append(
+								document.createTextNode( "Any → " + (countries[to] || to) )
+							);
+						} else if ( ! to) {
+							$tdCountries.append(
+								document.createTextNode( (countries[from] || from) + " → Any" )
+							);
+						} else {
+							$tdCountries.append(
+								document.createTextNode( (countries[from] || from) + " → " + (countries[to] || to) )
+							);
+						}
+						$tr.append( $tdCountries );
+
+						// Products (Categories & HS Code).
+						var $tdProducts = el( "td" );
+						var matchType   = rule.match_type || "all";
+						if (matchType === "all") {
+							$tdProducts.append( el( "em", null, null, "All Products" ) );
+						} else {
+							var hasLine = false;
+
+							// Categories.
+							if (rule.category_ids && rule.category_ids.length > 0) {
+								var catIds   = Array.isArray( rule.category_ids )
+								? rule.category_ids
+								: JSON.parse( rule.category_ids || "[]" );
+								var catNames = [];
+								$.each(
+									catIds.slice( 0, 2 ),
+									function (i, catId) {
+										if (cfwc_admin.categories && cfwc_admin.categories[catId]) {
+											catNames.push( cfwc_admin.categories[catId] );
+										}
+									}
+								);
+								if (catIds.length > 2) {
+									catNames.push( "+" + (catIds.length - 2) + " more" );
+								}
+								if (catNames.length > 0) {
+									var $line1 = el( "span" );
+									$line1.append( el( "span", { class: "dashicons dashicons-category" }, { "font-size": "14px" } ) );
+									$line1.append( document.createTextNode( " " + catNames.join( ", " ) ) );
+									$tdProducts.append( $line1 );
+									hasLine = true;
+								}
+							}
+
+							// HS Code.
+							if (rule.hs_code_pattern) {
+								if (hasLine) {
+									$tdProducts.append( el( "br" ) );
+								}
+								var $line2 = el( "span" );
+								$line2.append( el( "span", { class: "dashicons dashicons-tag" }, { "font-size": "14px" } ) );
+								$line2.append( document.createTextNode( " HS: " + rule.hs_code_pattern ) );
+								$tdProducts.append( $line2 );
+								hasLine = true;
+							}
+
+							if ( ! hasLine) {
+								$tdProducts.append( el( "em", null, null, "All Products" ) );
+							}
+						}
+						$tr.append( $tdProducts );
+
+						// Type.
+						$tr.append(
+							el(
+								"td",
+								null,
+								null,
+								(rule.type === "percentage" ? (strings.percentage || "Percentage") : (strings.flat || "Flat"))
+							)
+						);
+
+						// Rate/Amount.
+						if (rule.type === "percentage") {
+							$tr.append( el( "td", null, null, (rule.rate || 0) + "%" ) );
+						} else {
+							$tr.append( el( "td", null, null, currency_symbol + (rule.amount || 0) ) );
+						}
+
+						// Stacking badge.
+						$tr.append( el( "td" ).append( buildStackingBadge( rule.stacking_mode ) ) );
+
+						// Actions.
+						var $tdActions = el( "td" );
+						$tdActions.append(
+							el(
+								"button",
+								{ type: "button", class: "button cfwc-edit-rule", "data-index": index },
+								null,
+								strings.edit || "Edit"
+							)
+						);
+						$tdActions.append( " " );
+						$tdActions.append(
+							el(
+								"button",
+								{ type: "button", class: "button cfwc-delete-rule", "data-index": index },
+								null,
+								strings.delete || "Delete"
+							)
+						);
+						$tr.append( $tdActions );
+
+						$tbody.append( $tr );
+					}
+				);
 			}
+
+			// Expose updateRulesTable globally if needed by PHP-injected initial values.
+			window.cfwcUpdateRulesTable = updateRulesTable;
 		}
 	);
+
 	// Quick edit support for HS Code and Country of Origin.
 	$( document ).ready(
 		function () {
@@ -1415,9 +1381,7 @@
 									if (response.success && response.data) {
 										// Set HS Code if available.
 										if (response.data.hs_code) {
-											$( 'input[name="_cfwc_hs_code"]', $edit_row ).val(
-												response.data.hs_code
-											);
+											$( 'input[name="_cfwc_hs_code"]', $edit_row ).val( response.data.hs_code );
 										}
 
 										// Set Country of Origin if available.
