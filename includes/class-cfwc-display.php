@@ -120,7 +120,9 @@ class CFWC_Display {
 	 * @param WC_Order $order Order object.
 	 * @param array    $data   Posted data (unused but required by hook).
 	 */
-	public function save_fee_breakdown_to_order( $order, $data ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable -- Required by hook signature.
+	public function save_fee_breakdown_to_order( $order, $data ) {
+		// $data is required by the hook signature but not used.
+		unset( $data );
 		$breakdown = WC()->session->get( 'cfwc_fees_breakdown', array() );
 		if ( ! empty( $breakdown ) ) {
 			$order->update_meta_data( '_cfwc_fees_breakdown', $breakdown );
@@ -308,9 +310,9 @@ class CFWC_Display {
 	 * Add HS Code and Origin to order item email display.
 	 *
 	 * @since 1.0.0
-	 * @param array    $args      Email arguments.
+	 * @param array         $args      Email arguments.
 	 * @param WC_Order_Item $item Order item.
-	 * @param WC_Order $order     Order object.
+	 * @param WC_Order      $order     Order object.
 	 * @return array Modified arguments.
 	 */
 	public function add_hs_code_to_email_item( $args, $item, $order ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- Required by hook signature.

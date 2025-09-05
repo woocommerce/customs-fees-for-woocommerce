@@ -18,10 +18,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div class="cfwc-rules-section">
 	
 	<?php
-	// Collect all notices in one area
+	// Collect all notices in one area.
 	$notices = array();
 
-	// Check if WooCommerce tax is enabled
+	// Check if WooCommerce tax is enabled.
 	$tax_enabled = wc_tax_enabled();
 	if ( ! $tax_enabled ) {
 		$tax_notice  = '<strong>' . esc_html__( '⚠️ Tax is disabled in WooCommerce!', 'customs-fees-for-woocommerce' ) . '</strong> ';
@@ -36,7 +36,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		);
 	}
 
-	// Check setup status
+	// Check setup status.
 	if ( class_exists( 'CFWC_Onboarding' ) ) {
 		$onboarding = new CFWC_Onboarding();
 		$stats      = $onboarding->get_product_stats();
@@ -71,7 +71,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			$default_origin     = sanitize_text_field( get_option( 'cfwc_default_origin', 'store' ) );
 			$custom_origin      = sanitize_text_field( get_option( 'cfwc_custom_default_origin', '' ) );
 
-			// Determine the actual selected value for the dropdown
+			// Determine the actual selected value for the dropdown.
 			$selected_origin = '';
 			if ( 'store' === $default_origin ) {
 				$selected_origin = 'store';
@@ -433,7 +433,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</script>
 	
 	<?php
-	// Check if there are potentially stacking rules (only count "add" mode rules)
+	// Check if there are potentially stacking rules (only count "add" mode rules).
 	$has_stacking_risk  = false;
 	$stacking_countries = array();
 	if ( ! empty( $rules ) ) {
@@ -442,7 +442,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			$to_country    = $rule['to_country'] ?? $rule['country'] ?? '';
 			$stacking_mode = $rule['stacking_mode'] ?? 'add';
 
-			// Only count rules that can stack (add mode)
+			// Only count rules that can stack (add mode).
 			if ( ! empty( $to_country ) && 'add' === $stacking_mode ) {
 				if ( ! isset( $countries_add_rules[ $to_country ] ) ) {
 					$countries_add_rules[ $to_country ] = 0;
@@ -455,7 +455,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			}
 		}
 
-		// Also check if there are "add" mode rules mixed with exclusive/override for same country
+		// Also check if there are "add" mode rules mixed with exclusive/override for same country.
 		$countries_all_rules = array();
 		foreach ( $rules as $rule ) {
 			$to_country = $rule['to_country'] ?? $rule['country'] ?? '';
@@ -467,17 +467,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 			}
 		}
 
-		// Check for mixed stacking modes
+		// Check for mixed stacking modes.
 		foreach ( $countries_all_rules as $country => $modes ) {
 			if ( count( $modes ) > 1 && in_array( 'add', $modes, true ) ) {
-				// Has multiple rules AND at least one is "add" mode
+				// Has multiple rules AND at least one is "add" mode.
 				$has_stacking_risk              = true;
 				$stacking_countries[ $country ] = true;
 			}
 		}
 	}
 
-	// We'll handle stacking risk together with mixed rules below for a more comprehensive notice
+	// We'll handle stacking risk together with mixed rules below for a more comprehensive notice.
 	?>
 	
 	<!-- Quick Preset Loader -->
@@ -498,7 +498,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		
 		<button type="button" class="button button-primary cfwc-add-preset">
 			<?php
-			// Show different text based on whether rules exist
+			// Show different text based on whether rules exist.
 			if ( empty( $rules ) ) {
 				esc_html_e( 'Import Preset Rules', 'customs-fees-for-woocommerce' );
 			} else {
@@ -519,7 +519,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	
 	<!-- Mixed Rules Warning -->
 	<?php
-	// Check for potential conflicts between general and specific rules with "add" mode
+	// Check for potential conflicts between general and specific rules with "add" mode.
 	$has_general_add_rules  = false;
 	$has_specific_add_rules = false;
 	$mixed_destinations     = array();
@@ -529,30 +529,30 @@ if ( ! defined( 'ABSPATH' ) ) {
 		$to            = $rule['to_country'] ?? $rule['country'] ?? '';
 		$stacking_mode = $rule['stacking_mode'] ?? 'add';
 
-		// Only care about rules that can stack (add mode)
+		// Only care about rules that can stack (add mode).
 		if ( 'add' === $stacking_mode ) {
 			if ( empty( $from ) && ! empty( $to ) ) {
-				// General rule (any origin to specific destination)
+				// General rule (any origin to specific destination).
 				$has_general_add_rules     = true;
 				$mixed_destinations[ $to ] = true;
 			} elseif ( ! empty( $from ) && ! empty( $to ) ) {
-				// Specific rule (specific origin to specific destination)
+				// Specific rule (specific origin to specific destination).
 				$has_specific_add_rules    = true;
 				$mixed_destinations[ $to ] = true;
 			}
 		}
 	}
 
-	// Check for any rule stacking scenarios (combined notice for both mixed types and multiple rules)
+	// Check for any rule stacking scenarios (combined notice for both mixed types and multiple rules).
 	if ( $has_stacking_risk || ( $has_general_add_rules && $has_specific_add_rules ) ) {
 		$stacking_notice = '<strong>' . esc_html__( '⚠️ Rule Stacking Detected', 'customs-fees-for-woocommerce' ) . '</strong><br>';
 
-		// Check if we have mixed rule types
+		// Check if we have mixed rule types.
 		if ( $has_general_add_rules && $has_specific_add_rules ) {
 			$stacking_notice .= esc_html__( 'You have both general (Any → Country) and specific (Country → Country) rules with "Add" stacking mode. These will combine unless you set them to "Exclusive" or "Override" mode.', 'customs-fees-for-woocommerce' ) . ' ';
 			$stacking_notice .= esc_html__( 'Example: A general "Any → US 10%" rule will add to "China → US 25%" if both are in "Add" mode.', 'customs-fees-for-woocommerce' );
 		} elseif ( $has_stacking_risk ) {
-			// Just multiple rules for same destination
+			// Just multiple rules for same destination.
 			$country_names = array();
 			foreach ( array_keys( $stacking_countries ) as $code ) {
 				$country_names[] = WC()->countries->countries[ $code ] ?? $code;
@@ -570,7 +570,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		);
 	}
 
-	// Display all collected notices in one area
+	// Display all collected notices in one area.
 	if ( ! empty( $notices ) ) :
 		?>
 		<div class="cfwc-notices-container" style="margin-bottom: 20px;">
@@ -626,7 +626,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 								<?php
 								echo esc_html( $rule['label'] ?? '' );
 
-								// Match JavaScript rendering for priority
+								// Match JavaScript rendering for priority.
 								$priority = $rule['priority'] ?? 0;
 								if ( $priority > 0 ) {
 									echo ' <span style="color: #666; font-size: 11px;">(' . esc_html( $priority ) .
@@ -641,10 +641,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 								$from = $rule['from_country'] ?? '';
 								$to   = $rule['to_country'] ?? '';
 
-								// Handle old format where 'country' is the destination
+								// Handle old format where 'country' is the destination.
 								if ( empty( $from ) && empty( $to ) && ! empty( $rule['country'] ) ) {
-									$from = '';  // Any origin
-									$to   = $rule['country'];  // Destination
+									$from = '';  // Any origin.
+									$to   = $rule['country'];  // Destination.
 								}
 
 								if ( empty( $from ) && empty( $to ) ) {
@@ -726,7 +726,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 								<?php
 								$stacking_mode = $rule['stacking_mode'] ?? 'add';
 
-								// Use WooCommerce-style status badges
+								// Use WooCommerce-style status badges.
 								$stacking_labels = array(
 									'add'       => __( 'Stack', 'customs-fees-for-woocommerce' ),
 									'override'  => __( 'Override', 'customs-fees-for-woocommerce' ),
@@ -745,7 +745,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 									'exclusive' => __( 'Only this rule applies', 'customs-fees-for-woocommerce' ),
 								);
 
-								// Output WooCommerce-style badge
+								// Output WooCommerce-style badge.
 								$badge_color = $stacking_colors[ $stacking_mode ] ?? $stacking_colors['add'];
 								$badge_label = $stacking_labels[ $stacking_mode ] ?? $stacking_labels['add'];
 								$badge_title = $stacking_descriptions[ $stacking_mode ] ?? $stacking_descriptions['add'];

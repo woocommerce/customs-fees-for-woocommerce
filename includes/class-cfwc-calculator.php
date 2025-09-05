@@ -548,12 +548,12 @@ class CFWC_Calculator {
 	 * @return string Fee label.
 	 */
 	private function get_fee_label( $rule, $country, $origin = '' ) {
-		// If the rule has a custom label, use it as-is
+		// If the rule has a custom label, use it as-is.
 		if ( ! empty( $rule['label'] ) ) {
 			return $rule['label'];
 		}
 
-		// Otherwise, build a default label
+		// Otherwise, build a default label.
 		$countries    = WC()->countries->get_countries();
 		$country_name = isset( $countries[ $country ] ) ? $countries[ $country ] : $country;
 

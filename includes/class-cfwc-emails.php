@@ -32,7 +32,6 @@ class CFWC_Emails {
 		add_filter( 'woocommerce_order_item_name', array( $this, 'add_hs_code_to_order_item' ), 10, 3 );
 
 		// REMOVED: Custom content to emails - handled by class-cfwc-display.php to avoid duplication.
-		// add_action( 'woocommerce_email_after_order_table', array( $this, 'add_customs_info_to_email' ), 15, 4 );
 
 		// Admin email notifications.
 		add_action( 'woocommerce_email_order_meta', array( $this, 'add_admin_email_meta' ), 10, 3 );
@@ -51,6 +50,8 @@ class CFWC_Emails {
 	 * @return array Modified totals.
 	 */
 	public function add_fees_to_email_totals( $totals, $order, $tax_display = false ) {
+		// Unused parameter is required by filter signature.
+		unset( $tax_display );
 		$fees = $order->get_fees();
 
 		if ( empty( $fees ) ) {
@@ -119,6 +120,8 @@ class CFWC_Emails {
 	 * @return string Modified item name.
 	 */
 	public function add_hs_code_to_order_item( $item_name, $item, $is_visible = true ) {
+		// Unused parameter is required by filter signature.
+		unset( $is_visible );
 		// Only modify for product line items.
 		if ( ! is_a( $item, 'WC_Order_Item_Product' ) ) {
 			return $item_name;
@@ -182,6 +185,8 @@ class CFWC_Emails {
 	 * @param WC_Email $email         Email object.
 	 */
 	public function add_customs_info_to_email( $order, $sent_to_admin, $plain_text, $email ) {
+		// Unused parameter is required by action signature.
+		unset( $email );
 		// Only show for customer emails.
 		if ( $sent_to_admin ) {
 			return;
@@ -323,6 +328,8 @@ class CFWC_Emails {
 	 * @return string Modified CSS.
 	 */
 	public function add_email_styles( $css, $email ) {
+		// Unused parameter is required by filter signature.
+		unset( $email );
 		$additional_css = '
 			.cfwc-customs-notice {
 				margin: 20px 0;

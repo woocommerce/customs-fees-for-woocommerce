@@ -279,7 +279,7 @@ class CFWC_Onboarding {
 	 */
 	public function save_quick_edit_data( $post_id ) {
 		// Security checks.
-		if ( ! current_user_can( 'edit_product', $post_id ) ) {
+		if ( ! current_user_can( 'edit_product', $post_id ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown
 			return;
 		}
 
@@ -431,8 +431,6 @@ class CFWC_Onboarding {
 	 */
 	public function render_setup_status() {
 		// This method is now deprecated.
-		// Setup status is displayed in the consolidated notices area in rules-section.php
-		return;
+		// Setup status is displayed in the consolidated notices area in rules-section.php.
 	}
 }
-
