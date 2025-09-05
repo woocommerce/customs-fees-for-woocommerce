@@ -25,16 +25,42 @@ jobs:
           mkdir customs-fees-for-woocommerce
           rsync -av \
             --exclude="customs-fees-for-woocommerce" \
-            --exclude="assets" \
-            --exclude="src" \
             --exclude=".github" \
             --exclude=".gitignore" \
             --exclude="*.md" \
-            --exclude=".node_modules" \
+            --exclude="node_modules" \
             --exclude="package.json" \
             --exclude="package-lock.json" \
-            --exclude="prompts" \
+            --exclude="composer.json" \
+            --exclude="composer.lock" \
+            --exclude="phpstan.neon" \
+            --exclude="phpstan-bootstrap.php" \
+            --exclude="vendor" \
+            --exclude="src" \
+            --exclude="build" \
+            --exclude="dist" \
             --exclude="bin" \
+            --exclude="tests" \
+            --exclude="phpunit.xml" \
+            --exclude="phpunit.xml.dist" \
+            --exclude=".phpunit.result.cache" \
+            --exclude="*.log" \
+            --exclude="*.cache" \
+            --exclude="*.tmp" \
+            --exclude="*.bak" \
+            --exclude="*~" \
+            --exclude=".DS_Store" \
+            --exclude="Thumbs.db" \
+            --exclude="desktop.ini" \
+            --exclude=".vscode" \
+            --exclude=".idea" \
+            --exclude="*.sublime-project" \
+            --exclude="*.sublime-workspace" \
+            --exclude="*.swp" \
+            --exclude="*.swo" \
+            --exclude=".env" \
+            --exclude=".env.local" \
+            --exclude="prompts" \
             --exclude="sales.md" \
             ./* customs-fees-for-woocommerce/
 

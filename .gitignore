@@ -7,6 +7,9 @@
 /dist/
 *.zip
 
+# Development scripts (not for distribution)
+/bin/
+
 # IDE files
 .vscode/
 .idea/
