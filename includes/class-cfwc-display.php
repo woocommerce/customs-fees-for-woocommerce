@@ -284,7 +284,7 @@ class CFWC_Display {
 
 		// Get data from product/parent.
 		$hs_code = get_post_meta( $parent_id ? $parent_id : $product_id, '_cfwc_hs_code', true );
-		$origin  = get_post_meta( $parent_id ? $parent_id : $product_id, '_cfwc_origin_country', true );
+		$origin  = get_post_meta( $parent_id ? $parent_id : $product_id, '_cfwc_country_of_origin', true );
 
 		// Add to display if available.
 		$extra_info = '';
@@ -331,7 +331,7 @@ class CFWC_Display {
 
 		// Get data from product/parent.
 		$hs_code = get_post_meta( $parent_id ? $parent_id : $product_id, '_cfwc_hs_code', true );
-		$origin  = get_post_meta( $parent_id ? $parent_id : $product_id, '_cfwc_origin_country', true );
+		$origin  = get_post_meta( $parent_id ? $parent_id : $product_id, '_cfwc_country_of_origin', true );
 
 		// Add to display if available.
 		$extra_info = array();

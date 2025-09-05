@@ -62,6 +62,26 @@ class CFWC_Calculator {
 
 	/**
 	 * Calculate fees for the cart.
+	 * 
+	 * IMPORTANT: How Customs & Import Fees Work
+	 * ==========================================
+	 * In real-world customs, when a shipment contains multiple products:
+	 * 
+	 * 1. Each product type (HS code) is assessed individually
+	 * 2. The duty rate for each product is based on its specific HS code
+	 * 3. The fee for each product = (product value) × (duty rate)
+	 * 4. Total customs fees = sum of all individual product fees
+	 * 
+	 * Example: If you ship 2 electronics (25% duty) and 1 battery (25% duty):
+	 * - Electronics: $100 × 25% = $25
+	 * - Electronics: $100 × 25% = $25  
+	 * - Battery: $50 × 25% = $12.50
+	 * - Total customs fees = $62.50
+	 * 
+	 * Rule Matching Priority:
+	 * - More specific HS codes have priority over broader patterns
+	 * - Example: "8506*" (batteries) beats "85*" (electronics) for HS code 8506
+	 * - The specificity score considers pattern length and complexity
 	 *
 	 * @since 1.0.0
 	 * @param WC_Cart $cart The WooCommerce cart object.
@@ -135,15 +155,28 @@ class CFWC_Calculator {
 			// Get product origin.
 			$origin = get_post_meta( $product_id, '_cfwc_country_of_origin', true );
 
-			// Check and log if no origin set.
+			// Use default origin if no origin set on product.
 			if ( empty( $origin ) ) {
-				$this->log_debug(
-					sprintf(
-						'  SKIPPED %s - Reason: No country of origin configured',
-						$product_info
-					)
-				);
-				continue;
+				$origin = $this->get_default_origin();
+				
+				// Skip if still no origin after checking default.
+				if ( empty( $origin ) ) {
+					$this->log_debug(
+						sprintf(
+							'  SKIPPED %s - Reason: No country of origin configured and no default origin set',
+							$product_info
+						)
+					);
+					continue;
+				} else {
+					$this->log_debug(
+						sprintf(
+							'  Using default origin (%s) for %s',
+							$origin,
+							$product_info
+						)
+					);
+				}
 			}
 
 			// Get matching rules for this product.
@@ -181,11 +214,38 @@ class CFWC_Calculator {
 			} else {
 				$this->log_debug(
 					sprintf(
-						'    → No matching rules found for %s → %s',
+						'    → No specific rules found for %s → %s, checking for general import rule',
 						$origin,
 						$destination_country
 					)
 				);
+				
+				// Look for a general import rule (match_type = 'all') for this country pair
+				foreach ( $rules as $rule_id => $rule ) {
+					$match_type = $rule['match_type'] ?? 'all';
+					$rule_from = $rule['from_country'] ?? $rule['origin_country'] ?? $rule['country'] ?? '';
+					$rule_to   = $rule['to_country'] ?? $rule['country'] ?? '';
+					
+					// Check if this is a general rule for the same country pair
+					if ( 'all' === $match_type && 
+						 $rule_from === $origin && 
+						 $rule_to === $destination_country ) {
+						$rule['rule_id'] = $rule_id;
+						$matching_rules[] = $rule;
+						$this->log_debug(
+							sprintf(
+								'      → Found general import rule for %s → %s',
+								$origin,
+								$destination_country
+							)
+						);
+						break; // Use the first matching general rule
+					}
+				}
+				
+				if ( empty( $matching_rules ) ) {
+					$this->log_debug( '      → No general import rule found either' );
+				}
 			}
 
 			// Process matching rules for this product.
@@ -194,25 +254,36 @@ class CFWC_Calculator {
 				if ( false !== $fee && $fee > 0 ) {
 					$base_label = $this->get_fee_label( $rule, $destination_country, $origin );
 
-					// Add percentage rate in brackets only for percentage rules.
-					if ( isset( $rule['type'] ) && 'percentage' === $rule['type'] && ! empty( $rule['rate'] ) ) {
+					// Check if the label already contains a percentage (e.g., "(50%)")
+					$has_percentage = preg_match( '/\(\d+(?:\.\d+)?%\)/', $base_label );
+
+					// Add percentage rate in brackets only if not already present and it's a percentage rule.
+					if ( ! $has_percentage && isset( $rule['type'] ) && 'percentage' === $rule['type'] && ! empty( $rule['rate'] ) ) {
 						$label = sprintf( '%s (%s%%)', $base_label, $rule['rate'] );
 					} else {
-						// For flat rate, just use the base label.
+						// For flat rate or if percentage already in label, just use the base label.
 						$label = $base_label;
 					}
 
-					// Group fees by label for consolidation.
-					if ( ! isset( $fees_by_label[ $label ] ) ) {
-						$fees_by_label[ $label ] = array(
-							'label'     => $label,
-							'amount'    => 0,
-							'taxable'   => $this->is_fee_taxable( $rule ),
-							'tax_class' => $this->get_fee_tax_class( $rule ),
+					// Create a unique key for grouping that includes the base label and rate
+					$group_key = $base_label . '|' . ( $rule['type'] ?? 'flat' ) . '|' . ( $rule['rate'] ?? '0' );
+
+					// Group fees by rule for consolidation.
+					if ( ! isset( $fees_by_label[ $group_key ] ) ) {
+						$fees_by_label[ $group_key ] = array(
+							'base_label' => $base_label,
+							'label'      => $label,
+							'amount'     => 0,
+							'count'      => 0,
+							'rate'       => $rule['rate'] ?? '',
+							'type'       => $rule['type'] ?? 'flat',
+							'taxable'    => $this->is_fee_taxable( $rule ),
+							'tax_class'  => $this->get_fee_tax_class( $rule ),
 						);
 					}
 
-					$fees_by_label[ $label ]['amount'] += $fee;
+					$fees_by_label[ $group_key ]['amount'] += $fee;
+					$fees_by_label[ $group_key ]['count']++;
 
 					// Log fee application.
 					$this->log_debug(
@@ -226,8 +297,39 @@ class CFWC_Calculator {
 			}
 		}
 
-		// Convert grouped fees to array.
-		$fees = array_values( $fees_by_label );
+		// Convert grouped fees to array and update labels with count.
+		$fees = array();
+		foreach ( $fees_by_label as $fee_data ) {
+			// Update label to show count if more than one product matches
+			if ( $fee_data['count'] > 1 ) {
+				// Check if the label already has percentage
+				$has_percentage = preg_match( '/\(\d+(?:\.\d+)?%\)/', $fee_data['label'] );
+				
+				if ( $has_percentage ) {
+					// Label already has percentage, just add count
+					$fee_data['label'] = sprintf( '%s x %d', 
+						$fee_data['label'],
+						$fee_data['count']
+					);
+				} elseif ( 'percentage' === $fee_data['type'] && ! empty( $fee_data['rate'] ) ) {
+					// Add both percentage and count
+					$fee_data['label'] = sprintf( '%s (%s%%) x %d', 
+						$fee_data['base_label'], 
+						$fee_data['rate'],
+						$fee_data['count']
+					);
+				} else {
+					// Just add count
+					$fee_data['label'] = sprintf( '%s x %d', 
+						$fee_data['base_label'],
+						$fee_data['count']
+					);
+				}
+			}
+			// Remove temporary fields
+			unset( $fee_data['base_label'], $fee_data['count'], $fee_data['rate'], $fee_data['type'] );
+			$fees[] = $fee_data;
+		}
 
 		// Log summary.
 		if ( ! empty( $fees ) ) {
@@ -278,9 +380,13 @@ class CFWC_Calculator {
 			$product_id = $cart_item['variation_id'] ? $cart_item['variation_id'] : $cart_item['product_id'];
 			$origin     = get_post_meta( $product_id, '_cfwc_country_of_origin', true );
 
-			// Default to 'unknown' if no origin set.
+			// Use default origin if no origin set on product.
 			if ( empty( $origin ) ) {
-				$origin = 'unknown';
+				$origin = $this->get_default_origin();
+				// If still no origin, default to 'unknown'.
+				if ( empty( $origin ) ) {
+					$origin = 'unknown';
+				}
 			}
 
 			// Initialize group if not exists.
@@ -704,6 +810,32 @@ class CFWC_Calculator {
 	}
 
 	/**
+	 * Get default origin country from settings.
+	 *
+	 * @since 1.2.1
+	 * @return string|null Country code or null if not set.
+	 */
+	private function get_default_origin() {
+		$default_origin = get_option( 'cfwc_default_origin', 'store' );
+		
+		if ( 'store' === $default_origin ) {
+			// Use store's base country.
+			$base_country = get_option( 'woocommerce_default_country' );
+			if ( $base_country ) {
+				// Extract country code from base country (format: US:CA).
+				$parts = explode( ':', $base_country );
+				return $parts[0];
+			}
+		} elseif ( 'custom' === $default_origin ) {
+			// Use custom default origin.
+			return get_option( 'cfwc_custom_default_origin', '' );
+		}
+		
+		// Return null if 'none' or not set.
+		return null;
+	}
+
+	/**
 	 * Clear cache.
 	 *
 	 * @since 1.0.0
@@ -740,6 +872,12 @@ class CFWC_Calculator {
 			// If an origin_country is specified, only include products matching that origin.
 			if ( ! empty( $origin_country ) ) {
 				$product_origin = get_post_meta( $product->get_id(), '_cfwc_country_of_origin', true );
+				
+				// Use default origin if no origin set on product.
+				if ( empty( $product_origin ) ) {
+					$product_origin = $this->get_default_origin();
+				}
+				
 				if ( $product_origin !== $origin_country ) {
 					continue;
 				}

@@ -62,6 +62,22 @@ class CFWC_Rule_Matcher {
 		// Sort by priority (higher priority first).
 		usort( $matching_rules, array( $this, 'sort_by_priority' ) );
 
+		// Debug: Log matching rules with their specificity scores.
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
+			foreach ( $matching_rules as $rule ) {
+				$specificity = $this->calculate_specificity( $rule );
+				$priority = isset( $rule['priority'] ) ? (int) $rule['priority'] : 0;
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug only
+				error_log( sprintf(
+					'[CFWC] Matched rule: %s | HS: %s | Priority: %d | Specificity: %d',
+					$rule['label'] ?? 'Unknown',
+					$rule['hs_code_pattern'] ?? 'All',
+					$priority,
+					$specificity
+				) );
+			}
+		}
+
 		// Handle stacking modes.
 		return $this->apply_stacking_modes( $matching_rules );
 	}
@@ -318,11 +334,40 @@ class CFWC_Rule_Matcher {
 	private function calculate_specificity( $rule ) {
 		$score = 0;
 
-		// HS code is most specific.
-		if ( ! empty( $rule['hs_code_pattern'] ) && strpos( $rule['hs_code_pattern'], '*' ) === false ) {
-			$score += 100; // Exact HS code.
-		} elseif ( ! empty( $rule['hs_code_pattern'] ) ) {
-			$score += 50; // HS code pattern.
+		// HS code is most specific - calculate based on pattern complexity.
+		if ( ! empty( $rule['hs_code_pattern'] ) ) {
+			$pattern = $rule['hs_code_pattern'];
+			
+			// Check for comma-separated patterns (more specific).
+			if ( strpos( $pattern, ',' ) !== false ) {
+				$patterns = array_map( 'trim', explode( ',', $pattern ) );
+				$pattern_count = count( $patterns );
+				
+				// Multiple specific patterns get higher score.
+				$score += 80 + ( $pattern_count * 5 );
+				
+				// Add score based on the specificity of each pattern.
+				foreach ( $patterns as $p ) {
+					if ( strpos( $p, '*' ) === false ) {
+						// Exact code in the list.
+						$score += 10;
+					} else {
+						// Pattern with wildcard - more digits before * = more specific.
+						$digits_before_wildcard = strpos( $p, '*' );
+						$score += $digits_before_wildcard * 2;
+					}
+				}
+			} elseif ( strpos( $pattern, '*' ) === false ) {
+				// Single exact HS code (most specific).
+				$score += 100;
+			} else {
+				// Single pattern with wildcard - score based on specificity.
+				$digits_before_wildcard = strpos( $pattern, '*' );
+				// Base score of 50, plus 5 points per digit before wildcard.
+				// So "8506*" (4 digits) = 50 + 20 = 70
+				// And "85*" (2 digits) = 50 + 10 = 60
+				$score += 50 + ( $digits_before_wildcard * 5 );
+			}
 		}
 
 		// Category is moderately specific.
