@@ -60,71 +60,71 @@ if ( ! defined( 'ABSPATH' ) ) {
 	}
 	?>
 	
-	<!-- Settings Row (Simplified) -->
-	<div style="margin-top: 30px; margin-bottom: 40px;">
-		<div style="padding: 0;">
-			<?php
-			$base_country       = get_option( 'woocommerce_default_country' );
-			$base_country_parts = explode( ':', $base_country );
-			$store_country      = $base_country_parts[0];
-			$store_country_name = WC()->countries->countries[ $store_country ] ?? $store_country;
-			$default_origin     = sanitize_text_field( get_option( 'cfwc_default_origin', 'store' ) );
-			$custom_origin      = sanitize_text_field( get_option( 'cfwc_custom_default_origin', '' ) );
+	<!-- Global Settings Section (WooCommerce Style) -->
+	<?php
+	$base_country       = get_option( 'woocommerce_default_country' );
+	$base_country_parts = explode( ':', $base_country );
+	$store_country      = $base_country_parts[0];
+	$store_country_name = WC()->countries->countries[ $store_country ] ?? $store_country;
+	$default_origin     = sanitize_text_field( get_option( 'cfwc_default_origin', 'store' ) );
+	$custom_origin      = sanitize_text_field( get_option( 'cfwc_custom_default_origin', '' ) );
 
-			// Determine the actual selected value for the dropdown.
-			$selected_origin = '';
-			if ( 'store' === $default_origin ) {
-				$selected_origin = 'store';
-			} elseif ( 'none' === $default_origin ) {
-				$selected_origin = 'none';
-			} elseif ( 'custom' === $default_origin && ! empty( $custom_origin ) ) {
-				$selected_origin = $custom_origin;
-			}
-			?>
-			
-			<div>
-				<label for="cfwc_default_origin_select" style="font-weight: 600; font-size: 14px;">
-					<?php esc_html_e( 'Default Product Origin', 'customs-fees-for-woocommerce' ); ?>
-				</label>
-				
-				<select id="cfwc_default_origin_select" name="cfwc_default_origin_select" class="wc-enhanced-select" style="width: 350px; margin-left: 20px; max-width: 100%;">
-					<option value="store" <?php selected( $selected_origin, 'store' ); ?>>
-						<?php
-						printf(
-							/* translators: %s: Store country name */
-							esc_html__( 'Same as store location (%s)', 'customs-fees-for-woocommerce' ),
-							esc_html( $store_country_name )
-						);
-						?>
-					</option>
-					<option value="none" <?php selected( $selected_origin, 'none' ); ?>>
-						<?php esc_html_e( 'No default (set per product)', 'customs-fees-for-woocommerce' ); ?>
-					</option>
-					<optgroup label="<?php esc_attr_e( 'Different Country', 'customs-fees-for-woocommerce' ); ?>">
-						<?php
-						foreach ( WC()->countries->get_countries() as $code => $name ) {
-							if ( $code !== $store_country ) {
-								?>
-								<option value="<?php echo esc_attr( $code ); ?>" <?php selected( $selected_origin, $code ); ?>>
-									<?php echo esc_html( $name ); ?>
-								</option>
-								<?php
+	// Determine the actual selected value for the dropdown.
+	$selected_origin = '';
+	if ( 'store' === $default_origin ) {
+		$selected_origin = 'store';
+	} elseif ( 'none' === $default_origin ) {
+		$selected_origin = 'none';
+	} elseif ( 'custom' === $default_origin && ! empty( $custom_origin ) ) {
+		$selected_origin = $custom_origin;
+	}
+	?>
+	
+	<table class="form-table">
+		<tbody>
+			<tr valign="top">
+				<th scope="row" class="titledesc">
+					<label for="cfwc_default_origin_select">
+						<?php esc_html_e( 'Default Product Origin', 'customs-fees-for-woocommerce' ); ?>
+						<span class="woocommerce-help-tip" data-tip="<?php esc_attr_e( 'Sets the default country of origin for new products. This determines which customs rules apply when products are shipped internationally. Existing products keep their saved origin.', 'customs-fees-for-woocommerce' ); ?>"></span>
+					</label>
+				</th>
+				<td class="forminp">
+					<select id="cfwc_default_origin_select" name="cfwc_default_origin_select" class="wc-enhanced-select" style="width: 350px; max-width: 50%;">
+						<option value="store" <?php selected( $selected_origin, 'store' ); ?>>
+							<?php
+							printf(
+								/* translators: %s: Store country name */
+								esc_html__( 'Same as store location (%s)', 'customs-fees-for-woocommerce' ),
+								esc_html( $store_country_name )
+							);
+							?>
+						</option>
+						<option value="none" <?php selected( $selected_origin, 'none' ); ?>>
+							<?php esc_html_e( 'No default (set per product)', 'customs-fees-for-woocommerce' ); ?>
+						</option>
+						<optgroup label="<?php esc_attr_e( 'Different Country', 'customs-fees-for-woocommerce' ); ?>">
+							<?php
+							foreach ( WC()->countries->get_countries() as $code => $name ) {
+								if ( $code !== $store_country ) {
+									?>
+									<option value="<?php echo esc_attr( $code ); ?>" <?php selected( $selected_origin, $code ); ?>>
+										<?php echo esc_html( $name ); ?>
+									</option>
+									<?php
+								}
 							}
-						}
-						?>
-					</optgroup>
-				</select>
-			</div>
-			
-			<p style="margin: 10px 0 0 0; color: #666; font-size: 13px;">
-				<?php esc_html_e( 'This sets the default for new products only. Existing products keep their saved origin.', 'customs-fees-for-woocommerce' ); ?>
-			</p>
-			
-			<!-- Hidden inputs for backward compatibility -->
-			<input type="hidden" name="cfwc_default_origin" id="cfwc_default_origin" value="<?php echo esc_attr( $default_origin ); ?>" />
-			<input type="hidden" name="cfwc_custom_default_origin" id="cfwc_custom_default_origin" value="<?php echo esc_attr( $custom_origin ); ?>" />
-		</div>
-	</div>
+							?>
+						</optgroup>
+					</select>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	
+	<!-- Hidden inputs for backward compatibility -->
+	<input type="hidden" name="cfwc_default_origin" id="cfwc_default_origin" value="<?php echo esc_attr( $default_origin ); ?>" />
+	<input type="hidden" name="cfwc_custom_default_origin" id="cfwc_custom_default_origin" value="<?php echo esc_attr( $custom_origin ); ?>" />
 	
 	<!-- WooCommerce Style Modal for Help -->
 	<div id="cfwc-help-modal" class="cfwc-modal" style="display: none;">
