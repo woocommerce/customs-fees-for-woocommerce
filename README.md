@@ -1,15 +1,15 @@
 # Customs Fees for WooCommerce
 
-Automatically calculate and display customs fees, import duties, and tariffs at checkout based on product origin and destination countries.
+Automatically calculate and display import duties, customs fees, and taxes for international WooCommerce orders.
+
+Customs Fees for WooCommerce provides transparent international shipping cost calculations by automatically computing import duties, customs fees, and taxes during checkout. Your customers see the complete landed cost upfront, eliminating surprise fees at delivery and reducing cart abandonment.
 
 ## Purpose
 
 With the U.S. ending its de minimis exemption on **August 29, 2025**, all international shipments will require customs duties regardless of value. This plugin helps merchants:
 
 - **Add transparency** to international orders.
-- **Prevent cart abandonment** from surprise fees at delivery.
-- **Build customer trust** with upfront total costs.
-- **Stay compliant** with changing international regulations.
+- **Prevent cart abandonment** from
 
 ## Features
 
@@ -32,78 +32,6 @@ With the U.S. ending its de minimis exemption on **August 29, 2025**, all intern
 - **Multi-Currency Support**: Works with WooCommerce multi-currency stores.
 - **Developer Friendly**: Extensive hooks and filters for customization.
 
-## Installation
-
-### Requirements
-
-- WordPress 6.0 or higher
-- WooCommerce 9.0 or higher
-- PHP 7.4 or higher
-
-### Installation Steps
-
-1. Upload the plugin files to `/wp-content/plugins/customs-fees-for-woocommerce/`.
-2. Activate the plugin through the 'Plugins' menu in WordPress.
-3. Navigate to **WooCommerce > Settings > Tax > Customs Fees** to configure.
-
-## Quick Start Guide
-
-### Step 1: Add Customs Fees Rules
-
-1. Go to **WooCommerce > Settings > Tax > Customs & Import Fees**
-2. Choose your setup method:
-
-#### Option A: Use Presets (Recommended)
-
-1. Find the "Quick Start with Presets" section.
-2. Select a preset (e.g., "US Tariffs - General Import").
-3. Click "Add Preset Rules".
-4. Save changes.
-
-**Available Presets:**
-
-- **US Tariffs**: General, China (25%), EU, Canada (USMCA), Mexico, Japan.
-- **UK Import**: VAT (20%) and standard duties.
-- **EU Common Customs**: Standard EU tariff rates.
-- **Canadian**: GST and import duties.
-- **Australian**: GST (10%) and import duties.
-
-#### Option B: Create Custom Rules
-
-1. Click "Add New Rule".
-2. Configure:
-   - **Label**: Display name (e.g., "Import Duty from China").
-   - **Destination**: Where products ship to
-   - **Origin**: Where products come from
-   - **Type**: Percentage or Flat fee
-   - **Rate/Amount**: Fee value
-   - **Stacking**: How rule combines with others
-3. Save changes
-
-### Step 2: Set Product Origins
-
-#### Individual Products
-
-1. Edit any product.
-2. Go to **Product Data > Inventory**.
-3. Find **"Customs & Import Information"**.
-4. Set **Country of Origin**.
-5. Optionally add **HS Code**.
-6. Update product.
-
-#### Bulk Update
-
-1. **Method 1**: Select products → Bulk Edit → Set origin country.
-2. **Method 2**: Export products CSV → Add origin data → Re-import.
-3. **Method 3**: Use provided bulk actions in products list.
-
-### Step 3: Test Your Setup
-
-1. Add products to cart.
-2. Go to checkout.
-3. Verify "Customs & Import Fees" appears.
-4. Check fee breakdown is correct.
-
 ![Settings](.github/media/settings.png)
 ![Product Settings](.github/media/product-settings.png)
 ![Classic Cart](.github/media/cart.png)
@@ -112,111 +40,87 @@ With the U.S. ending its de minimis exemption on **August 29, 2025**, all intern
 ![Order Details](.github/media/order-details.png)
 ![Email](.github/media/email.png)
 
-## Testing Scenarios
+## Installation
 
-### Scenario 1: Mixed Origin Cart
+### Minimum requirements
 
-**Setup:**
+- WordPress 6.0 or higher
+- WooCommerce 9.0 or higher
+- PHP 7.4 or higher
 
-- Product A: T-shirt from China ($20)
-- Product B: Electronics from Japan ($100)
-- Product C: Local product ($50)
-- Customer shipping to: United States
+### Manual installation
 
-**Expected Result:**
+1. Download the plugin ZIP file
+2. Log in to your WordPress dashboard
+3. Navigate to **Plugins > Add New > Upload Plugin**
+4. Upload the ZIP file and click **Install Now**
+5. Activate the plugin through the **Plugins** menu
 
-```
-T-shirt (China → US): $20 × 25% = $5.00
-Electronics (Japan → US): $100 × 5% = $5.00
-Local product: No fee
-Total Customs Fees: $10.00
-```
+## Quick start guide
 
-### Scenario 2: USMCA Free Trade
+### 1. Configure global settings
 
-**Setup:**
+Navigate to **WooCommerce > Settings > Tax > Customs Fees** and set your default product origin country.
 
-- Products from Canada
-- Shipping to United States
+### 2. Create your first rule
 
-**Expected Result:**
+Click **Add New Rule** and configure:
 
-```
-No customs fees (0% under USMCA agreement)
-```
+- Rule name (e.g., "EU Electronics Import")
+- Origin and destination countries
+- Fee type (percentage or fixed amount)
+- Matching criteria (categories, HS codes, or all products)
 
-### Scenario 3: EU to UK Post-Brexit
+### 3. Configure products
 
-**Setup:**
+Edit products to add:
 
-- Products from Germany (EU)
-- Shipping to United Kingdom
-- Order value: £200
+- **Country of Origin** - Manufacturing country
+- **HS Code** - Harmonized System classification code
 
-**Expected Result:**
+### 4. Test the checkout
 
-```
-Import VAT: £200 × 20% = £40.00
-Duty: £200 × 8% = £16.00
-Total Customs Fees: £56.00
-```
+Add products to cart and proceed to checkout to see customs fees calculated automatically.
 
-### Scenario 4: Threshold-Based Rules
+## Usage examples
 
-**Setup:**
+### Example 1: General import duty
 
-- Configure rule: Apply 10% duty only on orders over $150
-- Test with $100 order and $200 order
-
-**Expected Result:**
+**Scenario:** Apply 7.5% import duty on all products from China to United States
 
 ```
-$100 order: No customs fees
-$200 order: $20 customs fee (10% of $200)
+Rule Name: China to US Import Duty
+From: China (CN)
+To: United States (US)
+Fee Type: Percentage
+Amount: 7.5
+Match Type: All Products
 ```
 
-### Scenario 5: Stacking Rules
+### Example 2: Category-specific fees
 
-**Setup:**
-
-- Rule 1: China → US: 25% (Stacking: Add)
-- Rule 2: Electronics category: 5% (Stacking: Add)
-- Electronics from China: $100
-
-**Expected Result:**
+**Scenario:** 15% duty on electronics from any country to European Union
 
 ```
-Base tariff: $100 × 25% = $25.00
-Electronics duty: $100 × 5% = $5.00
-Total: $30.00
+Rule Name: EU Electronics Tariff
+From: All Countries
+To: Germany (DE)
+Categories: Electronics
+Fee Type: Percentage
+Amount: 15
+Match Type: Category
 ```
 
-### Scenario 6: Override Rules
+### Example 3: HS code precision
 
-**Setup:**
-
-- Rule 1: All origins → US: 10% (Stacking: Add)
-- Rule 2: China → US: 25% (Stacking: Override)
-
-**Expected Result:**
+**Scenario:** Fixed fee for lithium batteries (HS codes 8506, 8507)
 
 ```
-Products from China: Only 25% applies (overrides 10%)
-Products from other countries: 10% applies
-```
-
-### Scenario 7: Exclusive Rules
-
-**Setup:**
-
-- Rule 1: Textiles: 12% (Stacking: Exclusive)
-- Rule 2: China origin: 25% (Stacking: Add)
-
-**Expected Result:**
-
-```
-Textile products: Only 12% applies (exclusive rule stops processing)
-Non-textile from China: 25% applies
+Rule Name: Battery Import Fee
+HS Codes: 8506,8507
+Fee Type: Fixed
+Amount: 25.00
+Match Type: HS Code
 ```
 
 ## Display Examples
@@ -244,101 +148,66 @@ Customs Fees      $23.50 ⓘ
 Total           $203.50
 ```
 
-## Configuration Examples
+## Developer documentation
 
-### Example 1: US Store with Global Suppliers
+### Available hooks
 
-```
-// Preset: US General Import
-Rules:
-- China → US: 25% (tariff)
-- EU → US: 8% (general duty)
-- Canada → US: 0% (USMCA)
-- Mexico → US: 0% (USMCA)
-- All others → US: 5% (general)
-```
-
-### Example 2: EU Store
+#### Filters
 
 ```
-// Preset: EU Common Customs
-Rules:
-- Non-EU → EU: 20% VAT + varying duties
-- China → EU: Anti-dumping duties
-- US → EU: Retaliatory tariffs on select items
-```
-
-### Example 3: Multi-Channel Setup
-
-```
-// Different rules per sales channel
-add_filter('cfwc_fee_rules', function($rules, $context) {
-    if (is_wholesale_customer()) {
-        // Apply wholesale customs rates
-        return $wholesale_rules;
-    }
-    return $rules;
-}, 10, 2);
-```
-
-## Developer Guide
-
-### Hooks and Filters
-
-```
-// Modify calculated fees
-add_filter('cfwc_calculated_fee', function($fee, $rule, $product, $context) {
-    // Custom logic here
+// Modify calculated fee amount
+add_filter( 'cfwc_calculated_fee', function( $fee, $product, $rule ) {
+    // Custom fee logic
     return $fee;
-}, 10, 4);
+}, 10, 3 );
 
-// Add custom rules programmatically
-add_filter('cfwc_fee_rules', function($rules, $destination) {
-    if ($destination === 'US') {
-        $rules[] = [
-            'label' => 'Special Processing Fee',
-            'type' => 'flat',
-            'amount' => 10
-        ];
-    }
-    return $rules;
-}, 10, 2);
-
-// Customize fee labels
-add_filter('cfwc_fee_label', function($label, $rule, $context) {
-    return sprintf(__('Import Tax: %s', 'text-domain'), $label);
-}, 10, 3);
+// Customize fee label
+add_filter( 'cfwc_fee_label', function( $label, $rule ) {
+    return $label . ' (Estimated)';
+}, 10, 2 );
 
 // Override product origin
-add_filter('cfwc_product_origin', function($origin, $product_id) {
-    // Custom logic to determine origin
+add_filter( 'cfwc_product_origin', function( $origin, $product_id ) {
+    // Custom origin logic
     return $origin;
-}, 10, 2);
+}, 10, 2 );
 ```
 
-### Custom Rule Conditions
+#### Actions
 
 ```
-// Add custom matching logic
-add_filter('cfwc_rule_matches', function($matches, $rule, $product, $context) {
-    // Check custom conditions
-    if ($rule['type'] === 'luxury' && $product->get_price() > 1000) {
-        return true;
-    }
-    return $matches;
-}, 10, 4);
+// After fees are calculated
+add_action( 'cfwc_after_calculate_fees', function( $fees, $cart ) {
+    // Log or process calculated fees
+}, 10, 2 );
+
+// After rule is saved
+add_action( 'cfwc_rule_saved', function( $rule_id, $rule_data ) {
+    // Sync with external system
+}, 10, 2 );
 ```
 
-### Database Structure
+### Database schema
 
-```
--- Rules stored in wp_options
-option_name: cfwc_rules
-option_value: JSON array of rule objects
+The plugin creates one custom table for storing rules:
 
--- Product meta
-meta_key: _country_of_origin (2-letter country code)
-meta_key: _hs_code (Harmonized System code)
+```sql
+CREATE TABLE {prefix}cfwc_rules (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    name VARCHAR(200) NOT NULL,
+    from_country VARCHAR(2),
+    to_country VARCHAR(2),
+    hs_codes TEXT,
+    categories TEXT,
+    fee_type VARCHAR(20),
+    fee_amount DECIMAL(10,2),
+    priority INT,
+    status VARCHAR(20),
+    stacking_mode VARCHAR(20),
+    created_at DATETIME,
+    updated_at DATETIME,
+    PRIMARY KEY (id)
+);
 ```
 
 ## Integration Examples
@@ -372,85 +241,39 @@ add_action('woocommerce_shipping_calculated', function() {
 - **Scalable**: Handles unlimited products and rules.
 - **Fast**: Average calculation time < 50ms.
 
-## Development
+## FAQs
 
-### Testing & Quality Assurance
+**Q: Do customers pay the customs fees at checkout?**
+A: The fees are calculated and displayed for transparency. Actual collection depends on your payment gateway and business model. Most merchants show fees for information but collect them separately at customs.
 
-#### Running Tests
+**Q: Can I set different fees for different states or provinces?**
+A: Currently, fees are configured at the country level. For region-specific fees, use the developer filters to implement custom logic.
 
-```
-# PHPStan Analysis (Level 0)
-vendor/bin/phpstan analyse
+**Q: How do I keep fees updated with changing regulations?**
+A: Regularly review and update your rules based on current customs regulations. You can export rules for backup before making changes.
 
-# PHPCS WordPress Standards
-phpcs --standard=WordPress-Extra --extensions=php .
+**Q: Is this compatible with multicurrency plugins?**
+A: Yes, the plugin uses WooCommerce's currency system and works with properly configured multicurrency plugins.
 
-# Auto-fix PHPCS issues
-phpcbf --standard=WordPress-Extra --extensions=php .
+## Contributing
 
-# Security Audit
-# Check for XSS, SQL injection, nonce verification
-grep -r "\$_POST\|\$_GET\|\$_REQUEST" --include="*.php" .
-```
+We welcome contributions from the community!
 
-#### Development Setup
+### How to contribute
 
-```
-# Install development dependencies
-composer install --dev
+1. Fork the repository on GitHub.
+2. Create a new branch for your feature.
+3. Commit your changes with clear messages.
+4. Push to your branch.
+5. Submit a pull request.
 
-# Required packages (already in composer.json)
-- phpstan/phpstan
-- szepeviktor/phpstan-wordpress
-- php-stubs/woocommerce-stubs
-- squizlabs/php_codesniffer
-- wp-coding-standards/wpcs
-```
+### Coding standards
 
-### Code Standards
+This plugin follows:
 
-- **PHPStan**: Level 0 compliance with WordPress & WooCommerce stubs
-- **PHPCS**: WordPress-Extra standard
-- **Security**: All inputs sanitized, outputs escaped, nonces verified
-- **HPOS**: Fully compatible with WooCommerce High-Performance Order Storage
-
-## Security
-
-- All inputs sanitized and validated.
-- SQL queries use prepared statements.
-- Nonce verification on all AJAX requests.
-- Capability checks for admin functions.
-- No external API calls (privacy-friendly).
-- PHPCS WordPress-Extra compliant.
-
-## Troubleshooting
-
-### Fees Not Showing
-
-1. ✓ Check customs fees are enabled.
-2. ✓ Verify active rules exist.
-3. ✓ Ensure products have origin countries.
-4. ✓ Confirm shipping destination matches rules.
-5. ✓ Check products aren't virtual/downloadable.
-
-### Incorrect Calculations
-
-1. ✓ Review rule configurations.
-2. ✓ Check stacking settings.
-3. ✓ Verify percentage vs flat fee.
-4. ✓ Look for conflicting rules.
-5. ✓ Test with simple single-rule setup.
-
-### Performance Issues
-
-1. ✓ Reduce number of rules.
-2. ✓ Use rule caching (enabled by default).
-3. ✓ Optimize rule conditions.
-4. ✓ Check for plugin conflicts.
-
-## License
-
-GPL v2 or later. See [LICENSE](LICENSE) for details.
+- WordPress Coding Standards.
+- WooCommerce development guidelines.
+- PSR-4 autoloading where applicable.
 
 ## ⚠️ Disclaimer
 
@@ -463,6 +286,34 @@ This plugin provides **estimated** customs fees for display purposes. Actual cus
 - Additional processing fees
 
 Always verify with official customs authorities for accurate fee information.
+
+## License
+
+This plugin is licensed under the GPL v2 or later.
+
+```
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+```
+
+## Changelog
+
+### Version 1.0.0 - January 2025
+
+- Initial release
+- Core fee calculation engine
+- Rule management interface
+- Product-level HS codes and origin
+- Import/export functionality
+- HPOS compatibility
+- Complete documentation
 
 ---
 

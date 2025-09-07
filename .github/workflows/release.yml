@@ -28,6 +28,7 @@ jobs:
             --exclude=".github" \
             --exclude=".gitignore" \
             --exclude="*.md" \
+            --exclude="docs" \
             --exclude="node_modules" \
             --exclude="package.json" \
             --exclude="package-lock.json" \

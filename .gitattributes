@@ -23,11 +23,8 @@
 /phpunit.xml.dist export-ignore
 
 # Documentation for developers (keep in Git, exclude from WordPress releases)
+/docs export-ignore
 /README.md export-ignore
-/TESTING.md export-ignore
-/HOWTO_DEBUG.md export-ignore
-/CONTRIBUTING.md export-ignore
-/CHANGELOG.md export-ignore
 /.editorconfig export-ignore
 
 # Build and CI/CD
