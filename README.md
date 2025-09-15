@@ -314,6 +314,13 @@ GNU General Public License for more details.
 
 ## Changelog
 
+### Version 1.1.0 - January 2025
+
+- Added full support for variable products with parent-level defaults and variation-level overrides
+- Enhanced inheritance pattern for HS codes and origin countries in product variations
+- Improved UX with clear parent value display in variation settings
+- Fixed issue where variable products weren't applying customs fees
+
 ### Version 1.0.0 - January 2025
 
 - Initial release
@@ -322,9 +329,6 @@ GNU General Public License for more details.
 - Product-level HS codes and origin
 - Import/export functionality
 - HPOS compatibility
-- Added full support for variable products with parent-level defaults and variation-level overrides
-- Enhanced inheritance pattern for HS codes and origin countries in product variations
-- Improved UX with clear parent value display in variation settings
 - Complete documentation
 
 ---
