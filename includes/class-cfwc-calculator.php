@@ -152,8 +152,19 @@ class CFWC_Calculator {
 				continue;
 			}
 
-			// Get product origin.
-			$origin = get_post_meta( $product_id, '_cfwc_country_of_origin', true );
+			// Get product origin using centralized helper.
+			if ( class_exists( 'CFWC_Products_Variation_Support' ) ) {
+				$customs_data = CFWC_Products_Variation_Support::get_product_customs_data( $product );
+				$origin = $customs_data['origin'];
+			} else {
+				// Fallback to direct meta lookup.
+				$origin = get_post_meta( $product_id, '_cfwc_country_of_origin', true );
+				
+				// For variations, check parent product if no origin found on variation.
+				if ( empty( $origin ) && $product->get_parent_id() ) {
+					$origin = get_post_meta( $product->get_parent_id(), '_cfwc_country_of_origin', true );
+				}
+			}
 
 			// Use default origin if no origin set on product.
 			if ( empty( $origin ) ) {
@@ -190,8 +201,19 @@ class CFWC_Calculator {
 			// Calculate fees for this product.
 			$line_total = $cart_item['line_total'];
 
-			// Log product processing with enhanced details.
-			$hs_code = get_post_meta( $product_id, '_cfwc_hs_code', true );
+			// Get HS code using centralized helper.
+			if ( class_exists( 'CFWC_Products_Variation_Support' ) ) {
+				$customs_data = CFWC_Products_Variation_Support::get_product_customs_data( $product );
+				$hs_code = $customs_data['hs_code'];
+			} else {
+				// Fallback to direct meta lookup.
+				$hs_code = get_post_meta( $product_id, '_cfwc_hs_code', true );
+				
+				// For variations, check parent product if no HS code found on variation.
+				if ( empty( $hs_code ) && $product->get_parent_id() ) {
+					$hs_code = get_post_meta( $product->get_parent_id(), '_cfwc_hs_code', true );
+				}
+			}
 			$this->log_debug(
 				sprintf(
 					'  PROCESSING %s - Type: Physical, Origin: %s, HS Code: %s, Line Total: $%.2f',
@@ -378,7 +400,19 @@ class CFWC_Calculator {
 
 			// Get product origin.
 			$product_id = $cart_item['variation_id'] ? $cart_item['variation_id'] : $cart_item['product_id'];
-			$origin     = get_post_meta( $product_id, '_cfwc_country_of_origin', true );
+			// Get origin using centralized helper.
+			if ( class_exists( 'CFWC_Products_Variation_Support' ) ) {
+				$customs_data = CFWC_Products_Variation_Support::get_product_customs_data( $product );
+				$origin = $customs_data['origin'];
+			} else {
+				// Fallback to direct meta lookup.
+				$origin = get_post_meta( $product_id, '_cfwc_country_of_origin', true );
+				
+				// For variations, check parent product if no origin found on variation.
+				if ( empty( $origin ) && $product->get_parent_id() ) {
+					$origin = get_post_meta( $product->get_parent_id(), '_cfwc_country_of_origin', true );
+				}
+			}
 
 			// Use default origin if no origin set on product.
 			if ( empty( $origin ) ) {

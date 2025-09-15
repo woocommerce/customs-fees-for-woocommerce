@@ -91,6 +91,7 @@ class CFWC_Loader {
 		require_once $plugin_dir . 'includes/class-cfwc-rule-matcher.php';
 		require_once $plugin_dir . 'includes/class-cfwc-calculator.php';
 		require_once $plugin_dir . 'includes/class-cfwc-products.php';
+		require_once $plugin_dir . 'includes/class-cfwc-products-variation-support.php';
 		require_once $plugin_dir . 'includes/class-cfwc-display.php';
 		require_once $plugin_dir . 'includes/class-cfwc-emails.php';
 		require_once $plugin_dir . 'includes/class-cfwc-templates.php';

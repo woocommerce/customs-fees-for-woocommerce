@@ -19,6 +19,7 @@ With the U.S. ending its de minimis exemption on **August 29, 2025**, all intern
 - **Origin-Based Rules**: Set different fees based on product origin countries.
 - **Smart Presets**: Quick setup with 25+ built-in presets for major countries.
 - **Product-Level Settings**: Define origin country and HS codes for individual products.
+- **Variable Product Support**: Full support for variable products with inheritance from parent.
 - **CSV Import/Export**: Bulk manage rules and product data.
 - **Transparent Checkout**: Display detailed fee breakdown to customers.
 - **Flexible Rules**: Create unlimited custom rules for any country combination.
@@ -77,6 +78,14 @@ Edit products to add:
 
 - **Country of Origin** - Manufacturing country
 - **HS Code** - Harmonized System classification code
+
+#### Variable Products
+
+For variable products, you can:
+
+- Set HS code and origin country at the **parent product level** (applies to all variations)
+- Optionally override settings at the **variation level** for specific variations
+- Variations automatically inherit parent settings when not specified
 
 ### 4. Test the checkout
 
@@ -313,6 +322,9 @@ GNU General Public License for more details.
 - Product-level HS codes and origin
 - Import/export functionality
 - HPOS compatibility
+- Added full support for variable products with parent-level defaults and variation-level overrides
+- Enhanced inheritance pattern for HS codes and origin countries in product variations
+- Improved UX with clear parent value display in variation settings
 - Complete documentation
 
 ---

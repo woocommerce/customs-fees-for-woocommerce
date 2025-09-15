@@ -31,6 +31,7 @@ With the U.S. ending its de minimis exemption on August 29, 2025, and increasing
 * **Smart Rule Engine** - Create unlimited rules based on origin/destination combinations.
 * **Percentage-Based Calculations** - Apply customs fees as percentage of product value.
 * **Product Origin Management** - Set country of origin and HS codes per product.
+* **Variable Product Support** - Full support for variable products with parent-level defaults and variation-level overrides.
 * **Preset Templates** - 30+ pre-configured rules for major trade routes.
 * **Flexible Stacking Rules** - Control how multiple fees combine (add, override, or exclusive).
 * **Detailed Breakdown** - Show customers exactly which fees apply and why.
@@ -150,6 +151,11 @@ Edit each product individually:
 3. Set Country of Origin and optional HS Code
 4. Save the product
 
+For variable products:
+- Set default values at the parent product level (applies to all variations)
+- Optionally override specific variations in the variation settings
+- Variations inherit parent values when not explicitly set
+
 = Do virtual/downloadable products have customs fees? =
 
 No, the plugin automatically excludes virtual and downloadable products from customs fee calculations.
@@ -198,6 +204,9 @@ Yes, through:
 * Stacking rules (add, override, exclusive)
 * Category and HS code rule matching
 * Comprehensive admin interface
+* Added full support for variable products with parent-level defaults and variation-level overrides
+* Enhanced inheritance pattern for HS codes and origin countries in product variations
+* Improved UX with clear parent value display in variation settings
 * Virtual/downloadable product exclusion
 * Email integration with fee breakdown
 * Debug logging system

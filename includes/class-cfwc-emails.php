@@ -140,6 +140,14 @@ class CFWC_Emails {
 		$product_id = $product->get_id();
 		$hs_code    = get_post_meta( $product_id, '_cfwc_hs_code', true );
 		$origin     = get_post_meta( $product_id, '_cfwc_country_of_origin', true );
+		
+		// For variations, check parent product if no metadata found on variation.
+		if ( empty( $hs_code ) && $product->get_parent_id() ) {
+			$hs_code = get_post_meta( $product->get_parent_id(), '_cfwc_hs_code', true );
+		}
+		if ( empty( $origin ) && $product->get_parent_id() ) {
+			$origin = get_post_meta( $product->get_parent_id(), '_cfwc_country_of_origin', true );
+		}
 
 		if ( $hs_code || $origin ) {
 			$customs_info = '<br><small style="color: #666; font-size: 0.9em;">';
