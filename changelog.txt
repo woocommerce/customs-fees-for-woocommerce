@@ -1,10 +1,10 @@
 *** Customs Fees for WooCommerce Changelog ***
 
-2025-01-20 - version 1.1.0
+2025-09-14 - version 1.1.0
 * Added full support for variable products with parent-level defaults and variation-level overrides
 * Enhanced inheritance pattern for HS codes and origin countries in product variations
 * Improved UX with clear parent value display in variation settings
 * Fixed issue where variable products weren't applying customs fees
 
-2025-01-20 - version 1.0.0
+2025-09-05 - version 1.0.0
 * Initial release
