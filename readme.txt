@@ -197,13 +197,13 @@ Yes, through:
 * Downloadable products that require shipping now properly have customs fees applied
 * Virtual products continue to be excluded as expected
 
-= 1.1.0 - 2025-09-16 =
+= 1.1.0 - 2025-09-14 =
 * Added full support for variable products with parent-level defaults and variation-level overrides
 * Enhanced inheritance pattern for HS codes and origin countries in product variations
 * Improved UX with clear parent value display in variation settings
 * Fixed issue where variable products weren't applying customs fees
 
-= 1.0.0 - 2025-09-15 =
+= 1.0.0 - 2025-09-05 =
 * Initial release
 * Core customs fee calculation engine
 * Product origin country and HS code management
