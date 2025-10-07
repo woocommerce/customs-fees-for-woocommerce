@@ -129,13 +129,12 @@ class CFWC_Calculator {
 				$product->get_sku() ? $product->get_sku() : 'N/A'
 			);
 
-			// Check and log if virtual/downloadable.
-			if ( $product->is_virtual() || $product->is_downloadable() ) {
+			// Check and log if virtual (purely digital products).
+			if ( $product->is_virtual() ) {
 				$this->log_debug(
 					sprintf(
-						'  SKIPPED %s - Reason: %s product (no customs fees apply)',
-						$product_info,
-						$product->is_virtual() ? 'Virtual' : 'Downloadable'
+						'  SKIPPED %s - Reason: Virtual product (no customs fees apply)',
+						$product_info
 					)
 				);
 				continue;
@@ -393,8 +392,8 @@ class CFWC_Calculator {
 		foreach ( $cart->get_cart() as $cart_item_key => $cart_item ) {
 			$product = $cart_item['data'];
 
-			// Skip virtual and downloadable products.
-			if ( $product->is_virtual() || $product->is_downloadable() ) {
+			// Skip virtual products (purely digital, no shipping required).
+			if ( $product->is_virtual() ) {
 				continue;
 			}
 
@@ -898,8 +897,8 @@ class CFWC_Calculator {
 		foreach ( $cart->get_cart_contents() as $cart_item_key => $cart_item ) {
 			$product = $cart_item['data'];
 
-			// Skip virtual and downloadable products.
-			if ( ! $product || $product->is_virtual() || $product->is_downloadable() ) {
+			// Skip virtual products (purely digital, no shipping required).
+			if ( ! $product || $product->is_virtual() ) {
 				continue;
 			}
 

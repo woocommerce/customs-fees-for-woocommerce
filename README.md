@@ -314,14 +314,20 @@ GNU General Public License for more details.
 
 ## Changelog
 
-### Version 1.1.0 - January 2025
+### Version 1.1.1 - October 2025
+
+- Fixed issue where downloadable products with physical shipping were incorrectly excluded from customs fee calculations.
+- Downloadable products that require shipping now properly have customs fees applied.
+- Virtual products continue to be excluded as expected.
+
+### Version 1.1.0 - September 2025
 
 - Added full support for variable products with parent-level defaults and variation-level overrides
 - Enhanced inheritance pattern for HS codes and origin countries in product variations
 - Improved UX with clear parent value display in variation settings
 - Fixed issue where variable products weren't applying customs fees
 
-### Version 1.0.0 - January 2025
+### Version 1.0.0 - September 2025
 
 - Initial release
 - Core fee calculation engine

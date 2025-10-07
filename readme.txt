@@ -7,7 +7,7 @@ Requires PHP: 7.4
 Requires Plugins: woocommerce
 WC requires at least: 9.0
 WC tested up to: 10.1.2
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -192,13 +192,18 @@ Yes, through:
 
 == Changelog ==
 
-= 1.1.0 - 2025-01-20 =
+= 1.1.1 - 2025-10-07 =
+* Fixed issue where downloadable products with physical shipping were incorrectly excluded from customs fee calculations
+* Downloadable products that require shipping now properly have customs fees applied
+* Virtual products continue to be excluded as expected
+
+= 1.1.0 - 2025-09-16 =
 * Added full support for variable products with parent-level defaults and variation-level overrides
 * Enhanced inheritance pattern for HS codes and origin countries in product variations
 * Improved UX with clear parent value display in variation settings
 * Fixed issue where variable products weren't applying customs fees
 
-= 1.0.0 - 2025-01-20 =
+= 1.0.0 - 2025-09-15 =
 * Initial release
 * Core customs fee calculation engine
 * Product origin country and HS code management
