@@ -246,14 +246,20 @@ class CFWC_Rule_Matcher {
 			return true; // No HS code restriction.
 		}
 
-		// Get product HS code.
-		$product_id = $product->get_id();
-		$hs_code    = get_post_meta( $product_id, '_cfwc_hs_code', true );
+		// Get product HS code using centralized helper for proper variation support.
+		if ( class_exists( 'CFWC_Products_Variation_Support' ) ) {
+			$customs_data = CFWC_Products_Variation_Support::get_product_customs_data( $product );
+			$hs_code = $customs_data['hs_code'];
+		} else {
+			// Fallback to direct meta lookup.
+			$product_id = $product->get_id();
+			$hs_code    = get_post_meta( $product_id, '_cfwc_hs_code', true );
 
-		if ( empty( $hs_code ) ) {
-			// Check parent for variations.
-			if ( $product->get_parent_id() ) {
-				$hs_code = get_post_meta( $product->get_parent_id(), '_cfwc_hs_code', true );
+			if ( empty( $hs_code ) ) {
+				// Check parent for variations.
+				if ( $product->get_parent_id() ) {
+					$hs_code = get_post_meta( $product->get_parent_id(), '_cfwc_hs_code', true );
+				}
 			}
 		}
 

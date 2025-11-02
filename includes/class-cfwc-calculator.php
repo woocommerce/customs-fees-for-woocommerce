@@ -157,7 +157,7 @@ class CFWC_Calculator {
 				$origin = $customs_data['origin'];
 			} else {
 				// Fallback to direct meta lookup.
-				$origin = get_post_meta( $product_id, '_cfwc_country_of_origin', true );
+			$origin = get_post_meta( $product_id, '_cfwc_country_of_origin', true );
 				
 				// For variations, check parent product if no origin found on variation.
 				if ( empty( $origin ) && $product->get_parent_id() ) {
@@ -206,7 +206,7 @@ class CFWC_Calculator {
 				$hs_code = $customs_data['hs_code'];
 			} else {
 				// Fallback to direct meta lookup.
-				$hs_code = get_post_meta( $product_id, '_cfwc_hs_code', true );
+			$hs_code = get_post_meta( $product_id, '_cfwc_hs_code', true );
 				
 				// For variations, check parent product if no HS code found on variation.
 				if ( empty( $hs_code ) && $product->get_parent_id() ) {

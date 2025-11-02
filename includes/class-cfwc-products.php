@@ -58,9 +58,28 @@ class CFWC_Products {
 			return $product_name;
 		}
 
-		$product_id = $cart_item['product_id'];
-		$hs_code    = get_post_meta( $product_id, '_cfwc_hs_code', true );
-		$origin     = get_post_meta( $product_id, '_cfwc_country_of_origin', true );
+		// Get the actual product (could be variation).
+		$product = $cart_item['data'];
+		
+		// Get HS code and origin using centralized helper for proper variation support.
+		if ( class_exists( 'CFWC_Products_Variation_Support' ) ) {
+			$customs_data = CFWC_Products_Variation_Support::get_product_customs_data( $product );
+			$hs_code = $customs_data['hs_code'];
+			$origin = $customs_data['origin'];
+		} else {
+			// Fallback to direct meta lookup for backward compatibility.
+			$product_id = $cart_item['variation_id'] ? $cart_item['variation_id'] : $cart_item['product_id'];
+			$hs_code    = get_post_meta( $product_id, '_cfwc_hs_code', true );
+			$origin     = get_post_meta( $product_id, '_cfwc_country_of_origin', true );
+			
+			// Check parent if variation doesn't have data.
+			if ( empty( $hs_code ) && $cart_item['variation_id'] ) {
+				$hs_code = get_post_meta( $cart_item['product_id'], '_cfwc_hs_code', true );
+			}
+			if ( empty( $origin ) && $cart_item['variation_id'] ) {
+				$origin = get_post_meta( $cart_item['product_id'], '_cfwc_country_of_origin', true );
+			}
+		}
 
 		if ( $hs_code || $origin ) {
 			// Use a break tag to ensure it appears on a new line right after product name.
@@ -119,9 +138,28 @@ class CFWC_Products {
 			return $quantity_html;
 		}
 
-		$product_id = $cart_item['product_id'];
-		$hs_code    = get_post_meta( $product_id, '_cfwc_hs_code', true );
-		$origin     = get_post_meta( $product_id, '_cfwc_country_of_origin', true );
+		// Get the actual product (could be variation).
+		$product = $cart_item['data'];
+		
+		// Get HS code and origin using centralized helper for proper variation support.
+		if ( class_exists( 'CFWC_Products_Variation_Support' ) ) {
+			$customs_data = CFWC_Products_Variation_Support::get_product_customs_data( $product );
+			$hs_code = $customs_data['hs_code'];
+			$origin = $customs_data['origin'];
+		} else {
+			// Fallback to direct meta lookup for backward compatibility.
+			$product_id = $cart_item['variation_id'] ? $cart_item['variation_id'] : $cart_item['product_id'];
+			$hs_code    = get_post_meta( $product_id, '_cfwc_hs_code', true );
+			$origin     = get_post_meta( $product_id, '_cfwc_country_of_origin', true );
+			
+			// Check parent if variation doesn't have data.
+			if ( empty( $hs_code ) && $cart_item['variation_id'] ) {
+				$hs_code = get_post_meta( $cart_item['product_id'], '_cfwc_hs_code', true );
+			}
+			if ( empty( $origin ) && $cart_item['variation_id'] ) {
+				$origin = get_post_meta( $cart_item['product_id'], '_cfwc_country_of_origin', true );
+			}
+		}
 
 		if ( $hs_code || $origin ) {
 			$customs_info = '<div class="cfwc-checkout-customs">';

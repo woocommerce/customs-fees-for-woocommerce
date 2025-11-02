@@ -314,6 +314,12 @@ GNU General Public License for more details.
 
 ## Changelog
 
+### Version 1.1.2 - November 2025
+
+- Fixed HS code matching for product variations in rule processing
+- Variations now properly match HS code-based rules with correct inheritance from parent products
+- Fixed HS code and origin display for variable products in cart and checkout
+
 ### Version 1.1.1 - October 2025
 
 - Fixed issue where downloadable products with physical shipping were incorrectly excluded from customs fee calculations.

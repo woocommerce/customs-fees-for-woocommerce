@@ -7,7 +7,7 @@ Requires PHP: 7.4
 Requires Plugins: woocommerce
 WC requires at least: 9.0
 WC tested up to: 10.1.2
-Stable tag: 1.1.1
+Stable tag: 1.1.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -191,6 +191,11 @@ Yes, through:
 8. Email with customs fee information
 
 == Changelog ==
+
+= 1.1.2 - 2025-11-02 =
+* Fixed HS code matching for product variations in rule processing
+* Variations now properly match HS code-based rules with correct inheritance from parent products
+* Fixed HS code and origin display for variable products in cart and checkout
 
 = 1.1.1 - 2025-10-07 =
 * Fixed issue where downloadable products with physical shipping were incorrectly excluded from customs fee calculations
