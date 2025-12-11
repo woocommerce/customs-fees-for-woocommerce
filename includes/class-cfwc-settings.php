@@ -181,6 +181,11 @@ class CFWC_Settings {
 				update_option( 'cfwc_custom_default_origin', $custom_origin );
 			}
 		}
+
+		// Save "use original price" setting.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verification is handled by WooCommerce settings API.
+		$use_original_price = isset( $_POST['cfwc_use_original_price'] ) ? 'yes' : 'no';
+		update_option( 'cfwc_use_original_price', $use_original_price );
 	}
 
 	/**

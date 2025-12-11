@@ -198,7 +198,17 @@ class CFWC_Calculator {
 			);
 
 			// Calculate fees for this product.
-			$line_total = $cart_item['line_total'];
+			// Check if we should use original price (before discounts).
+			$use_original_price = get_option( 'cfwc_use_original_price', 'no' );
+
+			if ( 'yes' === $use_original_price ) {
+				// Use regular price before discounts.
+				$regular_price = $product->get_regular_price();
+				$line_total    = ! empty( $regular_price ) ? (float) $regular_price * $cart_item['quantity'] : $cart_item['line_total'];
+			} else {
+				// Default: use discounted line total.
+				$line_total = $cart_item['line_total'];
+			}
 
 			// Get HS code using centralized helper.
 			if ( class_exists( 'CFWC_Products_Variation_Support' ) ) {
@@ -213,13 +223,16 @@ class CFWC_Calculator {
 					$hs_code = get_post_meta( $product->get_parent_id(), '_cfwc_hs_code', true );
 				}
 			}
+			// Determine price mode for logging.
+			$price_mode = ( 'yes' === $use_original_price ) ? 'Original Price' : 'Discounted Price';
 			$this->log_debug(
 				sprintf(
-					'  PROCESSING %s - Type: Physical, Origin: %s, HS Code: %s, Line Total: $%.2f',
+					'  PROCESSING %s - Type: Physical, Origin: %s, HS Code: %s, Line Total: $%.2f (%s)',
 					$product_info,
 					$origin,
 					$hs_code ? $hs_code : 'Not set',
-					$line_total
+					$line_total,
+					$price_mode
 				)
 			);
 

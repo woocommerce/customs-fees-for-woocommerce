@@ -164,6 +164,9 @@ class CFWC_Loader {
 		$plugin_basename = defined( 'CFWC_PLUGIN_BASENAME' ) ? CFWC_PLUGIN_BASENAME : 'customs-fees-for-woocommerce/customs-fees-for-woocommerce.php';
 		add_filter( 'plugin_action_links_' . $plugin_basename, array( $this, 'add_action_links' ) );
 
+		// Plugin row meta links (Docs, Feature Request).
+		add_filter( 'plugin_row_meta', array( $this, 'add_plugin_row_meta' ), 10, 2 );
+
 		// Admin hooks.
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
 
@@ -302,6 +305,31 @@ class CFWC_Loader {
 		);
 
 		return array_merge( $plugin_links, $links );
+	}
+
+	/**
+	 * Add plugin row meta links.
+	 *
+	 * Adds Docs and Feature Request links to the plugin meta row on the plugins page.
+	 *
+	 * @since 1.1.3
+	 * @param array  $links Plugin row meta links.
+	 * @param string $file  Plugin file path.
+	 * @return array Modified links.
+	 */
+	public function add_plugin_row_meta( $links, $file ) {
+		$plugin_basename = defined( 'CFWC_PLUGIN_BASENAME' ) ? CFWC_PLUGIN_BASENAME : 'customs-fees-for-woocommerce/customs-fees-for-woocommerce.php';
+
+		if ( $plugin_basename === $file ) {
+			$row_meta = array(
+				'docs'            => '<a href="' . esc_url( 'https://woocommerce.com/document/customs-fees/' ) . '" aria-label="' . esc_attr__( 'View Customs Fees documentation', 'customs-fees-for-woocommerce' ) . '">' . esc_html__( 'Docs', 'customs-fees-for-woocommerce' ) . '</a>',
+				'feature_request' => '<a href="' . esc_url( 'https://github.com/woocommerce/customs-fees-for-woocommerce/issues' ) . '" aria-label="' . esc_attr__( 'Submit a feature request', 'customs-fees-for-woocommerce' ) . '">' . esc_html__( 'Feature request', 'customs-fees-for-woocommerce' ) . '</a>',
+			);
+
+			return array_merge( $links, $row_meta );
+		}
+
+		return $links;
 	}
 
 	/**

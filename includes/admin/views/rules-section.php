@@ -80,6 +80,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	}
 	?>
 	
+	<?php
+	// Get the use original price setting.
+	$use_original_price = get_option( 'cfwc_use_original_price', 'no' );
+	?>
 	<table class="form-table">
 		<tbody>
 			<tr valign="top">
@@ -117,6 +121,25 @@ if ( ! defined( 'ABSPATH' ) ) {
 							?>
 						</optgroup>
 					</select>
+				</td>
+			</tr>
+			<tr valign="top">
+				<th scope="row" class="titledesc">
+					<label for="cfwc_use_original_price">
+						<?php esc_html_e( 'Calculate on Original Price', 'customs-fees-for-woocommerce' ); ?>
+						<span class="woocommerce-help-tip" data-tip="<?php esc_attr_e( 'When enabled, customs fees will be calculated based on the product\'s regular price, ignoring any discounts or coupons applied. Useful for promotions where you want customers to still pay applicable tariffs based on product value.', 'customs-fees-for-woocommerce' ); ?>"></span>
+					</label>
+				</th>
+				<td class="forminp">
+					<fieldset>
+						<label for="cfwc_use_original_price">
+							<input type="checkbox" name="cfwc_use_original_price" id="cfwc_use_original_price" value="yes" <?php checked( $use_original_price, 'yes' ); ?> />
+							<?php esc_html_e( 'Calculate customs fees on original price (before discounts)', 'customs-fees-for-woocommerce' ); ?>
+						</label>
+						<p class="description">
+							<?php esc_html_e( 'Enable this if you run promotions with discounts but still want to charge customs fees based on the full product value.', 'customs-fees-for-woocommerce' ); ?>
+						</p>
+					</fieldset>
 				</td>
 			</tr>
 		</tbody>

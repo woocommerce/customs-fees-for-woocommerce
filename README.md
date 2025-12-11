@@ -314,6 +314,12 @@ GNU General Public License for more details.
 
 ## Changelog
 
+### Version 1.1.3 - December 2025
+
+- Added new setting to calculate customs fees on original price (before discounts).
+- Useful for promotions where products are discounted but tariffs should still be based on full product value.
+- Tested up to WordPress 6.9 and WooCommerce 10.4.0.
+
 ### Version 1.1.2 - November 2025
 
 - Fixed HS code matching for product variations in rule processing

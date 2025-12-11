@@ -2,12 +2,12 @@
 Contributors: woocommerce
 Tags: woocommerce, customs, import-fees, international-shipping, tariffs
 Requires at least: 6.0
-Tested up to: 6.8
+Tested up to: 6.9
 Requires PHP: 7.4
 Requires Plugins: woocommerce
 WC requires at least: 9.0
-WC tested up to: 10.1.2
-Stable tag: 1.1.2
+WC tested up to: 10.4.0
+Stable tag: 1.1.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -192,6 +192,11 @@ Yes, through:
 
 == Changelog ==
 
+= 1.1.3 - 2025-12-11 =
+* Added new setting to calculate customs fees on original price (before discounts).
+* Useful for promotions where products are discounted but tariffs should still be based on full product value.
+* Tested up to WordPress 6.9 and WooCommerce 10.4.0.
+
 = 1.1.2 - 2025-11-02 =
 * Fixed HS code matching for product variations in rule processing
 * Variations now properly match HS code-based rules with correct inheritance from parent products
@@ -224,11 +229,6 @@ Yes, through:
 * Virtual/downloadable product exclusion
 * Email integration with fee breakdown
 * Debug logging system
-
-== Upgrade Notice ==
-
-= 1.0.0 =
-Initial release. Install to start adding transparent customs fees to your international orders.
 
 == Advanced Features ==
 
