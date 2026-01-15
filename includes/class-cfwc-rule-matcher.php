@@ -9,7 +9,7 @@
  * - Priority ordering
  *
  * @package CustomsFeesWooCommerce
- * @since 1.2.0
+ * @since 1.1.4
  */
 
 // Exit if accessed directly.
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Rule Matcher class.
  *
- * @since 1.2.0
+ * @since 1.1.4
  */
 class CFWC_Rule_Matcher {
 
@@ -42,7 +42,7 @@ class CFWC_Rule_Matcher {
 	/**
 	 * Find matching rules for a product.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.4
 	 * @param WC_Product $product The product to match.
 	 * @param string     $from_country Country of origin.
 	 * @param string     $to_country Destination country.
@@ -66,15 +66,17 @@ class CFWC_Rule_Matcher {
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
 			foreach ( $matching_rules as $rule ) {
 				$specificity = $this->calculate_specificity( $rule );
-				$priority = isset( $rule['priority'] ) ? (int) $rule['priority'] : 0;
+				$priority    = isset( $rule['priority'] ) ? (int) $rule['priority'] : 0;
 				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug only
-				error_log( sprintf(
-					'[CFWC] Matched rule: %s | HS: %s | Priority: %d | Specificity: %d',
-					$rule['label'] ?? 'Unknown',
-					$rule['hs_code_pattern'] ?? 'All',
-					$priority,
-					$specificity
-				) );
+				error_log(
+					sprintf(
+						'[CFWC] Matched rule: %s | HS: %s | Priority: %d | Specificity: %d',
+						$rule['label'] ?? 'Unknown',
+						$rule['hs_code_pattern'] ?? 'All',
+						$priority,
+						$specificity
+					)
+				);
 			}
 		}
 
@@ -85,7 +87,7 @@ class CFWC_Rule_Matcher {
 	/**
 	 * Check if a rule matches the given criteria.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.4
 	 * @param array      $rule The rule to check.
 	 * @param WC_Product $product The product.
 	 * @param string     $from_country Origin country.
@@ -125,7 +127,7 @@ class CFWC_Rule_Matcher {
 	/**
 	 * Check country match.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.4
 	 * @param array  $rule Rule to check.
 	 * @param string $from_country Origin country.
 	 * @param string $to_country Destination country.
@@ -195,7 +197,7 @@ class CFWC_Rule_Matcher {
 	/**
 	 * Check category match.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.4
 	 * @param array      $rule Rule to check.
 	 * @param WC_Product $product Product to check.
 	 * @return bool True if categories match.
@@ -236,7 +238,7 @@ class CFWC_Rule_Matcher {
 	/**
 	 * Check HS code match.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.4
 	 * @param array      $rule Rule to check.
 	 * @param WC_Product $product Product to check.
 	 * @return bool True if HS code matches.
@@ -249,7 +251,7 @@ class CFWC_Rule_Matcher {
 		// Get product HS code using centralized helper for proper variation support.
 		if ( class_exists( 'CFWC_Products_Variation_Support' ) ) {
 			$customs_data = CFWC_Products_Variation_Support::get_product_customs_data( $product );
-			$hs_code = $customs_data['hs_code'];
+			$hs_code      = $customs_data['hs_code'];
 		} else {
 			// Fallback to direct meta lookup.
 			$product_id = $product->get_id();
@@ -310,7 +312,7 @@ class CFWC_Rule_Matcher {
 	/**
 	 * Sort rules by priority.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.4
 	 * @param array $a First rule.
 	 * @param array $b Second rule.
 	 * @return int Sort order.
@@ -333,7 +335,7 @@ class CFWC_Rule_Matcher {
 	/**
 	 * Calculate rule specificity.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.4
 	 * @param array $rule Rule to check.
 	 * @return int Specificity score.
 	 */
@@ -343,15 +345,15 @@ class CFWC_Rule_Matcher {
 		// HS code is most specific - calculate based on pattern complexity.
 		if ( ! empty( $rule['hs_code_pattern'] ) ) {
 			$pattern = $rule['hs_code_pattern'];
-			
+
 			// Check for comma-separated patterns (more specific).
 			if ( strpos( $pattern, ',' ) !== false ) {
-				$patterns = array_map( 'trim', explode( ',', $pattern ) );
+				$patterns      = array_map( 'trim', explode( ',', $pattern ) );
 				$pattern_count = count( $patterns );
-				
+
 				// Multiple specific patterns get higher score.
 				$score += 80 + ( $pattern_count * 5 );
-				
+
 				// Add score based on the specificity of each pattern.
 				foreach ( $patterns as $p ) {
 					if ( strpos( $p, '*' ) === false ) {
@@ -360,7 +362,7 @@ class CFWC_Rule_Matcher {
 					} else {
 						// Pattern with wildcard - more digits before * = more specific.
 						$digits_before_wildcard = strpos( $p, '*' );
-						$score += $digits_before_wildcard * 2;
+						$score                 += $digits_before_wildcard * 2;
 					}
 				}
 			} elseif ( strpos( $pattern, '*' ) === false ) {
@@ -370,8 +372,8 @@ class CFWC_Rule_Matcher {
 				// Single pattern with wildcard - score based on specificity.
 				$digits_before_wildcard = strpos( $pattern, '*' );
 				// Base score of 50, plus 5 points per digit before wildcard.
-				// So "8506*" (4 digits) = 50 + 20 = 70
-				// And "85*" (2 digits) = 50 + 10 = 60
+				// So "8506*" (4 digits) = 50 + 20 = 70.
+				// And "85*" (2 digits) = 50 + 10 = 60.
 				$score += 50 + ( $digits_before_wildcard * 5 );
 			}
 		}
@@ -397,7 +399,7 @@ class CFWC_Rule_Matcher {
 	/**
 	 * Apply stacking modes to filter rules.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.4
 	 * @param array $rules Sorted rules.
 	 * @return array Filtered rules based on stacking modes.
 	 */
@@ -438,7 +440,7 @@ class CFWC_Rule_Matcher {
 	/**
 	 * Get human-readable match description.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.4
 	 * @param array $rule Rule to describe.
 	 * @return string Match description.
 	 */

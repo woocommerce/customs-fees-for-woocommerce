@@ -36,8 +36,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 		);
 	}
 
-	// Check setup status.
-	if ( class_exists( 'CFWC_Onboarding' ) ) {
+	// Check setup status (only if not dismissed).
+	$setup_notice_dismissed = get_option( 'cfwc_dismissed_setup_status_notice', false );
+	if ( ! $setup_notice_dismissed && class_exists( 'CFWC_Onboarding' ) ) {
 		$onboarding = new CFWC_Onboarding();
 		$stats      = $onboarding->get_product_stats();
 
@@ -53,8 +54,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 			$setup_notice .= ' <a href="' . esc_url( $products_url ) . '">' . esc_html__( 'View Products', 'customs-fees-for-woocommerce' ) . '</a>';
 
 			$notices[] = array(
-				'type'    => 'warning',
-				'content' => $setup_notice,
+				'type'        => 'warning',
+				'content'     => $setup_notice,
+				'dismissible' => true,
+				'dismiss_key' => 'setup_status',
 			);
 		}
 	}
@@ -138,6 +141,39 @@ if ( ! defined( 'ABSPATH' ) ) {
 						</label>
 						<p class="description">
 							<?php esc_html_e( 'Enable this if you run promotions with discounts but still want to charge customs fees based on the full product value.', 'customs-fees-for-woocommerce' ); ?>
+						</p>
+					</fieldset>
+				</td>
+			</tr>
+			<tr valign="top">
+				<th scope="row" class="titledesc">
+					<label for="cfwc_valuation_method">
+						<?php esc_html_e( 'Customs Valuation Method', 'customs-fees-for-woocommerce' ); ?>
+						<span class="woocommerce-help-tip" data-tip="<?php esc_attr_e( 'Choose how the customs value is calculated. FOB (Free On Board) uses product value only. CIF (Cost, Insurance, Freight) includes shipping costs in the customs value. Most countries outside the US use CIF-based valuation.', 'customs-fees-for-woocommerce' ); ?>"></span>
+					</label>
+				</th>
+				<td class="forminp">
+					<?php
+					$valuation_method = get_option( 'cfwc_valuation_method', 'fob' );
+					?>
+					<fieldset>
+						<label>
+							<input type="radio" name="cfwc_valuation_method" value="fob" <?php checked( $valuation_method, 'fob' ); ?> />
+							<strong><?php esc_html_e( 'FOB - Product Value Only', 'customs-fees-for-woocommerce' ); ?></strong>
+							<span class="description" style="display: block; margin: 2px 0 8px 24px; color: #666;">
+								<?php esc_html_e( 'Calculate customs fees based on product prices only. Used by USA, Canada.', 'customs-fees-for-woocommerce' ); ?>
+							</span>
+						</label>
+						<label>
+							<input type="radio" name="cfwc_valuation_method" value="cif" <?php checked( $valuation_method, 'cif' ); ?> />
+							<strong><?php esc_html_e( 'CIF - Include Shipping in Customs Value', 'customs-fees-for-woocommerce' ); ?></strong>
+							<span class="description" style="display: block; margin: 2px 0 8px 24px; color: #666;">
+								<?php esc_html_e( 'Include shipping costs in the customs value calculation. Used by EU, UK, Australia, Japan, and most other countries.', 'customs-fees-for-woocommerce' ); ?>
+							</span>
+						</label>
+						<p class="description" style="margin-top: 10px;">
+							<span class="dashicons dashicons-info" style="color: #2271b1;"></span>
+							<?php esc_html_e( 'When CIF is selected, shipping costs are distributed proportionally across products based on their value.', 'customs-fees-for-woocommerce' ); ?>
 						</p>
 					</fieldset>
 				</td>
@@ -452,6 +488,27 @@ if ( ! defined( 'ABSPATH' ) ) {
 				$('body').css('overflow', '');
 			}
 		});
+		
+		// Handle dismissible notices on settings page
+		$('.cfwc-dismissible-notice .cfwc-notice-dismiss').on('click', function(e) {
+			e.preventDefault();
+			var $notice = $(this).closest('.cfwc-dismissible-notice');
+			var dismissKey = $notice.data('dismiss-key');
+			
+			// Send AJAX to save dismissal
+			if (dismissKey) {
+				$.post(ajaxurl, {
+					action: 'cfwc_dismiss_settings_notice',
+					dismiss_key: dismissKey,
+					nonce: '<?php echo esc_js( wp_create_nonce( 'cfwc_dismiss_settings_notice' ) ); ?>'
+				});
+			}
+			
+			// Fade out the notice
+			$notice.fadeOut(200, function() {
+				$(this).remove();
+			});
+		});
 	});
 	</script>
 	
@@ -598,8 +655,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 		?>
 		<div class="cfwc-notices-container" style="margin-bottom: 20px;">
 			<?php foreach ( $notices as $notice ) : ?>
-				<div class="notice notice-<?php echo esc_attr( $notice['type'] ); ?>" style="margin-bottom: 10px;">
+				<?php
+				$is_dismissible = ! empty( $notice['dismissible'] );
+				$dismiss_key    = ! empty( $notice['dismiss_key'] ) ? $notice['dismiss_key'] : '';
+				$notice_class   = 'notice notice-' . esc_attr( $notice['type'] );
+				if ( $is_dismissible ) {
+					$notice_class .= ' is-dismissible cfwc-dismissible-notice';
+				}
+				?>
+				<div class="<?php echo esc_attr( $notice_class ); ?>" style="margin-bottom: 10px;" <?php echo $dismiss_key ? 'data-dismiss-key="' . esc_attr( $dismiss_key ) . '"' : ''; ?>>
 					<p><?php echo wp_kses_post( $notice['content'] ); ?></p>
+					<?php if ( $is_dismissible ) : ?>
+						<button type="button" class="notice-dismiss cfwc-notice-dismiss">
+							<span class="screen-reader-text"><?php esc_html_e( 'Dismiss this notice.', 'customs-fees-for-woocommerce' ); ?></span>
+						</button>
+					<?php endif; ?>
 				</div>
 			<?php endforeach; ?>
 		</div>

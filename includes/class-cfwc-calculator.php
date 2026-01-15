@@ -41,7 +41,7 @@ class CFWC_Calculator {
 	/**
 	 * Get all rules from settings.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.4
 	 * @return array Array of rules.
 	 */
 	private function get_rules() {
@@ -62,22 +62,22 @@ class CFWC_Calculator {
 
 	/**
 	 * Calculate fees for the cart.
-	 * 
+	 *
 	 * IMPORTANT: How Customs & Import Fees Work
 	 * ==========================================
 	 * In real-world customs, when a shipment contains multiple products:
-	 * 
+	 *
 	 * 1. Each product type (HS code) is assessed individually
 	 * 2. The duty rate for each product is based on its specific HS code
 	 * 3. The fee for each product = (product value) × (duty rate)
 	 * 4. Total customs fees = sum of all individual product fees
-	 * 
+	 *
 	 * Example: If you ship 2 electronics (25% duty) and 1 battery (25% duty):
 	 * - Electronics: $100 × 25% = $25
-	 * - Electronics: $100 × 25% = $25  
+	 * - Electronics: $100 × 25% = $25
 	 * - Battery: $50 × 25% = $12.50
 	 * - Total customs fees = $62.50
-	 * 
+	 *
 	 * Rule Matching Priority:
 	 * - More specific HS codes have priority over broader patterns
 	 * - Example: "8506*" (batteries) beats "85*" (electronics) for HS code 8506
@@ -102,7 +102,7 @@ class CFWC_Calculator {
 			return $fees;
 		}
 
-		// Initialize rule matcher for advanced matching (v1.2.0).
+		// Initialize rule matcher for advanced matching (v1.1.4).
 		$rule_matcher = new CFWC_Rule_Matcher();
 
 		// Log calculation start.
@@ -154,11 +154,11 @@ class CFWC_Calculator {
 			// Get product origin using centralized helper.
 			if ( class_exists( 'CFWC_Products_Variation_Support' ) ) {
 				$customs_data = CFWC_Products_Variation_Support::get_product_customs_data( $product );
-				$origin = $customs_data['origin'];
+				$origin       = $customs_data['origin'];
 			} else {
 				// Fallback to direct meta lookup.
-			$origin = get_post_meta( $product_id, '_cfwc_country_of_origin', true );
-				
+				$origin = get_post_meta( $product_id, '_cfwc_country_of_origin', true );
+
 				// For variations, check parent product if no origin found on variation.
 				if ( empty( $origin ) && $product->get_parent_id() ) {
 					$origin = get_post_meta( $product->get_parent_id(), '_cfwc_country_of_origin', true );
@@ -168,25 +168,39 @@ class CFWC_Calculator {
 			// Use default origin if no origin set on product.
 			if ( empty( $origin ) ) {
 				$origin = $this->get_default_origin();
-				
-				// Skip if still no origin after checking default.
-				if ( empty( $origin ) ) {
-					$this->log_debug(
-						sprintf(
-							'  SKIPPED %s - Reason: No country of origin configured and no default origin set',
-							$product_info
-						)
-					);
-					continue;
-				} else {
-					$this->log_debug(
-						sprintf(
-							'  Using default origin (%s) for %s',
-							$origin,
-							$product_info
-						)
-					);
-				}
+			}
+
+			/**
+			 * Filter the product origin country.
+			 *
+			 * @since 1.1.4
+			 * @param string     $origin     The origin country code.
+			 * @param int        $product_id Product ID.
+			 * @param WC_Product $product    Product object.
+			 */
+			$origin = apply_filters( 'cfwc_product_origin', $origin, $product_id, $product );
+
+			// Skip if still no origin after checking default.
+			if ( empty( $origin ) ) {
+				$this->log_debug(
+					sprintf(
+						'  SKIPPED %s - Reason: No country of origin configured and no default origin set',
+						$product_info
+					)
+				);
+				continue;
+			}
+
+			// Log if using default origin.
+			$product_origin_meta = get_post_meta( $product_id, '_cfwc_country_of_origin', true );
+			if ( empty( $product_origin_meta ) ) {
+				$this->log_debug(
+					sprintf(
+						'  Using default origin (%s) for %s',
+						$origin,
+						$product_info
+					)
+				);
 			}
 
 			// Get matching rules for this product.
@@ -210,14 +224,17 @@ class CFWC_Calculator {
 				$line_total = $cart_item['line_total'];
 			}
 
+			// Apply customs valuation method (CIF support).
+			$line_total = $this->apply_valuation_method( $line_total, $cart_item, $cart );
+
 			// Get HS code using centralized helper.
 			if ( class_exists( 'CFWC_Products_Variation_Support' ) ) {
 				$customs_data = CFWC_Products_Variation_Support::get_product_customs_data( $product );
-				$hs_code = $customs_data['hs_code'];
+				$hs_code      = $customs_data['hs_code'];
 			} else {
 				// Fallback to direct meta lookup.
-			$hs_code = get_post_meta( $product_id, '_cfwc_hs_code', true );
-				
+				$hs_code = get_post_meta( $product_id, '_cfwc_hs_code', true );
+
 				// For variations, check parent product if no HS code found on variation.
 				if ( empty( $hs_code ) && $product->get_parent_id() ) {
 					$hs_code = get_post_meta( $product->get_parent_id(), '_cfwc_hs_code', true );
@@ -253,18 +270,18 @@ class CFWC_Calculator {
 						$destination_country
 					)
 				);
-				
-				// Look for a general import rule (match_type = 'all') for this country pair
+
+				// Look for a general import rule (match_type = 'all') for this country pair.
 				foreach ( $rules as $rule_id => $rule ) {
 					$match_type = $rule['match_type'] ?? 'all';
-					$rule_from = $rule['from_country'] ?? $rule['origin_country'] ?? $rule['country'] ?? '';
-					$rule_to   = $rule['to_country'] ?? $rule['country'] ?? '';
-					
-					// Check if this is a general rule for the same country pair
-					if ( 'all' === $match_type && 
-						 $rule_from === $origin && 
-						 $rule_to === $destination_country ) {
-						$rule['rule_id'] = $rule_id;
+					$rule_from  = $rule['from_country'] ?? $rule['origin_country'] ?? $rule['country'] ?? '';
+					$rule_to    = $rule['to_country'] ?? $rule['country'] ?? '';
+
+					// Check if this is a general rule for the same country pair.
+					if ( 'all' === $match_type &&
+						$rule_from === $origin &&
+						$rule_to === $destination_country ) {
+						$rule['rule_id']  = $rule_id;
 						$matching_rules[] = $rule;
 						$this->log_debug(
 							sprintf(
@@ -273,10 +290,10 @@ class CFWC_Calculator {
 								$destination_country
 							)
 						);
-						break; // Use the first matching general rule
+						break; // Use the first matching general rule.
 					}
 				}
-				
+
 				if ( empty( $matching_rules ) ) {
 					$this->log_debug( '      → No general import rule found either' );
 				}
@@ -288,7 +305,7 @@ class CFWC_Calculator {
 				if ( false !== $fee && $fee > 0 ) {
 					$base_label = $this->get_fee_label( $rule, $destination_country, $origin );
 
-					// Check if the label already contains a percentage (e.g., "(50%)")
+					// Check if the label already contains a percentage (e.g., "(50%)").
 					$has_percentage = preg_match( '/\(\d+(?:\.\d+)?%\)/', $base_label );
 
 					// Add percentage rate in brackets only if not already present and it's a percentage rule.
@@ -299,7 +316,7 @@ class CFWC_Calculator {
 						$label = $base_label;
 					}
 
-					// Create a unique key for grouping that includes the base label and rate
+					// Create a unique key for grouping that includes the base label and rate.
 					$group_key = $base_label . '|' . ( $rule['type'] ?? 'flat' ) . '|' . ( $rule['rate'] ?? '0' );
 
 					// Group fees by rule for consolidation.
@@ -317,7 +334,7 @@ class CFWC_Calculator {
 					}
 
 					$fees_by_label[ $group_key ]['amount'] += $fee;
-					$fees_by_label[ $group_key ]['count']++;
+					++$fees_by_label[ $group_key ]['count'];
 
 					// Log fee application.
 					$this->log_debug(
@@ -334,33 +351,36 @@ class CFWC_Calculator {
 		// Convert grouped fees to array and update labels with count.
 		$fees = array();
 		foreach ( $fees_by_label as $fee_data ) {
-			// Update label to show count if more than one product matches
+			// Update label to show count if more than one product matches.
 			if ( $fee_data['count'] > 1 ) {
-				// Check if the label already has percentage
+				// Check if the label already has percentage.
 				$has_percentage = preg_match( '/\(\d+(?:\.\d+)?%\)/', $fee_data['label'] );
-				
+
 				if ( $has_percentage ) {
-					// Label already has percentage, just add count
-					$fee_data['label'] = sprintf( '%s x %d', 
+					// Label already has percentage, just add count.
+					$fee_data['label'] = sprintf(
+						'%s x %d',
 						$fee_data['label'],
 						$fee_data['count']
 					);
 				} elseif ( 'percentage' === $fee_data['type'] && ! empty( $fee_data['rate'] ) ) {
-					// Add both percentage and count
-					$fee_data['label'] = sprintf( '%s (%s%%) x %d', 
-						$fee_data['base_label'], 
+					// Add both percentage and count.
+					$fee_data['label'] = sprintf(
+						'%s (%s%%) x %d',
+						$fee_data['base_label'],
 						$fee_data['rate'],
 						$fee_data['count']
 					);
 				} else {
-					// Just add count
-					$fee_data['label'] = sprintf( '%s x %d', 
+					// Just add count.
+					$fee_data['label'] = sprintf(
+						'%s x %d',
 						$fee_data['base_label'],
 						$fee_data['count']
 					);
 				}
 			}
-			// Remove temporary fields
+			// Remove temporary fields.
 			unset( $fee_data['base_label'], $fee_data['count'], $fee_data['rate'], $fee_data['type'] );
 			$fees[] = $fee_data;
 		}
@@ -415,11 +435,11 @@ class CFWC_Calculator {
 			// Get origin using centralized helper.
 			if ( class_exists( 'CFWC_Products_Variation_Support' ) ) {
 				$customs_data = CFWC_Products_Variation_Support::get_product_customs_data( $product );
-				$origin = $customs_data['origin'];
+				$origin       = $customs_data['origin'];
 			} else {
 				// Fallback to direct meta lookup.
 				$origin = get_post_meta( $product_id, '_cfwc_country_of_origin', true );
-				
+
 				// For variations, check parent product if no origin found on variation.
 				if ( empty( $origin ) && $product->get_parent_id() ) {
 					$origin = get_post_meta( $product->get_parent_id(), '_cfwc_country_of_origin', true );
@@ -702,30 +722,41 @@ class CFWC_Calculator {
 	private function get_fee_label( $rule, $country, $origin = '' ) {
 		// If the rule has a custom label, use it as-is.
 		if ( ! empty( $rule['label'] ) ) {
-			return $rule['label'];
+			$label = $rule['label'];
+		} else {
+			// Otherwise, build a default label.
+			$countries    = WC()->countries->get_countries();
+			$country_name = isset( $countries[ $country ] ) ? $countries[ $country ] : $country;
+
+			// Add origin to label if available.
+			if ( ! empty( $origin ) && 'unknown' !== $origin ) {
+				$origin_name = isset( $countries[ $origin ] ) ? $countries[ $origin ] : $origin;
+				$label       = sprintf(
+					/* translators: %1$s: destination country, %2$s: origin country */
+					__( 'Import Fees (%1$s from %2$s)', 'customs-fees-for-woocommerce' ),
+					$country_name,
+					$origin_name
+				);
+			} else {
+				// Default label.
+				$label = sprintf(
+					/* translators: %s: country name */
+					__( 'Customs & Import Fees (%s)', 'customs-fees-for-woocommerce' ),
+					$country_name
+				);
+			}
 		}
 
-		// Otherwise, build a default label.
-		$countries    = WC()->countries->get_countries();
-		$country_name = isset( $countries[ $country ] ) ? $countries[ $country ] : $country;
-
-		// Add origin to label if available.
-		if ( ! empty( $origin ) && 'unknown' !== $origin ) {
-			$origin_name = isset( $countries[ $origin ] ) ? $countries[ $origin ] : $origin;
-			return sprintf(
-				/* translators: %1$s: destination country, %2$s: origin country */
-				__( 'Import Fees (%1$s from %2$s)', 'customs-fees-for-woocommerce' ),
-				$country_name,
-				$origin_name
-			);
-		}
-
-		// Default label.
-		return sprintf(
-			/* translators: %s: country name */
-			__( 'Customs & Import Fees (%s)', 'customs-fees-for-woocommerce' ),
-			$country_name
-		);
+		/**
+		 * Filter the fee label displayed at checkout.
+		 *
+		 * @since 1.1.4
+		 * @param string $label   The fee label.
+		 * @param array  $rule    The rule data.
+		 * @param string $country Destination country code.
+		 * @param string $origin  Origin country code.
+		 */
+		return apply_filters( 'cfwc_fee_label', $label, $rule, $country, $origin );
 	}
 
 	/**
@@ -863,7 +894,7 @@ class CFWC_Calculator {
 	 */
 	private function get_default_origin() {
 		$default_origin = get_option( 'cfwc_default_origin', 'store' );
-		
+
 		if ( 'store' === $default_origin ) {
 			// Use store's base country.
 			$base_country = get_option( 'woocommerce_default_country' );
@@ -876,7 +907,7 @@ class CFWC_Calculator {
 			// Use custom default origin.
 			return get_option( 'cfwc_custom_default_origin', '' );
 		}
-		
+
 		// Return null if 'none' or not set.
 		return null;
 	}
@@ -918,12 +949,12 @@ class CFWC_Calculator {
 			// If an origin_country is specified, only include products matching that origin.
 			if ( ! empty( $origin_country ) ) {
 				$product_origin = get_post_meta( $product->get_id(), '_cfwc_country_of_origin', true );
-				
+
 				// Use default origin if no origin set on product.
 				if ( empty( $product_origin ) ) {
 					$product_origin = $this->get_default_origin();
 				}
-				
+
 				if ( $product_origin !== $origin_country ) {
 					continue;
 				}
@@ -945,5 +976,145 @@ class CFWC_Calculator {
 		}
 
 		return (float) $total;
+	}
+
+	/**
+	 * Apply customs valuation method to line total.
+	 *
+	 * Supports FOB (product value only) and CIF (Cost, Insurance, Freight)
+	 * valuation methods for customs calculations.
+	 *
+	 * @since 1.1.4
+	 * @param float   $line_total Product line total.
+	 * @param array   $cart_item  Cart item data.
+	 * @param WC_Cart $cart       Cart object.
+	 * @return float Adjusted customs value.
+	 */
+	private function apply_valuation_method( $line_total, $cart_item, $cart ) {
+		$method = get_option( 'cfwc_valuation_method', 'fob' );
+
+		// FOB: Return unchanged (current/default behavior).
+		if ( 'fob' === $method ) {
+			return $line_total;
+		}
+
+		$customs_value = $line_total;
+
+		// CIF: Add proportional shipping share to customs value.
+		if ( in_array( $method, array( 'cif', 'cif_insurance' ), true ) ) {
+			$shipping_total = $cart->get_shipping_total();
+			$cart_subtotal  = $this->get_shippable_cart_subtotal( $cart );
+
+			if ( $cart_subtotal > 0 && $shipping_total > 0 ) {
+				// Calculate this product's proportional share of shipping.
+				$shipping_share = ( $line_total / $cart_subtotal ) * $shipping_total;
+				$customs_value += $shipping_share;
+
+				$this->log_debug(
+					sprintf(
+						'    CIF: Added shipping share $%.2f to customs value (%.2f%% of $%.2f shipping)',
+						$shipping_share,
+						( $line_total / $cart_subtotal ) * 100,
+						$shipping_total
+					)
+				);
+			}
+		}
+
+		// CIF + Insurance: Add insurance value (Phase 2 - future enhancement).
+		if ( 'cif_insurance' === $method ) {
+			$insurance_value = $this->calculate_insurance_value( $line_total );
+			if ( $insurance_value > 0 ) {
+				$customs_value += $insurance_value;
+
+				$this->log_debug(
+					sprintf(
+						'    CIF: Added insurance $%.2f to customs value',
+						$insurance_value
+					)
+				);
+			}
+		}
+
+		/**
+		 * Filter the calculated customs value.
+		 *
+		 * @since 1.1.4
+		 * @param float   $customs_value The calculated customs value.
+		 * @param float   $line_total    Original product line total.
+		 * @param array   $cart_item     Cart item data.
+		 * @param string  $method        Valuation method (fob, cif, cif_insurance).
+		 */
+		return apply_filters( 'cfwc_customs_value', $customs_value, $line_total, $cart_item, $method );
+	}
+
+	/**
+	 * Get the total value of shippable products in cart.
+	 *
+	 * Used for calculating proportional shipping distribution in CIF.
+	 *
+	 * @since 1.1.4
+	 * @param WC_Cart $cart Cart object.
+	 * @return float Total value of shippable products.
+	 */
+	private function get_shippable_cart_subtotal( $cart ) {
+		$total = 0;
+
+		foreach ( $cart->get_cart() as $cart_item ) {
+			$product = $cart_item['data'];
+
+			// Only include products that need shipping.
+			if ( $product && ! $product->is_virtual() && $product->needs_shipping() ) {
+				$total += $cart_item['line_total'];
+			}
+		}
+
+		return $total;
+	}
+
+	/**
+	 * Calculate insurance value for CIF customs valuation.
+	 *
+	 * @since 1.1.4
+	 * @param float $product_value Product line total.
+	 * @return float Insurance value.
+	 */
+	private function calculate_insurance_value( $product_value ) {
+		$insurance_method = get_option( 'cfwc_insurance_method', 'disabled' );
+
+		$insurance_value = 0;
+
+		switch ( $insurance_method ) {
+			case 'percentage':
+				$percentage      = floatval( get_option( 'cfwc_insurance_percentage', 2 ) );
+				$insurance_value = ( $product_value * $percentage ) / 100;
+				break;
+
+			case 'flat':
+				// For flat rate, we return per-product share.
+				// This is calculated per product proportionally.
+				// Note: For accurate flat distribution, we'd need cart context.
+				// For now, return 0 as flat insurance is Phase 2.
+				$insurance_value = 0;
+				break;
+
+			default:
+				// Insurance disabled - use 0.
+				$insurance_value = 0;
+				break;
+		}
+
+		/**
+		 * Filter the calculated insurance value.
+		 *
+		 * Allows third-party insurance plugins (Route, Shipsurance, etc.)
+		 * to provide actual insurance values.
+		 *
+		 * @since 1.1.4
+		 * @param float $insurance_value Calculated insurance value.
+		 * @param float $product_value   Product line total.
+		 * @param string $insurance_method Current insurance method setting.
+		 */
+		return apply_filters( 'cfwc_insurance_value', $insurance_value, $product_value, $insurance_method );
 	}
 }

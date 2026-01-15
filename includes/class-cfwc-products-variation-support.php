@@ -24,11 +24,11 @@ class CFWC_Products_Variation_Support {
 	 * Constructor.
 	 */
 	public function __construct() {
-		// Add fields to variation form
+		// Add fields to variation form.
 		add_action( 'woocommerce_variation_options_pricing', array( $this, 'add_variation_fields' ), 10, 3 );
 		add_action( 'woocommerce_save_product_variation', array( $this, 'save_variation_fields' ), 10, 2 );
-		
-		// Add variation data to frontend
+
+		// Add variation data to frontend.
 		add_filter( 'woocommerce_available_variation', array( $this, 'add_variation_data' ), 10, 3 );
 	}
 
@@ -41,43 +41,53 @@ class CFWC_Products_Variation_Support {
 	 */
 	public function add_variation_fields( $loop, $variation_data, $variation ) {
 		$variation_id = $variation->ID;
-		
-		// Get current values (empty if not set, will inherit from parent)
+
+		// Get current values (empty if not set, will inherit from parent).
 		$hs_code = get_post_meta( $variation_id, '_cfwc_hs_code', true );
-		$origin = get_post_meta( $variation_id, '_cfwc_country_of_origin', true );
-		
-		// Get parent values for placeholder
-		$parent_id = wp_get_post_parent_id( $variation_id );
+		$origin  = get_post_meta( $variation_id, '_cfwc_country_of_origin', true );
+
+		// Get parent values for placeholder.
+		$parent_id      = wp_get_post_parent_id( $variation_id );
 		$parent_hs_code = get_post_meta( $parent_id, '_cfwc_hs_code', true );
-		$parent_origin = get_post_meta( $parent_id, '_cfwc_country_of_origin', true );
+		$parent_origin  = get_post_meta( $parent_id, '_cfwc_country_of_origin', true );
 		?>
 		<div class="cfwc-variation-customs-fields">
 			<p class="form-row form-row-first">
 				<label for="cfwc_hs_code_<?php echo esc_attr( $loop ); ?>">
 					<?php esc_html_e( 'HS Code', 'customs-fees-for-woocommerce' ); ?>
-					<?php echo wp_kses_post( wc_help_tip( sprintf( 
-						/* translators: %s: parent HS code */
-						__( 'Leave empty to use parent product HS code: %s', 'customs-fees-for-woocommerce' ), 
-						$parent_hs_code ?: __( 'Not set', 'customs-fees-for-woocommerce' ) 
-					) ) ); ?>
+					<?php
+					echo wp_kses_post(
+						wc_help_tip(
+							sprintf(
+							/* translators: %s: parent HS code */
+								__( 'Leave empty to use parent product HS code: %s', 'customs-fees-for-woocommerce' ),
+								! empty( $parent_hs_code ) ? $parent_hs_code : __( 'Not set', 'customs-fees-for-woocommerce' )
+							)
+						)
+					);
+					?>
 				</label>
 				<input type="text" 
-					   id="cfwc_hs_code_<?php echo esc_attr( $loop ); ?>" 
-					   name="cfwc_hs_code[<?php echo esc_attr( $loop ); ?>]" 
-					   value="<?php echo esc_attr( $hs_code ); ?>" 
-					   placeholder="<?php echo esc_attr( $parent_hs_code ); ?>" />
+						id="cfwc_hs_code_<?php echo esc_attr( $loop ); ?>" 
+						name="cfwc_hs_code[<?php echo esc_attr( $loop ); ?>]" 
+						value="<?php echo esc_attr( $hs_code ); ?>" 
+						placeholder="<?php echo esc_attr( $parent_hs_code ); ?>" />
 			</p>
 			
 			<p class="form-row form-row-last">
 				<label for="cfwc_country_of_origin_<?php echo esc_attr( $loop ); ?>">
 					<?php esc_html_e( 'Country of Origin', 'customs-fees-for-woocommerce' ); ?>
-					<?php 
+					<?php
 					$countries = WC()->countries->get_countries();
-					echo wp_kses_post( wc_help_tip( sprintf( 
-						/* translators: %s: parent country */
-						__( 'Leave empty to use parent product origin: %s', 'customs-fees-for-woocommerce' ), 
-						$parent_origin && isset( $countries[ $parent_origin ] ) ? $countries[ $parent_origin ] : __( 'Not set', 'customs-fees-for-woocommerce' ) 
-					) ) ); 
+					echo wp_kses_post(
+						wc_help_tip(
+							sprintf(
+							/* translators: %s: parent country */
+								__( 'Leave empty to use parent product origin: %s', 'customs-fees-for-woocommerce' ),
+								$parent_origin && isset( $countries[ $parent_origin ] ) ? $countries[ $parent_origin ] : __( 'Not set', 'customs-fees-for-woocommerce' )
+							)
+						)
+					);
 					?>
 				</label>
 				<select id="cfwc_country_of_origin_<?php echo esc_attr( $loop ); ?>" 
@@ -108,8 +118,8 @@ class CFWC_Products_Variation_Support {
 	 */
 	public function save_variation_fields( $variation_id, $loop ) {
 		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified by WooCommerce
-		
-		// Save HS Code
+
+		// Save HS Code.
 		if ( isset( $_POST['cfwc_hs_code'][ $loop ] ) ) {
 			$hs_code = sanitize_text_field( wp_unslash( $_POST['cfwc_hs_code'][ $loop ] ) );
 			if ( ! empty( $hs_code ) ) {
@@ -118,8 +128,8 @@ class CFWC_Products_Variation_Support {
 				delete_post_meta( $variation_id, '_cfwc_hs_code' );
 			}
 		}
-		
-		// Save Country of Origin
+
+		// Save Country of Origin.
 		if ( isset( $_POST['cfwc_country_of_origin'][ $loop ] ) ) {
 			$origin = sanitize_text_field( wp_unslash( $_POST['cfwc_country_of_origin'][ $loop ] ) );
 			if ( ! empty( $origin ) ) {
@@ -128,7 +138,7 @@ class CFWC_Products_Variation_Support {
 				delete_post_meta( $variation_id, '_cfwc_country_of_origin' );
 			}
 		}
-		
+
 		// phpcs:enable
 	}
 
@@ -141,18 +151,18 @@ class CFWC_Products_Variation_Support {
 	 * @return array Modified variation data.
 	 */
 	public function add_variation_data( $variation_data, $product, $variation ) {
-		// Get variation customs data with parent fallback
+		// Get variation customs data with parent fallback.
 		$hs_code = $this->get_variation_hs_code( $variation );
-		$origin = $this->get_variation_origin( $variation );
-		
+		$origin  = $this->get_variation_origin( $variation );
+
 		if ( $hs_code ) {
 			$variation_data['cfwc_hs_code'] = $hs_code;
 		}
-		
+
 		if ( $origin ) {
 			$variation_data['cfwc_country_of_origin'] = $origin;
 		}
-		
+
 		return $variation_data;
 	}
 
@@ -164,12 +174,12 @@ class CFWC_Products_Variation_Support {
 	 */
 	public function get_variation_hs_code( $variation ) {
 		$hs_code = get_post_meta( $variation->get_id(), '_cfwc_hs_code', true );
-		
-		// Fallback to parent if not set
+
+		// Fallback to parent if not set.
 		if ( empty( $hs_code ) && $variation->get_parent_id() ) {
 			$hs_code = get_post_meta( $variation->get_parent_id(), '_cfwc_hs_code', true );
 		}
-		
+
 		return $hs_code;
 	}
 
@@ -181,12 +191,12 @@ class CFWC_Products_Variation_Support {
 	 */
 	public function get_variation_origin( $variation ) {
 		$origin = get_post_meta( $variation->get_id(), '_cfwc_country_of_origin', true );
-		
-		// Fallback to parent if not set
+
+		// Fallback to parent if not set.
 		if ( empty( $origin ) && $variation->get_parent_id() ) {
 			$origin = get_post_meta( $variation->get_parent_id(), '_cfwc_country_of_origin', true );
 		}
-		
+
 		return $origin;
 	}
 
@@ -200,26 +210,29 @@ class CFWC_Products_Variation_Support {
 		if ( ! is_object( $product ) ) {
 			$product = wc_get_product( $product );
 		}
-		
+
 		if ( ! $product ) {
-			return array( 'hs_code' => '', 'origin' => '' );
+			return array(
+				'hs_code' => '',
+				'origin'  => '',
+			);
 		}
-		
+
 		$product_id = $product->get_id();
-		$parent_id = $product->get_parent_id();
-		
-		// Get HS code with fallback
+		$parent_id  = $product->get_parent_id();
+
+		// Get HS code with fallback.
 		$hs_code = get_post_meta( $product_id, '_cfwc_hs_code', true );
 		if ( empty( $hs_code ) && $parent_id ) {
 			$hs_code = get_post_meta( $parent_id, '_cfwc_hs_code', true );
 		}
-		
-		// Get origin with fallback
+
+		// Get origin with fallback.
 		$origin = get_post_meta( $product_id, '_cfwc_country_of_origin', true );
 		if ( empty( $origin ) && $parent_id ) {
 			$origin = get_post_meta( $parent_id, '_cfwc_country_of_origin', true );
 		}
-		
+
 		return array(
 			'hs_code' => $hs_code,
 			'origin'  => $origin,
@@ -227,5 +240,5 @@ class CFWC_Products_Variation_Support {
 	}
 }
 
-// Initialize the class
+// Initialize the class.
 new CFWC_Products_Variation_Support();

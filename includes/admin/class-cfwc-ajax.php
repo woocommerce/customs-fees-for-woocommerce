@@ -67,7 +67,7 @@ class CFWC_Ajax {
 			'label'           => sanitize_text_field( $rule_data['label'] ?? '' ),
 			'taxable'         => isset( $rule_data['taxable'] ) ? (bool) $rule_data['taxable'] : true,
 			'tax_class'       => sanitize_text_field( $rule_data['tax_class'] ?? '' ),
-			// New fields for advanced matching (v1.2.0).
+			// New fields for advanced matching (v1.1.4).
 			'from_country'    => sanitize_text_field( $rule_data['from_country'] ?? $rule_data['country'] ?? '' ),
 			'to_country'      => sanitize_text_field( $rule_data['to_country'] ?? '' ),
 			'match_type'      => sanitize_text_field( $rule_data['match_type'] ?? 'all' ),

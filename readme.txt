@@ -7,7 +7,7 @@ Requires PHP: 7.4
 Requires Plugins: woocommerce
 WC requires at least: 9.0
 WC tested up to: 10.4.0
-Stable tag: 1.1.3
+Stable tag: 1.1.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -192,6 +192,18 @@ Yes, through:
 
 == Changelog ==
 
+= 1.1.4 - 2026-01-15 =
+* Add - CIF (Cost, Insurance, Freight) customs valuation method support.
+* Add - New setting to choose between FOB (product value only) and CIF (product + shipping) calculation methods.
+* Add - Shipping costs are proportionally distributed across products when CIF is enabled.
+* Add - `cfwc_customs_value` filter to customize customs value calculations.
+* Add - `cfwc_insurance_value` filter for third-party insurance plugin integration.
+* Add - `cfwc_fee_label` filter to customize fee labels at checkout.
+* Add - `cfwc_product_origin` filter to override product origin programmatically.
+* Update - Made "Setup Status" notice on settings page dismissible.
+* Update - Improved code quality with PHPCS and PHPStan compliance.
+* Dev - CIF is an opt-in feature; default behavior (FOB) remains unchanged.
+
 = 1.1.3 - 2025-12-11 =
 * Added new setting to calculate customs fees on original price (before discounts).
 * Useful for promotions where products are discounted but tariffs should still be based on full product value.
@@ -241,11 +253,30 @@ Control how multiple rules interact:
 
 = Developer Hooks =
 
-`cfwc_calculated_fee` - Modify calculated fees
-`cfwc_fee_rules` - Add/modify rules programmatically
-`cfwc_fee_label` - Customize fee labels
-`cfwc_product_origin` - Override product origin
-`cfwc_should_calculate` - Control when fees apply
+**Fee Calculation Filters:**
+`cfwc_calculated_fees` - Modify all calculated fees before they're applied.
+`cfwc_calculated_single_fee` - Modify a single fee calculation.
+`cfwc_fee_label` - Customize fee label displayed at checkout.
+`cfwc_fee_taxable_default` - Filter if fee should be taxable.
+`cfwc_fee_tax_class_default` - Filter fee tax class.
+
+**Product & Origin Filters:**
+`cfwc_product_origin` - Override product origin country.
+`cfwc_customs_value` - Modify the customs value (for CIF calculations).
+`cfwc_insurance_value` - Provide insurance value for CIF calculations.
+
+**Rules Filters:**
+`cfwc_rules_for_country` - Filter rules for a specific country.
+`cfwc_all_rules` - Filter all available rules.
+`cfwc_preset_templates` - Filter preset templates.
+
+**Configuration Filters:**
+`cfwc_include_shipping_in_calculation` - Include shipping in cart total calculations.
+`cfwc_include_taxes_in_calculation` - Include taxes in cart total calculations.
+`cfwc_enable_calculation_logging` - Enable detailed calculation logging.
+
+**Actions:**
+`cfwc_cache_cleared` - Fired after cache is cleared.
 
 == Testing Scenarios ==
 

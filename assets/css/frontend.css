@@ -286,31 +286,29 @@ ul.cfwc-fees-breakdown li:before,
 
 /* Info box on order received page */
 .cfwc-order-info-box {
-	background-color: #f7f7f7;
-	border-left: 4px solid #0073aa;
-	padding: 20px;
+	background-color: #f8f9fa;
+	border: 1px solid #e0e0e0;
+	border-radius: 4px;
+	padding: 15px 20px;
 	margin: 30px 0;
 }
 
 .cfwc-order-info-box h3 {
-	margin: 0 0 10px;
-	color: #0073aa;
-	font-size: 18px;
+	margin: 0 0 8px;
+	color: #333;
+	font-size: 14px;
+	font-weight: 600;
 }
 
 .cfwc-order-info-box p {
-	margin: 0 0 10px;
+	margin: 0;
 	color: #666;
 }
 
-.cfwc-order-info-box p:last-child {
-	margin-bottom: 0;
-}
-
 .cfwc-order-info-box .cfwc-disclaimer {
-	color: #999;
-	font-size: 12px;
-	font-style: italic;
+	color: #666;
+	font-size: 13px;
+	line-height: 1.5;
 }
 
 /* Email breakdown list */

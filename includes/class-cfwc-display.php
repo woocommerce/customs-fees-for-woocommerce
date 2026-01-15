@@ -40,7 +40,8 @@ class CFWC_Display {
 		add_filter( 'woocommerce_order_item_name', array( $this, 'add_hs_code_to_order_item_display' ), 10, 3 );
 
 		// Display info box on order received page (NOT the fee itself).
-		add_action( 'woocommerce_thankyou', array( $this, 'display_order_received_info' ), 15 );
+		// Use hook that fires AFTER customer details to avoid being inside styled containers.
+		add_action( 'woocommerce_order_details_after_customer_details', array( $this, 'display_order_received_info' ), 10 );
 
 		// Email info box display (NOT the fee itself - fee is in totals).
 		add_action( 'woocommerce_email_after_order_table', array( $this, 'display_customs_info_in_email' ), 10, 4 );
@@ -357,37 +358,41 @@ class CFWC_Display {
 	/**
 	 * Display fee breakdown info box on order received page.
 	 *
+	 * Shows only the disclaimer since the fee total is already displayed
+	 * in the order totals table above.
+	 *
 	 * @since 1.0.0
-	 * @param int $order_id Order ID.
+	 * @param WC_Order $order Order object.
 	 */
-	public function display_order_received_info( $order_id ) {
-		if ( ! $order_id ) {
-			return;
+	public function display_order_received_info( $order ) {
+		// Handle both order object and order ID (for backward compatibility).
+		if ( is_numeric( $order ) ) {
+			$order = wc_get_order( $order );
 		}
 
-		$order = wc_get_order( $order_id );
 		if ( ! $order ) {
 			return;
 		}
 
-		$breakdown = $order->get_meta( '_cfwc_fees_breakdown', true );
+		// Check if order has customs fees.
+		$fees             = $order->get_fees();
+		$has_customs_fees = false;
 
-		if ( ! empty( $breakdown ) && is_array( $breakdown ) ) {
-			$total = 0;
-			foreach ( $breakdown as $fee ) {
-				$total += $fee['amount'];
+		foreach ( $fees as $fee ) {
+			if ( strpos( $fee->get_name(), __( 'Customs & Import Fees', 'customs-fees-for-woocommerce' ) ) !== false ) {
+				$has_customs_fees = true;
+				break;
 			}
+		}
 
-			if ( $total > 0 ) {
-				?>
-				<div class="cfwc-order-info-box">
-					<h3><?php esc_html_e( 'Customs & Import Information', 'customs-fees-for-woocommerce' ); ?></h3>
-					<p><?php esc_html_e( 'Estimated import duties and taxes based on destination country.', 'customs-fees-for-woocommerce' ); ?></p>
-					<p><strong><?php esc_html_e( 'Total customs fees:', 'customs-fees-for-woocommerce' ); ?></strong> <?php echo wp_kses_post( wc_price( $total ) ); ?></p>
-					<p class="cfwc-disclaimer"><?php esc_html_e( 'These are estimated fees based on current rates. Actual fees may vary depending on customs regulations and carrier handling charges.', 'customs-fees-for-woocommerce' ); ?></p>
-				</div>
-				<?php
-			}
+		// Only show info box if there are customs fees.
+		if ( $has_customs_fees ) {
+			?>
+			<div class="cfwc-order-info-box">
+				<h3><?php esc_html_e( 'Customs & Import Information', 'customs-fees-for-woocommerce' ); ?></h3>
+				<p class="cfwc-disclaimer"><?php esc_html_e( 'The customs and import fees shown above are estimated based on current rates. Actual fees may vary depending on customs regulations and carrier handling charges.', 'customs-fees-for-woocommerce' ); ?></p>
+			</div>
+			<?php
 		}
 	}
 }

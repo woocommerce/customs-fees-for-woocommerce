@@ -163,37 +163,60 @@ Total           $203.50
 
 #### Filters
 
-```
-// Modify calculated fee amount
-add_filter( 'cfwc_calculated_fee', function( $fee, $product, $rule ) {
-    // Custom fee logic
+```php
+// Modify all calculated fees before they're applied
+add_filter( 'cfwc_calculated_fees', function( $fees, $destination_country, $cart ) {
+    // Modify fees array
+    return $fees;
+}, 10, 3 );
+
+// Modify a single fee calculation
+add_filter( 'cfwc_calculated_single_fee', function( $fee, $rule, $total ) {
+    // Apply 50% discount for orders over $1000
+    if ( WC()->cart->subtotal > 1000 ) {
+        $fee = $fee * 0.5;
+    }
     return $fee;
 }, 10, 3 );
 
-// Customize fee label
-add_filter( 'cfwc_fee_label', function( $label, $rule ) {
+// Customize fee label displayed at checkout
+add_filter( 'cfwc_fee_label', function( $label, $rule, $country, $origin ) {
     return $label . ' (Estimated)';
-}, 10, 2 );
+}, 10, 4 );
 
-// Override product origin
-add_filter( 'cfwc_product_origin', function( $origin, $product_id ) {
-    // Custom origin logic
+// Override product origin country
+add_filter( 'cfwc_product_origin', function( $origin, $product_id, $product ) {
+    // Force all electronics to use CN origin
+    if ( has_term( 'electronics', 'product_cat', $product_id ) ) {
+        return 'CN';
+    }
     return $origin;
-}, 10, 2 );
+}, 10, 3 );
+
+// Modify customs value (for CIF calculations)
+add_filter( 'cfwc_customs_value', function( $customs_value, $line_total, $cart_item, $method ) {
+    // Force FOB for US/Canada even if CIF is enabled
+    $destination = WC()->customer->get_shipping_country();
+    if ( in_array( $destination, array( 'US', 'CA' ), true ) ) {
+        return $line_total;
+    }
+    return $customs_value;
+}, 10, 4 );
+
+// Provide insurance value for CIF calculations
+add_filter( 'cfwc_insurance_value', function( $insurance_value, $product_value, $method ) {
+    // Add 2% insurance to all products
+    return $product_value * 0.02;
+}, 10, 3 );
 ```
 
 #### Actions
 
-```
-// After fees are calculated
-add_action( 'cfwc_after_calculate_fees', function( $fees, $cart ) {
-    // Log or process calculated fees
-}, 10, 2 );
-
-// After rule is saved
-add_action( 'cfwc_rule_saved', function( $rule_id, $rule_data ) {
-    // Sync with external system
-}, 10, 2 );
+```php
+// After cache is cleared
+add_action( 'cfwc_cache_cleared', function() {
+    // Perform cleanup or sync
+} );
 ```
 
 ### Database schema
@@ -223,24 +246,31 @@ CREATE TABLE {prefix}cfwc_rules (
 
 ### With Multi-Currency Plugins
 
-```
-// Fees automatically convert to displayed currency
-add_filter('cfwc_fee_amount', function($amount) {
-    if (function_exists('convert_to_current_currency')) {
-        return convert_to_current_currency($amount);
+```php
+// Modify calculated fees for currency conversion
+add_filter( 'cfwc_calculated_single_fee', function( $fee, $rule, $total ) {
+    if ( function_exists( 'convert_to_current_currency' ) ) {
+        return convert_to_current_currency( $fee );
     }
-    return $amount;
-});
+    return $fee;
+}, 10, 3 );
 ```
 
-### With Shipping Plugins
+### With Third-Party Insurance Plugins
 
-```
-// Combine with shipping calculations
-add_action('woocommerce_shipping_calculated', function() {
-    // Recalculate customs based on shipping destination
-    WC()->cart->calculate_fees();
-});
+```php
+// Integrate shipping insurance with CIF customs calculations
+add_filter( 'cfwc_insurance_value', function( $insurance_value, $product_value, $method ) {
+    if ( function_exists( 'get_cart_insurance_amount' ) ) {
+        $total_insurance = get_cart_insurance_amount();
+        $cart_subtotal   = WC()->cart->get_cart_contents_total();
+
+        if ( $cart_subtotal > 0 ) {
+            return ( $product_value / $cart_subtotal ) * $total_insurance;
+        }
+    }
+    return $insurance_value;
+}, 10, 3 );
 ```
 
 ## Performance
@@ -313,6 +343,29 @@ GNU General Public License for more details.
 ```
 
 ## Changelog
+
+### Version 1.1.4 - January 2026
+
+**New Feature: CIF Customs Valuation**
+
+- Added support for CIF (Cost, Insurance, Freight) customs valuation method.
+- New setting to choose between FOB (product value only) and CIF (product + shipping) calculation methods.
+- Shipping costs are proportionally distributed across products when CIF is enabled.
+- Added `cfwc_customs_value` filter to customize customs value calculations.
+- Added `cfwc_insurance_value` filter for third-party insurance plugin integration.
+- Added `cfwc_fee_label` filter to customize fee labels at checkout.
+- Added `cfwc_product_origin` filter to override product origin programmatically.
+
+**Improvements**
+
+- Made "Setup Status" notice on settings page dismissible.
+- Improved code quality with PHPCS and PHPStan compliance.
+
+**Developer Notes**
+
+- CIF is an opt-in feature; default behavior (FOB) remains unchanged.
+- Existing orders and rules are not affected.
+- Virtual/downloadable products are automatically excluded from CIF calculations.
 
 ### Version 1.1.3 - December 2025
 

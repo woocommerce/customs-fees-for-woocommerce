@@ -1,5 +1,17 @@
 *** Customs Fees for WooCommerce Changelog ***
 
+2026-01-15 - version 1.1.4
+* Add - CIF (Cost, Insurance, Freight) customs valuation method support.
+* Add - New setting to choose between FOB (product value only) and CIF (product + shipping) calculation methods.
+* Add - Shipping costs are proportionally distributed across products when CIF is enabled.
+* Add - `cfwc_customs_value` filter to customize customs value calculations.
+* Add - `cfwc_insurance_value` filter for third-party insurance plugin integration.
+* Add - `cfwc_fee_label` filter to customize fee labels at checkout.
+* Add - `cfwc_product_origin` filter to override product origin programmatically.
+* Update - Made "Setup Status" notice on settings page dismissible.
+* Update - Improved code quality with PHPCS and PHPStan compliance.
+* Dev - CIF is an opt-in feature; default behavior (FOB) remains unchanged.
+
 2025-12-11 - version 1.1.3
 * Added new setting to calculate customs fees on original price (before discounts).
 * Useful for promotions where products are discounted but tariffs should still be based on full product value.

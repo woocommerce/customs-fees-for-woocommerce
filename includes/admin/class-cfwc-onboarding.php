@@ -27,6 +27,7 @@ class CFWC_Onboarding {
 		// Admin notices - simple like AutomateWoo.
 		add_action( 'admin_notices', array( $this, 'maybe_show_setup_notice' ), 10 );
 		add_action( 'wp_ajax_cfwc_dismiss_setup_notice', array( $this, 'ajax_dismiss_notice' ) );
+		add_action( 'wp_ajax_cfwc_dismiss_settings_notice', array( $this, 'ajax_dismiss_settings_notice' ) );
 
 		// Quick edit.
 		add_action( 'quick_edit_custom_box', array( $this, 'add_quick_edit_fields' ), 10, 2 );
@@ -212,6 +213,30 @@ class CFWC_Onboarding {
 
 		if ( current_user_can( 'manage_options' ) ) {
 			update_option( 'cfwc_dismissed_setup_notice', true );
+		}
+
+		wp_die();
+	}
+
+	/**
+	 * AJAX handler to dismiss settings page notices.
+	 *
+	 * @since 1.1.4
+	 */
+	public function ajax_dismiss_settings_notice() {
+		check_ajax_referer( 'cfwc_dismiss_settings_notice', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die();
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce already verified above.
+		$dismiss_key = isset( $_POST['dismiss_key'] ) ? sanitize_text_field( wp_unslash( $_POST['dismiss_key'] ) ) : '';
+
+		if ( ! empty( $dismiss_key ) ) {
+			// Save dismissal based on key.
+			$option_name = 'cfwc_dismissed_' . $dismiss_key . '_notice';
+			update_option( $option_name, true );
 		}
 
 		wp_die();

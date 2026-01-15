@@ -157,7 +157,7 @@ class CFWC_Settings {
 	/**
 	 * Save global settings.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.4
 	 */
 	private function save_global_settings() {
 		// Check permissions.
@@ -186,6 +186,17 @@ class CFWC_Settings {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verification is handled by WooCommerce settings API.
 		$use_original_price = isset( $_POST['cfwc_use_original_price'] ) ? 'yes' : 'no';
 		update_option( 'cfwc_use_original_price', $use_original_price );
+
+		// Save customs valuation method setting (CIF support).
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verification is handled by WooCommerce settings API.
+		if ( isset( $_POST['cfwc_valuation_method'] ) ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verification is handled by WooCommerce settings API.
+			$valuation_method = sanitize_text_field( wp_unslash( $_POST['cfwc_valuation_method'] ) );
+			// Only allow valid values.
+			if ( in_array( $valuation_method, array( 'fob', 'cif', 'cif_insurance' ), true ) ) {
+				update_option( 'cfwc_valuation_method', $valuation_method );
+			}
+		}
 	}
 
 	/**
@@ -239,7 +250,7 @@ class CFWC_Settings {
 						'label'           => isset( $rule['label'] ) ? sanitize_text_field( $rule['label'] ) : '',
 						'taxable'         => isset( $rule['taxable'] ) ? (bool) $rule['taxable'] : true,
 						'tax_class'       => isset( $rule['tax_class'] ) ? sanitize_text_field( $rule['tax_class'] ) : '',
-						// New fields for advanced matching (v1.2.0).
+						// New fields for advanced matching (v1.1.4).
 						'from_country'    => isset( $rule['from_country'] ) ? sanitize_text_field( $rule['from_country'] ) : '',
 						'to_country'      => isset( $rule['to_country'] ) ? sanitize_text_field( $rule['to_country'] ) : '',
 						'match_type'      => isset( $rule['match_type'] ) ? sanitize_text_field( $rule['match_type'] ) : 'all',
