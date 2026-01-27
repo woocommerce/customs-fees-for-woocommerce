@@ -871,5 +871,4 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<input type="hidden" name="cfwc_rules" id="cfwc_rules" value='<?php echo esc_attr( wp_json_encode( $rules ) ); ?>' />
 	<!-- Hidden input to trigger WooCommerce form change detection -->
 	<input type="hidden" name="cfwc_rules_changed" id="cfwc_rules_changed" value="" />
-	<?php wp_nonce_field( 'cfwc_save_rules', 'cfwc_rules_nonce' ); ?>
 </div>

@@ -6,7 +6,7 @@ Tested up to: 6.9
 Requires PHP: 7.4
 Requires Plugins: woocommerce
 WC requires at least: 9.0
-WC tested up to: 10.4.0
+WC tested up to: 10.5
 Stable tag: 1.1.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -191,6 +191,9 @@ Yes, through:
 8. Email with customs fee information
 
 == Changelog ==
+
+= 1.1.5 - 2026-xx-xx =
+* Tweak - WooCommerce 10.5 compatibility.
 
 = 1.1.4 - 2026-01-15 =
 * Add - CIF (Cost, Insurance, Freight) customs valuation method support.
