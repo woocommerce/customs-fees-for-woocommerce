@@ -194,6 +194,7 @@ Yes, through:
 
 = 1.1.5 - 2026-xx-xx =
 * Tweak - WooCommerce 10.5 compatibility.
+* Fix   - Rules not saving when clicking "Save changes" in Customs & Import Fees settings.
 
 = 1.1.4 - 2026-01-15 =
 * Add - CIF (Cost, Insurance, Freight) customs valuation method support.

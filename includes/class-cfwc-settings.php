@@ -205,12 +205,6 @@ class CFWC_Settings {
 	 * @since 1.0.0
 	 */
 	private function save_rules() {
-		// Check nonce.
-		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash
-		if ( ! isset( $_POST['cfwc_rules_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['cfwc_rules_nonce'] ) ), 'cfwc_save_rules' ) ) {
-			return;
-		}
-
 		// Check permissions.
 		// phpcs:ignore WordPress.WP.Capabilities.Unknown -- manage_woocommerce is a standard WooCommerce capability.
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
