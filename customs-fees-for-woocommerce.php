@@ -11,11 +11,11 @@
  * Text Domain:       customs-fees-for-woocommerce
  * Domain Path:       /languages
  * Requires Plugins:  woocommerce
- * Requires at least: 6.0
+ * Requires at least: 6.8
  * Tested up to:      6.9
  * Requires PHP:      7.4
- * WC requires at least: 9.0.0
- * WC tested up to:   10.4.0
+ * WC requires at least: 10.3
+ * WC tested up to:   10.5
  *
  * @package CustomsFeesForWooCommerce
  */

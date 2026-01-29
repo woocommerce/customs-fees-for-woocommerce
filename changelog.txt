@@ -1,7 +1,8 @@
 *** Customs Fees for WooCommerce Changelog ***
 
 2026-xx-xx - version 1.1.5
-* Fix - Rules not saving when clicking "Save changes" in Customs & Import Fees settings.
+* Fix   - Rules not saving when clicking "Save changes" in Customs & Import Fees settings.
+* Tweak - WooCommerce 10.5 compatibility.
 
 2026-01-15 - version 1.1.4
 * Add - CIF (Cost, Insurance, Freight) customs valuation method support.
