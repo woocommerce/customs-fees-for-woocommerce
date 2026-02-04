@@ -1,8 +1,11 @@
 *** Customs Fees for WooCommerce Changelog ***
 
-2026-xx-xx - version 1.1.5
-* Fix   - Rules not saving when clicking "Save changes" in Customs & Import Fees settings.
+2026-02-04 - version 1.1.5
+* Add - `cfwc_show_hs_code_in_email` filter to control HS Code display in order emails.
+* Add - `cfwc_show_origin_in_email` filter to control Country of Origin display in order emails.
+* Fix - Rules not saving when clicking "Save changes" in Customs & Import Fees settings.
 * Tweak - WooCommerce 10.5 compatibility.
+* Dev - Filters pass the order item and product objects for conditional logic.
 
 2026-01-15 - version 1.1.4
 * Add - CIF (Cost, Insurance, Freight) customs valuation method support.

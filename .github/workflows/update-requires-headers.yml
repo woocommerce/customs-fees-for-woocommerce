@@ -1,0 +1,175 @@
+name: Update Requires Headers
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+env:
+  PLUGIN_FILE_NAME: "customs-fees-for-woocommerce.php"
+  MAIN_BRANCH: "main"
+
+jobs:
+  update-headers:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Fetch Latest WooCommerce Release
+        id: fetch_wc_release
+        run: |
+          echo "Fetching the latest stable release..."
+          LATEST_RELEASE=$(curl -s https://api.github.com/repos/woocommerce/woocommerce/releases/latest | jq -r '.tag_name')
+          echo "Stable release: $LATEST_RELEASE"
+
+          echo "Fetching the latest RC release..."
+          RC_RELEASE=$(curl -s https://api.github.com/repos/woocommerce/woocommerce/releases | jq -r '[.[] | select(.tag_name | ascii_downcase | contains("rc"))] | sort_by(.published_at) | reverse | .[0].tag_name')
+          echo "RC release: $RC_RELEASE"
+
+          DOWNLOAD_TAG="$LATEST_RELEASE"
+
+          if [ -n "$RC_RELEASE" ]; then
+            STABLE_VERSION=$(echo "$LATEST_RELEASE" | sed 's/^v//')
+            RC_VERSION=$(echo "$RC_RELEASE" | sed 's/^v//')
+            HIGHEST=$(echo -e "$RC_VERSION\n$STABLE_VERSION" | sort -V | tail -n 1)
+            if [ "$HIGHEST" = "$RC_VERSION" ] && [ "$RC_VERSION" != "$STABLE_VERSION" ]; then
+              echo "RC release is newer than stable release."
+              DOWNLOAD_TAG="$RC_RELEASE"
+            fi
+          fi
+
+          echo "Downloading release: $DOWNLOAD_TAG"
+          curl -L -o woocommerce.zip "https://github.com/woocommerce/woocommerce/releases/download/$DOWNLOAD_TAG/woocommerce.zip"
+          unzip -q woocommerce.zip
+
+          LATEST_RELEASE=$(echo "$DOWNLOAD_TAG" | sed -E 's/^v?([0-9]+\.[0-9]+\.[0-9]+).*/\1/')
+          MAJOR_VERSION=$(echo "$LATEST_RELEASE" | grep -oE '^[0-9]+')
+          MINOR_VERSION=$(echo "$LATEST_RELEASE" | grep -oE '^[0-9]+\.[0-9]+' | cut -d. -f2)
+          ADJUSTED_MINOR_VERSION=$((MINOR_VERSION - 2))
+
+          if [ "$ADJUSTED_MINOR_VERSION" -lt 0 ]; then
+            ADJUSTED_MAJOR_VERSION=$((MAJOR_VERSION - 1))
+            ADJUSTED_MINOR_VERSION=$((ADJUSTED_MINOR_VERSION + 10))
+          else
+            ADJUSTED_MAJOR_VERSION=$MAJOR_VERSION
+          fi
+
+          LATEST_MINOR_RELEASE="$ADJUSTED_MAJOR_VERSION.$ADJUSTED_MINOR_VERSION"
+
+          echo "Latest WooCommerce Release: $LATEST_RELEASE"
+          echo "LATEST_RELEASE=$LATEST_RELEASE" >> $GITHUB_ENV
+          echo "LATEST_MINOR_RELEASE=$LATEST_MINOR_RELEASE" >> $GITHUB_ENV
+
+      - name: Set Branch Name
+        run: |
+          BRANCH_NAME="tweak/update-requires-headers-${{ env.LATEST_RELEASE }}"
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+
+      - name: Compare and Update Headers
+        id: compare_and_update
+        run: |
+          WC_CORE_FILE="woocommerce/woocommerce.php"
+          EXTENSION_FILE=${{ env.PLUGIN_FILE_NAME }}
+          CHANGES_MADE=false
+
+          REQUIRES_AT_LEAST=$(grep -oP 'Requires at least: \K[\d.]+' "$WC_CORE_FILE")
+          REQUIRES_PHP=$(grep -oP 'Requires PHP: \K[\d.]+' "$WC_CORE_FILE")
+          LATEST_MINOR_RELEASE=${{ env.LATEST_MINOR_RELEASE }}
+          
+          echo "REQUIRES_AT_LEAST=$REQUIRES_AT_LEAST" >> $GITHUB_ENV
+          echo "REQUIRES_PHP=$REQUIRES_PHP" >> $GITHUB_ENV
+
+          # Update 'WC tested up to'
+          if grep -qE "^\s*\* WC tested up to:" "$EXTENSION_FILE"; then
+            current_wc_tested=$(grep -oP '^\s*\* WC tested up to:\s*\K[\d.]+' "$EXTENSION_FILE")
+            echo "Current 'WC tested up to': $current_wc_tested"
+            if [ "$current_wc_tested" != "${{ env.LATEST_RELEASE }}" ]; then
+              echo "Updating 'WC tested up to' to ${{ env.LATEST_RELEASE }}"
+              sed -i "s#^\s*\* WC tested up to:.*# * WC tested up to:   ${{ env.LATEST_RELEASE }}#" "$EXTENSION_FILE"
+              CHANGES_MADE=true
+            fi
+          fi
+
+          # Update 'WC requires at least'
+          if grep -qE "^\s*\* WC requires at least:" "$EXTENSION_FILE"; then
+            current_wc=$(grep -oP '^\s*\* WC requires at least:\s*\K[\d.]+' "$EXTENSION_FILE")
+            echo "Current 'WC requires at least': $current_wc"
+            if [ "$(printf "%s\n%s" "$current_wc" "$LATEST_MINOR_RELEASE" | sort -V | head -n1)" = "$current_wc" ] && [ "$current_wc" != "$LATEST_MINOR_RELEASE" ]; then
+              echo "Updating 'WC requires at least' to $LATEST_MINOR_RELEASE"
+              sed -i "s#^\s*\* WC requires at least:.*# * WC requires at least: $LATEST_MINOR_RELEASE#" "$EXTENSION_FILE"
+              CHANGES_MADE=true
+            fi
+          fi
+
+          echo "CHANGES_MADE=$CHANGES_MADE" >> $GITHUB_ENV
+
+      - name: Update README Headers
+        run: |
+          README_FILE="readme.txt"
+          CHANGES_MADE=${{ env.CHANGES_MADE }}
+
+          if [ -f "$README_FILE" ]; then
+            # Update 'WC tested up to'
+            if grep -qE "^WC tested up to:" "$README_FILE"; then
+              current_wc_tested=$(grep -oP '^WC tested up to:\s*\K[\d.]+' "$README_FILE")
+              if [ "$current_wc_tested" != "${{ env.LATEST_RELEASE }}" ]; then
+                echo "Updating README 'WC tested up to' to ${{ env.LATEST_RELEASE }}"
+                sed -i "s#^WC tested up to:.*#WC tested up to: ${{ env.LATEST_RELEASE }}#" "$README_FILE"
+                CHANGES_MADE=true
+              fi
+            fi
+
+            # Update 'WC requires at least'
+            if grep -qE "^WC requires at least:" "$README_FILE"; then
+              current_wc=$(grep -oP '^WC requires at least:\s*\K[\d.]+' "$README_FILE")
+              if [ "$(printf "%s\n%s" "$current_wc" "${{ env.LATEST_MINOR_RELEASE }}" | sort -V | head -n1)" = "$current_wc" ] && [ "$current_wc" != "${{ env.LATEST_MINOR_RELEASE }}" ]; then
+                echo "Updating README 'WC requires at least' to ${{ env.LATEST_MINOR_RELEASE }}"
+                sed -i "s#^WC requires at least:.*#WC requires at least: ${{ env.LATEST_MINOR_RELEASE }}#" "$README_FILE"
+                CHANGES_MADE=true
+              fi
+            fi
+
+            echo "CHANGES_MADE=$CHANGES_MADE" >> $GITHUB_ENV
+          fi
+
+      - name: Cleanup
+        run: |
+          rm -rf woocommerce woocommerce.zip
+
+      - name: Create and Push Branch
+        if: env.CHANGES_MADE == 'true'
+        run: |
+          if git ls-remote --exit-code --heads origin ${{ env.BRANCH_NAME }}; then
+            echo "Branch ${{ env.BRANCH_NAME }} already exists. Skipping."
+            exit 0
+          fi
+
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git checkout -b "${{ env.BRANCH_NAME }}"
+          git add ${{ env.PLUGIN_FILE_NAME }}
+          [ -f "readme.txt" ] && git add readme.txt
+          git commit -m "Update WooCommerce compatibility headers"
+          git push --set-upstream origin ${{ env.BRANCH_NAME }}
+
+      - name: Create Pull Request
+        if: env.CHANGES_MADE == 'true'
+        run: |
+          COMMIT_COUNT=$(git rev-list --count ${{ env.MAIN_BRANCH }}..${{ env.BRANCH_NAME }} 2>/dev/null || echo "0")
+
+          if [ "$COMMIT_COUNT" -eq 0 ]; then
+            echo "No commits. Skipping PR."
+            exit 0
+          fi
+
+          if gh pr list --head ${{ env.BRANCH_NAME }} --json number --jq length | grep -q "^0$"; then
+            gh pr create \
+              --title "Update WooCommerce compatibility headers" \
+              --body "This PR updates plugin headers for WooCommerce ${{ env.LATEST_RELEASE }} compatibility." \
+              --base ${{ env.MAIN_BRANCH }} \
+              --head ${{ env.BRANCH_NAME }}
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}

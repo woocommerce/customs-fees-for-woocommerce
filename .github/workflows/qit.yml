@@ -1,0 +1,172 @@
+name: QIT Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      test:
+        description: 'Test to run'
+        required: true
+        default: 'default'
+        type: choice
+        options:
+          - default
+          - activation
+          - api
+          - e2e
+          - phpstan
+          - phpcompat
+          - security
+          - malware
+          - validation
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
+
+env:
+  PLUGIN_NAME: customs-fees-for-woocommerce
+
+jobs:
+  build:
+    if: "${{ ( inputs.test != '' && inputs.test != 'none' ) || contains(github.event.pull_request.labels.*.name, 'needs: qit default tests') || contains(github.event.pull_request.labels.*.name, 'needs: qit activation test') || contains(github.event.pull_request.labels.*.name, 'needs: qit api test') || contains(github.event.pull_request.labels.*.name, 'needs: qit e2e test') || contains(github.event.pull_request.labels.*.name, 'needs: qit phpstan test') || contains(github.event.pull_request.labels.*.name, 'needs: qit phpcompat test') || contains(github.event.pull_request.labels.*.name, 'needs: qit security test') || contains(github.event.pull_request.labels.*.name, 'needs: qit malware test') || contains(github.event.pull_request.labels.*.name, 'needs: qit validation test') }}"
+    uses: ./.github/workflows/build.yml
+
+  test:
+    if: "${{ ( inputs.test != '' && inputs.test != 'none' ) || contains(github.event.pull_request.labels.*.name, 'needs: qit default tests') || contains(github.event.pull_request.labels.*.name, 'needs: qit activation test') || contains(github.event.pull_request.labels.*.name, 'needs: qit api test') || contains(github.event.pull_request.labels.*.name, 'needs: qit e2e test') || contains(github.event.pull_request.labels.*.name, 'needs: qit phpstan test') || contains(github.event.pull_request.labels.*.name, 'needs: qit phpcompat test') || contains(github.event.pull_request.labels.*.name, 'needs: qit security test') || contains(github.event.pull_request.labels.*.name, 'needs: qit malware test') || contains(github.event.pull_request.labels.*.name, 'needs: qit validation test') }}"
+    needs: build
+    name: Run QIT
+    runs-on: ubuntu-latest
+
+    env:
+      NO_COLOR: 1
+      QIT_DISABLE_ONBOARDING: yes
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download build
+        uses: actions/download-artifact@v4
+        with:
+          name: customs-fees-for-woocommerce
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          tools: composer:v2
+          coverage: none
+
+      - name: Install QIT via composer
+        run: composer require woocommerce/qit-cli
+
+      - name: Add QIT partner
+        run: ./vendor/bin/qit partner:add --user='${{ secrets.PARTNER_USER }}' --application_password='${{ secrets.PARTNER_SECRET }}'
+
+      # Activation Test
+      - name: Run activation test
+        if: "${{ ( inputs.test == 'default' || inputs.test == 'activation' ) || contains(github.event.pull_request.labels.*.name, 'needs: qit default tests') || contains(github.event.pull_request.labels.*.name, 'needs: qit activation test') }}"
+        id: run-activation-test
+        run: ./vendor/bin/qit run:activation ${{ env.PLUGIN_NAME }} --zip=${{ env.PLUGIN_NAME }}.zip --wait > activation-result.txt
+
+      - uses: marocchino/sticky-pull-request-comment@v2
+        if: ${{ failure() && steps.run-activation-test.conclusion == 'failure' }}
+        with:
+          header: QIT activation result
+          recreate: true
+          path: activation-result.txt
+
+      # Security Test
+      - name: Run security test
+        if: "${{ ( ( inputs.test == 'default' || inputs.test == 'security' ) || contains(github.event.pull_request.labels.*.name, 'needs: qit default tests') || contains(github.event.pull_request.labels.*.name, 'needs: qit security test') ) && ( success() || failure() ) }}"
+        id: run-security-test
+        run: ./vendor/bin/qit run:security ${{ env.PLUGIN_NAME }} --zip=${{ env.PLUGIN_NAME }}.zip --wait > security-result.txt
+
+      - uses: marocchino/sticky-pull-request-comment@v2
+        if: ${{ failure() && steps.run-security-test.conclusion == 'failure' }}
+        with:
+          header: QIT security result
+          recreate: true
+          path: security-result.txt
+
+      # Malware Test
+      - name: Run malware test
+        if: "${{ ( ( inputs.test == 'default' || inputs.test == 'malware' ) || contains(github.event.pull_request.labels.*.name, 'needs: qit default tests') || contains(github.event.pull_request.labels.*.name, 'needs: qit malware test') ) && ( success() || failure() ) }}"
+        id: run-malware-test
+        run: ./vendor/bin/qit run:malware ${{ env.PLUGIN_NAME }} --zip=${{ env.PLUGIN_NAME }}.zip --wait > malware-result.txt
+
+      - uses: marocchino/sticky-pull-request-comment@v2
+        if: ${{ failure() && steps.run-malware-test.conclusion == 'failure' }}
+        with:
+          header: QIT malware result
+          recreate: true
+          path: malware-result.txt
+
+      # API Test
+      - name: Run API test
+        if: "${{ ( ( inputs.test == 'default' || inputs.test == 'api' ) || contains(github.event.pull_request.labels.*.name, 'needs: qit default tests') || contains(github.event.pull_request.labels.*.name, 'needs: qit api test') ) && ( success() || failure() ) }}"
+        id: run-api-test
+        run: ./vendor/bin/qit run:woo-api ${{ env.PLUGIN_NAME }} --zip=${{ env.PLUGIN_NAME }}.zip --wait > api-result.txt
+
+      - uses: marocchino/sticky-pull-request-comment@v2
+        if: ${{ failure() && steps.run-api-test.conclusion == 'failure' }}
+        with:
+          header: QIT API result
+          recreate: true
+          path: api-result.txt
+
+      # E2E Test
+      - name: Run E2E test
+        if: "${{ ( ( inputs.test == 'default' || inputs.test == 'e2e' ) || contains(github.event.pull_request.labels.*.name, 'needs: qit default tests') || contains(github.event.pull_request.labels.*.name, 'needs: qit e2e test') ) && ( success() || failure() ) }}"
+        id: run-e2e-test
+        run: ./vendor/bin/qit run:woo-e2e ${{ env.PLUGIN_NAME }} --zip=${{ env.PLUGIN_NAME }}.zip --wait > e2e-result.txt
+
+      - uses: marocchino/sticky-pull-request-comment@v2
+        if: ${{ failure() && steps.run-e2e-test.conclusion == 'failure' }}
+        with:
+          header: QIT E2E result
+          recreate: true
+          path: e2e-result.txt
+
+      # PHPStan Test
+      - name: Run PHPStan test
+        if: "${{ inputs.test == 'phpstan' || contains(github.event.pull_request.labels.*.name, 'needs: qit phpstan test') && ( success() || failure() ) }}"
+        id: run-phpstan-test
+        run: ./vendor/bin/qit run:phpstan ${{ env.PLUGIN_NAME }} --zip=${{ env.PLUGIN_NAME }}.zip --wait > phpstan-result.txt
+
+      - uses: marocchino/sticky-pull-request-comment@v2
+        if: ${{ failure() && steps.run-phpstan-test.conclusion == 'failure' }}
+        with:
+          header: QIT PHPStan result
+          recreate: true
+          path: phpstan-result.txt
+
+      # PHP Compatibility Test
+      - name: Run PHPCompat test
+        if: "${{ inputs.test == 'phpcompat' || contains(github.event.pull_request.labels.*.name, 'needs: qit phpcompat test') && ( success() || failure() ) }}"
+        id: run-phpcompat-test
+        run: ./vendor/bin/qit run:phpcompatibility ${{ env.PLUGIN_NAME }} --zip=${{ env.PLUGIN_NAME }}.zip --wait > phpcompat-result.txt
+
+      - uses: marocchino/sticky-pull-request-comment@v2
+        if: ${{ failure() && steps.run-phpcompat-test.conclusion == 'failure' }}
+        with:
+          header: QIT PHPCompat result
+          recreate: true
+          path: phpcompat-result.txt
+
+      # Validation Test
+      - name: Run validation test
+        if: "${{ inputs.test == 'validation' || contains(github.event.pull_request.labels.*.name, 'needs: qit validation test') && ( success() || failure() ) }}"
+        id: run-validation-test
+        run: ./vendor/bin/qit run:validation ${{ env.PLUGIN_NAME }} --zip=${{ env.PLUGIN_NAME }}.zip --wait > validation-result.txt
+
+      - uses: marocchino/sticky-pull-request-comment@v2
+        if: ${{ failure() && steps.run-validation-test.conclusion == 'failure' }}
+        with:
+          header: QIT validation result
+          recreate: true
+          path: validation-result.txt

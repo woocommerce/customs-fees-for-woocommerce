@@ -4,6 +4,9 @@ on:
   release:
     types: [created]
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -11,75 +14,22 @@ jobs:
     steps:
       # 1. Checkout the repository code
       - name: 👉 Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      # 2. Install necessary packages: zip and rsync
-      - name: 🗄 Install zip and rsync
+      # 2. Build release package using the build script
+      - name: 📦 Build release package
         run: |
-          sudo apt-get update
-          sudo apt-get install -y zip rsync
+          chmod +x bin/build-release.sh
+          ./bin/build-release.sh
 
-      # 3. Create the required directory structure
-      - name: 📂 Create required directory structure
-        run: |
-          mkdir customs-fees-for-woocommerce
-          rsync -av \
-            --exclude="customs-fees-for-woocommerce" \
-            --exclude=".github" \
-            --exclude=".gitignore" \
-            --exclude="*.md" \
-            --exclude="docs" \
-            --exclude="node_modules" \
-            --exclude="package.json" \
-            --exclude="package-lock.json" \
-            --exclude="composer.json" \
-            --exclude="composer.lock" \
-            --exclude="phpstan.neon" \
-            --exclude="phpstan-bootstrap.php" \
-            --exclude="vendor" \
-            --exclude="src" \
-            --exclude="build" \
-            --exclude="dist" \
-            --exclude="bin" \
-            --exclude="tests" \
-            --exclude="phpunit.xml" \
-            --exclude="phpunit.xml.dist" \
-            --exclude=".phpunit.result.cache" \
-            --exclude="*.log" \
-            --exclude="*.cache" \
-            --exclude="*.tmp" \
-            --exclude="*.bak" \
-            --exclude="*~" \
-            --exclude=".DS_Store" \
-            --exclude="Thumbs.db" \
-            --exclude="desktop.ini" \
-            --exclude=".vscode" \
-            --exclude=".idea" \
-            --exclude="*.sublime-project" \
-            --exclude="*.sublime-workspace" \
-            --exclude="*.swp" \
-            --exclude="*.swo" \
-            --exclude=".env" \
-            --exclude=".env.local" \
-            --exclude="prompts" \
-            --exclude="sales.md" \
-            ./* customs-fees-for-woocommerce/
-
-      # 4. Zip the project
-      - name: 📦 Zip the project
-        run: zip -r customs-fees-for-woocommerce.zip customs-fees-for-woocommerce/
-
-      # 5. Upload the zipped project as a release asset
+      # 3. Upload the zipped project as a release asset
       - name: 📤 Upload Release Asset
-        uses: actions/upload-release-asset@v1.0.2
+        uses: softprops/action-gh-release@v2
+        with:
+          files: customs-fees-for-woocommerce.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./customs-fees-for-woocommerce.zip
-          asset_name: customs-fees-for-woocommerce.zip
-          asset_content_type: application/zip
 
-      # 6. All good
+      # 4. All good
       - name: 🎉 All good
         run: echo "All good!"

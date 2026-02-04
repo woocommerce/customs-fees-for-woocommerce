@@ -149,6 +149,34 @@ class CFWC_Emails {
 			$origin = get_post_meta( $product->get_parent_id(), '_cfwc_country_of_origin', true );
 		}
 
+		/**
+		 * Filter whether to show HS Code in order emails.
+		 *
+	 * @since 1.1.5
+	 * @param bool          $show    Whether to show HS Code. Default true.
+	 * @param WC_Order_Item $item    Order item object.
+	 * @param WC_Product    $product Product object.
+	 */
+	$show_hs_code = apply_filters( 'cfwc_show_hs_code_in_email', true, $item, $product );
+
+	/**
+	 * Filter whether to show Country of Origin in order emails.
+	 *
+	 * @since 1.1.5
+		 * @param bool          $show    Whether to show Country of Origin. Default true.
+		 * @param WC_Order_Item $item    Order item object.
+		 * @param WC_Product    $product Product object.
+		 */
+		$show_origin = apply_filters( 'cfwc_show_origin_in_email', true, $item, $product );
+
+		// Apply filters to conditionally hide data.
+		if ( ! $show_hs_code ) {
+			$hs_code = '';
+		}
+		if ( ! $show_origin ) {
+			$origin = '';
+		}
+
 		if ( $hs_code || $origin ) {
 			$customs_info = '<br><small style="color: #666; font-size: 0.9em;">';
 

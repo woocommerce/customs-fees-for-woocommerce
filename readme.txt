@@ -7,7 +7,7 @@ Requires PHP: 7.4
 Requires Plugins: woocommerce
 WC requires at least: 10.3
 WC tested up to: 10.5
-Stable tag: 1.1.4
+Stable tag: 1.1.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -192,9 +192,12 @@ Yes, through:
 
 == Changelog ==
 
-= 1.1.5 - 2026-xx-xx =
-* Fix   - Rules not saving when clicking "Save changes" in Customs & Import Fees settings.
+= 1.1.5 - 2026-02-04 =
+* Add - `cfwc_show_hs_code_in_email` filter to control HS Code display in order emails.
+* Add - `cfwc_show_origin_in_email` filter to control Country of Origin display in order emails.
+* Fix - Rules not saving when clicking "Save changes" in Customs & Import Fees settings.
 * Tweak - WooCommerce 10.5 compatibility.
+* Dev - Filters pass the order item and product objects for conditional logic.
 
 = 1.1.4 - 2026-01-15 =
 * Add - CIF (Cost, Insurance, Freight) customs valuation method support.
