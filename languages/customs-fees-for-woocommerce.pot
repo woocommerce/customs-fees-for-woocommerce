@@ -1,516 +1,875 @@
-# Copyright (C) 2025 WooCommerce
+# Copyright (C) 2026 WooCommerce
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Customs Fees for WooCommerce 1.0.0\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/customs-fees-for-woocommerce\n"
+"Project-Id-Version: Customs Fees for WooCommerce 1.1.5\n"
+"Report-Msgid-Bugs-To: "
+"https://wordpress.org/support/plugin/customs-fees-for-woocommerce\n"
+"POT-Creation-Date: 2026-02-05 02:21:04+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2026-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-08-30T03:48:38+00:00\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.12.0\n"
-"X-Domain: customs-fees-for-woocommerce\n"
+"X-Generator: node-wp-i18n 1.2.8\n"
 
-#. Plugin Name of the plugin
-#: customs-fees-for-woocommerce.php
-msgid "Customs Fees for WooCommerce"
-msgstr ""
-
-#. Plugin URI of the plugin
-#. Author URI of the plugin
-#: customs-fees-for-woocommerce.php
-msgid "https://woocommerce.com"
-msgstr ""
-
-#. Description of the plugin
-#: customs-fees-for-woocommerce.php
-msgid "Add customs and import fees to WooCommerce orders based on destination country and product origin."
-msgstr ""
-
-#. Author of the plugin
-#: customs-fees-for-woocommerce.php
-msgid "WooCommerce"
-msgstr ""
-
-#: customs-fees-for-woocommerce.php:53
-msgid "Customs Fees for WooCommerce requires WooCommerce to be installed and active."
-msgstr ""
-
-#: customs-fees-for-woocommerce.php:263
-#: includes/admin/class-cfwc-admin.php:103
-#: includes/admin/class-cfwc-admin.php:129
-#: includes/admin/class-cfwc-admin.php:197
-#: includes/class-cfwc-display.php:61
-#: includes/class-cfwc-display.php:89
-#: includes/class-cfwc-display.php:158
-#: includes/class-cfwc-display.php:201
-#: includes/class-cfwc-emails.php:99
-#: includes/class-cfwc-settings.php:65
+#: includes/admin/class-cfwc-admin.php:70
+#: includes/admin/class-cfwc-admin.php:97
+#: includes/admin/class-cfwc-admin.php:185 includes/class-cfwc-display.php:68
+#: includes/class-cfwc-display.php:144 includes/class-cfwc-display.php:170
+#: includes/class-cfwc-display.php:224 includes/class-cfwc-display.php:382
+#: includes/class-cfwc-loader.php:279 includes/class-cfwc-settings.php:65
 msgid "Customs & Import Fees"
 msgstr ""
 
-#: customs-fees-for-woocommerce.php:285
-msgid "Settings"
+#: includes/admin/class-cfwc-admin.php:112
+msgid "Fees Breakdown:"
 msgstr ""
 
-#. translators: %s: Settings page URL
-#: includes/admin/class-cfwc-admin.php:62
-#, php-format
-msgid "Customs Fees for WooCommerce is activated! %s to configure your customs fee rules."
+#: includes/admin/class-cfwc-admin.php:122
+msgid "Total:"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:63
-msgid "Visit settings"
-msgstr ""
-
-#. translators: %s: Settings page URL
-#: includes/admin/class-cfwc-admin.php:81
-#, php-format
-msgid "Customs fees are currently disabled. %s to enable and configure."
-msgstr ""
-
-#: includes/admin/class-cfwc-admin.php:82
-msgid "Enable customs fees"
-msgstr ""
-
-#: includes/admin/class-cfwc-admin.php:138
+#: includes/admin/class-cfwc-admin.php:125
 msgid "Total Customs Fees:"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:139
+#: includes/admin/class-cfwc-admin.php:127
 msgid "These fees were calculated based on the destination country and cart value."
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:141
+#: includes/admin/class-cfwc-admin.php:129
 msgid "No customs fees applied to this order."
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:148
+#: includes/admin/class-cfwc-admin.php:136
 msgid "Product Customs Information:"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:170
-#: includes/admin/class-cfwc-admin.php:364
+#: includes/admin/class-cfwc-admin.php:158
+#: includes/admin/class-cfwc-admin.php:498 includes/class-cfwc-display.php:294
+#: includes/class-cfwc-display.php:341
 msgid "HS Code:"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:177
-#: includes/admin/class-cfwc-admin.php:371
+#: includes/admin/class-cfwc-admin.php:165
+#: includes/admin/class-cfwc-admin.php:505 includes/class-cfwc-display.php:300
+#: includes/class-cfwc-display.php:347
 msgid "Origin:"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:201
+#: includes/admin/class-cfwc-admin.php:190
 msgid "HS/Tariff Code"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:202
+#: includes/admin/class-cfwc-admin.php:191
 msgid "e.g., 6109.10 or 6109.10.0012"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:204
-msgid "Harmonized System code for customs classification. This helps calculate accurate import duties."
+#: includes/admin/class-cfwc-admin.php:193
+msgid ""
+"Harmonized System code for customs classification. This helps calculate "
+"accurate import duties."
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:214
+#: includes/admin/class-cfwc-admin.php:200
+msgid "You can "
+msgstr ""
+
+#: includes/admin/class-cfwc-admin.php:202
+msgid "find HS codes here"
+msgstr ""
+
+#: includes/admin/class-cfwc-admin.php:229
+#: includes/admin/class-cfwc-onboarding.php:281
+#: includes/admin/class-cfwc-onboarding.php:361
+#: includes/class-cfwc-export-import.php:59
+#: includes/class-cfwc-export-import.php:72
+#: includes/class-cfwc-export-import.php:121
+#: includes/class-cfwc-export-import.php:144
+#: includes/class-cfwc-products-variation-support.php:79
 msgid "Country of Origin"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:216
-msgid "Select the country where this product was manufactured. This determines which customs rules apply."
+#: includes/admin/class-cfwc-admin.php:231
+msgid ""
+"Select the country where this product was manufactured. This determines "
+"which customs rules apply."
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:217
-#: includes/admin/class-cfwc-admin.php:284
-#: includes/admin/views/rules-section.php:326
+#: includes/admin/class-cfwc-admin.php:232
+#: includes/admin/class-cfwc-admin.php:236
+#: includes/admin/class-cfwc-admin.php:339
+#: includes/admin/class-cfwc-admin.php:422
 msgid "Select a country"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:320
-msgid "Apply this template? This will replace your current rules."
-msgstr ""
-
-#: includes/admin/class-cfwc-admin.php:392
-#: includes/class-cfwc-display.php:276
-#: includes/class-cfwc-emails.php:153
-#: includes/class-cfwc-products.php:70
-msgid "HS Code"
-msgstr ""
-
-#: includes/admin/class-cfwc-admin.php:396
-#: includes/class-cfwc-display.php:291
-#: includes/class-cfwc-emails.php:168
-#: includes/class-cfwc-products.php:85
-msgid "Origin"
-msgstr ""
-
-#: includes/admin/class-cfwc-ajax.php:90
-msgid "Rule saved successfully."
-msgstr ""
-
-#: includes/admin/class-cfwc-ajax.php:112
-msgid "Invalid rule ID."
-msgstr ""
-
-#: includes/admin/class-cfwc-ajax.php:133
-msgid "Rule deleted successfully."
-msgstr ""
-
-#: includes/admin/class-cfwc-ajax.php:137
-msgid "Rule not found."
-msgstr ""
-
-#: includes/admin/class-cfwc-ajax.php:159
-msgid "Invalid order data."
-msgstr ""
-
-#: includes/admin/class-cfwc-ajax.php:182
-msgid "Rules reordered successfully."
-msgstr ""
-
-#: includes/admin/class-cfwc-ajax.php:221
-msgid "Export ready for download."
-msgstr ""
-
-#: includes/admin/class-cfwc-ajax.php:243
-msgid "No CSV content provided."
-msgstr ""
-
-#: includes/admin/class-cfwc-ajax.php:275
-msgid "No valid rules found in CSV."
-msgstr ""
-
-#. translators: %d: Number of rules imported
-#: includes/admin/class-cfwc-ajax.php:295
-#, php-format
-msgid "%d rules imported successfully."
-msgstr ""
-
-#: includes/admin/class-cfwc-ajax.php:319
-msgid "Invalid test parameters."
-msgstr ""
-
-#: includes/admin/class-cfwc-ajax.php:328
-msgid "Calculation complete."
-msgstr ""
-
-#: includes/admin/views/rules-section.php:22
-msgid "Quick Start with Presets"
-msgstr ""
-
-#: includes/admin/views/rules-section.php:23
-msgid "Load presets to quickly configure common import scenarios:"
-msgstr ""
-
-#: includes/admin/views/rules-section.php:26
-msgid "-- Select a preset --"
-msgstr ""
-
-#: includes/admin/views/rules-section.php:37
-msgid "Add Preset Rules"
-msgstr ""
-
-#: includes/admin/views/rules-section.php:40
-#: includes/admin/views/rules-section.php:376
-#: includes/admin/views/rules-section.php:385
-msgid "Delete All Rules"
-msgstr ""
-
-#: includes/admin/views/rules-section.php:54
-msgid "All Rules"
-msgstr ""
-
-#: includes/admin/views/rules-section.php:55
-msgid "Configure customs fee rules based on destination countries and product origins."
-msgstr ""
-
-#: includes/admin/views/rules-section.php:58
-msgid "Add New Rule"
-msgstr ""
-
-#: includes/admin/views/rules-section.php:65
-msgid "Label"
-msgstr ""
-
-#: includes/admin/views/rules-section.php:66
-msgid "Destination"
-msgstr ""
-
-#: includes/admin/views/rules-section.php:67
-msgid "Origin Country"
-msgstr ""
-
-#: includes/admin/views/rules-section.php:68
-msgid "Type"
-msgstr ""
-
-#: includes/admin/views/rules-section.php:69
-msgid "Rate/Amount"
-msgstr ""
-
-#: includes/admin/views/rules-section.php:70
-msgid "Actions"
-msgstr ""
-
-#: includes/admin/views/rules-section.php:83
-#: includes/admin/views/rules-section.php:476
-#: includes/admin/views/rules-section.php:758
-msgid "All Origins"
-msgstr ""
-
-#: includes/admin/views/rules-section.php:85
-#: includes/admin/views/rules-section.php:477
-#: includes/admin/views/rules-section.php:760
-msgid "EU Countries"
-msgstr ""
-
-#: includes/admin/views/rules-section.php:103
-#: includes/admin/views/rules-section.php:778
-msgid "Edit"
-msgstr ""
-
-#: includes/admin/views/rules-section.php:106
-#: includes/admin/views/rules-section.php:779
-msgid "Delete"
-msgstr ""
-
-#: includes/admin/views/rules-section.php:113
-#: includes/admin/views/rules-section.php:744
-msgid "No rules configured. Use the preset loader above or add rules manually."
-msgstr ""
-
-#: includes/admin/views/rules-section.php:350
+#: includes/admin/class-cfwc-admin.php:423
 msgid "Please select a preset first."
 msgstr ""
 
-#: includes/admin/views/rules-section.php:355
+#: includes/admin/class-cfwc-admin.php:424
+#: includes/admin/views/rules-section.php:583
+msgid "Import Preset Rules"
+msgstr ""
+
+#: includes/admin/class-cfwc-admin.php:425
+#: includes/admin/views/rules-section.php:585
+msgid "Add to Existing Rules"
+msgstr ""
+
+#: includes/admin/class-cfwc-admin.php:426
 msgid "Adding preset rules..."
 msgstr ""
 
-#: includes/admin/views/rules-section.php:364
+#: includes/admin/class-cfwc-admin.php:427
+msgid "Replacing all rules with preset..."
+msgstr ""
+
+#: includes/admin/class-cfwc-admin.php:428
+msgid "Click again to confirm"
+msgstr ""
+
+#: includes/admin/class-cfwc-admin.php:429
+#: includes/admin/views/rules-section.php:590
+msgid "Replace All Rules"
+msgstr ""
+
+#: includes/admin/class-cfwc-admin.php:430
 msgid "No rules to delete."
 msgstr ""
 
-#: includes/admin/views/rules-section.php:375
+#: includes/admin/class-cfwc-admin.php:431
 msgid "All rules deleted. Remember to click \"Save changes\" to persist."
 msgstr ""
 
-#: includes/admin/views/rules-section.php:379
+#: includes/admin/class-cfwc-admin.php:432
+#: includes/admin/views/rules-section.php:689
+msgid "Delete All Rules"
+msgstr ""
+
+#: includes/admin/class-cfwc-admin.php:433
 msgid "Warning: This will delete all existing rules. Click again to confirm."
 msgstr ""
 
-#: includes/admin/views/rules-section.php:380
+#: includes/admin/class-cfwc-admin.php:434
 msgid "Click to Confirm Delete"
 msgstr ""
 
-#: includes/admin/views/rules-section.php:411
+#: includes/admin/class-cfwc-admin.php:435
 msgid "Preset applied successfully!"
 msgstr ""
 
-#: includes/admin/views/rules-section.php:412
+#: includes/admin/class-cfwc-admin.php:436
 msgid "Remember to click \"Save changes\" to persist these rules."
 msgstr ""
 
-#: includes/admin/views/rules-section.php:418
-#: includes/class-cfwc-templates.php:788
+#: includes/admin/class-cfwc-admin.php:437
+#: includes/class-cfwc-templates.php:1372
 msgid "Failed to apply preset."
 msgstr ""
 
-#: includes/admin/views/rules-section.php:424
+#: includes/admin/class-cfwc-admin.php:438
 msgid "An error occurred while applying the preset."
 msgstr ""
 
-#: includes/admin/views/rules-section.php:426
+#: includes/admin/class-cfwc-admin.php:439
 msgid "Check browser console for details."
 msgstr ""
 
-#: includes/admin/views/rules-section.php:440
+#: includes/admin/class-cfwc-admin.php:440
 msgid "Dismiss this notice"
 msgstr ""
 
-#: includes/admin/views/rules-section.php:466
+#: includes/admin/class-cfwc-admin.php:441
 msgid "Select country..."
 msgstr ""
 
-#: includes/admin/views/rules-section.php:478
+#: includes/admin/class-cfwc-admin.php:442
+msgid "All Origins"
+msgstr ""
+
+#: includes/admin/class-cfwc-admin.php:443
+msgid "EU Countries"
+msgstr ""
+
+#: includes/admin/class-cfwc-admin.php:444
 msgid "Specific Country"
 msgstr ""
 
-#: includes/admin/views/rules-section.php:515
-#: includes/admin/views/rules-section.php:589
+#: includes/admin/class-cfwc-admin.php:445
 msgid "Fee label"
 msgstr ""
 
-#: includes/admin/views/rules-section.php:518
-#: includes/admin/views/rules-section.php:592
+#: includes/admin/class-cfwc-admin.php:446
 msgid "Choose a country..."
 msgstr ""
 
-#: includes/admin/views/rules-section.php:523
-#: includes/admin/views/rules-section.php:597
+#: includes/admin/class-cfwc-admin.php:447
 msgid "Choose origin..."
 msgstr ""
 
-#: includes/admin/views/rules-section.php:529
-#: includes/admin/views/rules-section.php:603
-#: includes/admin/views/rules-section.php:767
+#: includes/admin/class-cfwc-admin.php:448
 msgid "Percentage"
 msgstr ""
 
-#: includes/admin/views/rules-section.php:530
-#: includes/admin/views/rules-section.php:604
-#: includes/admin/views/rules-section.php:767
+#: includes/admin/class-cfwc-admin.php:449
 msgid "Flat"
 msgstr ""
 
-#: includes/admin/views/rules-section.php:538
-#: includes/admin/views/rules-section.php:614
+#: includes/admin/class-cfwc-admin.php:450
 msgid "Save"
 msgstr ""
 
-#: includes/admin/views/rules-section.php:539
-#: includes/admin/views/rules-section.php:615
+#: includes/admin/class-cfwc-admin.php:451
 msgid "Cancel"
 msgstr ""
 
-#: includes/admin/views/rules-section.php:688
+#: includes/admin/class-cfwc-admin.php:452
+#: includes/admin/views/rules-section.php:853
+msgid "Edit"
+msgstr ""
+
+#: includes/admin/class-cfwc-admin.php:453
+#: includes/admin/views/rules-section.php:856
+msgid "Delete"
+msgstr ""
+
+#: includes/admin/class-cfwc-admin.php:454
 msgid "Rule saved. Remember to click \"Save changes\" to persist."
 msgstr ""
 
-#: includes/admin/views/rules-section.php:724
+#: includes/admin/class-cfwc-admin.php:455
 msgid "Rule deleted successfully. Remember to click \"Save changes\" to persist."
 msgstr ""
 
-#: includes/admin/views/rules-section.php:727
+#: includes/admin/class-cfwc-admin.php:456
 msgid "Click the delete button again to confirm deletion."
 msgstr ""
 
-#: includes/admin/views/rules-section.php:753
+#: includes/admin/class-cfwc-admin.php:457
+#: includes/admin/views/rules-section.php:863
+msgid "No rules configured. Use the preset loader above or add rules manually."
+msgstr ""
+
+#: includes/admin/class-cfwc-admin.php:458
+#: includes/class-cfwc-products-variation-support.php:64
+#: includes/class-cfwc-products-variation-support.php:87
 msgid "Not set"
 msgstr ""
 
+#: includes/admin/class-cfwc-admin.php:531
+#: includes/admin/class-cfwc-onboarding.php:274
+#: includes/admin/class-cfwc-onboarding.php:355
+#: includes/class-cfwc-emails.php:186 includes/class-cfwc-export-import.php:58
+#: includes/class-cfwc-export-import.php:71
+#: includes/class-cfwc-export-import.php:120
+#: includes/class-cfwc-export-import.php:135
+#: includes/class-cfwc-products-variation-support.php:57
+#: includes/class-cfwc-products.php:91
+msgid "HS Code"
+msgstr ""
+
+#: includes/admin/class-cfwc-admin.php:535 includes/class-cfwc-emails.php:201
+#: includes/class-cfwc-products.php:106
+msgid "Origin"
+msgstr ""
+
+#: includes/admin/class-cfwc-ajax.php:100
+msgid "Rule saved successfully."
+msgstr ""
+
+#: includes/admin/class-cfwc-ajax.php:125
+msgid "Invalid rule ID."
+msgstr ""
+
+#: includes/admin/class-cfwc-ajax.php:148
+msgid "Rule deleted successfully."
+msgstr ""
+
+#: includes/admin/class-cfwc-ajax.php:154
+msgid "Rule not found."
+msgstr ""
+
+#: includes/admin/class-cfwc-ajax.php:179
+msgid "Invalid order data."
+msgstr ""
+
+#: includes/admin/class-cfwc-ajax.php:204
+msgid "Rules reordered successfully."
+msgstr ""
+
+#: includes/admin/class-cfwc-ajax.php:247
+msgid "Export ready for download."
+msgstr ""
+
+#: includes/admin/class-cfwc-ajax.php:272
+msgid "No CSV content provided."
+msgstr ""
+
+#: includes/admin/class-cfwc-ajax.php:308
+msgid "No valid rules found in CSV."
+msgstr ""
+
+#: includes/admin/class-cfwc-ajax.php:330
+#. translators: %d: Number of rules imported
+msgid "%d rules imported successfully."
+msgstr ""
+
+#: includes/admin/class-cfwc-ajax.php:357
+msgid "Invalid test parameters."
+msgstr ""
+
+#: includes/admin/class-cfwc-ajax.php:393
+msgid "Customs Fee"
+msgstr ""
+
+#: includes/admin/class-cfwc-ajax.php:405
+msgid "Calculation complete."
+msgstr ""
+
+#: includes/admin/class-cfwc-onboarding.php:150
+msgid "Customs Fees for WooCommerce:"
+msgstr ""
+
+#: includes/admin/class-cfwc-onboarding.php:156
+#. translators: %d: number of products
+msgid "%d product needs Country of Origin data to calculate customs fees correctly."
+msgid_plural "%d products need Country of Origin data to calculate customs fees correctly."
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/admin/class-cfwc-onboarding.php:166
+msgid ""
+"All products have Country of Origin data. Configure your customs rules to "
+"start calculating fees."
+msgstr ""
+
+#: includes/admin/class-cfwc-onboarding.php:173
+msgid "Go to Products"
+msgstr ""
+
+#: includes/admin/class-cfwc-onboarding.php:178
+msgid "Configure Rules"
+msgstr ""
+
+#: includes/admin/class-cfwc-onboarding.php:182
+msgid "Close and don't show"
+msgstr ""
+
+#: includes/admin/class-cfwc-onboarding.php:284
+msgid "— Select —"
+msgstr ""
+
+#: includes/admin/class-cfwc-onboarding.php:356
+#: includes/admin/class-cfwc-onboarding.php:363
+msgid "— No Change —"
+msgstr ""
+
+#: includes/admin/class-cfwc-onboarding.php:364
+msgid "— Clear —"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:27
+msgid "⚠️ Tax is disabled in WooCommerce!"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:30
+#. translators: %s: Link to WooCommerce tax settings
+msgid "Customs fees are added as taxable fees. Please %s to use this plugin."
+msgstr ""
+
+#: includes/admin/views/rules-section.php:31
+msgid "enable taxes in WooCommerce settings"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:47
+msgid "Setup Status:"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:50
+#. translators: %1$d: number of products missing origin, %2$d: total products
+msgid "%1$d of %2$d products need Country of Origin data."
+msgstr ""
+
+#: includes/admin/views/rules-section.php:54
+msgid "View Products"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:95
+msgid "Default Product Origin"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:96
+msgid ""
+"Sets the default country of origin for new products. This determines which "
+"customs rules apply when products are shipped internationally. Existing "
+"products keep their saved origin."
+msgstr ""
+
+#: includes/admin/views/rules-section.php:105
+#. translators: %s: Store country name
+msgid "Same as store location (%s)"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:111
+msgid "No default (set per product)"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:113
+msgid "Different Country"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:132
+msgid "Calculate on Original Price"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:133
+msgid ""
+"When enabled, customs fees will be calculated based on the product's "
+"regular price, ignoring any discounts or coupons applied. Useful for "
+"promotions where you want customers to still pay applicable tariffs based "
+"on product value."
+msgstr ""
+
+#: includes/admin/views/rules-section.php:140
+msgid "Calculate customs fees on original price (before discounts)"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:143
+msgid ""
+"Enable this if you run promotions with discounts but still want to charge "
+"customs fees based on the full product value."
+msgstr ""
+
+#: includes/admin/views/rules-section.php:151
+msgid "Customs Valuation Method"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:152
+msgid ""
+"Choose how the customs value is calculated. FOB (Free On Board) uses "
+"product value only. CIF (Cost, Insurance, Freight) includes shipping costs "
+"in the customs value. Most countries outside the US use CIF-based valuation."
+msgstr ""
+
+#: includes/admin/views/rules-section.php:162
+msgid "FOB - Product Value Only"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:164
+msgid "Calculate customs fees based on product prices only. Used by USA, Canada."
+msgstr ""
+
+#: includes/admin/views/rules-section.php:169
+msgid "CIF - Include Shipping in Customs Value"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:171
+msgid ""
+"Include shipping costs in the customs value calculation. Used by EU, UK, "
+"Australia, Japan, and most other countries."
+msgstr ""
+
+#: includes/admin/views/rules-section.php:176
+msgid ""
+"When CIF is selected, shipping costs are distributed proportionally across "
+"products based on their value."
+msgstr ""
+
+#: includes/admin/views/rules-section.php:193
+msgid "Customs & import fees - Getting started guide"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:194
+msgid "Close"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:204
+msgid "How it works"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:207
+msgid "Add Country of Origin to products (Products → Edit → Inventory tab)."
+msgstr ""
+
+#: includes/admin/views/rules-section.php:208
+msgid "Configure rules below or use Quick Start presets."
+msgstr ""
+
+#: includes/admin/views/rules-section.php:209
+msgid "Rules apply automatically at checkout based on shipping destination."
+msgstr ""
+
+#: includes/admin/views/rules-section.php:210
+msgid "Customers see fee breakdown on cart and checkout pages."
+msgstr ""
+
+#: includes/admin/views/rules-section.php:218
+msgid "How rules apply"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:221
+msgid "\"Any → [Country]\""
+msgstr ""
+
+#: includes/admin/views/rules-section.php:221
+msgid "ALL imports to that country get the fee."
+msgstr ""
+
+#: includes/admin/views/rules-section.php:222
+msgid "\"[Country A] → [Country B]\""
+msgstr ""
+
+#: includes/admin/views/rules-section.php:222
+msgid "Only products from A to B."
+msgstr ""
+
+#: includes/admin/views/rules-section.php:223
+msgid ""
+"Multiple rules for same destination will stack unless set to "
+"Override/Exclusive."
+msgstr ""
+
+#: includes/admin/views/rules-section.php:231
+msgid "Pro tips"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:234
+msgid "Use priority (0-100) to control rule order - higher numbers apply first."
+msgstr ""
+
+#: includes/admin/views/rules-section.php:235
+msgid "Category-specific rules override general ones."
+msgstr ""
+
+#: includes/admin/views/rules-section.php:236
+msgid "Use CSV import/export for bulk updates."
+msgstr ""
+
+#: includes/admin/views/rules-section.php:237
+msgid "Test rules with different shipping destinations before going live."
+msgstr ""
+
+#: includes/admin/views/rules-section.php:245
+msgid "Rule stacking modes"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:249
+#: includes/admin/views/rules-section.php:824
+msgid "Stack"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:250
+msgid "Adds with other matching rules."
+msgstr ""
+
+#: includes/admin/views/rules-section.php:253
+#: includes/admin/views/rules-section.php:825
+msgid "Override"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:254
+msgid "Replaces lower priority rules."
+msgstr ""
+
+#: includes/admin/views/rules-section.php:257
+#: includes/admin/views/rules-section.php:826
+msgid "Exclusive"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:258
+msgid "Only this rule applies, ignores all others."
+msgstr ""
+
+#: includes/admin/views/rules-section.php:266
+msgid "Got it"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:565
+msgid "Quick Start with Presets"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:566
+msgid "Load presets to quickly configure common import scenarios:"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:569
+msgid "-- Select a preset --"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:628
+msgid "⚠️ Rule Stacking Detected"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:632
+msgid ""
+"You have both general (Any → Country) and specific (Country → Country) "
+"rules with \"Add\" stacking mode. These will combine unless you set them to "
+"\"Exclusive\" or \"Override\" mode."
+msgstr ""
+
+#: includes/admin/views/rules-section.php:633
+msgid ""
+"Example: A general \"Any → US 10%\" rule will add to \"China → US 25%\" if "
+"both are in \"Add\" mode."
+msgstr ""
+
+#: includes/admin/views/rules-section.php:642
+#. translators: %s: list of countries
+msgid ""
+"You have multiple rules with \"Add\" stacking mode for %s. These fees will "
+"be combined. Consider using \"Exclusive\" or \"Override\" mode if you want "
+"only the highest priority rule to apply."
+msgstr ""
+
+#: includes/admin/views/rules-section.php:670
+msgid "Dismiss this notice."
+msgstr ""
+
+#: includes/admin/views/rules-section.php:684
+msgid "All Rules"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:686
+msgid "Add New Rule"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:692
+msgid ""
+"Configure customs fee rules based on destination countries, product "
+"origins, categories, and HS codes."
+msgstr ""
+
+#: includes/admin/views/rules-section.php:696
+msgid "Need help getting started?"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:705
+msgid "Label"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:706
+msgid "Countries"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:707
+msgid "Products"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:708
+msgid "Type"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:709
+msgid "Rate"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:710
+msgid "Stacking"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:711
+msgid "Actions"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:727
+msgid "Higher priority rules are checked first (0-100)"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:744
+msgid "All → All"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:748
+#. translators: %s: destination country name
+msgid "Any → %s"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:752
+#. translators: %s: origin country name
+msgid "%s → Any"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:767
+#: includes/admin/views/rules-section.php:804
+msgid "All Products"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:782
+#. translators: %d: number of additional categories
+msgid "+%d more"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:836
+msgid "Adds with other matching rules"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:837
+msgid "Replaces lower priority rules"
+msgstr ""
+
+#: includes/admin/views/rules-section.php:838
+msgid "Only this rule applies"
+msgstr ""
+
+#: includes/class-cfwc-calculator.php:736
 #. translators: %1$s: destination country, %2$s: origin country
-#: includes/class-cfwc-calculator.php:473
-#, php-format
 msgid "Import Fees (%1$s from %2$s)"
 msgstr ""
 
+#: includes/class-cfwc-calculator.php:744
 #. translators: %s: country name
-#: includes/class-cfwc-calculator.php:482
-#, php-format
 msgid "Customs & Import Fees (%s)"
 msgstr ""
 
-#: includes/class-cfwc-emails.php:219
-msgid "CUSTOMS & IMPORT INFORMATION"
-msgstr ""
-
-#. translators: %s: Total customs fees amount
-#: includes/class-cfwc-emails.php:226
-#, php-format
-msgid "Total customs fees applied: %s"
-msgstr ""
-
-#: includes/class-cfwc-emails.php:229
-msgid "Note: These are estimated fees. Actual fees at delivery may vary."
-msgstr ""
-
-#: includes/class-cfwc-emails.php:234
+#: includes/class-cfwc-display.php:236 includes/class-cfwc-display.php:248
+#: includes/class-cfwc-display.php:392 includes/class-cfwc-emails.php:269
 msgid "Customs & Import Information"
 msgstr ""
 
-#. translators: %s: Total customs fees amount
-#: includes/class-cfwc-emails.php:247
-#, php-format
-msgid "Total customs fees: %s"
+#: includes/class-cfwc-display.php:238 includes/class-cfwc-display.php:249
+#: includes/class-cfwc-settings.php:306
+msgid "Estimated import duties and taxes based on destination country."
+msgstr ""
+
+#: includes/class-cfwc-display.php:240 includes/class-cfwc-display.php:250
+msgid "Total customs fees:"
+msgstr ""
+
+#: includes/class-cfwc-display.php:242 includes/class-cfwc-display.php:251
+#: includes/class-cfwc-emails.php:289
+msgid ""
+"These are estimated fees based on current rates. Actual fees may vary "
+"depending on customs regulations and carrier handling charges."
+msgstr ""
+
+#: includes/class-cfwc-display.php:393
+msgid ""
+"The customs and import fees shown above are estimated based on current "
+"rates. Actual fees may vary depending on customs regulations and carrier "
+"handling charges."
 msgstr ""
 
 #: includes/class-cfwc-emails.php:254
-msgid "These are estimated fees based on current rates. Actual fees may vary depending on customs regulations and carrier handling charges."
+msgid "CUSTOMS & IMPORT INFORMATION"
 msgstr ""
 
-#: includes/class-cfwc-emails.php:297
-#: includes/class-cfwc-emails.php:305
+#: includes/class-cfwc-emails.php:261
+#. translators: %s: Total customs fees amount
+msgid "Total customs fees applied: %s"
+msgstr ""
+
+#: includes/class-cfwc-emails.php:264
+msgid "Note: These are estimated fees. Actual fees at delivery may vary."
+msgstr ""
+
+#: includes/class-cfwc-emails.php:282
+#. translators: %s: Total customs fees amount
+msgid "Total customs fees: %s"
+msgstr ""
+
+#: includes/class-cfwc-emails.php:332 includes/class-cfwc-emails.php:340
 msgid "Customs Fees Applied:"
 msgstr ""
 
-#: includes/class-cfwc-loader.php:145
-msgid "View fee details"
+#: includes/class-cfwc-loader.php:304
+msgid "Settings"
 msgstr ""
 
-#: includes/class-cfwc-loader.php:146
-msgid "Loading..."
+#: includes/class-cfwc-loader.php:325
+msgid "View Customs Fees documentation"
 msgstr ""
 
-#: includes/class-cfwc-loader.php:147
-#: includes/class-cfwc-loader.php:203
-msgid "An error occurred. Please try again."
+#: includes/class-cfwc-loader.php:325
+msgid "Docs"
 msgstr ""
 
-#: includes/class-cfwc-loader.php:199
+#: includes/class-cfwc-loader.php:326
+msgid "Submit a feature request"
+msgstr ""
+
+#: includes/class-cfwc-loader.php:326
+msgid "Feature request"
+msgstr ""
+
+#: includes/class-cfwc-loader.php:403
 msgid "Are you sure you want to delete this rule?"
 msgstr ""
 
-#: includes/class-cfwc-loader.php:200
+#: includes/class-cfwc-loader.php:404
 msgid "This will replace all existing rules. Continue?"
 msgstr ""
 
-#: includes/class-cfwc-loader.php:201
+#: includes/class-cfwc-loader.php:405
 msgid "Saving..."
 msgstr ""
 
-#: includes/class-cfwc-loader.php:202
+#: includes/class-cfwc-loader.php:406
 msgid "Settings saved!"
 msgstr ""
 
-#: includes/class-cfwc-loader.php:204
+#: includes/class-cfwc-loader.php:407
+msgid "An error occurred. Please try again."
+msgstr ""
+
+#: includes/class-cfwc-loader.php:408
 msgid "Add Rule"
 msgstr ""
 
-#: includes/class-cfwc-loader.php:205
+#: includes/class-cfwc-loader.php:409
 msgid "Edit Rule"
 msgstr ""
 
-#: includes/class-cfwc-loader.php:219
+#: includes/class-cfwc-loader.php:423
 msgid "U.S. General Import (2025 rules)"
 msgstr ""
 
-#: includes/class-cfwc-loader.php:220
+#: includes/class-cfwc-loader.php:424
 msgid "U.S. Electronics Import"
 msgstr ""
 
-#: includes/class-cfwc-loader.php:221
+#: includes/class-cfwc-loader.php:425
 msgid "U.S. Textiles & Apparel"
 msgstr ""
 
-#: includes/class-cfwc-loader.php:222
+#: includes/class-cfwc-loader.php:426
 msgid "EU to U.S. Standard"
 msgstr ""
 
-#: includes/class-cfwc-loader.php:223
+#: includes/class-cfwc-loader.php:427
 msgid "UK to U.S. Standard"
 msgstr ""
 
-#: includes/class-cfwc-loader.php:224
+#: includes/class-cfwc-loader.php:428
 msgid "Simple 10% All Countries"
 msgstr ""
 
-#: includes/class-cfwc-loader.php:270
+#: includes/class-cfwc-loader.php:474
 msgid "Once Weekly"
 msgstr ""
 
-#: includes/class-cfwc-settings.php:143
+#: includes/class-cfwc-products-variation-support.php:63
+#. translators: %s: parent HS code
+msgid "Leave empty to use parent product HS code: %s"
+msgstr ""
+
+#: includes/class-cfwc-products-variation-support.php:86
+#. translators: %s: parent country
+msgid "Leave empty to use parent product origin: %s"
+msgstr ""
+
+#: includes/class-cfwc-products-variation-support.php:96
+msgid "Use parent product"
+msgstr ""
+
+#: includes/class-cfwc-settings.php:146
 msgid "Customs & Import Fees Settings"
 msgstr ""
 
-#: includes/class-cfwc-settings.php:238
+#: includes/class-cfwc-settings.php:292
 msgid "All Countries"
-msgstr ""
-
-#: includes/class-cfwc-settings.php:252
-msgid "Estimated import duties and taxes based on destination country."
 msgstr ""
 
 #: includes/class-cfwc-templates.php:60
@@ -518,369 +877,568 @@ msgid "US General Import (10%)"
 msgstr ""
 
 #: includes/class-cfwc-templates.php:61
-msgid "Standard 10% import duty for general merchandise entering the US"
+msgid ""
+"⚠️ BASIC RULE: Only for general US imports. For China→US, use the China "
+"preset instead. This rule may stack with country-specific rules unless set "
+"to \"Exclusive\"."
 msgstr ""
 
-#: includes/class-cfwc-templates.php:69
+#: includes/class-cfwc-templates.php:72
 msgid "US Tariff (General)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:76
-msgid "EU to US Import (15%)"
+#: includes/class-cfwc-templates.php:80
+msgid "China to US Import Tariffs (2025)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:77
-msgid "Standard 15% rate for EU goods entering US"
-msgstr ""
-
-#: includes/class-cfwc-templates.php:85
-msgid "US Tariff (EU)"
-msgstr ""
-
-#: includes/class-cfwc-templates.php:92
-msgid "China to US Import (25%)"
+#: includes/class-cfwc-templates.php:81
+msgid ""
+"⚠️ COMPLETE PRESET: Clear existing rules before applying! This preset "
+"includes ALL China→US tariffs (Section 301, 232, fentanyl). No additional "
+"US import rules needed."
 msgstr ""
 
 #: includes/class-cfwc-templates.php:93
-msgid "US reciprocal tariff for Chinese goods - 25%"
+msgid "China Apparel (Section 301 + Fentanyl)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:101
-msgid "US Tariff (China)"
+#: includes/class-cfwc-templates.php:107
+msgid "China Electronics (Section 301)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:110
-msgid "India to US (25%)"
-msgstr ""
-
-#: includes/class-cfwc-templates.php:111
-msgid "US reciprocal tariff for goods from India - 25%"
-msgstr ""
-
-#: includes/class-cfwc-templates.php:119
-msgid "US Tariff (India)"
-msgstr ""
-
-#: includes/class-cfwc-templates.php:126
-msgid "UK to US (10%)"
-msgstr ""
-
-#: includes/class-cfwc-templates.php:127
-msgid "US reciprocal tariff for goods from United Kingdom - 10%"
+#: includes/class-cfwc-templates.php:121
+msgid "China Solar/Semiconductors (50%)"
 msgstr ""
 
 #: includes/class-cfwc-templates.php:135
-msgid "US Tariff (UK)"
+msgid "China Electric Vehicles (100%)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:142
-msgid "Japan to US (15%)"
+#: includes/class-cfwc-templates.php:149
+msgid "China Auto Parts (25%)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:143
-msgid "US reciprocal tariff for goods from Japan - 15%"
+#: includes/class-cfwc-templates.php:163
+msgid "China Steel (Section 232)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:151
-msgid "US Tariff (Japan)"
+#: includes/class-cfwc-templates.php:177
+msgid "China Aluminum (Section 232)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:158
-msgid "Brazil to US (10%)"
+#: includes/class-cfwc-templates.php:191
+msgid "China Batteries (25%)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:159
-msgid "US reciprocal tariff for goods from Brazil - 10%"
+#: includes/class-cfwc-templates.php:205
+msgid "China Medical Syringes/Needles (50%)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:167
-msgid "US Tariff (Brazil)"
-msgstr ""
-
-#: includes/class-cfwc-templates.php:174
-msgid "Switzerland to US (39%)"
-msgstr ""
-
-#: includes/class-cfwc-templates.php:175
-msgid "US reciprocal tariff for goods from Switzerland - 39%"
-msgstr ""
-
-#: includes/class-cfwc-templates.php:183
-#: includes/class-cfwc-templates.php:458
-msgid "US Tariff (Switzerland)"
-msgstr ""
-
-#: includes/class-cfwc-templates.php:192
-msgid "Vietnam to US (20%)"
-msgstr ""
-
-#: includes/class-cfwc-templates.php:193
-msgid "US reciprocal tariff for goods from Vietnam - 20%"
-msgstr ""
-
-#: includes/class-cfwc-templates.php:201
-#: includes/class-cfwc-templates.php:555
-msgid "US Tariff (Vietnam)"
-msgstr ""
-
-#: includes/class-cfwc-templates.php:208
-msgid "Thailand to US (19%)"
-msgstr ""
-
-#: includes/class-cfwc-templates.php:209
-msgid "US reciprocal tariff for goods from Thailand - 19%"
-msgstr ""
-
-#: includes/class-cfwc-templates.php:217
-#: includes/class-cfwc-templates.php:565
-msgid "US Tariff (Thailand)"
-msgstr ""
-
-#: includes/class-cfwc-templates.php:224
-msgid "Indonesia to US (19%)"
-msgstr ""
-
-#: includes/class-cfwc-templates.php:225
-msgid "US reciprocal tariff for goods from Indonesia - 19%"
+#: includes/class-cfwc-templates.php:219
+msgid "China Consumer Appliances"
 msgstr ""
 
 #: includes/class-cfwc-templates.php:233
-#: includes/class-cfwc-templates.php:585
-msgid "US Tariff (Indonesia)"
+msgid "China Footwear (Section 301)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:242
-msgid "Bangladesh to US (20%)"
+#: includes/class-cfwc-templates.php:247
+msgid "China Leather Goods & Bags"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:243
-msgid "US reciprocal tariff for goods from Bangladesh - 20%"
+#: includes/class-cfwc-templates.php:261
+msgid "China Toys & Games"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:251
-msgid "US Tariff (Bangladesh)"
+#: includes/class-cfwc-templates.php:275
+msgid "China Chemical Products (25%)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:258
-msgid "Pakistan to US (19%)"
+#: includes/class-cfwc-templates.php:288
+msgid "China General Import (MFN)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:259
-msgid "US reciprocal tariff for goods from Pakistan - 19%"
+#: includes/class-cfwc-templates.php:297
+msgid "India to US (25%)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:267
-msgid "US Tariff (Pakistan)"
+#: includes/class-cfwc-templates.php:298
+msgid "US reciprocal tariff for goods from India - 25%"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:276
-msgid "South Korea to US (15%)"
+#: includes/class-cfwc-templates.php:307
+msgid "US Tariff (India)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:277
-msgid "US reciprocal tariff for goods from South Korea - 15%"
+#: includes/class-cfwc-templates.php:316
+msgid "EU to US Import Tariffs (2025 Agreement)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:285
-msgid "US Tariff (South Korea)"
+#: includes/class-cfwc-templates.php:317
+msgid ""
+"⚠️ COMPLETE EU PRESET: 15% tariff on all 27 EU member states per Aug 2025 "
+"trade agreement. Special handling for cars, semiconductors, "
+"pharmaceuticals. Aircraft parts and generic pharma exempt."
 msgstr ""
 
-#: includes/class-cfwc-templates.php:292
-msgid "Taiwan to US (20%)"
+#: includes/class-cfwc-templates.php:328
+msgid "US-EU Tariff (Germany)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:293
-msgid "US reciprocal tariff for goods from Taiwan - 20%"
+#: includes/class-cfwc-templates.php:340
+msgid "US-EU Tariff (France)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:301
-msgid "US Tariff (Taiwan)"
+#: includes/class-cfwc-templates.php:352
+msgid "US-EU Tariff (Italy)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:310
-msgid "Turkey to US (15%)"
+#: includes/class-cfwc-templates.php:364
+msgid "US-EU Tariff (Spain)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:311
-msgid "US reciprocal tariff for goods from Turkey - 15%"
+#: includes/class-cfwc-templates.php:376
+msgid "US-EU Tariff (Netherlands)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:319
-msgid "US Tariff (Turkey)"
+#: includes/class-cfwc-templates.php:388
+msgid "US-EU Tariff (Belgium)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:326
-msgid "Israel to US (15%)"
+#: includes/class-cfwc-templates.php:400
+msgid "US-EU Tariff (Poland)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:327
-msgid "US reciprocal tariff for goods from Israel - 15%"
+#: includes/class-cfwc-templates.php:412
+msgid "US-EU Tariff (Austria)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:335
-msgid "US Tariff (Israel)"
+#: includes/class-cfwc-templates.php:424
+msgid "US-EU Tariff (Sweden)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:344
-msgid "South Africa to US (30%)"
+#: includes/class-cfwc-templates.php:436
+msgid "US-EU Tariff (Denmark)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:345
-msgid "US reciprocal tariff for goods from South Africa - 30%"
+#: includes/class-cfwc-templates.php:448
+msgid "US-EU Tariff (Finland)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:353
-msgid "US Tariff (South Africa)"
+#: includes/class-cfwc-templates.php:460
+msgid "US-EU Tariff (Ireland)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:360
-msgid "Nigeria to US (15%)"
+#: includes/class-cfwc-templates.php:472
+msgid "US-EU Tariff (Portugal)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:361
-msgid "US reciprocal tariff for goods from Nigeria - 15%"
+#: includes/class-cfwc-templates.php:484
+msgid "US-EU Tariff (Greece)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:369
-msgid "US Tariff (Nigeria)"
-msgstr ""
-
-#: includes/class-cfwc-templates.php:378
-msgid "New Zealand to US (15%)"
-msgstr ""
-
-#: includes/class-cfwc-templates.php:379
-msgid "US reciprocal tariff for goods from New Zealand - 15%"
-msgstr ""
-
-#: includes/class-cfwc-templates.php:387
-msgid "US Tariff (New Zealand)"
-msgstr ""
-
-#: includes/class-cfwc-templates.php:395
-msgid "UK VAT & Duty"
-msgstr ""
-
-#: includes/class-cfwc-templates.php:396
-msgid "UK import VAT (20%) and duty for international shipments"
-msgstr ""
-
-#: includes/class-cfwc-templates.php:404
-msgid "UK VAT (Import)"
-msgstr ""
-
-#: includes/class-cfwc-templates.php:414
-msgid "UK Duty (Import)"
-msgstr ""
-
-#: includes/class-cfwc-templates.php:421
-msgid "Canada GST & Duty"
-msgstr ""
-
-#: includes/class-cfwc-templates.php:422
-msgid "Canadian GST and import duties"
-msgstr ""
-
-#: includes/class-cfwc-templates.php:430
-msgid "Canada GST (Import)"
-msgstr ""
-
-#: includes/class-cfwc-templates.php:440
-msgid "Canada Duty (Import)"
-msgstr ""
-
-#: includes/class-cfwc-templates.php:449
-msgid "US High Tariff Countries (30%+)"
-msgstr ""
-
-#: includes/class-cfwc-templates.php:450
-msgid "Countries with 30% or higher US reciprocal tariffs"
-msgstr ""
-
-#: includes/class-cfwc-templates.php:468
-msgid "US Tariff (Syria)"
-msgstr ""
-
-#: includes/class-cfwc-templates.php:478
-msgid "US Tariff (Myanmar)"
-msgstr ""
-
-#: includes/class-cfwc-templates.php:488
-msgid "US Tariff (Laos)"
-msgstr ""
-
-#: includes/class-cfwc-templates.php:498
-msgid "US Tariff (Iraq)"
+#: includes/class-cfwc-templates.php:496
+msgid "US-EU Tariff (Czech Rep.)"
 msgstr ""
 
 #: includes/class-cfwc-templates.php:508
+msgid "US-EU Tariff (Hungary)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:520
+msgid "US-EU Tariff (Romania)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:532
+msgid "US-EU Tariff (Bulgaria)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:544
+msgid "US-EU Tariff (Slovakia)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:556
+msgid "US-EU Tariff (Croatia)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:568
+msgid "US-EU Tariff (Slovenia)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:580
+msgid "US-EU Tariff (Lithuania)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:592
+msgid "US-EU Tariff (Latvia)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:604
+msgid "US-EU Tariff (Estonia)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:616
+msgid "US-EU Tariff (Luxembourg)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:628
+msgid "US-EU Tariff (Cyprus)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:640
+msgid "US-EU Tariff (Malta)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:647
+msgid "UK to US (10%)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:648
+msgid "US reciprocal tariff for goods from United Kingdom - 10%"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:657
+msgid "US Tariff (UK)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:664
+msgid "Japan to US (15%)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:665
+msgid "US reciprocal tariff for goods from Japan - 15%"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:674
+msgid "US Tariff (Japan)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:681
+msgid "Brazil to US (10%)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:682
+msgid "US reciprocal tariff for goods from Brazil - 10%"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:691
+msgid "US Tariff (Brazil)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:698
+msgid "Switzerland to US (39%)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:699
+msgid "US reciprocal tariff for goods from Switzerland - 39%"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:708 includes/class-cfwc-templates.php:996
+msgid "US Tariff (Switzerland)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:717
+msgid "Vietnam to US (20%)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:718
+msgid "US reciprocal tariff for goods from Vietnam - 20%"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:727 includes/class-cfwc-templates.php:1102
+msgid "US Tariff (Vietnam)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:734
+msgid "Thailand to US (19%)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:735
+msgid "US reciprocal tariff for goods from Thailand - 19%"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:744 includes/class-cfwc-templates.php:1113
+msgid "US Tariff (Thailand)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:751
+msgid "Indonesia to US (19%)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:752
+msgid "US reciprocal tariff for goods from Indonesia - 19%"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:761 includes/class-cfwc-templates.php:1135
+msgid "US Tariff (Indonesia)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:770
+msgid "Bangladesh to US (20%)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:771
+msgid "US reciprocal tariff for goods from Bangladesh - 20%"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:780
+msgid "US Tariff (Bangladesh)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:787
+msgid "Pakistan to US (19%)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:788
+msgid "US reciprocal tariff for goods from Pakistan - 19%"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:797
+msgid "US Tariff (Pakistan)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:806
+msgid "South Korea to US (15%)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:807
+msgid "US reciprocal tariff for goods from South Korea - 15%"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:816
+msgid "US Tariff (South Korea)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:823
+msgid "Taiwan to US (20%)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:824
+msgid "US reciprocal tariff for goods from Taiwan - 20%"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:833
+msgid "US Tariff (Taiwan)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:842
+msgid "Turkey to US (15%)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:843
+msgid "US reciprocal tariff for goods from Turkey - 15%"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:852
+msgid "US Tariff (Turkey)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:859
+msgid "Israel to US (15%)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:860
+msgid "US reciprocal tariff for goods from Israel - 15%"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:869
+msgid "US Tariff (Israel)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:878
+msgid "South Africa to US (30%)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:879
+msgid "US reciprocal tariff for goods from South Africa - 30%"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:888
+msgid "US Tariff (South Africa)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:895
+msgid "Nigeria to US (15%)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:896
+msgid "US reciprocal tariff for goods from Nigeria - 15%"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:905
+msgid "US Tariff (Nigeria)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:914
+msgid "New Zealand to US (15%)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:915
+msgid "US reciprocal tariff for goods from New Zealand - 15%"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:924
+msgid "US Tariff (New Zealand)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:932
+msgid "UK VAT & Duty"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:933
+msgid "UK import VAT (20%) and duty for international shipments"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:941
+msgid "UK VAT (Import)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:951
+msgid "UK Duty (Import)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:958
+msgid "Canada GST & Duty"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:959
+msgid "Canadian GST and import duties"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:967
+msgid "Canada GST (Import)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:977
+msgid "Canada Duty (Import)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:986
+msgid "US High Tariff Countries (30%+)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:987
+msgid "Countries with 30% or higher US reciprocal tariffs"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:1007
+msgid "US Tariff (Syria)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:1018
+msgid "US Tariff (Myanmar)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:1029
+msgid "US Tariff (Laos)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:1040
+msgid "US Tariff (Iraq)"
+msgstr ""
+
+#: includes/class-cfwc-templates.php:1051
 msgid "US Tariff (Serbia)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:518
+#: includes/class-cfwc-templates.php:1062
 msgid "US Tariff (Algeria)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:528
+#: includes/class-cfwc-templates.php:1073
 msgid "US Tariff (Bosnia)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:538
+#: includes/class-cfwc-templates.php:1084
 msgid "US Tariff (Libya)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:546
+#: includes/class-cfwc-templates.php:1092
 msgid "US-Southeast Asia All Countries"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:547
+#: includes/class-cfwc-templates.php:1093
 msgid "All Southeast Asian countries with US reciprocal tariffs"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:575
+#: includes/class-cfwc-templates.php:1124
 msgid "US Tariff (Malaysia)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:595
+#: includes/class-cfwc-templates.php:1146
 msgid "US Tariff (Philippines)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:605
+#: includes/class-cfwc-templates.php:1157
 msgid "US Tariff (Cambodia)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:615
+#: includes/class-cfwc-templates.php:1168
 msgid "US Tariff (Brunei)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:623
+#: includes/class-cfwc-templates.php:1176
 msgid "Australia GST"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:624
+#: includes/class-cfwc-templates.php:1177
 msgid "Australian GST (10%) on imported goods"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:632
+#: includes/class-cfwc-templates.php:1185
 msgid "Australia GST (Import)"
 msgstr ""
 
+#: includes/class-cfwc-templates.php:1344
 #. translators: %1$d: number of rules added, %2$d: number of duplicates skipped
-#: includes/class-cfwc-templates.php:763
-#, php-format
 msgid "Added %1$d new rules. Skipped %2$d duplicates."
 msgstr ""
 
-#: includes/class-cfwc-templates.php:768
+#: includes/class-cfwc-templates.php:1349
 msgid "All preset rules already exist. No rules added."
 msgstr ""
 
+#: includes/class-cfwc-templates.php:1353
 #. translators: %d: number of rules added
-#: includes/class-cfwc-templates.php:772
-#, php-format
 msgid "%d preset rules added successfully."
 msgstr ""
 
-#: includes/class-cfwc-templates.php:777
+#: includes/class-cfwc-templates.php:1358
 msgid "All rules replaced with preset."
+msgstr ""
+
+#: includes/class-customs-fees-woocommerce.php:105
+msgid ""
+"Customs Fees for WooCommerce requires WooCommerce to be installed and "
+"active."
+msgstr ""
+
+#: includes/class-customs-fees-woocommerce.php:163
+msgid "Cloning is forbidden."
+msgstr ""
+
+#: includes/class-customs-fees-woocommerce.php:172
+msgid "Unserializing instances of this class is forbidden."
+msgstr ""
+
+#. Plugin Name of the plugin/theme
+msgid "Customs Fees for WooCommerce"
+msgstr ""
+
+#. Plugin URI of the plugin/theme
+msgid "https://woocommerce.com/products/customs-fees"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid ""
+"Add customs and import fees to WooCommerce orders based on destination "
+"country and product origin."
+msgstr ""
+
+#. Author of the plugin/theme
+msgid "WooCommerce"
+msgstr ""
+
+#. Author URI of the plugin/theme
+msgid "https://woocommerce.com"
 msgstr ""
