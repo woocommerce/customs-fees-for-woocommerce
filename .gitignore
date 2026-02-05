@@ -6,6 +6,8 @@
 /build/
 /dist/
 *.zip
+/assets/**/*.min.js
+/assets/**/*.min.css
 
 # Development scripts (not for distribution)
 /bin/
