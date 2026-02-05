@@ -106,10 +106,11 @@ class CFWC_Display {
 		// Load on cart, checkout (including shortcode), order received, and my account pages.
 		// Also load if we're on any WooCommerce page.
 		if ( is_checkout() || is_cart() || is_order_received_page() || is_account_page() || is_woocommerce() || $has_checkout_shortcode ) {
-			wp_enqueue_style( 'cfwc-frontend', plugin_dir_url( __DIR__ ) . 'assets/css/frontend.css', array(), '1.0.0' );
+			$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+			wp_enqueue_style( 'cfwc-frontend', plugin_dir_url( __DIR__ ) . 'assets/css/frontend' . $suffix . '.css', array(), '1.0.0' );
 			// Only load JS on cart/checkout for tooltips.
 			if ( is_checkout() || is_cart() || $has_checkout_shortcode ) {
-				wp_enqueue_script( 'cfwc-frontend', plugin_dir_url( __DIR__ ) . 'assets/js/frontend.js', array( 'jquery' ), '1.0.0', true );
+				wp_enqueue_script( 'cfwc-frontend', plugin_dir_url( __DIR__ ) . 'assets/js/frontend' . $suffix . '.js', array( 'jquery' ), '1.0.0', true );
 			}
 		}
 	}

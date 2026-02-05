@@ -1,0 +1,44 @@
+{
+  "name": "customs-fees-for-woocommerce",
+  "title": "Customs Fees for WooCommerce",
+  "version": "1.1.5",
+  "homepage": "https://woocommerce.com/products/customs-fees/",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/woocommerce/customs-fees-for-woocommerce.git"
+  },
+  "devDependencies": {
+    "clean-css-cli": "^4.3.0",
+    "node-wp-i18n": "~1.2.3",
+    "uglify-js": "^3.6.0"
+  },
+  "scripts": {
+    "build": "composer install -o --no-dev && pnpm run uglify && pnpm run cleancss && pnpm run makepot && pnpm run archive",
+    "build:dev": "composer install -o && pnpm run uglify && pnpm run cleancss && pnpm run makepot",
+    "archive": "composer archive --file=$npm_package_name --format=zip",
+    "postarchive": "rm -rf $npm_package_name && unzip $npm_package_name.zip -d $npm_package_name && rm $npm_package_name.zip && zip -r $npm_package_name.zip $npm_package_name && rm -rf $npm_package_name",
+    "preuglify": "rm -f $npm_package_config_paths_js_min",
+    "uglify": "for f in $npm_package_config_paths_js; do file=${f%.js}; node_modules/.bin/uglifyjs $f -c -m > $file.min.js; done",
+    "precleancss": "rm -f $npm_package_config_paths_css_min",
+    "cleancss": "for f in $npm_package_config_paths_css; do echo Processing $f; file=${f%.css}; node_modules/.bin/cleancss -o $file.min.css $f; done",
+    "makepot": "wpi18n makepot --domain-path languages --pot-file customs-fees-for-woocommerce.pot --type plugin --main-file customs-fees-for-woocommerce.php --exclude node_modules,tests,docs",
+    "build:qit": "composer install --no-dev -o && pnpm run makepot && pnpm run archive:qit && pnpm run postarchive",
+    "archive:qit": "composer archive --file=$npm_package_name --format=zip && pnpm run zip:phpstan_config",
+    "zip:phpstan_config": "zip -r $npm_package_name.zip .phpstan/dist/* -j"
+  },
+  "engines": {
+    "node": "^22.14.0",
+    "pnpm": "^10.4.1"
+  },
+  "config": {
+    "use_pnpm": true,
+    "translate": true,
+    "use_gh_release_notes": true,
+    "paths": {
+      "js": "assets/js/*.js",
+      "js_min": "assets/js/*.min.js",
+      "css": "assets/css/*.css",
+      "css_min": "assets/css/*.min.css"
+    }
+  }
+}

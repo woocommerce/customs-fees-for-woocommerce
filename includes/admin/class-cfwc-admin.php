@@ -290,16 +290,17 @@ class CFWC_Admin {
 
 		// Load on product list page for quick/bulk edit support.
 		if ( 'edit.php' === $hook && 'product' === $post_type ) {
+			$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 			wp_enqueue_style(
 				'cfwc-admin',
-				( defined( 'CFWC_PLUGIN_URL' ) ? CFWC_PLUGIN_URL : plugin_dir_url( dirname( __DIR__ ) ) ) . 'assets/css/admin.css',
+				( defined( 'CFWC_PLUGIN_URL' ) ? CFWC_PLUGIN_URL : plugin_dir_url( dirname( __DIR__ ) ) ) . 'assets/css/admin' . $suffix . '.css',
 				array(),
 				( defined( 'CFWC_VERSION' ) ? CFWC_VERSION : '1.0.0' )
 			);
 
 			wp_enqueue_script(
 				'cfwc-admin',
-				( defined( 'CFWC_PLUGIN_URL' ) ? CFWC_PLUGIN_URL : plugin_dir_url( dirname( __DIR__ ) ) ) . 'assets/js/admin.js',
+				( defined( 'CFWC_PLUGIN_URL' ) ? CFWC_PLUGIN_URL : plugin_dir_url( dirname( __DIR__ ) ) ) . 'assets/js/admin' . $suffix . '.js',
 				array( 'jquery' ),
 				( defined( 'CFWC_VERSION' ) ? CFWC_VERSION : '1.0.0' ),
 				true
@@ -314,9 +315,10 @@ class CFWC_Admin {
 				wp_enqueue_style( 'woocommerce_admin_styles' );
 
 				// Also load our admin CSS for proper select2 styling.
+				$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 				wp_enqueue_style(
 					'cfwc-admin',
-					( defined( 'CFWC_PLUGIN_URL' ) ? CFWC_PLUGIN_URL : plugin_dir_url( dirname( __DIR__ ) ) ) . 'assets/css/admin.css',
+					( defined( 'CFWC_PLUGIN_URL' ) ? CFWC_PLUGIN_URL : plugin_dir_url( dirname( __DIR__ ) ) ) . 'assets/css/admin' . $suffix . '.css',
 					array( 'woocommerce_admin_styles' ),
 					( defined( 'CFWC_VERSION' ) ? CFWC_VERSION : '1.0.0' )
 				);
@@ -362,10 +364,12 @@ class CFWC_Admin {
 			return;
 		}
 
+		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+
 		// Enqueue admin CSS.
 		wp_enqueue_style(
 			'cfwc-admin',
-			( defined( 'CFWC_PLUGIN_URL' ) ? CFWC_PLUGIN_URL : plugin_dir_url( dirname( __DIR__ ) ) ) . 'assets/css/admin.css',
+			( defined( 'CFWC_PLUGIN_URL' ) ? CFWC_PLUGIN_URL : plugin_dir_url( dirname( __DIR__ ) ) ) . 'assets/css/admin' . $suffix . '.css',
 			array( 'woocommerce_admin_styles' ),
 			( defined( 'CFWC_VERSION' ) ? CFWC_VERSION : '1.0.0' )
 		);
@@ -373,7 +377,7 @@ class CFWC_Admin {
 		// Enqueue UI improvements CSS.
 		wp_enqueue_style(
 			'cfwc-admin-improvements',
-			( defined( 'CFWC_PLUGIN_URL' ) ? CFWC_PLUGIN_URL : plugin_dir_url( dirname( __DIR__ ) ) ) . 'assets/css/admin-improvements.css',
+			( defined( 'CFWC_PLUGIN_URL' ) ? CFWC_PLUGIN_URL : plugin_dir_url( dirname( __DIR__ ) ) ) . 'assets/css/admin-improvements' . $suffix . '.css',
 			array( 'cfwc-admin' ),
 			( defined( 'CFWC_VERSION' ) ? CFWC_VERSION : '1.0.0' )
 		);
@@ -381,7 +385,7 @@ class CFWC_Admin {
 		// Enqueue admin JavaScript with dependencies.
 		wp_enqueue_script(
 			'cfwc-admin',
-			( defined( 'CFWC_PLUGIN_URL' ) ? CFWC_PLUGIN_URL : plugin_dir_url( dirname( __DIR__ ) ) ) . 'assets/js/admin.js',
+			( defined( 'CFWC_PLUGIN_URL' ) ? CFWC_PLUGIN_URL : plugin_dir_url( dirname( __DIR__ ) ) ) . 'assets/js/admin' . $suffix . '.js',
 			array( 'jquery', 'wc-enhanced-select', 'selectWoo', 'wp-data', 'wp-notices' ),
 			( defined( 'CFWC_VERSION' ) ? CFWC_VERSION : '1.0.0' ),
 			true

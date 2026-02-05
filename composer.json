@@ -1,4 +1,29 @@
 {
+    "name": "woocommerce/customs-fees-for-woocommerce",
+    "description": "Add customs and import fees to WooCommerce orders based on destination country and product origin.",
+    "homepage": "https://woocommerce.com/products/customs-fees/",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0+",
+    "archive": {
+        "exclude": [
+            "!/assets",
+            "!/languages",
+            "bin",
+            "tests",
+            "/vendor",
+            "README.md",
+            "package.json",
+            "phpstan-bootstrap.php",
+            "phpstan.neon",
+            "package-lock.json",
+            "pnpm-lock.yaml",
+            "composer.json",
+            "composer.lock",
+            "node_modules",
+            "customs-fees-for-woocommerce.zip",
+            ".*"
+        ]
+    },
     "require-dev": {
         "szepeviktor/phpstan-wordpress": "*",
         "phpstan/phpstan": "*",
