@@ -4,9 +4,9 @@
 - No autoloading or namespaces -- the plugin uses `CFWC_` prefixed classes with manual `require_once`. Do not introduce PSR-4 or Composer autoloading.
 - All PHP classes must have the `ABSPATH` guard at the top: `if ( ! defined( 'ABSPATH' ) ) { exit; }`.
 - Minified assets are built from source files -- edit only the non-minified versions in `assets/`.
-- Version must be updated in **four** places when bumped: `customs-fees-for-woocommerce.php` (header + `CFWC_VERSION` constant), `readme.txt` (Stable tag), and `package.json` (version field).
 - No external API calls. All customs fee calculations happen server-side with zero network dependencies.
 - WooCommerce is a hard dependency declared via `Requires Plugins: woocommerce`.
+- Never manually bump the plugin version.
 
 ## Project Knowledge
 
