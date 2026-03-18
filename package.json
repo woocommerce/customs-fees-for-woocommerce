@@ -8,6 +8,7 @@
     "url": "git://github.com/woocommerce/customs-fees-for-woocommerce.git"
   },
   "devDependencies": {
+    "@wordpress/env": "^10.0.0",
     "clean-css-cli": "^4.3.0",
     "node-wp-i18n": "~1.2.3",
     "uglify-js": "^3.6.0"
