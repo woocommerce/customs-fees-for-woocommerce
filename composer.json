@@ -21,7 +21,9 @@
             "composer.lock",
             "node_modules",
             "customs-fees-for-woocommerce.zip",
-            ".*"
+            ".*",
+            "AGENTS.md",
+            "CLAUDE.md"
         ]
     },
     "require-dev": {
