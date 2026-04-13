@@ -3,7 +3,7 @@
  * Plugin Name:       Customs Fees for WooCommerce
  * Plugin URI:        https://woocommerce.com/products/customs-fees
  * Description:       Add customs and import fees to WooCommerce orders based on destination country and product origin.
- * Version:           1.1.6
+ * Version:           1.1.7
  * Author:            WooCommerce
  * Author URI:        https://woocommerce.com
  * License:           GPL v2 or later
