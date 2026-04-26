@@ -224,9 +224,6 @@ class CFWC_Calculator {
 				$line_total = $cart_item['line_total'];
 			}
 
-			// Apply customs valuation method (CIF support).
-			$line_total = $this->apply_valuation_method( $line_total, $cart_item, $cart );
-
 			// Get HS code using centralized helper.
 			if ( class_exists( 'CFWC_Products_Variation_Support' ) ) {
 				$customs_data = CFWC_Products_Variation_Support::get_product_customs_data( $product );
@@ -240,6 +237,7 @@ class CFWC_Calculator {
 					$hs_code = get_post_meta( $product->get_parent_id(), '_cfwc_hs_code', true );
 				}
 			}
+
 			// Determine price mode for logging.
 			$price_mode = ( 'yes' === $use_original_price ) ? 'Original Price' : 'Discounted Price';
 			$this->log_debug(
@@ -281,7 +279,7 @@ class CFWC_Calculator {
 					if ( 'all' === $match_type &&
 						$rule_from === $origin &&
 						$rule_to === $destination_country ) {
-						$rule['rule_id']  = $rule_id;
+						$rule['rule_id']  = isset( $rule['rule_id'] ) ? $rule['rule_id'] : (string) $rule_id;
 						$matching_rules[] = $rule;
 						$this->log_debug(
 							sprintf(
@@ -299,54 +297,204 @@ class CFWC_Calculator {
 				}
 			}
 
-			// Process matching rules for this product.
-			foreach ( $matching_rules as $rule ) {
-				$fee = $this->calculate_single_fee( $rule, $line_total );
-				if ( false !== $fee && $fee > 0 ) {
-					$base_label = $this->get_fee_label( $rule, $destination_country, $origin );
-
-					// Check if the label already contains a percentage (e.g., "(50%)").
-					$has_percentage = preg_match( '/\(\d+(?:\.\d+)?%\)/', $base_label );
-
-					// Add percentage rate in brackets only if not already present and it's a percentage rule.
-					if ( ! $has_percentage && isset( $rule['type'] ) && 'percentage' === $rule['type'] && ! empty( $rule['rate'] ) ) {
-						$label = sprintf( '%s (%s%%)', $base_label, $rule['rate'] );
-					} else {
-						// For flat rate or if percentage already in label, just use the base label.
-						$label = $base_label;
-					}
-
-					// Create a unique key for grouping that includes the base label and rate.
-					$group_key = $base_label . '|' . ( $rule['type'] ?? 'flat' ) . '|' . ( $rule['rate'] ?? '0' );
-
-					// Group fees by rule for consolidation.
-					if ( ! isset( $fees_by_label[ $group_key ] ) ) {
-						$fees_by_label[ $group_key ] = array(
-							'base_label' => $base_label,
-							'label'      => $label,
-							'amount'     => 0,
-							'count'      => 0,
-							'rate'       => $rule['rate'] ?? '',
-							'type'       => $rule['type'] ?? 'flat',
-							'taxable'    => $this->is_fee_taxable( $rule ),
-							'tax_class'  => $this->get_fee_tax_class( $rule ),
-						);
-					}
-
-					$fees_by_label[ $group_key ]['amount'] += $fee;
-					++$fees_by_label[ $group_key ]['count'];
-
-					// Log fee application.
-					$this->log_debug(
-						sprintf(
-							'      Applied: %s = $%.2f',
-							$label,
-							$fee
-						)
-					);
+			// Build rule ID map for dependency resolution.
+			$id_to_rule = array();
+			foreach ( $matching_rules as $mr ) {
+				$rid = isset( $mr['rule_id'] ) && '' !== $mr['rule_id'] ? $mr['rule_id'] : '';
+				if ( '' !== $rid ) {
+					$id_to_rule[ $rid ] = $mr;
 				}
 			}
-		}
+
+			// Round-based dependency resolution for matching rules.
+			$calculated = array(); // rule_id => fee amount.
+			$pending    = $matching_rules;
+			$rounds     = 0;
+			$max_rounds = count( $matching_rules ) + 1;
+
+			while ( ! empty( $pending ) && $rounds < $max_rounds ) {
+				++$rounds;
+				$made_progress = false;
+				$still_pending = array();
+
+				foreach ( $pending as $rule ) {
+					$rule_id = isset( $rule['rule_id'] ) && '' !== $rule['rule_id'] ? $rule['rule_id'] : (string) array_search( $rule, $matching_rules, true );
+					if ( '' === $rule_id ) {
+						$rule_id = 'rule_' . wp_rand( 1000, 9999 );
+					}
+
+					$deps = isset( $rule['base_includes'] ) && is_array( $rule['base_includes'] )
+						? $rule['base_includes']
+						: array();
+
+					// Filter deps to only those that actually matched.
+					$deps = array_filter(
+						$deps,
+						function ( $dep_id ) use ( $id_to_rule ) {
+							return isset( $id_to_rule[ $dep_id ] );
+						}
+					);
+
+					// Check if all deps are already calculated.
+					$deps_ready = true;
+					foreach ( $deps as $dep_id ) {
+						if ( ! isset( $calculated[ $dep_id ] ) ) {
+							$deps_ready = false;
+							break;
+						}
+					}
+
+					if ( $deps_ready ) {
+						// Apply valuation method per-rule.
+						$customs_value = $this->apply_valuation_method( $line_total, $cart_item, $cart, $rule );
+
+						// Add included fees from dependencies.
+						foreach ( $deps as $dep_id ) {
+							// Self-reference protection.
+							if ( $dep_id === $rule_id ) {
+								continue;
+							}
+							// Cycle detection.
+							if ( $this->has_cycle( $matching_rules, $rule_id ) ) {
+								$this->log_debug(
+									sprintf(
+										'    WARNING: Cycle detected in base_includes for rule "%s". Skipping dependency fees.',
+										$rule['label'] ?? $rule_id
+									),
+									'warning'
+								);
+								if ( function_exists( 'wc_get_logger' ) ) {
+									wc_get_logger()->warning(
+										sprintf(
+											'Cycle detected in customs fee rule dependencies: %s',
+											$rule['label'] ?? $rule_id
+										),
+										array( 'source' => 'customs-fees' )
+									);
+								}
+								// Set admin notice transient.
+								$cycle_labels = array();
+								foreach ( $matching_rules as $r ) {
+									if ( $this->has_cycle( $matching_rules, $r['rule_id'] ?? '' ) ) {
+										$cycle_labels[] = $r['label'] ?? ( $r['rule_id'] ?? '' );
+									}
+								}
+								if ( ! empty( $cycle_labels ) ) {
+									set_transient( 'cfwc_rules_dependency_error', array_unique( $cycle_labels ), DAY_IN_SECONDS );
+								}
+								break;
+							}
+							$customs_value += $calculated[ $dep_id ];
+						}
+
+						$fee = $this->calculate_single_fee( $rule, $customs_value );
+
+						if ( false !== $fee && $fee > 0 ) {
+							$calculated[ $rule_id ] = $fee;
+
+							$base_label = $this->get_fee_label( $rule, $destination_country, $origin );
+
+							// Check if the label already contains a percentage (e.g., "(50%)").
+							$has_percentage = preg_match( '/\(\d+(?:\.\d+)?%\)/', $base_label );
+
+							// Add percentage rate in brackets only if not already present and it's a percentage rule.
+							if ( ! $has_percentage && isset( $rule['type'] ) && 'percentage' === $rule['type'] && ! empty( $rule['rate'] ) ) {
+								$label = sprintf( '%s (%s%%)', $base_label, $rule['rate'] );
+							} else {
+								// For flat rate or if percentage already in label, just use the base label.
+								$label = $base_label;
+							}
+
+							// Create a unique key for grouping that includes the base label and rate.
+							$group_key = $base_label . '|' . ( $rule['type'] ?? 'flat' ) . '|' . ( $rule['rate'] ?? '0' );
+
+							// Group fees by rule for consolidation.
+							if ( ! isset( $fees_by_label[ $group_key ] ) ) {
+								$fees_by_label[ $group_key ] = array(
+									'base_label' => $base_label,
+									'label'      => $label,
+									'amount'     => 0,
+									'count'      => 0,
+									'rate'       => $rule['rate'] ?? '',
+									'type'       => $rule['type'] ?? 'flat',
+									'taxable'    => $this->is_fee_taxable( $rule ),
+									'tax_class'  => $this->get_fee_tax_class( $rule ),
+								);
+							}
+
+							$fees_by_label[ $group_key ]['amount'] += $fee;
+							++$fees_by_label[ $group_key ]['count'];
+
+							// Log fee application.
+							$this->log_debug(
+								sprintf(
+									'      Applied: %s = $%.2f (base: $%.2f)',
+									$label,
+									$fee,
+									$customs_value
+								)
+							);
+						}
+
+						$made_progress = true;
+					} else {
+						$still_pending[] = $rule;
+					}
+				}
+
+				$pending = $still_pending;
+
+				if ( ! $made_progress ) {
+					// Unresolvable: cycle or external dependency.
+					// Compute remaining rules on their own base so the cart still works.
+					foreach ( $pending as $rule ) {
+						$rule_id = isset( $rule['rule_id'] ) && '' !== $rule['rule_id'] ? $rule['rule_id'] : 'rule_' . wp_rand( 1000, 9999 );
+
+						$customs_value = $this->apply_valuation_method( $line_total, $cart_item, $cart, $rule );
+						$fee           = $this->calculate_single_fee( $rule, $customs_value );
+
+						if ( false !== $fee && $fee > 0 ) {
+							$calculated[ $rule_id ] = $fee;
+
+							$base_label = $this->get_fee_label( $rule, $destination_country, $origin );
+							$has_percentage = preg_match( '/\(\d+(?:\.\d+)?%\)/', $base_label );
+							if ( ! $has_percentage && isset( $rule['type'] ) && 'percentage' === $rule['type'] && ! empty( $rule['rate'] ) ) {
+								$label = sprintf( '%s (%s%%)', $base_label, $rule['rate'] );
+							} else {
+								$label = $base_label;
+							}
+
+							$group_key = $base_label . '|' . ( $rule['type'] ?? 'flat' ) . '|' . ( $rule['rate'] ?? '0' );
+
+							if ( ! isset( $fees_by_label[ $group_key ] ) ) {
+								$fees_by_label[ $group_key ] = array(
+									'base_label' => $base_label,
+									'label'      => $label,
+									'amount'     => 0,
+									'count'      => 0,
+									'rate'       => $rule['rate'] ?? '',
+									'type'       => $rule['type'] ?? 'flat',
+									'taxable'    => $this->is_fee_taxable( $rule ),
+									'tax_class'  => $this->get_fee_tax_class( $rule ),
+								);
+							}
+
+							$fees_by_label[ $group_key ]['amount'] += $fee;
+							++$fees_by_label[ $group_key ]['count'];
+
+							$this->log_debug(
+								sprintf(
+									'      Applied (unresolved deps): %s = $%.2f (base: $%.2f)',
+									$label,
+									$fee,
+									$customs_value
+								)
+							);
+						}
+					}
+					break;
+				}
+			}
 
 		// Convert grouped fees to array and update labels with count.
 		$fees = array();
@@ -679,6 +827,49 @@ class CFWC_Calculator {
 	}
 
 	/**
+	 * Detect cycles in base_includes dependencies for a set of rules.
+	 *
+	 * Uses DFS to detect any circular references between rules.
+	 *
+	 * @since 1.2.0
+	 * @param array  $rules      Rules to check.
+	 * @param string $start_id   Rule ID to start checking from.
+	 * @param array  $visited    Already visited rule IDs.
+	 * @return bool True if a cycle is detected.
+	 */
+	private function has_cycle( $rules, $start_id, $visited = array() ) {
+		$rule_map = array();
+		foreach ( $rules as $rule ) {
+			$rid = isset( $rule['rule_id'] ) ? $rule['rule_id'] : '';
+			if ( ! empty( $rid ) ) {
+				$rule_map[ $rid ] = $rule;
+			}
+		}
+
+		if ( ! isset( $rule_map[ $start_id ] ) ) {
+			return false;
+		}
+
+		$rule = $rule_map[ $start_id ];
+		$deps = isset( $rule['base_includes'] ) && is_array( $rule['base_includes'] ) ? $rule['base_includes'] : array();
+
+		foreach ( $deps as $dep_id ) {
+			if ( $dep_id === $start_id ) {
+				return true;
+			}
+			if ( in_array( $dep_id, $visited, true ) ) {
+				return true;
+			}
+			$visited[] = $dep_id;
+			if ( $this->has_cycle( $rules, $dep_id, $visited ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Calculate a single fee.
 	 *
 	 * @since 1.0.0
@@ -982,16 +1173,26 @@ class CFWC_Calculator {
 	 * Apply customs valuation method to line total.
 	 *
 	 * Supports FOB (product value only) and CIF (Cost, Insurance, Freight)
-	 * valuation methods for customs calculations.
+	 * valuation methods for customs calculations. Per-rule override takes
+	 * precedence over the global setting when the rule declares a specific
+	 * valuation_method.
 	 *
 	 * @since 1.1.4
 	 * @param float   $line_total Product line total.
 	 * @param array   $cart_item  Cart item data.
 	 * @param WC_Cart $cart       Cart object.
+	 * @param array   $rule       Optional. Rule data for per-rule valuation.
 	 * @return float Adjusted customs value.
 	 */
-	private function apply_valuation_method( $line_total, $cart_item, $cart ) {
-		$method = get_option( 'cfwc_valuation_method', 'fob' );
+	private function apply_valuation_method( $line_total, $cart_item, $cart, $rule = null ) {
+		$global_method = get_option( 'cfwc_valuation_method', 'fob' );
+
+		// Use per-rule valuation if set and valid; otherwise inherit global.
+		if ( ! empty( $rule['valuation_method'] ) && in_array( $rule['valuation_method'], array( 'fob', 'cif', 'cif_insurance' ), true ) ) {
+			$method = $rule['valuation_method'];
+		} else {
+			$method = $global_method;
+		}
 
 		// FOB: Return unchanged (current/default behavior).
 		if ( 'fob' === $method ) {
@@ -1044,8 +1245,9 @@ class CFWC_Calculator {
 		 * @param float   $line_total    Original product line total.
 		 * @param array   $cart_item     Cart item data.
 		 * @param string  $method        Valuation method (fob, cif, cif_insurance).
+		 * @param array   $rule          The matching rule data.
 		 */
-		return apply_filters( 'cfwc_customs_value', $customs_value, $line_total, $cart_item, $method );
+		return apply_filters( 'cfwc_customs_value', $customs_value, $line_total, $cart_item, $method, $rule );
 	}
 
 	/**
