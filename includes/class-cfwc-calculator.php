@@ -306,6 +306,37 @@ class CFWC_Calculator {
 				}
 			}
 
+			// Detect cycles once across the entire matching rule set.
+			$cycle_labels   = array();
+			$cycle_rule_ids = array();
+			foreach ( $matching_rules as $cr ) {
+				$cr_id = isset( $cr['rule_id'] ) && '' !== $cr['rule_id'] ? $cr['rule_id'] : '';
+				if ( '' !== $cr_id && $this->has_cycle( $matching_rules, $cr_id ) ) {
+					$cycle_labels[]            = $cr['label'] ?? $cr_id;
+					$cycle_rule_ids[ $cr_id ] = true;
+				}
+			}
+			if ( ! empty( $cycle_labels ) ) {
+				$cycle_labels = array_values( array_unique( $cycle_labels ) );
+				$this->log_debug(
+					sprintf(
+						'    WARNING: Cycle detected in base_includes for rules: %s. Skipping dependency fees for affected rules.',
+						implode( ', ', $cycle_labels )
+					),
+					'warning'
+				);
+				if ( function_exists( 'wc_get_logger' ) ) {
+					wc_get_logger()->warning(
+						sprintf(
+							'Cycle detected in customs fee rule dependencies: %s',
+							implode( ', ', $cycle_labels )
+						),
+						array( 'source' => 'customs-fees' )
+					);
+				}
+				set_transient( 'cfwc_rules_dependency_error', $cycle_labels, DAY_IN_SECONDS );
+			}
+
 			// Round-based dependency resolution for matching rules.
 			$calculated = array(); // rule_id => fee amount.
 			$pending    = $matching_rules;
@@ -348,43 +379,15 @@ class CFWC_Calculator {
 						// Apply valuation method per-rule.
 						$customs_value = $this->apply_valuation_method( $line_total, $cart_item, $cart, $rule );
 
-						// Cycle detection: check once before processing deps.
-						$has_cycle = $this->has_cycle( $matching_rules, $rule_id );
-						if ( $has_cycle ) {
-							$this->log_debug(
-								sprintf(
-									'    WARNING: Cycle detected in base_includes for rule "%s". Skipping dependency fees.',
-									$rule['label'] ?? $rule_id
-								),
-								'warning'
-							);
-							if ( function_exists( 'wc_get_logger' ) ) {
-								wc_get_logger()->warning(
-									sprintf(
-										'Cycle detected in customs fee rule dependencies: %s',
-										$rule['label'] ?? $rule_id
-									),
-									array( 'source' => 'customs-fees' )
-								);
-							}
-							// Set admin notice transient once per calculation.
-							$cycle_labels = array();
-							foreach ( $matching_rules as $r ) {
-								if ( $this->has_cycle( $matching_rules, $r['rule_id'] ?? '' ) ) {
-									$cycle_labels[] = $r['label'] ?? ( $r['rule_id'] ?? '' );
-								}
-							}
-							if ( ! empty( $cycle_labels ) ) {
-								set_transient( 'cfwc_rules_dependency_error', array_unique( $cycle_labels ), DAY_IN_SECONDS );
-							}
-						} else {
-							// Add included fees from dependencies.
+						// Add included fees from dependencies, unless this rule participates in a cycle.
+						if ( ! isset( $cycle_rule_ids[ $rule_id ] ) ) {
 							foreach ( $deps as $dep_id ) {
-								// Self-reference protection.
 								if ( $dep_id === $rule_id ) {
 									continue;
 								}
-								$customs_value += $calculated[ $dep_id ];
+								if ( isset( $calculated[ $dep_id ] ) ) {
+									$customs_value += $calculated[ $dep_id ];
+								}
 							}
 						}
 
@@ -861,8 +864,9 @@ class CFWC_Calculator {
 			if ( in_array( $dep_id, $visited, true ) ) {
 				return true;
 			}
-			$visited[] = $dep_id;
-			if ( $this->has_cycle( $rules, $dep_id, $visited ) ) {
+			$path   = $visited;
+			$path[] = $dep_id;
+			if ( $this->has_cycle( $rules, $dep_id, $path ) ) {
 				return true;
 			}
 		}
