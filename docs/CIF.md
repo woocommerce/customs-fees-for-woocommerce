@@ -1,6 +1,6 @@
 # CIF Customs Valuation Documentation
 
-This document covers the CIF (Cost, Insurance, Freight) customs valuation feature added in version 1.1.4.
+This document covers the CIF (Cost, Insurance, Freight) customs valuation feature added in version 1.1.4, and the per-rule valuation & compound bases feature added in version 1.2.0.
 
 ---
 
@@ -59,6 +59,74 @@ Customs Value (A) = $100 + ($20 × 50%) = $110
 Customs Value (B) = $100 + ($20 × 50%) = $110
 Total Customs Fee = ($110 + $110) × 25% = $55.00
 ```
+
+---
+
+## Per-Rule Valuation & Compound Bases (v1.2.0)
+
+Version 1.2.0 adds per-rule valuation method overrides and compound base support, allowing different valuation methods for duty vs. import tax within the same country.
+
+### Problem: Single Global Setting is Insufficient
+
+Some jurisdictions require different valuation bases for duty vs. import tax:
+
+- **Canada**: Duty on FOB, GST on CIF + duty amount
+- **Australia**: Duty on FOB, GST on customs value + duty
+- **UK/EU**: Duty on CIF, VAT on CIF + duty
+
+A single global FOB/CIF toggle cannot produce compliant results for these countries.
+
+### Per-Rule Valuation Method
+
+Each rule can now override the global valuation method:
+
+| Setting | Behavior |
+|---------|----------|
+| `inherit` | Use the global setting (default) |
+| `fob` | Product value only |
+| `cif` | Product value + shipping |
+| `cif_insurance` | Product value + shipping + insurance |
+
+**Admin UI:** Each rule has a "Valuation" column showing the override (or "Global" if inheriting).
+
+### Compound Bases (`base_includes`)
+
+A rule can include other rules' computed fees in its own customs value base. This enables GST-on-CIF+duty calculations.
+
+**Example - Canada:**
+
+| Rule | Rate | Valuation | Depends on |
+|------|------|-----------|------------|
+| Duty | 8% | FOB | - |
+| GST | 5% | CIF | Duty |
+
+**Calculation:**
+- Product: $100, Shipping: $20
+- Duty base = $100 (FOB)
+- Duty = $100 × 8% = **$8.00**
+- GST base = $120 (CIF) + $8.00 (duty) = **$128.00**
+- GST = $128 × 5% = **$6.40**
+
+### Dependency Resolution
+
+The calculator resolves rule dependencies in rounds:
+
+1. Base rules (no dependencies) calculate first
+2. Dependent rules calculate after their dependencies
+3. Cycles are detected and logged; offending rules fall back to their own base
+
+### Admin UI
+
+- **Add/Edit Rule Modal**: New "Valuation" select and "Depends on" multi-select
+- **Rules Table**: Shows valuation badge and dependency count
+- **Cycle Warning**: Dismissible admin notice appears if a cycle is detected
+
+### Migration
+
+Existing rules from versions < 1.2.0 are automatically migrated on upgrade:
+- `rule_id`: Assigned a stable UUID
+- `valuation_method`: Set to `inherit`
+- `base_includes`: Set to empty array
 
 ### Important Notes
 
