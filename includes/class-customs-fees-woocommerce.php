@@ -63,6 +63,11 @@ final class Customs_Fees_WooCommerce {
 		// Handle activation on admin_init like AutomateWoo does.
 		add_action( 'admin_init', array( $this, 'maybe_activate' ), 20 );
 
+		// Run data migrations on every request so frontend cart calculations
+		// see migrated rules even before any admin user logs in. Guarded by
+		// option flags so the work only runs once per site.
+		add_action( 'init', array( $this, 'maybe_run_migrations' ), 5 );
+
 		// Initialize the plugin.
 		$this->init();
 	}
@@ -143,14 +148,26 @@ final class Customs_Fees_WooCommerce {
 			delete_option( 'cfwc_activated' );
 		}
 
-		// Handle upgrades that introduced new per-rule fields (rule_id,
-		// valuation_method, base_includes). Run once per upgrade by gating
-		// on a dedicated option independent of the plugin version, so
-		// patch-level bumps do not re-trigger and the option always reflects
-		// the running plugin version after migration.
+		// Per-rule field migration is now run unconditionally on `init` via
+		// maybe_run_migrations() so frontend requests see migrated data
+		// before any admin user logs in.
+	}
+
+	/**
+	 * Run idempotent data migrations on every request.
+	 *
+	 * Guarded by dedicated option flags so each migration runs at most once
+	 * per site. Hooked early on `init` so the calculator sees migrated rules
+	 * during checkout calculations even before any admin page is loaded.
+	 *
+	 * @since 1.2.0
+	 */
+	public function maybe_run_migrations() {
+		// Migration: per-rule valuation fields (rule_id, valuation_method,
+		// base_includes) introduced for the per-rule valuation feature.
 		if ( ! get_option( 'cfwc_rules_migrated_perrule_valuation' ) ) {
-			$rules = get_option( 'cfwc_rules', array() );
 			if ( class_exists( 'CFWC_Settings' ) && method_exists( 'CFWC_Settings', 'migrate_rules' ) ) {
+				$rules = get_option( 'cfwc_rules', array() );
 				$rules = CFWC_Settings::migrate_rules( $rules );
 				update_option( 'cfwc_rules', $rules );
 			}
@@ -158,8 +175,8 @@ final class Customs_Fees_WooCommerce {
 			delete_transient( 'cfwc_rules_cache' );
 		}
 
-		// Keep cfwc_version aligned with the running plugin so future migrations
-		// can gate on version_compare against the real release number.
+		// Keep cfwc_version aligned with the running plugin so future
+		// migrations can gate on version_compare against the real release.
 		if ( defined( 'CFWC_VERSION' ) && get_option( 'cfwc_version' ) !== CFWC_VERSION ) {
 			update_option( 'cfwc_version', CFWC_VERSION );
 		}
