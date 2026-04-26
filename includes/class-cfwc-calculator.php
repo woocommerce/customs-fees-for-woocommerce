@@ -499,6 +499,7 @@ class CFWC_Calculator {
 					break;
 				}
 			}
+		}
 
 		// Convert grouped fees to array and update labels with count.
 		$fees = array();
