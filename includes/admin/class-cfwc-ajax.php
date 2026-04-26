@@ -75,15 +75,44 @@ class CFWC_Ajax {
 			'hs_code_pattern' => sanitize_text_field( $rule_data['hs_code_pattern'] ?? '' ),
 			'priority'        => absint( $rule_data['priority'] ?? 0 ),
 			'stacking_mode'   => sanitize_text_field( $rule_data['stacking_mode'] ?? 'add' ),
+			// New fields for per-rule valuation and compound bases (v1.2.0).
+			'rule_id'         => ! empty( $rule_data['rule_id'] )
+				? sanitize_text_field( $rule_data['rule_id'] )
+				: 'rule_' . wp_generate_uuid4(),
+			'valuation_method' => in_array( $rule_data['valuation_method'] ?? '', array( 'inherit', 'fob', 'cif', 'cif_insurance' ), true )
+				? $rule_data['valuation_method']
+				: 'inherit',
+			'base_includes'   => isset( $rule_data['base_includes'] ) && is_array( $rule_data['base_includes'] )
+				? array_values( array_unique( array_map( 'sanitize_text_field', $rule_data['base_includes'] ) ) )
+				: array(),
 		);
 
 		// Get existing rules.
 		$rules = get_option( 'cfwc_rules', array() );
 
+		// Normalize before save.
+		if ( class_exists( 'CFWC_Settings' ) && method_exists( 'CFWC_Settings', 'migrate_rules' ) ) {
+			$rules = CFWC_Settings::migrate_rules( $rules );
+		}
+
 		// Update or add rule.
+		$updated = false;
 		if ( null !== $rule_id && isset( $rules[ $rule_id ] ) ) {
 			$rules[ $rule_id ] = $rule;
+			$updated = true;
 		} else {
+			// Try matching by rule_id string for existing rules.
+			foreach ( $rules as $index => $existing_rule ) {
+				if ( isset( $existing_rule['rule_id'] ) && $existing_rule['rule_id'] === $rule['rule_id'] ) {
+					$rules[ $index ] = $rule;
+					$rule_id         = $index;
+					$updated         = true;
+					break;
+				}
+			}
+		}
+
+		if ( ! $updated ) {
 			$rules[] = $rule;
 			$rule_id = count( $rules ) - 1;
 		}
@@ -117,9 +146,11 @@ class CFWC_Ajax {
 			wp_die( -1 );
 		}
 
-		$rule_id = isset( $_POST['rule_id'] ) ? absint( $_POST['rule_id'] ) : null;
+		// Support both string rule_id (new) and numeric index (legacy).
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$raw_rule_id = isset( $_POST['rule_id'] ) ? wp_unslash( $_POST['rule_id'] ) : null;
 
-		if ( null === $rule_id ) {
+		if ( null === $raw_rule_id || '' === $raw_rule_id ) {
 			wp_send_json_error(
 				array(
 					'message' => __( 'Invalid rule ID.', 'customs-fees-for-woocommerce' ),
@@ -130,9 +161,29 @@ class CFWC_Ajax {
 		// Get existing rules.
 		$rules = get_option( 'cfwc_rules', array() );
 
+		$rule_index = null;
+
+		// Try matching by string rule_id first.
+		if ( is_string( $raw_rule_id ) ) {
+			foreach ( $rules as $index => $existing_rule ) {
+				if ( isset( $existing_rule['rule_id'] ) && $existing_rule['rule_id'] === $raw_rule_id ) {
+					$rule_index = $index;
+					break;
+				}
+			}
+		}
+
+		// Fallback to numeric index for legacy clients.
+		if ( null === $rule_index ) {
+			$numeric_id = absint( $raw_rule_id );
+			if ( isset( $rules[ $numeric_id ] ) ) {
+				$rule_index = $numeric_id;
+			}
+		}
+
 		// Remove rule.
-		if ( isset( $rules[ $rule_id ] ) ) {
-			unset( $rules[ $rule_id ] );
+		if ( null !== $rule_index && isset( $rules[ $rule_index ] ) ) {
+			unset( $rules[ $rule_index ] );
 			// Re-index array.
 			$rules = array_values( $rules );
 
