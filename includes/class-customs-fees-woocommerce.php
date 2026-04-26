@@ -142,6 +142,18 @@ final class Customs_Fees_WooCommerce {
 			// Clear the activation flag.
 			delete_option( 'cfwc_activated' );
 		}
+
+		// Handle upgrades from versions before 1.2.0.
+		$current_version = get_option( 'cfwc_version', '1.0.0' );
+		if ( version_compare( $current_version, '1.2.0', '<' ) ) {
+			$rules = get_option( 'cfwc_rules', array() );
+			if ( class_exists( 'CFWC_Settings' ) && method_exists( 'CFWC_Settings', 'migrate_rules' ) ) {
+				$rules = CFWC_Settings::migrate_rules( $rules );
+				update_option( 'cfwc_rules', $rules );
+			}
+			update_option( 'cfwc_version', '1.2.0' );
+			delete_transient( 'cfwc_rules_cache' );
+		}
 	}
 
 	/**
