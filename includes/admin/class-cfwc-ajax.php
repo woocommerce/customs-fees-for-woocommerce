@@ -462,14 +462,24 @@ class CFWC_Ajax {
 		$fees       = array();
 		$total_fees = 0;
 
-		// Filter rules for the specified country.
+		// Filter rules for the specified country (check both legacy and new format).
 		foreach ( $all_rules as $rule ) {
-			if ( isset( $rule['country'] ) && $rule['country'] === $country ) {
+			$rule_country = $rule['to_country'] ?? $rule['country'] ?? '';
+			if ( $rule_country === $country ) {
 				$fee_amount = 0;
+				$base       = $cart_total;
+
+				// Apply per-rule valuation method.
+				$valuation = $rule['valuation_method'] ?? 'inherit';
+				$global_method = get_option( 'cfwc_valuation_method', 'fob' );
+				$method    = ( 'inherit' !== $valuation ) ? $valuation : $global_method;
+				// Note: shipping proportion cannot be calculated without line-item
+				// context, so CIF is approximated by the caller providing a total
+				// that already includes shipping when desired.
 
 				// Calculate based on rule type.
 				if ( 'percentage' === $rule['type'] ) {
-					$fee_amount = ( $cart_total * $rule['rate'] ) / 100;
+					$fee_amount = ( $base * $rule['rate'] ) / 100;
 				} elseif ( 'flat' === $rule['type'] ) {
 					$fee_amount = $rule['amount'];
 				}
