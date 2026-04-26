@@ -1348,6 +1348,32 @@ class CFWC_Templates {
 			// Check for duplicates when appending.
 			$rules = $existing_rules;
 
+			// Build set of existing rule_ids so we can suffix collisions and
+			// rewrite intra-batch base_includes references to the new IDs.
+			$existing_rule_ids = array();
+			foreach ( $existing_rules as $existing_rule ) {
+				if ( ! empty( $existing_rule['rule_id'] ) ) {
+					$existing_rule_ids[ $existing_rule['rule_id'] ] = true;
+				}
+			}
+
+			$id_remap = array();
+			foreach ( $template_rules as $new_rule ) {
+				$original_id = $new_rule['rule_id'] ?? '';
+				if ( '' === $original_id ) {
+					continue;
+				}
+				if ( isset( $existing_rule_ids[ $original_id ] ) ) {
+					$suffix    = 2;
+					$candidate = $original_id . '_' . $suffix;
+					while ( isset( $existing_rule_ids[ $candidate ] ) || isset( $id_remap[ $candidate ] ) ) {
+						++$suffix;
+						$candidate = $original_id . '_' . $suffix;
+					}
+					$id_remap[ $original_id ] = $candidate;
+				}
+			}
+
 			foreach ( $template_rules as $new_rule ) {
 				// Convert old format to new format if needed.
 				if ( ! isset( $new_rule['from_country'] ) && isset( $new_rule['origin_country'] ) ) {
@@ -1355,6 +1381,22 @@ class CFWC_Templates {
 				}
 				if ( ! isset( $new_rule['to_country'] ) && isset( $new_rule['country'] ) ) {
 					$new_rule['to_country'] = $new_rule['country'];
+				}
+
+				// Apply rule_id remap (collision-suffixed) and rewrite
+				// base_includes references that point at remapped sibling
+				// rules so dependency edges within this batch stay intact.
+				$original_id = $new_rule['rule_id'] ?? '';
+				if ( '' !== $original_id && isset( $id_remap[ $original_id ] ) ) {
+					$new_rule['rule_id'] = $id_remap[ $original_id ];
+				}
+				if ( ! empty( $new_rule['base_includes'] ) && is_array( $new_rule['base_includes'] ) ) {
+					$new_rule['base_includes'] = array_map(
+						function ( $dep_id ) use ( $id_remap ) {
+							return $id_remap[ $dep_id ] ?? $dep_id;
+						},
+						$new_rule['base_includes']
+					);
 				}
 
 				// Check if rule already exists (same country pair + label combination).
@@ -1389,6 +1431,9 @@ class CFWC_Templates {
 
 				if ( ! $is_duplicate ) {
 					$rules[] = $new_rule;
+					if ( ! empty( $new_rule['rule_id'] ) ) {
+						$existing_rule_ids[ $new_rule['rule_id'] ] = true;
+					}
 					++$added_count;
 				}
 			}
