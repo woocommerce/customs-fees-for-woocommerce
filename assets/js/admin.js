@@ -722,6 +722,31 @@
       return html;
     }
 
+    // Populate base_includes select options from existing rules.
+    function populateBaseIncludesSelect($select, currentRuleId, selectedValues) {
+      var rules = JSON.parse($("#cfwc_rules").val() || "[]");
+      var optionsHtml = "";
+      $.each(rules, function (i, r) {
+        var rid = r.rule_id || "";
+        var label = r.label || rid || "Rule " + i;
+        if (rid && rid !== currentRuleId) {
+          var selected =
+            selectedValues && selectedValues.indexOf(rid) !== -1
+              ? " selected"
+              : "";
+          optionsHtml +=
+            '<option value="' +
+            escapeHtml(rid) +
+            '"' +
+            selected +
+            ">" +
+            escapeHtml(label) +
+            "</option>";
+        }
+      });
+      $select.html(optionsHtml);
+    }
+
     // Store state for edit/add operations.
     var originalRules = null;
     var editingIndex = null;
@@ -885,6 +910,15 @@
         initCountrySelect(
           ".cfwc-rules-table tbody tr:last .cfwc-category-select"
         );
+        var $baseIncludes = $(
+          ".cfwc-rules-table tbody tr:last .cfwc-base-includes-select"
+        );
+        populateBaseIncludesSelect($baseIncludes, newRuleId, []);
+        if ($baseIncludes.length && typeof $.fn.selectWoo !== "undefined") {
+          $baseIncludes.selectWoo({ width: "100%", placeholder: "Select fees to include in base" });
+        } else if ($baseIncludes.length && $.fn.select2) {
+          $baseIncludes.select2({ width: "100%", placeholder: "Select fees to include in base" });
+        }
       }, 100);
 
       // Scroll to new row.
@@ -1164,6 +1198,25 @@
       // Initialize Select2 on selects.
       initCountrySelect($row.find(".cfwc-country-select"));
       initCountrySelect($row.find(".cfwc-category-select"));
+
+      // Populate and init base_includes select.
+      var $baseIncludes = $row.find(".cfwc-base-includes-select");
+      populateBaseIncludesSelect(
+        $baseIncludes,
+        rule.rule_id || "",
+        currentBaseIncludes
+      );
+      if ($baseIncludes.length && typeof $.fn.selectWoo !== "undefined") {
+        $baseIncludes.selectWoo({
+          width: "100%",
+          placeholder: "Select fees to include in base",
+        });
+      } else if ($baseIncludes.length && $.fn.select2) {
+        $baseIncludes.select2({
+          width: "100%",
+          placeholder: "Select fees to include in base",
+        });
+      }
 
       // Handle match type change to show/hide fields.
       $row.find(".cfwc-match-type").on("change", function () {
