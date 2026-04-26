@@ -453,47 +453,84 @@ class CFWC_Ajax {
 			);
 		}
 
-		// Calculate fees by simulating a cart.
-		// Since calculate_fees_for_country doesn't exist, we need to simulate the calculation.
-		$calculator = new CFWC_Calculator();
+		// Test tool uses cart_total as the FOB base and resolves base_includes;
+		// per-product shipping share is unavailable here, so cif/cif_insurance
+		// fall back to cart_total (with global insurance percentage added when
+		// method is cif_insurance and a percentage is configured).
+		$all_rules     = get_option( 'cfwc_rules', array() );
+		$global_method = get_option( 'cfwc_valuation_method', 'fob' );
 
-		// Get rules and filter by country to simulate the calculation.
-		$all_rules  = get_option( 'cfwc_rules', array() );
+		$matching = array();
+		foreach ( $all_rules as $key => $rule ) {
+			$rule_country = $rule['to_country'] ?? $rule['country'] ?? '';
+			if ( $rule_country !== $country ) {
+				continue;
+			}
+			if ( empty( $rule['rule_id'] ) ) {
+				$rule['rule_id'] = (string) $key;
+			}
+			$matching[] = $rule;
+		}
+
+		$id_to_rule = array();
+		foreach ( $matching as $mr ) {
+			$rid = isset( $mr['rule_id'] ) ? $mr['rule_id'] : '';
+			if ( '' !== $rid ) {
+				$id_to_rule[ $rid ] = $mr;
+			}
+		}
+
+		// One-shot cycle detection over the matching set.
+		$cycle_rule_ids = array();
+		foreach ( $matching as $cr ) {
+			$cr_id = $cr['rule_id'] ?? '';
+			if ( '' !== $cr_id && self::test_has_cycle( $matching, $cr_id ) ) {
+				$cycle_rule_ids[ $cr_id ] = true;
+			}
+		}
+
 		$fees       = array();
 		$total_fees = 0;
+		$calculated = array();
+		$pending    = $matching;
+		$rounds     = 0;
+		$max_rounds = count( $matching ) + 1;
 
-		// Filter rules for the specified country (check both legacy and new format).
-		foreach ( $all_rules as $rule ) {
-			$rule_country = $rule['to_country'] ?? $rule['country'] ?? '';
-			if ( $rule_country === $country ) {
-				$fee_amount = 0;
-				$base       = $cart_total;
+		while ( ! empty( $pending ) && $rounds < $max_rounds ) {
+			++$rounds;
+			$made_progress = false;
+			$still_pending = array();
 
-				// Apply per-rule valuation method.
-				$valuation = $rule['valuation_method'] ?? 'inherit';
-				$global_method = get_option( 'cfwc_valuation_method', 'fob' );
-				$method    = ( 'inherit' !== $valuation ) ? $valuation : $global_method;
-				// Note: shipping proportion cannot be calculated without line-item
-				// context, so CIF is approximated by the caller providing a total
-				// that already includes shipping when desired.
+			foreach ( $pending as $rule ) {
+				$rule_id = $rule['rule_id'] ?? '';
+				$deps    = isset( $rule['base_includes'] ) && is_array( $rule['base_includes'] )
+					? $rule['base_includes']
+					: array();
+				$deps    = array_filter(
+					$deps,
+					function ( $dep_id ) use ( $id_to_rule ) {
+						return isset( $id_to_rule[ $dep_id ] );
+					}
+				);
 
-				// Calculate based on rule type.
-				if ( 'percentage' === $rule['type'] ) {
-					$fee_amount = ( $base * $rule['rate'] ) / 100;
-				} elseif ( 'flat' === $rule['type'] ) {
-					$fee_amount = $rule['amount'];
+				$deps_ready = true;
+				foreach ( $deps as $dep_id ) {
+					if ( ! isset( $calculated[ $dep_id ] ) ) {
+						$deps_ready = false;
+						break;
+					}
 				}
 
-				// Apply minimum/maximum limits if set.
-				if ( isset( $rule['minimum'] ) && $rule['minimum'] > 0 && $fee_amount < $rule['minimum'] ) {
-					$fee_amount = $rule['minimum'];
+				if ( ! $deps_ready ) {
+					$still_pending[] = $rule;
+					continue;
 				}
-				if ( isset( $rule['maximum'] ) && $rule['maximum'] > 0 && $fee_amount > $rule['maximum'] ) {
-					$fee_amount = $rule['maximum'];
-				}
+
+				$fee_amount = self::compute_test_fee( $rule, $cart_total, $deps, $calculated, $cycle_rule_ids, $global_method );
 
 				if ( $fee_amount > 0 ) {
-					$fees[]      = array(
+					$calculated[ $rule_id ] = $fee_amount;
+					$fees[]                 = array(
 						'label'  => isset( $rule['label'] ) ? $rule['label'] : __( 'Customs Fee', 'customs-fees-for-woocommerce' ),
 						'amount' => $fee_amount,
 						'type'   => $rule['type'],
@@ -501,6 +538,33 @@ class CFWC_Ajax {
 					);
 					$total_fees += $fee_amount;
 				}
+
+				$made_progress = true;
+			}
+
+			$pending = $still_pending;
+
+			if ( ! $made_progress ) {
+				// Fallback: compute remaining rules on their own base so the
+				// preview still shows something useful when deps cannot resolve.
+				foreach ( $pending as $rule ) {
+					$rule_id    = $rule['rule_id'] ?? '';
+					$fee_amount = self::compute_test_fee( $rule, $cart_total, array(), $calculated, $cycle_rule_ids, $global_method );
+
+					if ( $fee_amount > 0 ) {
+						if ( '' !== $rule_id ) {
+							$calculated[ $rule_id ] = $fee_amount;
+						}
+						$fees[]      = array(
+							'label'  => isset( $rule['label'] ) ? $rule['label'] : __( 'Customs Fee', 'customs-fees-for-woocommerce' ),
+							'amount' => $fee_amount,
+							'type'   => $rule['type'],
+							'rate'   => isset( $rule['rate'] ) ? $rule['rate'] : 0,
+						);
+						$total_fees += $fee_amount;
+					}
+				}
+				break;
 			}
 		}
 
@@ -511,5 +575,102 @@ class CFWC_Ajax {
 				'total'   => $total_fees,
 			)
 		);
+	}
+
+	/**
+	 * Compute a single test fee with per-rule valuation and dependency includes.
+	 *
+	 * @since 1.2.0
+	 * @param array $rule           Rule data.
+	 * @param float $cart_total     Test cart total (treated as the FOB base).
+	 * @param array $deps           Filtered list of dependency rule IDs.
+	 * @param array $calculated     Map of already-computed fees by rule_id.
+	 * @param array $cycle_rule_ids Map of rule IDs that participate in a cycle.
+	 * @param string $global_method Global valuation method.
+	 * @return float Computed fee amount (after min/max limits).
+	 */
+	private static function compute_test_fee( $rule, $cart_total, $deps, $calculated, $cycle_rule_ids, $global_method ) {
+		$valuation = $rule['valuation_method'] ?? 'inherit';
+		$method    = ( 'inherit' !== $valuation ) ? $valuation : $global_method;
+
+		$base = (float) $cart_total;
+
+		if ( 'cif_insurance' === $method ) {
+			$insurance_method = get_option( 'cfwc_insurance_method', 'disabled' );
+			if ( 'percentage' === $insurance_method ) {
+				$pct   = floatval( get_option( 'cfwc_insurance_percentage', 2 ) );
+				$base += ( $cart_total * $pct ) / 100;
+			}
+		}
+
+		$rule_id = $rule['rule_id'] ?? '';
+		if ( '' === $rule_id || ! isset( $cycle_rule_ids[ $rule_id ] ) ) {
+			foreach ( $deps as $dep_id ) {
+				if ( $dep_id === $rule_id ) {
+					continue;
+				}
+				if ( isset( $calculated[ $dep_id ] ) ) {
+					$base += $calculated[ $dep_id ];
+				}
+			}
+		}
+
+		$fee_amount = 0;
+		if ( 'percentage' === $rule['type'] ) {
+			$fee_amount = ( $base * floatval( $rule['rate'] ?? 0 ) ) / 100;
+		} elseif ( 'flat' === $rule['type'] ) {
+			$fee_amount = floatval( $rule['amount'] ?? 0 );
+		}
+
+		if ( isset( $rule['minimum'] ) && $rule['minimum'] > 0 && $fee_amount < $rule['minimum'] ) {
+			$fee_amount = floatval( $rule['minimum'] );
+		}
+		if ( isset( $rule['maximum'] ) && $rule['maximum'] > 0 && $fee_amount > $rule['maximum'] ) {
+			$fee_amount = floatval( $rule['maximum'] );
+		}
+
+		return $fee_amount;
+	}
+
+	/**
+	 * Detect a base_includes cycle for the given rule via DFS.
+	 *
+	 * @since 1.2.0
+	 * @param array  $rules    Matching rules.
+	 * @param string $start_id Rule ID to inspect.
+	 * @param array  $visited  Current DFS path (snapshot per recursive call).
+	 * @return bool True if a cycle is detected.
+	 */
+	private static function test_has_cycle( $rules, $start_id, $visited = array() ) {
+		$rule_map = array();
+		foreach ( $rules as $rule ) {
+			$rid = isset( $rule['rule_id'] ) ? $rule['rule_id'] : '';
+			if ( '' !== $rid ) {
+				$rule_map[ $rid ] = $rule;
+			}
+		}
+
+		if ( ! isset( $rule_map[ $start_id ] ) ) {
+			return false;
+		}
+
+		$rule = $rule_map[ $start_id ];
+		$deps = isset( $rule['base_includes'] ) && is_array( $rule['base_includes'] ) ? $rule['base_includes'] : array();
+
+		foreach ( $deps as $dep_id ) {
+			if ( $dep_id === $start_id ) {
+				return true;
+			}
+			if ( in_array( $dep_id, $visited, true ) ) {
+				return true;
+			}
+			$path   = $visited;
+			$path[] = $dep_id;
+			if ( self::test_has_cycle( $rules, $dep_id, $path ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }
