@@ -251,7 +251,17 @@ class CFWC_Settings {
 						'category_ids'    => isset( $rule['category_ids'] ) ? array_map( 'absint', (array) $rule['category_ids'] ) : array(),
 						'hs_code_pattern' => isset( $rule['hs_code_pattern'] ) ? sanitize_text_field( $rule['hs_code_pattern'] ) : '',
 						'priority'        => isset( $rule['priority'] ) ? absint( $rule['priority'] ) : 0,
-						'stacking_mode'   => isset( $rule['stacking_mode'] ) ? sanitize_text_field( $rule['stacking_mode'] ) : 'add',
+						'stacking_mode'    => isset( $rule['stacking_mode'] ) ? sanitize_text_field( $rule['stacking_mode'] ) : 'add',
+						// New fields for per-rule valuation and compound bases (v1.2.0).
+						'rule_id'          => ! empty( $rule['rule_id'] )
+							? sanitize_text_field( $rule['rule_id'] )
+							: 'rule_' . wp_generate_uuid4(),
+						'valuation_method' => in_array( $rule['valuation_method'] ?? '', array( 'inherit', 'fob', 'cif', 'cif_insurance' ), true )
+							? $rule['valuation_method']
+							: 'inherit',
+						'base_includes'    => isset( $rule['base_includes'] ) && is_array( $rule['base_includes'] )
+							? array_values( array_unique( array_map( 'sanitize_text_field', $rule['base_includes'] ) ) )
+							: array(),
 					);
 
 					// Only add if either old country field or new to_country field is set.
@@ -261,6 +271,9 @@ class CFWC_Settings {
 				}
 			}
 		}
+
+		// Normalize all rules before saving.
+		$rules = self::migrate_rules( $rules );
 
 		// Save rules.
 		update_option( 'cfwc_rules', $rules );
@@ -276,6 +289,44 @@ class CFWC_Settings {
 
 		// Don't add settings error here - let WooCommerce handle the success message.
 		// to avoid conflicts with their redirect process.
+	}
+
+	/**
+	 * Migrate rules to ensure all required fields are present.
+	 *
+	 * Normalizes legacy rules by adding missing fields with safe defaults.
+	 *
+	 * @since 1.2.0
+	 * @param array $rules Rules to migrate.
+	 * @return array Migrated rules.
+	 */
+	public static function migrate_rules( $rules ) {
+		if ( ! is_array( $rules ) ) {
+			return array();
+		}
+
+		foreach ( $rules as $index => $rule ) {
+			if ( ! is_array( $rule ) ) {
+				continue;
+			}
+
+			// Ensure rule_id exists.
+			if ( empty( $rule['rule_id'] ) ) {
+				$rules[ $index ]['rule_id'] = 'rule_' . wp_generate_uuid4();
+			}
+
+			// Ensure valuation_method exists.
+			if ( empty( $rule['valuation_method'] ) || ! in_array( $rule['valuation_method'], array( 'inherit', 'fob', 'cif', 'cif_insurance' ), true ) ) {
+				$rules[ $index ]['valuation_method'] = 'inherit';
+			}
+
+			// Ensure base_includes exists.
+			if ( ! isset( $rule['base_includes'] ) || ! is_array( $rule['base_includes'] ) ) {
+				$rules[ $index ]['base_includes'] = array();
+			}
+		}
+
+		return $rules;
 	}
 
 	/**
