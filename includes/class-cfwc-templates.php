@@ -933,24 +933,30 @@ class CFWC_Templates {
 				'description' => __( 'UK import VAT (20%) and duty for international shipments', 'customs-fees-for-woocommerce' ),
 				'rules'       => array(
 					array(
+						'rule_id'        => 'uk_vat_vat',
 						'country'        => 'GB',
-						'origin_country' => '',  // Applies to all origins.
+						'origin_country' => '',
 						'type'           => 'percentage',
 						'rate'           => 20,
 						'amount'         => 0,
 						'label'          => __( 'UK VAT (Import)', 'customs-fees-for-woocommerce' ),
 						'taxable'        => false,
 						'tax_class'      => '',
+						'valuation_method' => 'cif',
+						'base_includes'  => array( 'uk_vat_duty' ),
 					),
 					array(
+						'rule_id'        => 'uk_vat_duty',
 						'country'        => 'GB',
-						'origin_country' => '',  // Applies to all origins.
+						'origin_country' => '',
 						'type'           => 'percentage',
 						'rate'           => 5,
 						'amount'         => 0,
 						'label'          => __( 'UK Duty (Import)', 'customs-fees-for-woocommerce' ),
 						'taxable'        => false,
 						'tax_class'      => '',
+						'valuation_method' => 'cif',
+						'base_includes'  => array(),
 					),
 				),
 			),
@@ -959,24 +965,30 @@ class CFWC_Templates {
 				'description' => __( 'Canadian GST and import duties', 'customs-fees-for-woocommerce' ),
 				'rules'       => array(
 					array(
+						'rule_id'        => 'canada_gst_gst',
 						'country'        => 'CA',
-						'origin_country' => '',  // Applies to all origins.
+						'origin_country' => '',
 						'type'           => 'percentage',
 						'rate'           => 5,
 						'amount'         => 0,
 						'label'          => __( 'Canada GST (Import)', 'customs-fees-for-woocommerce' ),
 						'taxable'        => false,
 						'tax_class'      => '',
+						'valuation_method' => 'cif',
+						'base_includes'  => array( 'canada_gst_duty' ),
 					),
 					array(
+						'rule_id'        => 'canada_gst_duty',
 						'country'        => 'CA',
-						'origin_country' => '',  // Applies to all origins.
+						'origin_country' => '',
 						'type'           => 'percentage',
 						'rate'           => 8,
 						'amount'         => 0,
 						'label'          => __( 'Canada Duty (Import)', 'customs-fees-for-woocommerce' ),
 						'taxable'        => false,
 						'tax_class'      => '',
+						'valuation_method' => 'fob',
+						'base_includes'  => array(),
 					),
 				),
 			),
@@ -1173,18 +1185,98 @@ class CFWC_Templates {
 			),
 
 			'australia_gst'            => array(
-				'name'        => __( 'Australia GST', 'customs-fees-for-woocommerce' ),
-				'description' => __( 'Australian GST (10%) on imported goods', 'customs-fees-for-woocommerce' ),
+				'name'        => __( 'Australia GST & Duty', 'customs-fees-for-woocommerce' ),
+				'description' => __( 'Australian GST (10%) and duty on imported goods', 'customs-fees-for-woocommerce' ),
 				'rules'       => array(
 					array(
+						'rule_id'        => 'aus_gst',
 						'country'        => 'AU',
-						'origin_country' => '',  // Applies to all origins.
+						'origin_country' => '',
 						'type'           => 'percentage',
 						'rate'           => 10,
 						'amount'         => 0,
 						'label'          => __( 'Australia GST (Import)', 'customs-fees-for-woocommerce' ),
 						'taxable'        => false,
 						'tax_class'      => '',
+						'valuation_method' => 'cif',
+						'base_includes'  => array( 'aus_duty' ),
+					),
+					array(
+						'rule_id'        => 'aus_duty',
+						'country'        => 'AU',
+						'origin_country' => '',
+						'type'           => 'percentage',
+						'rate'           => 5,
+						'amount'         => 0,
+						'label'          => __( 'Australia Duty (Import)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => false,
+						'tax_class'      => '',
+						'valuation_method' => 'fob',
+						'base_includes'  => array(),
+					),
+				),
+			),
+			'new_zealand_gst'          => array(
+				'name'        => __( 'New Zealand GST & Duty', 'customs-fees-for-woocommerce' ),
+				'description' => __( 'New Zealand GST (15%) and duty on imported goods', 'customs-fees-for-woocommerce' ),
+				'rules'       => array(
+					array(
+						'rule_id'        => 'nz_gst',
+						'country'        => 'NZ',
+						'origin_country' => '',
+						'type'           => 'percentage',
+						'rate'           => 15,
+						'amount'         => 0,
+						'label'          => __( 'New Zealand GST (Import)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => false,
+						'tax_class'      => '',
+						'valuation_method' => 'cif',
+						'base_includes'  => array( 'nz_duty' ),
+					),
+					array(
+						'rule_id'        => 'nz_duty',
+						'country'        => 'NZ',
+						'origin_country' => '',
+						'type'           => 'percentage',
+						'rate'           => 5,
+						'amount'         => 0,
+						'label'          => __( 'New Zealand Duty (Import)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => false,
+						'tax_class'      => '',
+						'valuation_method' => 'fob',
+						'base_includes'  => array(),
+					),
+				),
+			),
+			'eu_vat'                   => array(
+				'name'        => __( 'EU VAT & Duty', 'customs-fees-for-woocommerce' ),
+				'description' => __( 'EU import VAT (20%) and duty for international shipments', 'customs-fees-for-woocommerce' ),
+				'rules'       => array(
+					array(
+						'rule_id'        => 'eu_vat_vat',
+						'country'        => 'EU',
+						'origin_country' => '',
+						'type'           => 'percentage',
+						'rate'           => 20,
+						'amount'         => 0,
+						'label'          => __( 'EU VAT (Import)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => false,
+						'tax_class'      => '',
+						'valuation_method' => 'cif',
+						'base_includes'  => array( 'eu_vat_duty' ),
+					),
+					array(
+						'rule_id'        => 'eu_vat_duty',
+						'country'        => 'EU',
+						'origin_country' => '',
+						'type'           => 'percentage',
+						'rate'           => 5,
+						'amount'         => 0,
+						'label'          => __( 'EU Duty (Import)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => false,
+						'tax_class'      => '',
+						'valuation_method' => 'cif',
+						'base_includes'  => array(),
 					),
 				),
 			),
@@ -1247,11 +1339,16 @@ class CFWC_Templates {
 		$added_count     = 0;
 		$duplicate_count = 0;
 
+		// Normalize template rules before applying.
+		$template_rules = class_exists( 'CFWC_Settings' ) && method_exists( 'CFWC_Settings', 'migrate_rules' )
+			? CFWC_Settings::migrate_rules( $template['rules'] )
+			: $template['rules'];
+
 		if ( $append ) {
 			// Check for duplicates when appending.
 			$rules = $existing_rules;
 
-			foreach ( $template['rules'] as $new_rule ) {
+			foreach ( $template_rules as $new_rule ) {
 				// Convert old format to new format if needed.
 				if ( ! isset( $new_rule['from_country'] ) && isset( $new_rule['origin_country'] ) ) {
 					$new_rule['from_country'] = $new_rule['origin_country'];
@@ -1297,8 +1394,8 @@ class CFWC_Templates {
 			}
 		} else {
 			// Replace all rules.
-			$rules       = $template['rules'];
-			$added_count = count( $template['rules'] );
+			$rules       = $template_rules;
+			$added_count = count( $template_rules );
 		}
 
 		update_option( 'cfwc_rules', $rules );
