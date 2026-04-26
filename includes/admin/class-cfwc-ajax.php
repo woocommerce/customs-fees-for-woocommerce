@@ -272,21 +272,31 @@ class CFWC_Ajax {
 
 		$rules = get_option( 'cfwc_rules', array() );
 
-		// Create CSV content.
-		$csv_content = "Country,Type,Rate,Amount,Minimum,Maximum,Label,Taxable,Tax Class\n";
+		// Create CSV content with all rule fields.
+		$csv_content = "Country,Type,Rate,Amount,Minimum,Maximum,Label,Taxable,Tax Class,Rule ID,From Country,To Country,Match Type,HS Code,Priority,Stacking Mode,Valuation Method,Depends On\n";
 
 		foreach ( $rules as $rule ) {
-			$csv_content .= sprintf(
-				'"%s","%s",%.2f,%.2f,%.2f,%.2f,"%s","%s","%s"' . "\n",
-				$rule['country'],
-				$rule['type'],
-				$rule['rate'],
-				$rule['amount'],
-				$rule['minimum'],
-				$rule['maximum'],
-				$rule['label'],
-				$rule['taxable'] ? 'yes' : 'no',
-				$rule['tax_class']
+			$base_includes = isset( $rule['base_includes'] ) && is_array( $rule['base_includes'] ) ? implode( '|', $rule['base_includes'] ) : '';
+			$csv_content  .= sprintf(
+				'"%s","%s",%.2f,%.2f,%.2f,%.2f,"%s","%s","%s","%s","%s","%s","%s","%s",%d,"%s","%s","%s"' . "\n",
+				$rule['country'] ?? '',
+				$rule['type'] ?? 'percentage',
+				$rule['rate'] ?? 0,
+				$rule['amount'] ?? 0,
+				$rule['minimum'] ?? 0,
+				$rule['maximum'] ?? 0,
+				$rule['label'] ?? '',
+				! empty( $rule['taxable'] ) ? 'yes' : 'no',
+				$rule['tax_class'] ?? '',
+				$rule['rule_id'] ?? '',
+				$rule['from_country'] ?? '',
+				$rule['to_country'] ?? '',
+				$rule['match_type'] ?? 'all',
+				$rule['hs_code_pattern'] ?? '',
+				$rule['priority'] ?? 0,
+				$rule['stacking_mode'] ?? 'add',
+				$rule['valuation_method'] ?? 'inherit',
+				$base_includes
 			);
 		}
 
@@ -331,6 +341,12 @@ class CFWC_Ajax {
 		$headers   = str_getcsv( array_shift( $lines ), ',', '"', '\\' );
 		$new_rules = array();
 
+		// Build header index map for flexible column mapping.
+		$header_map = array();
+		foreach ( $headers as $index => $header ) {
+			$header_map[ strtolower( trim( $header ) ) ] = $index;
+		}
+
 		foreach ( $lines as $line ) {
 			if ( empty( trim( $line ) ) ) {
 				continue;
@@ -338,19 +354,46 @@ class CFWC_Ajax {
 
 			// Add escape parameter (backslash) for PHP 8.4+ compatibility.
 			$data = str_getcsv( $line, ',', '"', '\\' );
-			if ( count( $data ) === count( $headers ) ) {
-				$new_rules[] = array(
-					'country'   => sanitize_text_field( $data[0] ),
-					'type'      => sanitize_text_field( $data[1] ),
-					'rate'      => floatval( $data[2] ),
-					'amount'    => floatval( $data[3] ),
-					'minimum'   => floatval( $data[4] ),
-					'maximum'   => floatval( $data[5] ),
-					'label'     => sanitize_text_field( $data[6] ),
-					'taxable'   => 'yes' === strtolower( $data[7] ),
-					'tax_class' => sanitize_text_field( $data[8] ),
-				);
+			if ( count( $data ) !== count( $headers ) ) {
+				continue;
 			}
+
+			// Helper to safely read a column by header name.
+			$get = function ( $name, $default = '' ) use ( $data, $header_map ) {
+				$index = $header_map[ strtolower( $name ) ] ?? null;
+				return ( null !== $index && isset( $data[ $index ] ) ) ? $data[ $index ] : $default;
+			};
+
+			$base_includes_raw = $get( 'depends on', '' );
+			$base_includes     = array();
+			if ( ! empty( $base_includes_raw ) ) {
+				$base_includes = array_values( array_unique( array_filter( array_map( 'trim', explode( '|', $base_includes_raw ) ) ) ) );
+			}
+
+			$new_rules[] = array(
+				'country'          => sanitize_text_field( $get( 'country', '' ) ),
+				'type'             => sanitize_text_field( $get( 'type', 'percentage' ) ),
+				'rate'             => floatval( $get( 'rate', 0 ) ),
+				'amount'           => floatval( $get( 'amount', 0 ) ),
+				'minimum'          => floatval( $get( 'minimum', 0 ) ),
+				'maximum'          => floatval( $get( 'maximum', 0 ) ),
+				'label'            => sanitize_text_field( $get( 'label', '' ) ),
+				'taxable'          => 'yes' === strtolower( $get( 'taxable', 'yes' ) ),
+				'tax_class'        => sanitize_text_field( $get( 'tax class', '' ) ),
+				'rule_id'          => ! empty( $get( 'rule id', '' ) )
+					? sanitize_text_field( $get( 'rule id' ) )
+					: 'rule_' . wp_generate_uuid4(),
+				'from_country'     => sanitize_text_field( $get( 'from country', '' ) ),
+				'to_country'       => sanitize_text_field( $get( 'to country', '' ) ),
+				'match_type'       => sanitize_text_field( $get( 'match type', 'all' ) ),
+				'hs_code_pattern'  => sanitize_text_field( $get( 'hs code', '' ) ),
+				'priority'         => absint( $get( 'priority', 0 ) ),
+				'stacking_mode'    => sanitize_text_field( $get( 'stacking mode', 'add' ) ),
+				'valuation_method' => in_array( $get( 'valuation method', 'inherit' ), array( 'inherit', 'fob', 'cif', 'cif_insurance' ), true )
+					? $get( 'valuation method', 'inherit' )
+					: 'inherit',
+				'base_includes'    => $base_includes,
+			);
 		}
 
 		if ( empty( $new_rules ) ) {
