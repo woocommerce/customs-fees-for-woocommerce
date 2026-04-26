@@ -284,6 +284,18 @@ class CFWC_Settings {
 			WC()->session->set( 'cfwc_tooltip_text', null );
 		}
 
+		// Explicitly delete the rules transient. wp_cache_flush() does not
+		// remove DB-backed transients without a persistent object cache, so
+		// the rules cache could otherwise survive a settings save and the
+		// calculator would keep returning stale rule data.
+		delete_transient( 'cfwc_rules_cache' );
+
+		// Clear in-memory calculator cache for this request.
+		if ( class_exists( 'CFWC_Calculator' ) ) {
+			$calculator = new CFWC_Calculator();
+			$calculator->clear_cache();
+		}
+
 		// Clear all caches.
 		wp_cache_flush();
 
