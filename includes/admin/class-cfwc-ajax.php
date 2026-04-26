@@ -347,6 +347,8 @@ class CFWC_Ajax {
 			$header_map[ strtolower( trim( $header ) ) ] = $index;
 		}
 
+		$header_count = count( $headers );
+
 		foreach ( $lines as $line ) {
 			if ( empty( trim( $line ) ) ) {
 				continue;
@@ -354,14 +356,25 @@ class CFWC_Ajax {
 
 			// Add escape parameter (backslash) for PHP 8.4+ compatibility.
 			$data = str_getcsv( $line, ',', '"', '\\' );
-			if ( count( $data ) !== count( $headers ) ) {
+
+			// Skip rows that have no data at all.
+			if ( empty( $data ) ) {
 				continue;
+			}
+
+			// Tolerate row width drift: pad short rows (Excel/Sheets often
+			// strips trailing empty columns on save) and truncate long ones
+			// so the header_map lookups stay in bounds.
+			if ( count( $data ) < $header_count ) {
+				$data = array_pad( $data, $header_count, '' );
+			} elseif ( count( $data ) > $header_count ) {
+				$data = array_slice( $data, 0, $header_count );
 			}
 
 			// Helper to safely read a column by header name.
 			$get = function ( $name, $default = '' ) use ( $data, $header_map ) {
 				$index = $header_map[ strtolower( $name ) ] ?? null;
-				return ( null !== $index && isset( $data[ $index ] ) ) ? $data[ $index ] : $default;
+				return ( null !== $index && isset( $data[ $index ] ) && '' !== $data[ $index ] ) ? $data[ $index ] : $default;
 			};
 
 			$base_includes_raw = $get( 'depends on', '' );
