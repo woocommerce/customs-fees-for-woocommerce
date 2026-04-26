@@ -193,6 +193,12 @@ Yes, through:
 == Changelog ==
 
 = 1.1.7 - 2026-xx-xx =
+* Add - Per-rule valuation method override (FOB, CIF, CIF + Insurance) with inheritance from global setting.
+* Add - Compound base support via base_includes: rules can include other rules' computed fees in their customs value.
+* Add - Round-based dependency resolution with cycle detection for base_includes.
+* Add - Admin UI columns for Valuation and Depends On in the rules table.
+* Update - Canada, Australia, New Zealand, UK, and EU presets use correct duty vs. import tax valuation bases.
+* Update - CSV export/import preserves rule_id, valuation_method, base_includes, and all advanced rule fields.
 * Tweak - WooCommerce 10.7 Compatibility.
 
 = 1.1.6 - 2026-xx-xx =

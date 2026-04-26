@@ -213,7 +213,7 @@ apply_filters( 'cfwc_fee_tax_class_default', '', $rule );
 apply_filters( 'cfwc_product_origin', $origin, $product_id, $product );
 
 // Modify the customs value (for CIF calculations)
-apply_filters( 'cfwc_customs_value', $customs_value, $line_total, $cart_item, $method );
+apply_filters( 'cfwc_customs_value', $customs_value, $line_total, $cart_item, $method, $rule );
 
 // Provide insurance value for CIF calculations
 apply_filters( 'cfwc_insurance_value', $insurance_value, $product_value, $method );
@@ -311,16 +311,21 @@ add_filter( 'cfwc_enable_calculation_logging', '__return_true' );
 #### Country-specific valuation override
 
 ```php
-add_filter( 'cfwc_customs_value', function( $customs_value, $line_total, $cart_item, $method ) {
+add_filter( 'cfwc_customs_value', function( $customs_value, $line_total, $cart_item, $method, $rule ) {
     $destination = WC()->customer->get_shipping_country();
 
-    // Force FOB for US/Canada even if CIF is enabled globally
+    // Force FOB for US/Canada even if CIF is enabled globally.
     if ( in_array( $destination, array( 'US', 'CA' ), true ) ) {
-        return $line_total; // Return product value only
+        return $line_total; // Return product value only.
+    }
+
+    // Example: Add an arbitrary surcharge to the customs value for a specific rule.
+    if ( ! empty( $rule['label'] ) && false !== strpos( $rule['label'], 'Special' ) ) {
+        $customs_value += 10;
     }
 
     return $customs_value;
-}, 10, 4 );
+}, 10, 5 );
 ```
 
 ---
