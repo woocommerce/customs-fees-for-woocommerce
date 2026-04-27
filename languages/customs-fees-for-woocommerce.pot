@@ -2,7 +2,7 @@
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Customs Fees for WooCommerce 1.2.1\n"
+"Project-Id-Version: Customs Fees for WooCommerce 1.1.7\n"
 "Report-Msgid-Bugs-To: "
 "https://wordpress.org/support/plugin/customs-fees-for-woocommerce\n"
 "POT-Creation-Date: 2026-04-27 15:42:21+00:00\n"
