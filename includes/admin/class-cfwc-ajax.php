@@ -121,8 +121,7 @@ class CFWC_Ajax {
 		update_option( 'cfwc_rules', $rules );
 
 		// Clear cache.
-		$calculator = new CFWC_Calculator();
-		$calculator->clear_cache();
+		CFWC_Calculator::clear_cache();
 
 		wp_send_json_success(
 			array(
@@ -191,8 +190,7 @@ class CFWC_Ajax {
 			update_option( 'cfwc_rules', $rules );
 
 			// Clear cache.
-			$calculator = new CFWC_Calculator();
-			$calculator->clear_cache();
+			CFWC_Calculator::clear_cache();
 
 			wp_send_json_success(
 				array(
@@ -247,8 +245,7 @@ class CFWC_Ajax {
 		update_option( 'cfwc_rules', $reordered );
 
 		// Clear cache.
-		$calculator = new CFWC_Calculator();
-		$calculator->clear_cache();
+		CFWC_Calculator::clear_cache();
 
 		wp_send_json_success(
 			array(
@@ -427,8 +424,7 @@ class CFWC_Ajax {
 		update_option( 'cfwc_rules', $new_rules );
 
 		// Clear cache.
-		$calculator = new CFWC_Calculator();
-		$calculator->clear_cache();
+		CFWC_Calculator::clear_cache();
 
 		wp_send_json_success(
 			array(
@@ -494,11 +490,10 @@ class CFWC_Ajax {
 		}
 
 		// One-shot cycle detection over the matching set.
-		$calc_instance  = new CFWC_Calculator();
 		$cycle_rule_ids = array();
 		foreach ( $matching as $cr ) {
 			$cr_id = $cr['rule_id'] ?? '';
-			if ( '' !== $cr_id && $calc_instance->has_cycle( $matching, $cr_id ) ) {
+			if ( '' !== $cr_id && CFWC_Calculator::has_cycle( $matching, $cr_id ) ) {
 				$cycle_rule_ids[ $cr_id ] = true;
 			}
 		}

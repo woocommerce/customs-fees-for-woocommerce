@@ -114,10 +114,7 @@ class CFWC_Settings {
 
 			// Clear calculator cache if class exists.
 			if ( class_exists( 'CFWC_Calculator' ) ) {
-				$calculator = new CFWC_Calculator();
-				if ( method_exists( $calculator, 'clear_cache' ) ) {
-					$calculator->clear_cache();
-				}
+				CFWC_Calculator::clear_cache();
 			}
 		} catch ( Exception $e ) {
 			// Log error only when debugging is enabled.
@@ -292,8 +289,7 @@ class CFWC_Settings {
 
 		// Clear in-memory calculator cache for this request.
 		if ( class_exists( 'CFWC_Calculator' ) ) {
-			$calculator = new CFWC_Calculator();
-			$calculator->clear_cache();
+			CFWC_Calculator::clear_cache();
 		}
 
 		// Clear all caches.

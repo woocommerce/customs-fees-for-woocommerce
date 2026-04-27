@@ -311,7 +311,7 @@ class CFWC_Calculator {
 			$cycle_rule_ids = array();
 			foreach ( $matching_rules as $cr ) {
 				$cr_id = isset( $cr['rule_id'] ) && '' !== $cr['rule_id'] ? $cr['rule_id'] : '';
-				if ( '' !== $cr_id && $this->has_cycle( $matching_rules, $cr_id ) ) {
+				if ( '' !== $cr_id && self::has_cycle( $matching_rules, $cr_id ) ) {
 					$cycle_labels[]            = $cr['label'] ?? $cr_id;
 					$cycle_rule_ids[ $cr_id ] = true;
 				}
@@ -829,7 +829,7 @@ class CFWC_Calculator {
 	 * @param array  $visited    Already visited rule IDs.
 	 * @return bool True if a cycle is detected.
 	 */
-	public function has_cycle( $rules, $start_id, $visited = array() ) {
+	public static function has_cycle( $rules, $start_id, $visited = array() ) {
 		$rule_map = array();
 		foreach ( $rules as $rule ) {
 			$rid = isset( $rule['rule_id'] ) ? $rule['rule_id'] : '';
@@ -854,7 +854,7 @@ class CFWC_Calculator {
 			}
 			$path   = $visited;
 			$path[] = $dep_id;
-			if ( $this->has_cycle( $rules, $dep_id, $path ) ) {
+			if ( self::has_cycle( $rules, $dep_id, $path ) ) {
 				return true;
 			}
 		}
@@ -1101,9 +1101,7 @@ class CFWC_Calculator {
 	 *
 	 * @since 1.0.0
 	 */
-	public function clear_cache() {
-		$this->rules_cache = null;
-
+	public static function clear_cache() {
 		// Clear any transients.
 		delete_transient( 'cfwc_rules_cache' );
 

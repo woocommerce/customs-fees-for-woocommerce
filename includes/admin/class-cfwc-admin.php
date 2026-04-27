@@ -471,7 +471,7 @@ class CFWC_Admin {
 					'delete_confirm'             => __( 'Click the delete button again to confirm deletion.', 'customs-fees-for-woocommerce' ),
 					'no_rules'                   => __( 'No rules configured. Use the preset loader above or add rules manually.', 'customs-fees-for-woocommerce' ),
 					'not_set'                    => __( 'Not set', 'customs-fees-for-woocommerce' ),
-					'valuation_method'           => __( 'Valuation Method', 'customs-fees-for-woocommerce' ),
+					'valuation_method'           => __( 'Valuation method', 'customs-fees-for-woocommerce' ),
 					'depends_on'                 => __( 'Depends on', 'customs-fees-for-woocommerce' ),
 					'inherit_global'             => __( 'Inherit global', 'customs-fees-for-woocommerce' ),
 					'overrides_global'           => __( 'Overrides global valuation', 'customs-fees-for-woocommerce' ),

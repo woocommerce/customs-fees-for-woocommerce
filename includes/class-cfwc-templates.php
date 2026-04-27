@@ -1446,8 +1446,7 @@ class CFWC_Templates {
 		update_option( 'cfwc_rules', $rules );
 
 		// Clear cache.
-		$calculator = new CFWC_Calculator();
-		$calculator->clear_cache();
+		CFWC_Calculator::clear_cache();
 
 		return array(
 			'success'     => true,
