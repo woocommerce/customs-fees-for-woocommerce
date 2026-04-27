@@ -395,41 +395,8 @@ class CFWC_Calculator {
 
 						if ( false !== $fee && $fee > 0 ) {
 							$calculated[ $rule_id ] = $fee;
+							$label                   = $this->accumulate_fee( $fees_by_label, $rule, $fee, $destination_country, $origin );
 
-							$base_label = $this->get_fee_label( $rule, $destination_country, $origin );
-
-							// Check if the label already contains a percentage (e.g., "(50%)").
-							$has_percentage = preg_match( '/\(\d+(?:\.\d+)?%\)/', $base_label );
-
-							// Add percentage rate in brackets only if not already present and it's a percentage rule.
-							if ( ! $has_percentage && isset( $rule['type'] ) && 'percentage' === $rule['type'] && ! empty( $rule['rate'] ) ) {
-								$label = sprintf( '%s (%s%%)', $base_label, $rule['rate'] );
-							} else {
-								// For flat rate or if percentage already in label, just use the base label.
-								$label = $base_label;
-							}
-
-							// Create a unique key for grouping that includes the base label and rate.
-							$group_key = $base_label . '|' . ( $rule['type'] ?? 'flat' ) . '|' . ( $rule['rate'] ?? '0' );
-
-							// Group fees by rule for consolidation.
-							if ( ! isset( $fees_by_label[ $group_key ] ) ) {
-								$fees_by_label[ $group_key ] = array(
-									'base_label' => $base_label,
-									'label'      => $label,
-									'amount'     => 0,
-									'count'      => 0,
-									'rate'       => $rule['rate'] ?? '',
-									'type'       => $rule['type'] ?? 'flat',
-									'taxable'    => $this->is_fee_taxable( $rule ),
-									'tax_class'  => $this->get_fee_tax_class( $rule ),
-								);
-							}
-
-							$fees_by_label[ $group_key ]['amount'] += $fee;
-							++$fees_by_label[ $group_key ]['count'];
-
-							// Log fee application.
 							$this->log_debug(
 								sprintf(
 									'      Applied: %s = $%.2f (base: $%.2f)',
@@ -459,32 +426,7 @@ class CFWC_Calculator {
 
 						if ( false !== $fee && $fee > 0 ) {
 							$calculated[ $rule_id ] = $fee;
-
-							$base_label = $this->get_fee_label( $rule, $destination_country, $origin );
-							$has_percentage = preg_match( '/\(\d+(?:\.\d+)?%\)/', $base_label );
-							if ( ! $has_percentage && isset( $rule['type'] ) && 'percentage' === $rule['type'] && ! empty( $rule['rate'] ) ) {
-								$label = sprintf( '%s (%s%%)', $base_label, $rule['rate'] );
-							} else {
-								$label = $base_label;
-							}
-
-							$group_key = $base_label . '|' . ( $rule['type'] ?? 'flat' ) . '|' . ( $rule['rate'] ?? '0' );
-
-							if ( ! isset( $fees_by_label[ $group_key ] ) ) {
-								$fees_by_label[ $group_key ] = array(
-									'base_label' => $base_label,
-									'label'      => $label,
-									'amount'     => 0,
-									'count'      => 0,
-									'rate'       => $rule['rate'] ?? '',
-									'type'       => $rule['type'] ?? 'flat',
-									'taxable'    => $this->is_fee_taxable( $rule ),
-									'tax_class'  => $this->get_fee_tax_class( $rule ),
-								);
-							}
-
-							$fees_by_label[ $group_key ]['amount'] += $fee;
-							++$fees_by_label[ $group_key ]['count'];
+							$label                   = $this->accumulate_fee( $fees_by_label, $rule, $fee, $destination_country, $origin );
 
 							$this->log_debug(
 								sprintf(
@@ -829,6 +771,51 @@ class CFWC_Calculator {
 		$this->rules_cache = $rules;
 
 		return apply_filters( 'cfwc_all_rules', $rules );
+	}
+
+	/**
+	 * Accumulate a calculated fee into the by-label grouping structure.
+	 *
+	 * Handles label generation (with optional percentage annotation),
+	 * grouping key creation, and per-group consolidation.
+	 *
+	 * @since 1.2.0
+	 * @param array  &$fees_by_label    Reference to the fees grouping array.
+	 * @param array  $rule              Rule data.
+	 * @param float  $fee               Calculated fee amount.
+	 * @param string $destination_country Destination country code.
+	 * @param string $origin            Origin country code.
+	 * @return string The generated display label.
+	 */
+	private function accumulate_fee( &$fees_by_label, $rule, $fee, $destination_country, $origin ) {
+		$base_label     = $this->get_fee_label( $rule, $destination_country, $origin );
+		$has_percentage = preg_match( '/\(\d+(?:\.\d+)?%\)/', $base_label );
+
+		if ( ! $has_percentage && isset( $rule['type'] ) && 'percentage' === $rule['type'] && ! empty( $rule['rate'] ) ) {
+			$label = sprintf( '%s (%s%%)', $base_label, $rule['rate'] );
+		} else {
+			$label = $base_label;
+		}
+
+		$group_key = $base_label . '|' . ( $rule['type'] ?? 'flat' ) . '|' . ( $rule['rate'] ?? '0' );
+
+		if ( ! isset( $fees_by_label[ $group_key ] ) ) {
+			$fees_by_label[ $group_key ] = array(
+				'base_label' => $base_label,
+				'label'      => $label,
+				'amount'     => 0,
+				'count'      => 0,
+				'rate'       => $rule['rate'] ?? '',
+				'type'       => $rule['type'] ?? 'flat',
+				'taxable'    => $this->is_fee_taxable( $rule ),
+				'tax_class'  => $this->get_fee_tax_class( $rule ),
+			);
+		}
+
+		$fees_by_label[ $group_key ]['amount'] += $fee;
+		++$fees_by_label[ $group_key ]['count'];
+
+		return $label;
 	}
 
 	/**
