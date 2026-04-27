@@ -57,7 +57,12 @@ class CFWC_Admin {
 		// Check for rule dependency errors (cycle or unresolvable deps).
 		$dependency_error = get_transient( 'cfwc_rules_dependency_error' );
 		if ( ! empty( $dependency_error ) ) {
-			echo '<div class="notice notice-warning is-dismissible"><p><strong>' . esc_html__( 'Customs Fees Warning', 'customs-fees-for-woocommerce' ) . ':</strong> ' . esc_html( $dependency_error ) . '</p></div>';
+			delete_transient( 'cfwc_rules_dependency_error' );
+			echo '<div class="notice notice-warning is-dismissible"><p><strong>'
+				. esc_html__( 'Customs Fees Warning', 'customs-fees-for-woocommerce' )
+				. ':</strong> '
+				. esc_html( implode( ', ', (array) $dependency_error ) )
+				. '</p></div>';
 		}
 	}
 
