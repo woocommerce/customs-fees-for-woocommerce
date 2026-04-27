@@ -842,7 +842,7 @@ class CFWC_Calculator {
 	 * @param array  $visited    Already visited rule IDs.
 	 * @return bool True if a cycle is detected.
 	 */
-	private function has_cycle( $rules, $start_id, $visited = array() ) {
+	public function has_cycle( $rules, $start_id, $visited = array() ) {
 		$rule_map = array();
 		foreach ( $rules as $rule ) {
 			$rid = isset( $rule['rule_id'] ) ? $rule['rule_id'] : '';

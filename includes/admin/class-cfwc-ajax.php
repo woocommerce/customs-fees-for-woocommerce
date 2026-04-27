@@ -494,10 +494,11 @@ class CFWC_Ajax {
 		}
 
 		// One-shot cycle detection over the matching set.
+		$calc_instance  = new CFWC_Calculator();
 		$cycle_rule_ids = array();
 		foreach ( $matching as $cr ) {
 			$cr_id = $cr['rule_id'] ?? '';
-			if ( '' !== $cr_id && self::test_has_cycle( $matching, $cr_id ) ) {
+			if ( '' !== $cr_id && $calc_instance->has_cycle( $matching, $cr_id ) ) {
 				$cycle_rule_ids[ $cr_id ] = true;
 			}
 		}
@@ -645,45 +646,4 @@ class CFWC_Ajax {
 		return $fee_amount;
 	}
 
-	/**
-	 * Detect a base_includes cycle for the given rule via DFS.
-	 *
-	 * @since 1.2.0
-	 * @param array  $rules    Matching rules.
-	 * @param string $start_id Rule ID to inspect.
-	 * @param array  $visited  Current DFS path (snapshot per recursive call).
-	 * @return bool True if a cycle is detected.
-	 */
-	private static function test_has_cycle( $rules, $start_id, $visited = array() ) {
-		$rule_map = array();
-		foreach ( $rules as $rule ) {
-			$rid = isset( $rule['rule_id'] ) ? $rule['rule_id'] : '';
-			if ( '' !== $rid ) {
-				$rule_map[ $rid ] = $rule;
-			}
-		}
-
-		if ( ! isset( $rule_map[ $start_id ] ) ) {
-			return false;
-		}
-
-		$rule = $rule_map[ $start_id ];
-		$deps = isset( $rule['base_includes'] ) && is_array( $rule['base_includes'] ) ? $rule['base_includes'] : array();
-
-		foreach ( $deps as $dep_id ) {
-			if ( $dep_id === $start_id ) {
-				return true;
-			}
-			if ( in_array( $dep_id, $visited, true ) ) {
-				return true;
-			}
-			$path   = $visited;
-			$path[] = $dep_id;
-			if ( self::test_has_cycle( $rules, $dep_id, $path ) ) {
-				return true;
-			}
-		}
-
-		return false;
-	}
 }
