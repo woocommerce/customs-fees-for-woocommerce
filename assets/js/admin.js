@@ -843,6 +843,24 @@
         '<td><input type="number" name="cfwc_rule_rate" class="cfwc-rule-field" data-field="rate" value="0" step="0.01" style="width: 80px;" required />' +
         '<span style="font-size: 11px; color: #999; display: block; margin-top: 2px;">Required *</span></td>';
 
+      // Valuation method.
+      newRowHtml += "<td>";
+      newRowHtml += '<select name="cfwc_rule_valuation_method" class="cfwc-rule-field" data-field="valuation_method" style="width: 100%;">';
+      newRowHtml += '<option value="inherit">Inherit global</option>';
+      newRowHtml += '<option value="fob">FOB</option>';
+      newRowHtml += '<option value="cif">CIF</option>';
+      newRowHtml += '<option value="cif_insurance">CIF + Insurance</option>';
+      newRowHtml += "</select>";
+      newRowHtml += '<span style="font-size: 11px; color: #666; margin-top: 2px; display: block;">Overrides global for this rule</span>';
+      newRowHtml += "</td>";
+
+      // Depends on (base_includes) - hidden for flat type.
+      newRowHtml += '<td class="cfwc-base-includes-cell">';
+      newRowHtml += '<select name="cfwc_rule_base_includes" class="cfwc-rule-field cfwc-base-includes-select" data-field="base_includes" multiple="multiple" style="width: 100%;">';
+      newRowHtml += "</select>";
+      newRowHtml += '<span style="font-size: 11px; color: #666; margin-top: 2px; display: block;">Select fees to include in base</span>';
+      newRowHtml += "</td>";
+
       // Stacking mode.
       newRowHtml += "<td>";
       newRowHtml +=
@@ -862,24 +880,6 @@
       newRowHtml +=
         '<span class="stacking-help-exclusive" style="display: none;">No other rules apply</span>';
       newRowHtml += "</span>";
-      newRowHtml += "</td>";
-
-      // Valuation method.
-      newRowHtml += "<td>";
-      newRowHtml += '<select name="cfwc_rule_valuation_method" class="cfwc-rule-field" data-field="valuation_method" style="width: 100%;">';
-      newRowHtml += '<option value="inherit">Inherit global</option>';
-      newRowHtml += '<option value="fob">FOB</option>';
-      newRowHtml += '<option value="cif">CIF</option>';
-      newRowHtml += '<option value="cif_insurance">CIF + Insurance</option>';
-      newRowHtml += "</select>";
-      newRowHtml += '<span style="font-size: 11px; color: #666; margin-top: 2px; display: block;">Overrides global for this rule</span>';
-      newRowHtml += "</td>";
-
-      // Depends on (base_includes) - hidden for flat type.
-      newRowHtml += '<td class="cfwc-base-includes-cell">';
-      newRowHtml += '<select name="cfwc_rule_base_includes" class="cfwc-rule-field cfwc-base-includes-select" data-field="base_includes" multiple="multiple" style="width: 100%;">';
-      newRowHtml += "</select>";
-      newRowHtml += '<span style="font-size: 11px; color: #666; margin-top: 2px; display: block;">Select fees to include in base</span>';
       newRowHtml += "</td>";
 
       // Actions.
@@ -1123,6 +1123,26 @@
         '" step="0.01" style="width: 80px;" required />' +
         '<span style="font-size: 11px; color: #999; display: block; margin-top: 2px;">Required *</span></td>';
 
+      // Valuation method.
+      var currentValuation = rule.valuation_method || "inherit";
+      editRowHtml += "<td>";
+      editRowHtml += '<select name="cfwc_rule_valuation_method" class="cfwc-rule-field" data-field="valuation_method" style="width: 100%;">';
+      editRowHtml += '<option value="inherit"' + (currentValuation === "inherit" ? " selected" : "") + '>Inherit global</option>';
+      editRowHtml += '<option value="fob"' + (currentValuation === "fob" ? " selected" : "") + '>FOB</option>';
+      editRowHtml += '<option value="cif"' + (currentValuation === "cif" ? " selected" : "") + '>CIF</option>';
+      editRowHtml += '<option value="cif_insurance"' + (currentValuation === "cif_insurance" ? " selected" : "") + '>CIF + Insurance</option>';
+      editRowHtml += "</select>";
+      editRowHtml += '<span style="font-size: 11px; color: #666; margin-top: 2px; display: block;">Overrides global for this rule</span>';
+      editRowHtml += "</td>";
+
+      // Depends on (base_includes).
+      var currentBaseIncludes = rule.base_includes || [];
+      editRowHtml += '<td class="cfwc-base-includes-cell">';
+      editRowHtml += '<select name="cfwc_rule_base_includes" class="cfwc-rule-field cfwc-base-includes-select" data-field="base_includes" multiple="multiple" style="width: 100%;">';
+      editRowHtml += "</select>";
+      editRowHtml += '<span style="font-size: 11px; color: #666; margin-top: 2px; display: block;">Select fees to include in base</span>';
+      editRowHtml += "</td>";
+
       // Stacking mode.
       editRowHtml += "<td>";
       editRowHtml +=
@@ -1156,26 +1176,6 @@
         (currentMode === "exclusive" ? "" : "display: none;") +
         '">No other rules apply</span>';
       editRowHtml += "</span>";
-      editRowHtml += "</td>";
-
-      // Valuation method.
-      var currentValuation = rule.valuation_method || "inherit";
-      editRowHtml += "<td>";
-      editRowHtml += '<select name="cfwc_rule_valuation_method" class="cfwc-rule-field" data-field="valuation_method" style="width: 100%;">';
-      editRowHtml += '<option value="inherit"' + (currentValuation === "inherit" ? " selected" : "") + '>Inherit global</option>';
-      editRowHtml += '<option value="fob"' + (currentValuation === "fob" ? " selected" : "") + '>FOB</option>';
-      editRowHtml += '<option value="cif"' + (currentValuation === "cif" ? " selected" : "") + '>CIF</option>';
-      editRowHtml += '<option value="cif_insurance"' + (currentValuation === "cif_insurance" ? " selected" : "") + '>CIF + Insurance</option>';
-      editRowHtml += "</select>";
-      editRowHtml += '<span style="font-size: 11px; color: #666; margin-top: 2px; display: block;">Overrides global for this rule</span>';
-      editRowHtml += "</td>";
-
-      // Depends on (base_includes).
-      var currentBaseIncludes = rule.base_includes || [];
-      editRowHtml += '<td class="cfwc-base-includes-cell">';
-      editRowHtml += '<select name="cfwc_rule_base_includes" class="cfwc-rule-field cfwc-base-includes-select" data-field="base_includes" multiple="multiple" style="width: 100%;">';
-      editRowHtml += "</select>";
-      editRowHtml += '<span style="font-size: 11px; color: #666; margin-top: 2px; display: block;">Select fees to include in base</span>';
       editRowHtml += "</td>";
 
       // Actions.
