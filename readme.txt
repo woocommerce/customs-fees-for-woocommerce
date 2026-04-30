@@ -192,10 +192,14 @@ Yes, through:
 
 == Changelog ==
 
-= 1.1.7 - 2026-xx-xx =
+= 1.2.0 - 2026-xx-xx =
+* Add - Per-rule valuation overrides (FOB, CIF, CIF + Insurance) with compound base support, so a rule's customs value can include other rules' computed fees.
+* Update - Built-in presets for Canada, Australia, New Zealand, UK, and EU now use correct duty vs. import tax valuation bases.
+
+= 1.1.7 - 2026-04-13 =
 * Tweak - WooCommerce 10.7 Compatibility.
 
-= 1.1.6 - 2026-xx-xx =
+= 1.1.6 - 2026-03-31 =
 * Tweak - WooCommerce 10.6 Compatibility.
 
 = 1.1.5 - 2026-02-04 =

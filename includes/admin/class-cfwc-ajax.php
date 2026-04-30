@@ -75,15 +75,44 @@ class CFWC_Ajax {
 			'hs_code_pattern' => sanitize_text_field( $rule_data['hs_code_pattern'] ?? '' ),
 			'priority'        => absint( $rule_data['priority'] ?? 0 ),
 			'stacking_mode'   => sanitize_text_field( $rule_data['stacking_mode'] ?? 'add' ),
+			// New fields for per-rule valuation and compound bases (v1.2.0).
+			'rule_id'         => ! empty( $rule_data['rule_id'] )
+				? sanitize_text_field( $rule_data['rule_id'] )
+				: 'rule_' . wp_generate_uuid4(),
+			'valuation_method' => in_array( $rule_data['valuation_method'] ?? '', array( 'inherit', 'fob', 'cif', 'cif_insurance' ), true )
+				? $rule_data['valuation_method']
+				: 'inherit',
+			'base_includes'   => isset( $rule_data['base_includes'] ) && is_array( $rule_data['base_includes'] )
+				? array_values( array_unique( array_map( 'sanitize_text_field', $rule_data['base_includes'] ) ) )
+				: array(),
 		);
 
 		// Get existing rules.
 		$rules = get_option( 'cfwc_rules', array() );
 
+		// Normalize before save.
+		if ( class_exists( 'CFWC_Settings' ) && method_exists( 'CFWC_Settings', 'migrate_rules' ) ) {
+			$rules = CFWC_Settings::migrate_rules( $rules );
+		}
+
 		// Update or add rule.
+		$updated = false;
 		if ( null !== $rule_id && isset( $rules[ $rule_id ] ) ) {
 			$rules[ $rule_id ] = $rule;
+			$updated = true;
 		} else {
+			// Try matching by rule_id string for existing rules.
+			foreach ( $rules as $index => $existing_rule ) {
+				if ( isset( $existing_rule['rule_id'] ) && $existing_rule['rule_id'] === $rule['rule_id'] ) {
+					$rules[ $index ] = $rule;
+					$rule_id         = $index;
+					$updated         = true;
+					break;
+				}
+			}
+		}
+
+		if ( ! $updated ) {
 			$rules[] = $rule;
 			$rule_id = count( $rules ) - 1;
 		}
@@ -92,8 +121,7 @@ class CFWC_Ajax {
 		update_option( 'cfwc_rules', $rules );
 
 		// Clear cache.
-		$calculator = new CFWC_Calculator();
-		$calculator->clear_cache();
+		CFWC_Calculator::clear_cache();
 
 		wp_send_json_success(
 			array(
@@ -117,9 +145,10 @@ class CFWC_Ajax {
 			wp_die( -1 );
 		}
 
-		$rule_id = isset( $_POST['rule_id'] ) ? absint( $_POST['rule_id'] ) : null;
+		// Support both string rule_id (new) and numeric index (legacy).
+		$raw_rule_id = isset( $_POST['rule_id'] ) ? sanitize_text_field( wp_unslash( $_POST['rule_id'] ) ) : '';
 
-		if ( null === $rule_id ) {
+		if ( '' === $raw_rule_id ) {
 			wp_send_json_error(
 				array(
 					'message' => __( 'Invalid rule ID.', 'customs-fees-for-woocommerce' ),
@@ -130,9 +159,27 @@ class CFWC_Ajax {
 		// Get existing rules.
 		$rules = get_option( 'cfwc_rules', array() );
 
+		$rule_index = null;
+
+		// Try matching by string rule_id first.
+		foreach ( $rules as $index => $existing_rule ) {
+			if ( isset( $existing_rule['rule_id'] ) && $existing_rule['rule_id'] === $raw_rule_id ) {
+				$rule_index = $index;
+				break;
+			}
+		}
+
+		// Fallback to numeric index for legacy clients.
+		if ( null === $rule_index ) {
+			$numeric_id = absint( $raw_rule_id );
+			if ( isset( $rules[ $numeric_id ] ) ) {
+				$rule_index = $numeric_id;
+			}
+		}
+
 		// Remove rule.
-		if ( isset( $rules[ $rule_id ] ) ) {
-			unset( $rules[ $rule_id ] );
+		if ( null !== $rule_index && isset( $rules[ $rule_index ] ) ) {
+			unset( $rules[ $rule_index ] );
 			// Re-index array.
 			$rules = array_values( $rules );
 
@@ -140,8 +187,7 @@ class CFWC_Ajax {
 			update_option( 'cfwc_rules', $rules );
 
 			// Clear cache.
-			$calculator = new CFWC_Calculator();
-			$calculator->clear_cache();
+			CFWC_Calculator::clear_cache();
 
 			wp_send_json_success(
 				array(
@@ -196,8 +242,7 @@ class CFWC_Ajax {
 		update_option( 'cfwc_rules', $reordered );
 
 		// Clear cache.
-		$calculator = new CFWC_Calculator();
-		$calculator->clear_cache();
+		CFWC_Calculator::clear_cache();
 
 		wp_send_json_success(
 			array(
@@ -221,21 +266,31 @@ class CFWC_Ajax {
 
 		$rules = get_option( 'cfwc_rules', array() );
 
-		// Create CSV content.
-		$csv_content = "Country,Type,Rate,Amount,Minimum,Maximum,Label,Taxable,Tax Class\n";
+		// Create CSV content with all rule fields.
+		$csv_content = "Country,Type,Rate,Amount,Minimum,Maximum,Label,Taxable,Tax Class,Rule ID,From Country,To Country,Match Type,HS Code,Priority,Stacking Mode,Valuation Method,Depends On\n";
 
 		foreach ( $rules as $rule ) {
-			$csv_content .= sprintf(
-				'"%s","%s",%.2f,%.2f,%.2f,%.2f,"%s","%s","%s"' . "\n",
-				$rule['country'],
-				$rule['type'],
-				$rule['rate'],
-				$rule['amount'],
-				$rule['minimum'],
-				$rule['maximum'],
-				$rule['label'],
-				$rule['taxable'] ? 'yes' : 'no',
-				$rule['tax_class']
+			$base_includes = isset( $rule['base_includes'] ) && is_array( $rule['base_includes'] ) ? implode( '|', $rule['base_includes'] ) : '';
+			$csv_content  .= sprintf(
+				'"%s","%s",%.2f,%.2f,%.2f,%.2f,"%s","%s","%s","%s","%s","%s","%s","%s",%d,"%s","%s","%s"' . "\n",
+				$rule['country'] ?? '',
+				$rule['type'] ?? 'percentage',
+				$rule['rate'] ?? 0,
+				$rule['amount'] ?? 0,
+				$rule['minimum'] ?? 0,
+				$rule['maximum'] ?? 0,
+				$rule['label'] ?? '',
+				! empty( $rule['taxable'] ) ? 'yes' : 'no',
+				$rule['tax_class'] ?? '',
+				$rule['rule_id'] ?? '',
+				$rule['from_country'] ?? '',
+				$rule['to_country'] ?? '',
+				$rule['match_type'] ?? 'all',
+				$rule['hs_code_pattern'] ?? '',
+				$rule['priority'] ?? 0,
+				$rule['stacking_mode'] ?? 'add',
+				$rule['valuation_method'] ?? 'inherit',
+				$base_includes
 			);
 		}
 
@@ -280,6 +335,14 @@ class CFWC_Ajax {
 		$headers   = str_getcsv( array_shift( $lines ), ',', '"', '\\' );
 		$new_rules = array();
 
+		// Build header index map for flexible column mapping.
+		$header_map = array();
+		foreach ( $headers as $index => $header ) {
+			$header_map[ strtolower( trim( $header ) ) ] = $index;
+		}
+
+		$header_count = count( $headers );
+
 		foreach ( $lines as $line ) {
 			if ( empty( trim( $line ) ) ) {
 				continue;
@@ -287,19 +350,67 @@ class CFWC_Ajax {
 
 			// Add escape parameter (backslash) for PHP 8.4+ compatibility.
 			$data = str_getcsv( $line, ',', '"', '\\' );
-			if ( count( $data ) === count( $headers ) ) {
-				$new_rules[] = array(
-					'country'   => sanitize_text_field( $data[0] ),
-					'type'      => sanitize_text_field( $data[1] ),
-					'rate'      => floatval( $data[2] ),
-					'amount'    => floatval( $data[3] ),
-					'minimum'   => floatval( $data[4] ),
-					'maximum'   => floatval( $data[5] ),
-					'label'     => sanitize_text_field( $data[6] ),
-					'taxable'   => 'yes' === strtolower( $data[7] ),
-					'tax_class' => sanitize_text_field( $data[8] ),
-				);
+
+			// Skip rows that have no data at all.
+			if ( empty( $data ) ) {
+				continue;
 			}
+
+			// Tolerate row width drift: pad short rows (Excel/Sheets often
+			// strips trailing empty columns on save) and truncate long ones
+			// so the header_map lookups stay in bounds.
+			if ( count( $data ) < $header_count ) {
+				$data = array_pad( $data, $header_count, '' );
+			} elseif ( count( $data ) > $header_count ) {
+				$data = array_slice( $data, 0, $header_count );
+			}
+
+			// Helper to safely read a column by header name.
+			$get = function ( $name, $default = '' ) use ( $data, $header_map ) {
+				$index = $header_map[ strtolower( $name ) ] ?? null;
+				return ( null !== $index && isset( $data[ $index ] ) && '' !== $data[ $index ] ) ? $data[ $index ] : $default;
+			};
+
+			$base_includes_raw = $get( 'depends on', '' );
+			$base_includes     = array();
+			if ( ! empty( $base_includes_raw ) ) {
+				$base_includes = array_values( array_unique( array_filter( array_map( 'trim', explode( '|', $base_includes_raw ) ) ) ) );
+			}
+
+			$country_value    = sanitize_text_field( $get( 'country', '' ) );
+			$to_country_value = sanitize_text_field( $get( 'to country', '' ) );
+
+			// Mirror the settings save validation: a rule must declare at least
+			// one destination (legacy `country` or new `to_country`). Otherwise
+			// the row is dropped so importers don't end up with inert rules.
+			if ( '' === $country_value && '' === $to_country_value ) {
+				continue;
+			}
+
+			$new_rules[] = array(
+				'country'          => $country_value,
+				'type'             => sanitize_text_field( $get( 'type', 'percentage' ) ),
+				'rate'             => floatval( $get( 'rate', 0 ) ),
+				'amount'           => floatval( $get( 'amount', 0 ) ),
+				'minimum'          => floatval( $get( 'minimum', 0 ) ),
+				'maximum'          => floatval( $get( 'maximum', 0 ) ),
+				'label'            => sanitize_text_field( $get( 'label', '' ) ),
+				'taxable'          => 'yes' === strtolower( $get( 'taxable', 'yes' ) ),
+				'tax_class'        => sanitize_text_field( $get( 'tax class', '' ) ),
+				'rule_id'          => ! empty( $get( 'rule id', '' ) )
+					? sanitize_text_field( $get( 'rule id' ) )
+					: 'rule_' . wp_generate_uuid4(),
+				'from_country'     => sanitize_text_field( $get( 'from country', '' ) ),
+				'to_country'       => $to_country_value,
+				'match_type'       => sanitize_text_field( $get( 'match type', 'all' ) ),
+				'hs_code_pattern'  => sanitize_text_field( $get( 'hs code', '' ) ),
+				'priority'         => absint( $get( 'priority', 0 ) ),
+				'stacking_mode'    => sanitize_text_field( $get( 'stacking mode', 'add' ) ),
+				'valuation_method' => in_array( $get( 'valuation method', 'inherit' ), array( 'inherit', 'fob', 'cif', 'cif_insurance' ), true )
+					? $get( 'valuation method', 'inherit' )
+					: 'inherit',
+				'base_includes'    => $base_includes,
+			);
 		}
 
 		if ( empty( $new_rules ) ) {
@@ -320,8 +431,7 @@ class CFWC_Ajax {
 		update_option( 'cfwc_rules', $new_rules );
 
 		// Clear cache.
-		$calculator = new CFWC_Calculator();
-		$calculator->clear_cache();
+		CFWC_Calculator::clear_cache();
 
 		wp_send_json_success(
 			array(
@@ -359,37 +469,84 @@ class CFWC_Ajax {
 			);
 		}
 
-		// Calculate fees by simulating a cart.
-		// Since calculate_fees_for_country doesn't exist, we need to simulate the calculation.
-		$calculator = new CFWC_Calculator();
+		// Test tool uses cart_total as the FOB base and resolves base_includes;
+		// per-product shipping share is unavailable here, so cif/cif_insurance
+		// fall back to cart_total (with global insurance percentage added when
+		// method is cif_insurance and a percentage is configured).
+		$all_rules     = get_option( 'cfwc_rules', array() );
+		$global_method = get_option( 'cfwc_valuation_method', 'fob' );
 
-		// Get rules and filter by country to simulate the calculation.
-		$all_rules  = get_option( 'cfwc_rules', array() );
+		$matching = array();
+		foreach ( $all_rules as $key => $rule ) {
+			$rule_country = $rule['to_country'] ?? $rule['country'] ?? '';
+			if ( $rule_country !== $country ) {
+				continue;
+			}
+			if ( empty( $rule['rule_id'] ) ) {
+				$rule['rule_id'] = (string) $key;
+			}
+			$matching[] = $rule;
+		}
+
+		$id_to_rule = array();
+		foreach ( $matching as $mr ) {
+			$rid = isset( $mr['rule_id'] ) ? $mr['rule_id'] : '';
+			if ( '' !== $rid ) {
+				$id_to_rule[ $rid ] = $mr;
+			}
+		}
+
+		// One-shot cycle detection over the matching set.
+		$cycle_rule_ids = array();
+		foreach ( $matching as $cr ) {
+			$cr_id = $cr['rule_id'] ?? '';
+			if ( '' !== $cr_id && CFWC_Calculator::has_cycle( $matching, $cr_id ) ) {
+				$cycle_rule_ids[ $cr_id ] = true;
+			}
+		}
+
 		$fees       = array();
 		$total_fees = 0;
+		$calculated = array();
+		$pending    = $matching;
+		$rounds     = 0;
+		$max_rounds = count( $matching ) + 1;
 
-		// Filter rules for the specified country.
-		foreach ( $all_rules as $rule ) {
-			if ( isset( $rule['country'] ) && $rule['country'] === $country ) {
-				$fee_amount = 0;
+		while ( ! empty( $pending ) && $rounds < $max_rounds ) {
+			++$rounds;
+			$made_progress = false;
+			$still_pending = array();
 
-				// Calculate based on rule type.
-				if ( 'percentage' === $rule['type'] ) {
-					$fee_amount = ( $cart_total * $rule['rate'] ) / 100;
-				} elseif ( 'flat' === $rule['type'] ) {
-					$fee_amount = $rule['amount'];
+			foreach ( $pending as $rule ) {
+				$rule_id = $rule['rule_id'] ?? '';
+				$deps    = isset( $rule['base_includes'] ) && is_array( $rule['base_includes'] )
+					? $rule['base_includes']
+					: array();
+				$deps    = array_filter(
+					$deps,
+					function ( $dep_id ) use ( $id_to_rule ) {
+						return isset( $id_to_rule[ $dep_id ] );
+					}
+				);
+
+				$deps_ready = true;
+				foreach ( $deps as $dep_id ) {
+					if ( ! isset( $calculated[ $dep_id ] ) ) {
+						$deps_ready = false;
+						break;
+					}
 				}
 
-				// Apply minimum/maximum limits if set.
-				if ( isset( $rule['minimum'] ) && $rule['minimum'] > 0 && $fee_amount < $rule['minimum'] ) {
-					$fee_amount = $rule['minimum'];
+				if ( ! $deps_ready ) {
+					$still_pending[] = $rule;
+					continue;
 				}
-				if ( isset( $rule['maximum'] ) && $rule['maximum'] > 0 && $fee_amount > $rule['maximum'] ) {
-					$fee_amount = $rule['maximum'];
-				}
+
+				$fee_amount = self::compute_test_fee( $rule, $cart_total, $deps, $calculated, $cycle_rule_ids, $global_method );
 
 				if ( $fee_amount > 0 ) {
-					$fees[]      = array(
+					$calculated[ $rule_id ] = $fee_amount;
+					$fees[]                 = array(
 						'label'  => isset( $rule['label'] ) ? $rule['label'] : __( 'Customs Fee', 'customs-fees-for-woocommerce' ),
 						'amount' => $fee_amount,
 						'type'   => $rule['type'],
@@ -397,6 +554,33 @@ class CFWC_Ajax {
 					);
 					$total_fees += $fee_amount;
 				}
+
+				$made_progress = true;
+			}
+
+			$pending = $still_pending;
+
+			if ( ! $made_progress ) {
+				// Fallback: compute remaining rules on their own base so the
+				// preview still shows something useful when deps cannot resolve.
+				foreach ( $pending as $rule ) {
+					$rule_id    = $rule['rule_id'] ?? '';
+					$fee_amount = self::compute_test_fee( $rule, $cart_total, array(), $calculated, $cycle_rule_ids, $global_method );
+
+					if ( $fee_amount > 0 ) {
+						if ( '' !== $rule_id ) {
+							$calculated[ $rule_id ] = $fee_amount;
+						}
+						$fees[]      = array(
+							'label'  => isset( $rule['label'] ) ? $rule['label'] : __( 'Customs Fee', 'customs-fees-for-woocommerce' ),
+							'amount' => $fee_amount,
+							'type'   => $rule['type'],
+							'rate'   => isset( $rule['rate'] ) ? $rule['rate'] : 0,
+						);
+						$total_fees += $fee_amount;
+					}
+				}
+				break;
 			}
 		}
 
@@ -408,4 +592,60 @@ class CFWC_Ajax {
 			)
 		);
 	}
+
+	/**
+	 * Compute a single test fee with per-rule valuation and dependency includes.
+	 *
+	 * @since 1.2.0
+	 * @param array $rule           Rule data.
+	 * @param float $cart_total     Test cart total (treated as the FOB base).
+	 * @param array $deps           Filtered list of dependency rule IDs.
+	 * @param array $calculated     Map of already-computed fees by rule_id.
+	 * @param array $cycle_rule_ids Map of rule IDs that participate in a cycle.
+	 * @param string $global_method Global valuation method.
+	 * @return float Computed fee amount (after min/max limits).
+	 */
+	private static function compute_test_fee( $rule, $cart_total, $deps, $calculated, $cycle_rule_ids, $global_method ) {
+		$valuation = $rule['valuation_method'] ?? 'inherit';
+		$method    = ( 'inherit' !== $valuation ) ? $valuation : $global_method;
+
+		$base = (float) $cart_total;
+
+		if ( 'cif_insurance' === $method ) {
+			$insurance_method = get_option( 'cfwc_insurance_method', 'disabled' );
+			if ( 'percentage' === $insurance_method ) {
+				$pct   = floatval( get_option( 'cfwc_insurance_percentage', 2 ) );
+				$base += ( $cart_total * $pct ) / 100;
+			}
+		}
+
+		$rule_id = $rule['rule_id'] ?? '';
+		if ( '' === $rule_id || ! isset( $cycle_rule_ids[ $rule_id ] ) ) {
+			foreach ( $deps as $dep_id ) {
+				if ( $dep_id === $rule_id ) {
+					continue;
+				}
+				if ( isset( $calculated[ $dep_id ] ) ) {
+					$base += $calculated[ $dep_id ];
+				}
+			}
+		}
+
+		$fee_amount = 0;
+		if ( 'percentage' === $rule['type'] ) {
+			$fee_amount = ( $base * floatval( $rule['rate'] ?? 0 ) ) / 100;
+		} elseif ( 'flat' === $rule['type'] ) {
+			$fee_amount = floatval( $rule['amount'] ?? 0 );
+		}
+
+		if ( isset( $rule['minimum'] ) && $rule['minimum'] > 0 && $fee_amount < $rule['minimum'] ) {
+			$fee_amount = floatval( $rule['minimum'] );
+		}
+		if ( isset( $rule['maximum'] ) && $rule['maximum'] > 0 && $fee_amount > $rule['maximum'] ) {
+			$fee_amount = floatval( $rule['maximum'] );
+		}
+
+		return $fee_amount;
+	}
+
 }

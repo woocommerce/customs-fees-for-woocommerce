@@ -701,15 +701,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<div class="cfwc-rules-table-wrapper">
 		<table class="widefat fixed striped cfwc-rules-table">
 			<thead>
-				<tr>
-					<th style="width: 18%;"><?php esc_html_e( 'Label', 'customs-fees-for-woocommerce' ); ?></th>
-					<th style="width: 18%;"><?php esc_html_e( 'Countries', 'customs-fees-for-woocommerce' ); ?></th>
-					<th style="width: 18%;"><?php esc_html_e( 'Products', 'customs-fees-for-woocommerce' ); ?></th>
-					<th style="width: 12%;"><?php esc_html_e( 'Type', 'customs-fees-for-woocommerce' ); ?></th>
-					<th style="width: 7%;"><?php esc_html_e( 'Rate', 'customs-fees-for-woocommerce' ); ?></th>
-					<th style="width: 12%;"><?php esc_html_e( 'Stacking', 'customs-fees-for-woocommerce' ); ?></th>
-					<th style="width: 15%;"><?php esc_html_e( 'Actions', 'customs-fees-for-woocommerce' ); ?></th>
-				</tr>
+					<tr>
+						<th style="width: 15%;"><?php esc_html_e( 'Label', 'customs-fees-for-woocommerce' ); ?></th>
+						<th style="width: 15%;"><?php esc_html_e( 'Countries', 'customs-fees-for-woocommerce' ); ?></th>
+						<th style="width: 15%;"><?php esc_html_e( 'Products', 'customs-fees-for-woocommerce' ); ?></th>
+						<th style="width: 10%;"><?php esc_html_e( 'Type', 'customs-fees-for-woocommerce' ); ?></th>
+						<th style="width: 7%;"><?php esc_html_e( 'Rate', 'customs-fees-for-woocommerce' ); ?></th>
+						<th style="width: 10%;"><?php esc_html_e( 'Valuation', 'customs-fees-for-woocommerce' ); ?></th>
+						<th style="width: 10%;"><?php esc_html_e( 'Depends on', 'customs-fees-for-woocommerce' ); ?></th>
+						<th style="width: 10%;"><?php esc_html_e( 'Stacking', 'customs-fees-for-woocommerce' ); ?></th>
+						<th style="width: 8%;"><?php esc_html_e( 'Actions', 'customs-fees-for-woocommerce' ); ?></th>
+					</tr>
 			</thead>
 			<tbody id="cfwc-rules-tbody">
 				<?php if ( ! empty( $rules ) ) : ?>
@@ -814,8 +816,44 @@ if ( ! defined( 'ABSPATH' ) ) {
 									echo wp_kses_post( wc_price( $rule['amount'] ?? 0 ) );
 								}
 								?>
-							</td>
-							<td>
+								</td>
+								<td>
+									<?php
+									$valuation_method = $rule['valuation_method'] ?? 'inherit';
+									$valuation_labels = array(
+										'fob'           => __( 'FOB', 'customs-fees-for-woocommerce' ),
+										'cif'           => __( 'CIF', 'customs-fees-for-woocommerce' ),
+										'cif_insurance' => __( 'CIF + Ins', 'customs-fees-for-woocommerce' ),
+									);
+									if ( 'inherit' !== $valuation_method ) {
+										echo '<span style="display: inline-block; padding: 3px 8px; background: #2271b1; color: #fff; border-radius: 3px; font-size: 11px; font-weight: 600; line-height: 1;" title="' . esc_attr__( 'Overrides global valuation', 'customs-fees-for-woocommerce' ) . '">' . esc_html( $valuation_labels[ $valuation_method ] ?? $valuation_method ) . '</span>';
+									} else {
+										echo '<em style="color: #999; font-size: 11px;">' . esc_html__( 'Global', 'customs-fees-for-woocommerce' ) . '</em>';
+									}
+									?>
+								</td>
+								<td>
+									<?php
+									$base_includes = $rule['base_includes'] ?? array();
+									if ( ! empty( $base_includes ) ) {
+										$count  = count( $base_includes );
+										$labels = array();
+										foreach ( $base_includes as $dep_id ) {
+											foreach ( $rules as $r ) {
+												if ( isset( $r['rule_id'] ) && $r['rule_id'] === $dep_id ) {
+													$labels[] = $r['label'] ?? $dep_id;
+													break;
+												}
+											}
+										}
+										$title = esc_attr( implode( ', ', $labels ) );
+										echo '<span style="display: inline-block; padding: 3px 8px; background: #8261a1; color: #fff; border-radius: 3px; font-size: 11px; font-weight: 600; line-height: 1;" title="' . $title . '">+' . esc_html( $count ) . ' fee(s)</span>';
+									} else {
+										echo '<em style="color: #999; font-size: 11px;">-</em>';
+									}
+									?>
+								</td>
+								<td>
 								<?php
 								$stacking_mode = $rule['stacking_mode'] ?? 'add';
 
@@ -860,7 +898,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<?php endforeach; ?>
 				<?php else : ?>
 					<tr class="no-rules">
-						<td colspan="7"><?php esc_html_e( 'No rules configured. Use the preset loader above or add rules manually.', 'customs-fees-for-woocommerce' ); ?></td>
+						<td colspan="9"><?php esc_html_e( 'No rules configured. Use the preset loader above or add rules manually.', 'customs-fees-for-woocommerce' ); ?></td>
 					</tr>
 				<?php endif; ?>
 			</tbody>

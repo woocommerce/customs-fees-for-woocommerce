@@ -52,9 +52,11 @@ class CFWC_Rule_Matcher {
 	public function find_matching_rules( $product, $from_country, $to_country, $all_rules ) {
 		$matching_rules = array();
 
-		foreach ( $all_rules as $rule_id => $rule ) {
+		foreach ( $all_rules as $key => $rule ) {
 			if ( $this->does_rule_match( $rule, $product, $from_country, $to_country ) ) {
-				$rule['rule_id']  = $rule_id;
+				if ( empty( $rule['rule_id'] ) ) {
+					$rule['rule_id'] = (string) $key;
+				}
 				$matching_rules[] = $rule;
 			}
 		}
