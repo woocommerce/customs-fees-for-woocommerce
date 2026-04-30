@@ -351,7 +351,7 @@ class CFWC_Calculator {
 				foreach ( $pending as $rule ) {
 					$rule_id = isset( $rule['rule_id'] ) && '' !== $rule['rule_id'] ? $rule['rule_id'] : (string) array_search( $rule, $matching_rules, true );
 					if ( '' === $rule_id ) {
-						$rule_id = 'rule_' . wp_rand( 1000, 9999 );
+						$rule_id = 'rule_' . wp_generate_uuid4();
 					}
 
 					$deps = isset( $rule['base_includes'] ) && is_array( $rule['base_includes'] )
@@ -419,7 +419,7 @@ class CFWC_Calculator {
 					// Unresolvable: cycle or external dependency.
 					// Compute remaining rules on their own base so the cart still works.
 					foreach ( $pending as $rule ) {
-						$rule_id = isset( $rule['rule_id'] ) && '' !== $rule['rule_id'] ? $rule['rule_id'] : 'rule_' . wp_rand( 1000, 9999 );
+						$rule_id = isset( $rule['rule_id'] ) && '' !== $rule['rule_id'] ? $rule['rule_id'] : 'rule_' . wp_generate_uuid4();
 
 						$customs_value = $this->apply_valuation_method( $line_total, $cart_item, $cart, $rule );
 						$fee           = $this->calculate_single_fee( $rule, $customs_value );
