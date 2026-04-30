@@ -146,10 +146,9 @@ class CFWC_Ajax {
 		}
 
 		// Support both string rule_id (new) and numeric index (legacy).
-		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		$raw_rule_id = isset( $_POST['rule_id'] ) ? wp_unslash( $_POST['rule_id'] ) : null;
+		$raw_rule_id = isset( $_POST['rule_id'] ) ? sanitize_text_field( wp_unslash( $_POST['rule_id'] ) ) : '';
 
-		if ( null === $raw_rule_id || '' === $raw_rule_id ) {
+		if ( '' === $raw_rule_id ) {
 			wp_send_json_error(
 				array(
 					'message' => __( 'Invalid rule ID.', 'customs-fees-for-woocommerce' ),
@@ -163,12 +162,10 @@ class CFWC_Ajax {
 		$rule_index = null;
 
 		// Try matching by string rule_id first.
-		if ( is_string( $raw_rule_id ) ) {
-			foreach ( $rules as $index => $existing_rule ) {
-				if ( isset( $existing_rule['rule_id'] ) && $existing_rule['rule_id'] === $raw_rule_id ) {
-					$rule_index = $index;
-					break;
-				}
+		foreach ( $rules as $index => $existing_rule ) {
+			if ( isset( $existing_rule['rule_id'] ) && $existing_rule['rule_id'] === $raw_rule_id ) {
+				$rule_index = $index;
+				break;
 			}
 		}
 
