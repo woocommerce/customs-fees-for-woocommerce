@@ -380,8 +380,18 @@ class CFWC_Ajax {
 				$base_includes = array_values( array_unique( array_filter( array_map( 'trim', explode( '|', $base_includes_raw ) ) ) ) );
 			}
 
+			$country_value    = sanitize_text_field( $get( 'country', '' ) );
+			$to_country_value = sanitize_text_field( $get( 'to country', '' ) );
+
+			// Mirror the settings save validation: a rule must declare at least
+			// one destination (legacy `country` or new `to_country`). Otherwise
+			// the row is dropped so importers don't end up with inert rules.
+			if ( '' === $country_value && '' === $to_country_value ) {
+				continue;
+			}
+
 			$new_rules[] = array(
-				'country'          => sanitize_text_field( $get( 'country', '' ) ),
+				'country'          => $country_value,
 				'type'             => sanitize_text_field( $get( 'type', 'percentage' ) ),
 				'rate'             => floatval( $get( 'rate', 0 ) ),
 				'amount'           => floatval( $get( 'amount', 0 ) ),
@@ -394,7 +404,7 @@ class CFWC_Ajax {
 					? sanitize_text_field( $get( 'rule id' ) )
 					: 'rule_' . wp_generate_uuid4(),
 				'from_country'     => sanitize_text_field( $get( 'from country', '' ) ),
-				'to_country'       => sanitize_text_field( $get( 'to country', '' ) ),
+				'to_country'       => $to_country_value,
 				'match_type'       => sanitize_text_field( $get( 'match type', 'all' ) ),
 				'hs_code_pattern'  => sanitize_text_field( $get( 'hs code', '' ) ),
 				'priority'         => absint( $get( 'priority', 0 ) ),
