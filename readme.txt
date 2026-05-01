@@ -192,10 +192,10 @@ Yes, through:
 
 == Changelog ==
 
-= 1.1.7 - 2026-xx-xx =
+= 1.1.7 - 2026-04-13 =
 * Tweak - WooCommerce 10.7 Compatibility.
 
-= 1.1.6 - 2026-xx-xx =
+= 1.1.6 - 2026-03-31 =
 * Tweak - WooCommerce 10.6 Compatibility.
 
 = 1.1.5 - 2026-02-04 =
