@@ -123,6 +123,11 @@ class CFWC_Ajax {
 		// Clear cache.
 		CFWC_Calculator::clear_cache();
 
+		// Reset the cycle-error flag — the rule set just changed, so any
+		// previous dependency-error notice is stale and should be re-derived
+		// on the next calculator run rather than flashed against new data.
+		delete_transient( 'cfwc_rules_dependency_error' );
+
 		wp_send_json_success(
 			array(
 				'message' => __( 'Rule saved successfully.', 'customs-fees-for-woocommerce' ),
@@ -215,6 +220,11 @@ class CFWC_Ajax {
 			// Clear cache.
 			CFWC_Calculator::clear_cache();
 
+			// Reset the cycle-error flag — the rule set just changed, so any
+			// previous dependency-error notice is stale and should be re-derived
+			// on the next calculator run rather than flashed against new data.
+			delete_transient( 'cfwc_rules_dependency_error' );
+
 			wp_send_json_success(
 				array(
 					'message' => __( 'Rule deleted successfully.', 'customs-fees-for-woocommerce' ),
@@ -269,6 +279,11 @@ class CFWC_Ajax {
 
 		// Clear cache.
 		CFWC_Calculator::clear_cache();
+
+		// Reset the cycle-error flag — the rule set just changed, so any
+		// previous dependency-error notice is stale and should be re-derived
+		// on the next calculator run rather than flashed against new data.
+		delete_transient( 'cfwc_rules_dependency_error' );
 
 		wp_send_json_success(
 			array(
@@ -458,6 +473,11 @@ class CFWC_Ajax {
 
 		// Clear cache.
 		CFWC_Calculator::clear_cache();
+
+		// Reset the cycle-error flag — the rule set just changed, so any
+		// previous dependency-error notice is stale and should be re-derived
+		// on the next calculator run rather than flashed against new data.
+		delete_transient( 'cfwc_rules_dependency_error' );
 
 		wp_send_json_success(
 			array(
