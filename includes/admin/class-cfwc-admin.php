@@ -475,9 +475,19 @@ class CFWC_Admin {
 					'depends_on'                 => __( 'Depends on', 'customs-fees-for-woocommerce' ),
 					'inherit_global'             => __( 'Inherit global', 'customs-fees-for-woocommerce' ),
 					'overrides_global'           => __( 'Overrides global valuation', 'customs-fees-for-woocommerce' ),
+					'overrides_global_for_rule'  => __( 'Overrides global for this rule', 'customs-fees-for-woocommerce' ),
 					'select_fees_include'        => __( 'Select fees to include in base', 'customs-fees-for-woocommerce' ),
 					'cycle_warning'              => __( 'Rule dependency cycle detected. Some rules may not calculate correctly.', 'customs-fees-for-woocommerce' ),
-			),
+					'fob'                        => __( 'FOB', 'customs-fees-for-woocommerce' ),
+					'cif'                        => __( 'CIF', 'customs-fees-for-woocommerce' ),
+					'cif_insurance'              => __( 'CIF + Insurance', 'customs-fees-for-woocommerce' ),
+					'cif_insurance_short'        => __( 'CIF + Ins', 'customs-fees-for-woocommerce' ),
+					'global_label'               => __( 'Global', 'customs-fees-for-woocommerce' ),
+					/* translators: %d: count of dependency fees included in the base */
+					'dep_fee_singular'           => __( '+%d fee', 'customs-fees-for-woocommerce' ),
+					/* translators: %d: count of dependency fees included in the base */
+					'dep_fee_plural'             => __( '+%d fees', 'customs-fees-for-woocommerce' ),
+				),
 			)
 		);
 	}

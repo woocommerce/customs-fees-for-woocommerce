@@ -846,8 +846,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 												}
 											}
 										}
-										$title = esc_attr( implode( ', ', $labels ) );
-										echo '<span style="display: inline-block; padding: 3px 8px; background: #8261a1; color: #fff; border-radius: 3px; font-size: 11px; font-weight: 600; line-height: 1;" title="' . $title . '">+' . esc_html( $count ) . ' fee(s)</span>';
+										$title       = esc_attr( implode( ', ', $labels ) );
+										$badge_label = sprintf(
+											/* translators: %s: count of dependency fees included in the base */
+											_n( '+%s fee', '+%s fees', $count, 'customs-fees-for-woocommerce' ),
+											number_format_i18n( $count )
+										);
+										echo '<span style="display: inline-block; padding: 3px 8px; background: #8261a1; color: #fff; border-radius: 3px; font-size: 11px; font-weight: 600; line-height: 1;" title="' . $title . '">' . esc_html( $badge_label ) . '</span>';
 									} else {
 										echo '<em style="color: #999; font-size: 11px;">-</em>';
 									}

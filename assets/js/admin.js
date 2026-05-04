@@ -846,19 +846,19 @@
       // Valuation method.
       newRowHtml += "<td>";
       newRowHtml += '<select name="cfwc_rule_valuation_method" class="cfwc-rule-field" data-field="valuation_method" style="width: 100%;">';
-      newRowHtml += '<option value="inherit">Inherit global</option>';
-      newRowHtml += '<option value="fob">FOB</option>';
-      newRowHtml += '<option value="cif">CIF</option>';
-      newRowHtml += '<option value="cif_insurance">CIF + Insurance</option>';
+      newRowHtml += '<option value="inherit">' + escapeHtml(strings.inherit_global || "Inherit global") + "</option>";
+      newRowHtml += '<option value="fob">' + escapeHtml(strings.fob || "FOB") + "</option>";
+      newRowHtml += '<option value="cif">' + escapeHtml(strings.cif || "CIF") + "</option>";
+      newRowHtml += '<option value="cif_insurance">' + escapeHtml(strings.cif_insurance || "CIF + Insurance") + "</option>";
       newRowHtml += "</select>";
-      newRowHtml += '<span style="font-size: 11px; color: #666; margin-top: 2px; display: block;">Overrides global for this rule</span>';
+      newRowHtml += '<span style="font-size: 11px; color: #666; margin-top: 2px; display: block;">' + escapeHtml(strings.overrides_global_for_rule || "Overrides global for this rule") + "</span>";
       newRowHtml += "</td>";
 
       // Depends on (base_includes) - hidden for flat type.
       newRowHtml += '<td class="cfwc-base-includes-cell">';
       newRowHtml += '<select name="cfwc_rule_base_includes" class="cfwc-rule-field cfwc-base-includes-select" data-field="base_includes" multiple="multiple" style="width: 100%;">';
       newRowHtml += "</select>";
-      newRowHtml += '<span style="font-size: 11px; color: #666; margin-top: 2px; display: block;">Select fees to include in base</span>';
+      newRowHtml += '<span style="font-size: 11px; color: #666; margin-top: 2px; display: block;">' + escapeHtml(strings.select_fees_include || "Select fees to include in base") + "</span>";
       newRowHtml += "</td>";
 
       // Stacking mode.
@@ -914,10 +914,11 @@
           ".cfwc-rules-table tbody tr:last .cfwc-base-includes-select"
         );
         populateBaseIncludesSelect($baseIncludes, newRuleId, []);
+        var basePlaceholder = strings.select_fees_include || "Select fees to include in base";
         if ($baseIncludes.length && typeof $.fn.selectWoo !== "undefined") {
-          $baseIncludes.selectWoo({ width: "100%", placeholder: "Select fees to include in base" });
+          $baseIncludes.selectWoo({ width: "100%", placeholder: basePlaceholder });
         } else if ($baseIncludes.length && $.fn.select2) {
-          $baseIncludes.select2({ width: "100%", placeholder: "Select fees to include in base" });
+          $baseIncludes.select2({ width: "100%", placeholder: basePlaceholder });
         }
       }, 100);
 
@@ -1127,12 +1128,12 @@
       var currentValuation = rule.valuation_method || "inherit";
       editRowHtml += "<td>";
       editRowHtml += '<select name="cfwc_rule_valuation_method" class="cfwc-rule-field" data-field="valuation_method" style="width: 100%;">';
-      editRowHtml += '<option value="inherit"' + (currentValuation === "inherit" ? " selected" : "") + '>Inherit global</option>';
-      editRowHtml += '<option value="fob"' + (currentValuation === "fob" ? " selected" : "") + '>FOB</option>';
-      editRowHtml += '<option value="cif"' + (currentValuation === "cif" ? " selected" : "") + '>CIF</option>';
-      editRowHtml += '<option value="cif_insurance"' + (currentValuation === "cif_insurance" ? " selected" : "") + '>CIF + Insurance</option>';
+      editRowHtml += '<option value="inherit"' + (currentValuation === "inherit" ? " selected" : "") + ">" + escapeHtml(strings.inherit_global || "Inherit global") + "</option>";
+      editRowHtml += '<option value="fob"' + (currentValuation === "fob" ? " selected" : "") + ">" + escapeHtml(strings.fob || "FOB") + "</option>";
+      editRowHtml += '<option value="cif"' + (currentValuation === "cif" ? " selected" : "") + ">" + escapeHtml(strings.cif || "CIF") + "</option>";
+      editRowHtml += '<option value="cif_insurance"' + (currentValuation === "cif_insurance" ? " selected" : "") + ">" + escapeHtml(strings.cif_insurance || "CIF + Insurance") + "</option>";
       editRowHtml += "</select>";
-      editRowHtml += '<span style="font-size: 11px; color: #666; margin-top: 2px; display: block;">Overrides global for this rule</span>';
+      editRowHtml += '<span style="font-size: 11px; color: #666; margin-top: 2px; display: block;">' + escapeHtml(strings.overrides_global_for_rule || "Overrides global for this rule") + "</span>";
       editRowHtml += "</td>";
 
       // Depends on (base_includes).
@@ -1140,7 +1141,7 @@
       editRowHtml += '<td class="cfwc-base-includes-cell">';
       editRowHtml += '<select name="cfwc_rule_base_includes" class="cfwc-rule-field cfwc-base-includes-select" data-field="base_includes" multiple="multiple" style="width: 100%;">';
       editRowHtml += "</select>";
-      editRowHtml += '<span style="font-size: 11px; color: #666; margin-top: 2px; display: block;">Select fees to include in base</span>';
+      editRowHtml += '<span style="font-size: 11px; color: #666; margin-top: 2px; display: block;">' + escapeHtml(strings.select_fees_include || "Select fees to include in base") + "</span>";
       editRowHtml += "</td>";
 
       // Stacking mode.
@@ -1206,15 +1207,16 @@
         rule.rule_id || "",
         currentBaseIncludes
       );
+      var editBasePlaceholder = strings.select_fees_include || "Select fees to include in base";
       if ($baseIncludes.length && typeof $.fn.selectWoo !== "undefined") {
         $baseIncludes.selectWoo({
           width: "100%",
-          placeholder: "Select fees to include in base",
+          placeholder: editBasePlaceholder,
         });
       } else if ($baseIncludes.length && $.fn.select2) {
         $baseIncludes.select2({
           width: "100%",
-          placeholder: "Select fees to include in base",
+          placeholder: editBasePlaceholder,
         });
       }
 
@@ -1604,14 +1606,14 @@
           // Valuation method badge.
           var valuationMethod = rule.valuation_method || "inherit";
           var valuationLabels = {
-            fob: "FOB",
-            cif: "CIF",
-            cif_insurance: "CIF + Ins",
+            fob: strings.fob || "FOB",
+            cif: strings.cif || "CIF",
+            cif_insurance: strings.cif_insurance_short || "CIF + Ins",
           };
           if (valuationMethod !== "inherit") {
-            row += '<td><span style="display: inline-block; padding: 3px 8px; background: #2271b1; color: #fff; border-radius: 3px; font-size: 11px; font-weight: 600; line-height: 1;" title="Overrides global valuation">' + escapeHtml(valuationLabels[valuationMethod] || valuationMethod) + "</span></td>";
+            row += '<td><span style="display: inline-block; padding: 3px 8px; background: #2271b1; color: #fff; border-radius: 3px; font-size: 11px; font-weight: 600; line-height: 1;" title="' + escapeHtml(strings.overrides_global || "Overrides global valuation") + '">' + escapeHtml(valuationLabels[valuationMethod] || valuationMethod) + "</span></td>";
           } else {
-            row += '<td><em style="color: #999; font-size: 11px;">Global</em></td>';
+            row += '<td><em style="color: #999; font-size: 11px;">' + escapeHtml(strings.global_label || "Global") + "</em></td>";
           }
 
           // Depends on (base_includes).
@@ -1627,7 +1629,13 @@
               });
             });
             var depTitle = escapeHtml(depLabels.join(", "));
-            row += '<td><span style="display: inline-block; padding: 3px 8px; background: #8261a1; color: #fff; border-radius: 3px; font-size: 11px; font-weight: 600; line-height: 1;" title="' + depTitle + '">+' + baseIncludes.length + " fee(s)</span></td>";
+            // Pick singular/plural form. Languages with >2 plural forms (e.g. Russian, Polish, Arabic)
+            // need wp.i18n._n with wp_set_script_translations; tracked separately.
+            var depTemplate = baseIncludes.length === 1
+              ? (strings.dep_fee_singular || "+%d fee")
+              : (strings.dep_fee_plural || "+%d fees");
+            var depBadgeText = depTemplate.replace("%d", baseIncludes.length);
+            row += '<td><span style="display: inline-block; padding: 3px 8px; background: #8261a1; color: #fff; border-radius: 3px; font-size: 11px; font-weight: 600; line-height: 1;" title="' + depTitle + '">' + escapeHtml(depBadgeText) + "</span></td>";
           } else {
             row += '<td><em style="color: #999; font-size: 11px;">-</em></td>';
           }
