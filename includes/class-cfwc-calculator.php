@@ -325,15 +325,6 @@ class CFWC_Calculator {
 					),
 					'warning'
 				);
-				if ( function_exists( 'wc_get_logger' ) ) {
-					wc_get_logger()->warning(
-						sprintf(
-							'Cycle detected in customs fee rule dependencies: %s',
-							implode( ', ', $cycle_labels )
-						),
-						array( 'source' => 'customs-fees' )
-					);
-				}
 				set_transient( 'cfwc_rules_dependency_error', $cycle_labels, DAY_IN_SECONDS );
 			}
 
@@ -349,9 +340,33 @@ class CFWC_Calculator {
 				$still_pending = array();
 
 				foreach ( $pending as $rule ) {
-					$rule_id = isset( $rule['rule_id'] ) && '' !== $rule['rule_id'] ? $rule['rule_id'] : (string) array_search( $rule, $matching_rules, true );
-					if ( '' === $rule_id ) {
-						$rule_id = 'rule_' . wp_generate_uuid4();
+					if ( isset( $rule['rule_id'] ) && '' !== $rule['rule_id'] ) {
+						$rule_id = $rule['rule_id'];
+					} else {
+						$found_index = array_search( $rule, $matching_rules, true );
+						$rule_id     = false !== $found_index ? (string) $found_index : '';
+
+						// If the fallback id is already in $calculated, two rules
+						// without a rule_id resolved to the same array_search index
+						// — i.e. the merchant has duplicate identical rules. Surface
+						// this so it can be cleaned up; otherwise the second one
+						// silently overwrites the first in $calculated.
+						if ( '' !== $rule_id && isset( $calculated[ $rule_id ] ) ) {
+							$dup_label = isset( $rule['label'] ) && '' !== $rule['label']
+								? $rule['label']
+								: ( isset( $rule['country'] ) ? $rule['country'] : '' );
+							$this->log_debug(
+								sprintf(
+									'    WARNING: Duplicate rule detected (no rule_id, label "%s"). Only the first match will apply — assign a unique rule_id or remove the duplicate.',
+									$dup_label
+								),
+								'warning'
+							);
+						}
+
+						if ( '' === $rule_id ) {
+							$rule_id = 'rule_' . wp_generate_uuid4();
+						}
 					}
 
 					$deps = isset( $rule['base_includes'] ) && is_array( $rule['base_includes'] )

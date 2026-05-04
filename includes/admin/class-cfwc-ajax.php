@@ -123,6 +123,11 @@ class CFWC_Ajax {
 		// Clear cache.
 		CFWC_Calculator::clear_cache();
 
+		// Reset the cycle-error flag — the rule set just changed, so any
+		// previous dependency-error notice is stale and should be re-derived
+		// on the next calculator run rather than flashed against new data.
+		delete_transient( 'cfwc_rules_dependency_error' );
+
 		wp_send_json_success(
 			array(
 				'message' => __( 'Rule saved successfully.', 'customs-fees-for-woocommerce' ),
@@ -179,15 +184,46 @@ class CFWC_Ajax {
 
 		// Remove rule.
 		if ( null !== $rule_index && isset( $rules[ $rule_index ] ) ) {
+			$deleted_rule_id = isset( $rules[ $rule_index ]['rule_id'] ) ? $rules[ $rule_index ]['rule_id'] : '';
+
 			unset( $rules[ $rule_index ] );
 			// Re-index array.
 			$rules = array_values( $rules );
+
+			// Scrub the deleted rule_id from any other rule's base_includes so
+			// dependencies don't dangle after deletion. Without this, a rule
+			// that depended on the deleted one would keep referencing a
+			// non-existent id; the calculator silently drops missing deps but
+			// the merchant gets no signal that a dependency was broken.
+			if ( '' !== $deleted_rule_id ) {
+				foreach ( $rules as $i => $existing_rule ) {
+					if ( empty( $existing_rule['base_includes'] ) || ! is_array( $existing_rule['base_includes'] ) ) {
+						continue;
+					}
+					$filtered = array_values(
+						array_filter(
+							$existing_rule['base_includes'],
+							function ( $dep_id ) use ( $deleted_rule_id ) {
+								return $dep_id !== $deleted_rule_id;
+							}
+						)
+					);
+					if ( $filtered !== $existing_rule['base_includes'] ) {
+						$rules[ $i ]['base_includes'] = $filtered;
+					}
+				}
+			}
 
 			// Save rules.
 			update_option( 'cfwc_rules', $rules );
 
 			// Clear cache.
 			CFWC_Calculator::clear_cache();
+
+			// Reset the cycle-error flag — the rule set just changed, so any
+			// previous dependency-error notice is stale and should be re-derived
+			// on the next calculator run rather than flashed against new data.
+			delete_transient( 'cfwc_rules_dependency_error' );
 
 			wp_send_json_success(
 				array(
@@ -243,6 +279,11 @@ class CFWC_Ajax {
 
 		// Clear cache.
 		CFWC_Calculator::clear_cache();
+
+		// Reset the cycle-error flag — the rule set just changed, so any
+		// previous dependency-error notice is stale and should be re-derived
+		// on the next calculator run rather than flashed against new data.
+		delete_transient( 'cfwc_rules_dependency_error' );
 
 		wp_send_json_success(
 			array(
@@ -432,6 +473,11 @@ class CFWC_Ajax {
 
 		// Clear cache.
 		CFWC_Calculator::clear_cache();
+
+		// Reset the cycle-error flag — the rule set just changed, so any
+		// previous dependency-error notice is stale and should be re-derived
+		// on the next calculator run rather than flashed against new data.
+		delete_transient( 'cfwc_rules_dependency_error' );
 
 		wp_send_json_success(
 			array(
