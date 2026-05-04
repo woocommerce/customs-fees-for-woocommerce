@@ -325,15 +325,6 @@ class CFWC_Calculator {
 					),
 					'warning'
 				);
-				if ( function_exists( 'wc_get_logger' ) ) {
-					wc_get_logger()->warning(
-						sprintf(
-							'Cycle detected in customs fee rule dependencies: %s',
-							implode( ', ', $cycle_labels )
-						),
-						array( 'source' => 'customs-fees' )
-					);
-				}
 				set_transient( 'cfwc_rules_dependency_error', $cycle_labels, DAY_IN_SECONDS );
 			}
 
@@ -371,15 +362,6 @@ class CFWC_Calculator {
 								),
 								'warning'
 							);
-							if ( function_exists( 'wc_get_logger' ) ) {
-								wc_get_logger()->warning(
-									sprintf(
-										'Customs fee rule "%s" is missing a rule_id and is identical to another rule. Duplicate rules detected — assign a unique rule_id or remove the duplicate.',
-										$dup_label
-									),
-									array( 'source' => 'customs-fees' )
-								);
-							}
 						}
 
 						if ( '' === $rule_id ) {
