@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Customs Fees for WooCommerce 1.1.7\n"
 "Report-Msgid-Bugs-To: "
 "https://wordpress.org/support/plugin/customs-fees-for-woocommerce\n"
-"POT-Creation-Date: 2026-04-27 15:42:21+00:00\n"
+"POT-Creation-Date: 2026-05-04 13:51:56+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -52,13 +52,13 @@ msgid "Product Customs Information:"
 msgstr ""
 
 #: includes/admin/class-cfwc-admin.php:169
-#: includes/admin/class-cfwc-admin.php:519 includes/class-cfwc-display.php:295
+#: includes/admin/class-cfwc-admin.php:529 includes/class-cfwc-display.php:295
 #: includes/class-cfwc-display.php:342
 msgid "HS Code:"
 msgstr ""
 
 #: includes/admin/class-cfwc-admin.php:176
-#: includes/admin/class-cfwc-admin.php:526 includes/class-cfwc-display.php:301
+#: includes/admin/class-cfwc-admin.php:536 includes/class-cfwc-display.php:301
 #: includes/class-cfwc-display.php:348
 msgid "Origin:"
 msgstr ""
@@ -231,12 +231,12 @@ msgid "Cancel"
 msgstr ""
 
 #: includes/admin/class-cfwc-admin.php:467
-#: includes/admin/views/rules-section.php:891
+#: includes/admin/views/rules-section.php:896
 msgid "Edit"
 msgstr ""
 
 #: includes/admin/class-cfwc-admin.php:468
-#: includes/admin/views/rules-section.php:894
+#: includes/admin/views/rules-section.php:899
 msgid "Delete"
 msgstr ""
 
@@ -253,7 +253,7 @@ msgid "Click the delete button again to confirm deletion."
 msgstr ""
 
 #: includes/admin/class-cfwc-admin.php:472
-#: includes/admin/views/rules-section.php:901
+#: includes/admin/views/rules-section.php:906
 msgid "No rules configured. Use the preset loader above or add rules manually."
 msgstr ""
 
@@ -282,14 +282,52 @@ msgid "Overrides global valuation"
 msgstr ""
 
 #: includes/admin/class-cfwc-admin.php:478
-msgid "Select fees to include in base"
+msgid "Overrides global for this rule"
 msgstr ""
 
 #: includes/admin/class-cfwc-admin.php:479
+msgid "Select fees to include in base"
+msgstr ""
+
+#: includes/admin/class-cfwc-admin.php:480
 msgid "Rule dependency cycle detected. Some rules may not calculate correctly."
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:552
+#: includes/admin/class-cfwc-admin.php:481
+#: includes/admin/views/rules-section.php:824
+msgid "FOB"
+msgstr ""
+
+#: includes/admin/class-cfwc-admin.php:482
+#: includes/admin/views/rules-section.php:825
+msgid "CIF"
+msgstr ""
+
+#: includes/admin/class-cfwc-admin.php:483
+msgid "CIF + Insurance"
+msgstr ""
+
+#: includes/admin/class-cfwc-admin.php:484
+#: includes/admin/views/rules-section.php:826
+msgid "CIF + Ins"
+msgstr ""
+
+#: includes/admin/class-cfwc-admin.php:485
+#: includes/admin/views/rules-section.php:831
+msgid "Global"
+msgstr ""
+
+#: includes/admin/class-cfwc-admin.php:487
+#. translators: %d: count of dependency fees included in the base
+msgid "+%d fee"
+msgstr ""
+
+#: includes/admin/class-cfwc-admin.php:489
+#. translators: %d: count of dependency fees included in the base
+msgid "+%d fees"
+msgstr ""
+
+#: includes/admin/class-cfwc-admin.php:562
 #: includes/admin/class-cfwc-onboarding.php:274
 #: includes/admin/class-cfwc-onboarding.php:355
 #: includes/class-cfwc-emails.php:186 includes/class-cfwc-export-import.php:58
@@ -301,7 +339,7 @@ msgstr ""
 msgid "HS Code"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:556 includes/class-cfwc-emails.php:201
+#: includes/admin/class-cfwc-admin.php:566 includes/class-cfwc-emails.php:201
 #: includes/class-cfwc-products.php:106
 msgid "Origin"
 msgstr ""
@@ -310,53 +348,53 @@ msgstr ""
 msgid "Rule saved successfully."
 msgstr ""
 
-#: includes/admin/class-cfwc-ajax.php:155
+#: includes/admin/class-cfwc-ajax.php:154
 msgid "Invalid rule ID."
 msgstr ""
 
-#: includes/admin/class-cfwc-ajax.php:197
+#: includes/admin/class-cfwc-ajax.php:194
 msgid "Rule deleted successfully."
 msgstr ""
 
-#: includes/admin/class-cfwc-ajax.php:203
+#: includes/admin/class-cfwc-ajax.php:200
 msgid "Rule not found."
 msgstr ""
 
-#: includes/admin/class-cfwc-ajax.php:228
+#: includes/admin/class-cfwc-ajax.php:225
 msgid "Invalid order data."
 msgstr ""
 
-#: includes/admin/class-cfwc-ajax.php:252
+#: includes/admin/class-cfwc-ajax.php:249
 msgid "Rules reordered successfully."
 msgstr ""
 
-#: includes/admin/class-cfwc-ajax.php:305
+#: includes/admin/class-cfwc-ajax.php:302
 msgid "Export ready for download."
 msgstr ""
 
-#: includes/admin/class-cfwc-ajax.php:330
+#: includes/admin/class-cfwc-ajax.php:327
 msgid "No CSV content provided."
 msgstr ""
 
-#: includes/admin/class-cfwc-ajax.php:412
+#: includes/admin/class-cfwc-ajax.php:419
 msgid "No valid rules found in CSV."
 msgstr ""
 
-#: includes/admin/class-cfwc-ajax.php:433
+#: includes/admin/class-cfwc-ajax.php:440
 #. translators: %d: Number of rules imported
 msgid "%d rules imported successfully."
 msgstr ""
 
-#: includes/admin/class-cfwc-ajax.php:460
+#: includes/admin/class-cfwc-ajax.php:467
 msgid "Invalid test parameters."
 msgstr ""
 
-#: includes/admin/class-cfwc-ajax.php:543
-#: includes/admin/class-cfwc-ajax.php:568
+#: includes/admin/class-cfwc-ajax.php:550
+#: includes/admin/class-cfwc-ajax.php:575
 msgid "Customs Fee"
 msgstr ""
 
-#: includes/admin/class-cfwc-ajax.php:582
+#: includes/admin/class-cfwc-ajax.php:589
 msgid "Calculation complete."
 msgstr ""
 
@@ -588,7 +626,7 @@ msgid "Rule stacking modes"
 msgstr ""
 
 #: includes/admin/views/rules-section.php:249
-#: includes/admin/views/rules-section.php:862
+#: includes/admin/views/rules-section.php:867
 msgid "Stack"
 msgstr ""
 
@@ -597,7 +635,7 @@ msgid "Adds with other matching rules."
 msgstr ""
 
 #: includes/admin/views/rules-section.php:253
-#: includes/admin/views/rules-section.php:863
+#: includes/admin/views/rules-section.php:868
 msgid "Override"
 msgstr ""
 
@@ -606,7 +644,7 @@ msgid "Replaces lower priority rules."
 msgstr ""
 
 #: includes/admin/views/rules-section.php:257
-#: includes/admin/views/rules-section.php:864
+#: includes/admin/views/rules-section.php:869
 msgid "Exclusive"
 msgstr ""
 
@@ -737,31 +775,22 @@ msgstr ""
 msgid "+%d more"
 msgstr ""
 
-#: includes/admin/views/rules-section.php:824
-msgid "FOB"
-msgstr ""
+#: includes/admin/views/rules-section.php:852
+#. translators: %s: count of dependency fees included in the base
+msgid "+%s fee"
+msgid_plural "+%s fees"
+msgstr[0] ""
+msgstr[1] ""
 
-#: includes/admin/views/rules-section.php:825
-msgid "CIF"
-msgstr ""
-
-#: includes/admin/views/rules-section.php:826
-msgid "CIF + Ins"
-msgstr ""
-
-#: includes/admin/views/rules-section.php:831
-msgid "Global"
-msgstr ""
-
-#: includes/admin/views/rules-section.php:874
+#: includes/admin/views/rules-section.php:879
 msgid "Adds with other matching rules"
 msgstr ""
 
-#: includes/admin/views/rules-section.php:875
+#: includes/admin/views/rules-section.php:880
 msgid "Replaces lower priority rules"
 msgstr ""
 
-#: includes/admin/views/rules-section.php:876
+#: includes/admin/views/rules-section.php:881
 msgid "Only this rule applies"
 msgstr ""
 
