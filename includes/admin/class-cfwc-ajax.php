@@ -98,8 +98,14 @@ class CFWC_Ajax {
 		// Update or add rule.
 		$updated = false;
 		if ( null !== $rule_id && isset( $rules[ $rule_id ] ) ) {
+			// Preserve the canonical rule_id from storage so a missing or
+			// stale client-supplied rule_id can't silently rotate the id and
+			// break other rules' base_includes references.
+			if ( ! empty( $rules[ $rule_id ]['rule_id'] ) ) {
+				$rule['rule_id'] = $rules[ $rule_id ]['rule_id'];
+			}
 			$rules[ $rule_id ] = $rule;
-			$updated = true;
+			$updated           = true;
 		} else {
 			// Try matching by rule_id string for existing rules.
 			foreach ( $rules as $index => $existing_rule ) {
