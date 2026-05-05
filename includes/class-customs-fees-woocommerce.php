@@ -165,13 +165,19 @@ final class Customs_Fees_WooCommerce {
 	public function maybe_run_migrations() {
 		// Migration: per-rule valuation fields (rule_id, valuation_method,
 		// base_includes) introduced for the per-rule valuation feature.
-		if ( ! get_option( 'cfwc_rules_migrated_perrule_valuation' ) ) {
+		//
+		// add_option() is atomic at the DB layer: only the first concurrent
+		// request after upgrade succeeds, so the migration body runs exactly
+		// once even if multiple PHP workers hit init() in parallel. Using a
+		// non-atomic get_option/update_option pair here previously allowed
+		// concurrent workers to each read the pre-migration rules and race
+		// their update_option('cfwc_rules', ...) writes.
+		if ( add_option( 'cfwc_rules_migrated_perrule_valuation', 1 ) ) {
 			if ( class_exists( 'CFWC_Settings' ) && method_exists( 'CFWC_Settings', 'migrate_rules' ) ) {
 				$rules = get_option( 'cfwc_rules', array() );
 				$rules = CFWC_Settings::migrate_rules( $rules );
 				update_option( 'cfwc_rules', $rules );
 			}
-			update_option( 'cfwc_rules_migrated_perrule_valuation', 1 );
 			delete_transient( 'cfwc_rules_cache' );
 		}
 
