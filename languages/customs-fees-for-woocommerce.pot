@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Customs Fees for WooCommerce 1.1.7\n"
 "Report-Msgid-Bugs-To: "
 "https://wordpress.org/support/plugin/customs-fees-for-woocommerce\n"
-"POT-Creation-Date: 2026-05-05 09:32:59+00:00\n"
+"POT-Creation-Date: 2026-05-05 09:51:21+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -344,57 +344,58 @@ msgstr ""
 msgid "Origin"
 msgstr ""
 
-#: includes/admin/class-cfwc-ajax.php:133
+#: includes/admin/class-cfwc-ajax.php:139
 msgid "Rule saved successfully."
 msgstr ""
 
-#: includes/admin/class-cfwc-ajax.php:159
+#: includes/admin/class-cfwc-ajax.php:165
 msgid "Invalid rule ID."
 msgstr ""
 
-#: includes/admin/class-cfwc-ajax.php:230
+#: includes/admin/class-cfwc-ajax.php:236
 msgid "Rule deleted successfully."
 msgstr ""
 
-#: includes/admin/class-cfwc-ajax.php:236
+#: includes/admin/class-cfwc-ajax.php:242
 msgid "Rule not found."
 msgstr ""
 
-#: includes/admin/class-cfwc-ajax.php:261
+#: includes/admin/class-cfwc-ajax.php:267
+#: includes/admin/class-cfwc-ajax.php:289
 msgid "Invalid order data."
 msgstr ""
 
-#: includes/admin/class-cfwc-ajax.php:290
+#: includes/admin/class-cfwc-ajax.php:307
 msgid "Rules reordered successfully."
 msgstr ""
 
-#: includes/admin/class-cfwc-ajax.php:343
+#: includes/admin/class-cfwc-ajax.php:360
 msgid "Export ready for download."
 msgstr ""
 
-#: includes/admin/class-cfwc-ajax.php:368
+#: includes/admin/class-cfwc-ajax.php:385
 msgid "No CSV content provided."
 msgstr ""
 
-#: includes/admin/class-cfwc-ajax.php:460
+#: includes/admin/class-cfwc-ajax.php:477
 msgid "No valid rules found in CSV."
 msgstr ""
 
-#: includes/admin/class-cfwc-ajax.php:486
+#: includes/admin/class-cfwc-ajax.php:503
 #. translators: %d: Number of rules imported
 msgid "%d rules imported successfully."
 msgstr ""
 
-#: includes/admin/class-cfwc-ajax.php:513
+#: includes/admin/class-cfwc-ajax.php:530
 msgid "Invalid test parameters."
 msgstr ""
 
-#: includes/admin/class-cfwc-ajax.php:596
-#: includes/admin/class-cfwc-ajax.php:621
+#: includes/admin/class-cfwc-ajax.php:613
+#: includes/admin/class-cfwc-ajax.php:638
 msgid "Customs Fee"
 msgstr ""
 
-#: includes/admin/class-cfwc-ajax.php:635
+#: includes/admin/class-cfwc-ajax.php:652
 msgid "Calculation complete."
 msgstr ""
 
@@ -1529,11 +1530,11 @@ msgid ""
 "active."
 msgstr ""
 
-#: includes/class-customs-fees-woocommerce.php:201
+#: includes/class-customs-fees-woocommerce.php:207
 msgid "Cloning is forbidden."
 msgstr ""
 
-#: includes/class-customs-fees-woocommerce.php:210
+#: includes/class-customs-fees-woocommerce.php:216
 msgid "Unserializing instances of this class is forbidden."
 msgstr ""
 
