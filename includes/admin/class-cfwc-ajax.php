@@ -280,6 +280,17 @@ class CFWC_Ajax {
 			}
 		}
 
+		// Refuse a partial reorder: a stale or short order payload would
+		// silently drop the rules whose indices it omits, permanently
+		// deleting them from cfwc_rules.
+		if ( count( $reordered ) !== count( $rules ) ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'Invalid order data.', 'customs-fees-for-woocommerce' ),
+				)
+			);
+		}
+
 		// Save reordered rules.
 		update_option( 'cfwc_rules', $reordered );
 
