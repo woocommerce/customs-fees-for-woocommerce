@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Customs Fees for WooCommerce 1.1.7\n"
 "Report-Msgid-Bugs-To: "
 "https://wordpress.org/support/plugin/customs-fees-for-woocommerce\n"
-"POT-Creation-Date: 2026-05-05 09:51:21+00:00\n"
+"POT-Creation-Date: 2026-05-05 10:11:04+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -22,7 +22,7 @@ msgstr ""
 #: includes/admin/class-cfwc-admin.php:111
 #: includes/admin/class-cfwc-admin.php:199 includes/class-cfwc-display.php:68
 #: includes/class-cfwc-display.php:145 includes/class-cfwc-display.php:171
-#: includes/class-cfwc-display.php:225 includes/class-cfwc-display.php:383
+#: includes/class-cfwc-display.php:225 includes/class-cfwc-display.php:384
 #: includes/class-cfwc-loader.php:279 includes/class-cfwc-settings.php:65
 msgid "Customs & Import Fees"
 msgstr ""
@@ -114,12 +114,12 @@ msgid "Please select a preset first."
 msgstr ""
 
 #: includes/admin/class-cfwc-admin.php:442
-#: includes/admin/views/rules-section.php:583
+#: includes/admin/views/rules-section.php:417
 msgid "Import Preset Rules"
 msgstr ""
 
 #: includes/admin/class-cfwc-admin.php:443
-#: includes/admin/views/rules-section.php:585
+#: includes/admin/views/rules-section.php:419
 msgid "Add to Existing Rules"
 msgstr ""
 
@@ -136,7 +136,7 @@ msgid "Click again to confirm"
 msgstr ""
 
 #: includes/admin/class-cfwc-admin.php:447
-#: includes/admin/views/rules-section.php:590
+#: includes/admin/views/rules-section.php:424
 msgid "Replace All Rules"
 msgstr ""
 
@@ -149,7 +149,7 @@ msgid "All rules deleted. Remember to click \"Save changes\" to persist."
 msgstr ""
 
 #: includes/admin/class-cfwc-admin.php:450
-#: includes/admin/views/rules-section.php:689
+#: includes/admin/views/rules-section.php:523
 msgid "Delete All Rules"
 msgstr ""
 
@@ -231,12 +231,12 @@ msgid "Cancel"
 msgstr ""
 
 #: includes/admin/class-cfwc-admin.php:470
-#: includes/admin/views/rules-section.php:896
+#: includes/admin/views/rules-section.php:722
 msgid "Edit"
 msgstr ""
 
 #: includes/admin/class-cfwc-admin.php:471
-#: includes/admin/views/rules-section.php:899
+#: includes/admin/views/rules-section.php:725
 msgid "Delete"
 msgstr ""
 
@@ -253,7 +253,7 @@ msgid "Click the delete button again to confirm deletion."
 msgstr ""
 
 #: includes/admin/class-cfwc-admin.php:475
-#: includes/admin/views/rules-section.php:906
+#: includes/admin/views/rules-section.php:732
 msgid "No rules configured. Use the preset loader above or add rules manually."
 msgstr ""
 
@@ -268,7 +268,7 @@ msgid "Valuation method"
 msgstr ""
 
 #: includes/admin/class-cfwc-admin.php:478
-#: includes/admin/views/rules-section.php:711
+#: includes/admin/views/rules-section.php:545
 msgid "Depends on"
 msgstr ""
 
@@ -277,7 +277,7 @@ msgid "Inherit global"
 msgstr ""
 
 #: includes/admin/class-cfwc-admin.php:480
-#: includes/admin/views/rules-section.php:829
+#: includes/admin/views/rules-section.php:662
 msgid "Overrides global valuation"
 msgstr ""
 
@@ -294,12 +294,12 @@ msgid "Rule dependency cycle detected. Some rules may not calculate correctly."
 msgstr ""
 
 #: includes/admin/class-cfwc-admin.php:484
-#: includes/admin/views/rules-section.php:824
+#: includes/admin/views/rules-section.php:657
 msgid "FOB"
 msgstr ""
 
 #: includes/admin/class-cfwc-admin.php:485
-#: includes/admin/views/rules-section.php:825
+#: includes/admin/views/rules-section.php:658
 msgid "CIF"
 msgstr ""
 
@@ -308,12 +308,12 @@ msgid "CIF + Insurance"
 msgstr ""
 
 #: includes/admin/class-cfwc-admin.php:487
-#: includes/admin/views/rules-section.php:826
+#: includes/admin/views/rules-section.php:659
 msgid "CIF + Ins"
 msgstr ""
 
 #: includes/admin/class-cfwc-admin.php:488
-#: includes/admin/views/rules-section.php:831
+#: includes/admin/views/rules-section.php:664
 msgid "Global"
 msgstr ""
 
@@ -627,7 +627,7 @@ msgid "Rule stacking modes"
 msgstr ""
 
 #: includes/admin/views/rules-section.php:249
-#: includes/admin/views/rules-section.php:867
+#: includes/admin/views/rules-section.php:700
 msgid "Stack"
 msgstr ""
 
@@ -636,7 +636,7 @@ msgid "Adds with other matching rules."
 msgstr ""
 
 #: includes/admin/views/rules-section.php:253
-#: includes/admin/views/rules-section.php:868
+#: includes/admin/views/rules-section.php:701
 msgid "Override"
 msgstr ""
 
@@ -645,7 +645,7 @@ msgid "Replaces lower priority rules."
 msgstr ""
 
 #: includes/admin/views/rules-section.php:257
-#: includes/admin/views/rules-section.php:869
+#: includes/admin/views/rules-section.php:702
 msgid "Exclusive"
 msgstr ""
 
@@ -657,36 +657,36 @@ msgstr ""
 msgid "Got it"
 msgstr ""
 
-#: includes/admin/views/rules-section.php:565
+#: includes/admin/views/rules-section.php:399
 msgid "Quick Start with Presets"
 msgstr ""
 
-#: includes/admin/views/rules-section.php:566
+#: includes/admin/views/rules-section.php:400
 msgid "Load presets to quickly configure common import scenarios:"
 msgstr ""
 
-#: includes/admin/views/rules-section.php:569
+#: includes/admin/views/rules-section.php:403
 msgid "-- Select a preset --"
 msgstr ""
 
-#: includes/admin/views/rules-section.php:628
+#: includes/admin/views/rules-section.php:462
 msgid "⚠️ Rule Stacking Detected"
 msgstr ""
 
-#: includes/admin/views/rules-section.php:632
+#: includes/admin/views/rules-section.php:466
 msgid ""
 "You have both general (Any → Country) and specific (Country → Country) "
 "rules with \"Add\" stacking mode. These will combine unless you set them to "
 "\"Exclusive\" or \"Override\" mode."
 msgstr ""
 
-#: includes/admin/views/rules-section.php:633
+#: includes/admin/views/rules-section.php:467
 msgid ""
 "Example: A general \"Any → US 10%\" rule will add to \"China → US 25%\" if "
 "both are in \"Add\" mode."
 msgstr ""
 
-#: includes/admin/views/rules-section.php:642
+#: includes/admin/views/rules-section.php:476
 #. translators: %s: list of countries
 msgid ""
 "You have multiple rules with \"Add\" stacking mode for %s. These fees will "
@@ -694,104 +694,104 @@ msgid ""
 "only the highest priority rule to apply."
 msgstr ""
 
-#: includes/admin/views/rules-section.php:670
+#: includes/admin/views/rules-section.php:504
 msgid "Dismiss this notice."
 msgstr ""
 
-#: includes/admin/views/rules-section.php:684
+#: includes/admin/views/rules-section.php:518
 msgid "All Rules"
 msgstr ""
 
-#: includes/admin/views/rules-section.php:686
+#: includes/admin/views/rules-section.php:520
 msgid "Add New Rule"
 msgstr ""
 
-#: includes/admin/views/rules-section.php:692
+#: includes/admin/views/rules-section.php:526
 msgid ""
 "Configure customs fee rules based on destination countries, product "
 "origins, categories, and HS codes."
 msgstr ""
 
-#: includes/admin/views/rules-section.php:696
+#: includes/admin/views/rules-section.php:530
 msgid "Need help getting started?"
 msgstr ""
 
-#: includes/admin/views/rules-section.php:705
+#: includes/admin/views/rules-section.php:539
 msgid "Label"
 msgstr ""
 
-#: includes/admin/views/rules-section.php:706
+#: includes/admin/views/rules-section.php:540
 msgid "Countries"
 msgstr ""
 
-#: includes/admin/views/rules-section.php:707
+#: includes/admin/views/rules-section.php:541
 msgid "Products"
 msgstr ""
 
-#: includes/admin/views/rules-section.php:708
+#: includes/admin/views/rules-section.php:542
 msgid "Type"
 msgstr ""
 
-#: includes/admin/views/rules-section.php:709
+#: includes/admin/views/rules-section.php:543
 msgid "Rate"
 msgstr ""
 
-#: includes/admin/views/rules-section.php:710
+#: includes/admin/views/rules-section.php:544
 msgid "Valuation"
 msgstr ""
 
-#: includes/admin/views/rules-section.php:712
+#: includes/admin/views/rules-section.php:546
 msgid "Stacking"
 msgstr ""
 
-#: includes/admin/views/rules-section.php:713
+#: includes/admin/views/rules-section.php:547
 msgid "Actions"
 msgstr ""
 
-#: includes/admin/views/rules-section.php:729
+#: includes/admin/views/rules-section.php:563
 msgid "Higher priority rules are checked first (0-100)"
 msgstr ""
 
-#: includes/admin/views/rules-section.php:746
+#: includes/admin/views/rules-section.php:580
 msgid "All → All"
 msgstr ""
 
-#: includes/admin/views/rules-section.php:750
+#: includes/admin/views/rules-section.php:584
 #. translators: %s: destination country name
 msgid "Any → %s"
 msgstr ""
 
-#: includes/admin/views/rules-section.php:754
+#: includes/admin/views/rules-section.php:588
 #. translators: %s: origin country name
 msgid "%s → Any"
 msgstr ""
 
-#: includes/admin/views/rules-section.php:769
-#: includes/admin/views/rules-section.php:806
+#: includes/admin/views/rules-section.php:603
+#: includes/admin/views/rules-section.php:639
 msgid "All Products"
 msgstr ""
 
-#: includes/admin/views/rules-section.php:784
+#: includes/admin/views/rules-section.php:618
 #. translators: %d: number of additional categories
 msgid "+%d more"
 msgstr ""
 
-#: includes/admin/views/rules-section.php:852
+#: includes/admin/views/rules-section.php:685
 #. translators: %s: count of dependency fees included in the base
 msgid "+%s fee"
 msgid_plural "+%s fees"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/admin/views/rules-section.php:879
+#: includes/admin/views/rules-section.php:706
 msgid "Adds with other matching rules"
 msgstr ""
 
-#: includes/admin/views/rules-section.php:880
+#: includes/admin/views/rules-section.php:707
 msgid "Replaces lower priority rules"
 msgstr ""
 
-#: includes/admin/views/rules-section.php:881
+#: includes/admin/views/rules-section.php:708
 msgid "Only this rule applies"
 msgstr ""
 
@@ -806,7 +806,7 @@ msgid "Customs & Import Fees (%s)"
 msgstr ""
 
 #: includes/class-cfwc-display.php:237 includes/class-cfwc-display.php:249
-#: includes/class-cfwc-display.php:393 includes/class-cfwc-emails.php:269
+#: includes/class-cfwc-display.php:394 includes/class-cfwc-emails.php:269
 msgid "Customs & Import Information"
 msgstr ""
 
@@ -826,7 +826,7 @@ msgid ""
 "depending on customs regulations and carrier handling charges."
 msgstr ""
 
-#: includes/class-cfwc-display.php:394
+#: includes/class-cfwc-display.php:395
 msgid ""
 "The customs and import fees shown above are estimated based on current "
 "rates. Actual fees may vary depending on customs regulations and carrier "

@@ -124,15 +124,15 @@ class CFWC_Admin {
 			if ( ! empty( $breakdown ) && is_array( $breakdown ) ) {
 				// Show detailed breakdown.
 				echo '<strong>' . esc_html__( 'Fees Breakdown:', 'customs-fees-for-woocommerce' ) . '</strong>';
-				echo '<ul style="margin: 10px 0; padding-left: 20px;">';
+				echo '<ul class="cfwc-fees-breakdown-list">';
 				foreach ( $breakdown as $fee_item ) {
-					echo '<li style="margin: 5px 0;">';
+					echo '<li>';
 					echo esc_html( $fee_item['label'] ) . ': ';
 					echo '<strong>' . wp_kses_post( wc_price( $fee_item['amount'] ) ) . '</strong>';
 					echo '</li>';
 				}
 				echo '</ul>';
-				echo '<hr style="margin: 10px 0;">';
+				echo '<hr class="cfwc-fees-divider">';
 				echo '<p><strong>' . esc_html__( 'Total:', 'customs-fees-for-woocommerce' ) . '</strong> ' . wp_kses_post( wc_price( $total_fees ) ) . '</p>';
 			} else {
 				// Fallback to simple total.
@@ -146,9 +146,9 @@ class CFWC_Admin {
 		// Display HS codes and origin for order items.
 		$items = $order->get_items();
 		if ( ! empty( $items ) ) {
-			echo '<hr style="margin: 15px 0;">';
+			echo '<hr class="cfwc-section-divider">';
 			echo '<p><strong>' . esc_html__( 'Product Customs Information:', 'customs-fees-for-woocommerce' ) . '</strong></p>';
-			echo '<ul style="margin: 10px 0 0 20px;">';
+			echo '<ul class="cfwc-product-customs-list">';
 
 			foreach ( $items as $item ) {
 				if ( ! is_a( $item, 'WC_Order_Item_Product' ) ) {
@@ -196,7 +196,7 @@ class CFWC_Admin {
 		echo '<div class="options_group show_if_simple show_if_variable">';
 
 		// Add a heading without grey background to match WooCommerce style.
-		echo '<h4 style="margin: 10px 12px 5px; font-size: 14px; font-weight: 600;">' . esc_html__( 'Customs & Import Fees', 'customs-fees-for-woocommerce' ) . '</h4>';
+		echo '<h4 class="cfwc-product-fields-heading">' . esc_html__( 'Customs & Import Fees', 'customs-fees-for-woocommerce' ) . '</h4>';
 
 		woocommerce_wp_text_input(
 			array(
@@ -210,7 +210,7 @@ class CFWC_Admin {
 		);
 
 		// Add help text with link after HS Code field.
-		echo '<p class="cfwc-hs-code-help" style="margin-left: 154px; margin-top: -10px; margin-bottom: 10px; font-size: 12px; color: #666;">';
+		echo '<p class="cfwc-hs-code-help">';
 		echo esc_html__( 'You can ', 'customs-fees-for-woocommerce' );
 		echo '<a href="https://hts.usitc.gov/" target="_blank" rel="noopener noreferrer">';
 		echo esc_html__( 'find HS codes here', 'customs-fees-for-woocommerce' );
@@ -524,7 +524,7 @@ class CFWC_Admin {
 
 		// Display as meta data similar to SKU.
 		if ( $hs_code || $origin ) {
-			echo '<div class="cfwc-order-item-meta" style="margin-top: 0.5em;">';
+			echo '<div class="cfwc-order-item-meta">';
 			echo '<table cellspacing="0" class="display_meta">';
 
 			if ( $hs_code ) {

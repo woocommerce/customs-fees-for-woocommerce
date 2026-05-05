@@ -664,3 +664,555 @@ span[aria-labelledby="select2-_cfwc_country_of_origin-container"] {
 	font-size: 13px;
 	}
 }
+
+/* ==========================================================================
+	Rules table column widths
+	========================================================================== */
+
+.cfwc-rules-table .cfwc-col-label,
+.cfwc-rules-table .cfwc-col-countries,
+.cfwc-rules-table .cfwc-col-products {
+	width: 15%;
+}
+
+.cfwc-rules-table .cfwc-col-type,
+.cfwc-rules-table .cfwc-col-valuation,
+.cfwc-rules-table .cfwc-col-depends,
+.cfwc-rules-table .cfwc-col-stacking {
+	width: 10%;
+}
+
+.cfwc-rules-table .cfwc-col-rate {
+	width: 7%;
+}
+
+.cfwc-rules-table .cfwc-col-actions {
+	width: 8%;
+}
+
+/* ==========================================================================
+	Rules table inline content
+	========================================================================== */
+
+.cfwc-rules-table .cfwc-priority-meta {
+	color: #666;
+	font-size: 11px;
+}
+
+.cfwc-rules-table .cfwc-priority-meta .dashicons {
+	font-size: 14px;
+	vertical-align: middle;
+	cursor: help;
+}
+
+.cfwc-rules-table .cfwc-criteria-icon {
+	font-size: 14px;
+}
+
+.cfwc-rules-table .cfwc-empty-cell {
+	color: #999;
+	font-size: 11px;
+}
+
+/* ==========================================================================
+	Badges
+	========================================================================== */
+
+.cfwc-rule-badge {
+	display: inline-block;
+	padding: 3px 8px;
+	color: #fff;
+	border-radius: 3px;
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 1;
+}
+
+.cfwc-rule-badge--valuation {
+	background: #2271b1;
+}
+
+.cfwc-rule-badge--dependency {
+	background: #8261a1;
+}
+
+.cfwc-rule-badge--stacking-add {
+	background: #46b450;
+}
+
+.cfwc-rule-badge--stacking-override {
+	background: #f0ad4e;
+}
+
+.cfwc-rule-badge--stacking-exclusive {
+	background: #dc3232;
+}
+
+/* ==========================================================================
+	Rule row form fields (used by rules table edit/add rows in admin.js)
+	========================================================================== */
+
+.cfwc-rule-row .cfwc-rule-field {
+	width: 100%;
+}
+
+.cfwc-rule-row .cfwc-rule-field--label,
+.cfwc-rule-row .cfwc-rule-field--match-type,
+.cfwc-rule-row .cfwc-rule-field--category {
+	margin-bottom: 5px;
+}
+
+.cfwc-rule-row .cfwc-rule-field--country {
+	width: 47%;
+}
+
+.cfwc-rule-row .cfwc-rule-field--rate {
+	width: 80px;
+}
+
+.cfwc-rule-row .cfwc-country-spacer {
+	display: inline-block;
+	width: 10px;
+}
+
+.cfwc-rule-row .cfwc-field-spacer {
+	display: none;
+	height: 5px;
+	width: 100%;
+}
+
+.cfwc-rule-row .cfwc-field-spacer.is-visible {
+	display: block;
+}
+
+.cfwc-rule-row .cfwc-field-help {
+	font-size: 11px;
+	color: #666;
+	margin-top: 2px;
+	display: block;
+}
+
+.cfwc-rule-row .cfwc-field-help--inline {
+	display: inline-block;
+}
+
+.cfwc-rule-row .cfwc-field-required {
+	display: block;
+	font-size: 11px;
+	color: #999;
+	margin-top: 2px;
+}
+
+.cfwc-rule-row .cfwc-stacking-help span {
+	display: none;
+}
+
+.cfwc-rule-row .is-hidden {
+	display: none;
+}
+
+.cfwc-rule-row .cfwc-stacking-help span.is-visible {
+	display: inline;
+}
+
+/* ==========================================================================
+	Delete confirmation warning
+	========================================================================== */
+
+.cfwc-delete-warning {
+	color: #d63638;
+	margin-left: 10px;
+	font-weight: 600;
+}
+
+.button.confirm-delete,
+.button.confirm-replace {
+	background: #d63638;
+	color: #fff;
+	border-color: #d63638;
+}
+
+.button.confirm-delete:hover,
+.button.confirm-replace:hover {
+	background: #b32d2e;
+	color: #fff;
+}
+
+/* ==========================================================================
+	Edit-screen meta box helpers (class-cfwc-admin.php)
+	========================================================================== */
+
+.cfwc-fees-breakdown-list {
+	margin: 10px 0;
+	padding-left: 20px;
+}
+
+.cfwc-fees-breakdown-list li {
+	margin: 5px 0;
+}
+
+.cfwc-fees-divider {
+	margin: 10px 0;
+}
+
+.cfwc-section-divider {
+	margin: 15px 0;
+}
+
+.cfwc-product-customs-list {
+	margin: 10px 0 0 20px;
+}
+
+/* ==========================================================================
+	Product edit screen
+	========================================================================== */
+
+.cfwc-product-fields-heading {
+	margin: 10px 12px 5px;
+	font-size: 14px;
+	font-weight: 600;
+}
+
+.cfwc-hs-code-help {
+	margin-left: 154px;
+	margin-top: -10px;
+	margin-bottom: 10px;
+	font-size: 12px;
+	color: #666;
+}
+
+/* ==========================================================================
+	Order item meta (admin order screen)
+	========================================================================== */
+
+.cfwc-order-item-meta {
+	margin-top: 0.5em;
+}
+
+/* ==========================================================================
+	Onboarding notice
+	========================================================================== */
+
+.cfwc-dismiss-notice {
+	margin-left: 15px;
+}
+
+/* ==========================================================================
+	Settings: default origin select
+	========================================================================== */
+
+#cfwc_default_origin_select {
+	width: 350px;
+	max-width: 50%;
+}
+
+/* ==========================================================================
+	Settings: rules section header / preset / notices
+	========================================================================== */
+
+.cfwc-default-origin-help {
+	display: block;
+	margin: 2px 0 8px 24px;
+	color: #666;
+}
+
+.cfwc-help-link-under {
+	margin-top: 10px;
+}
+
+.cfwc-help-link-under .dashicons-info {
+	color: #2271b1;
+}
+
+.cfwc-rules-divider {
+	margin: 40px 0 30px 0;
+	border-top: 1px solid #c3c4c7;
+}
+
+.cfwc-notices-container {
+	margin-bottom: 20px;
+}
+
+.cfwc-notices-container > .notice {
+	margin-bottom: 10px;
+}
+
+.cfwc-rules-header-info {
+	flex: 1;
+}
+
+.cfwc-rules-header-title {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-bottom: 10px;
+}
+
+.cfwc-rules-header-title h3,
+.cfwc-rules-header-info p {
+	margin: 0;
+}
+
+.cfwc-rules-header-actions {
+	align-self: flex-start;
+}
+
+#cfwc-preset-select {
+	width: 280px;
+	max-width: 100%;
+}
+
+/* ==========================================================================
+	WooCommerce-style modal (moved from rules-section.php inline <style>)
+	========================================================================== */
+
+.cfwc-modal {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 160000;
+}
+
+.cfwc-modal-backdrop {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.6);
+	z-index: 159990;
+}
+
+.cfwc-modal-content {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 90%;
+	max-width: 600px;
+	max-height: 90vh;
+	background: #fff;
+	border-radius: 4px;
+	box-shadow: 0 3px 30px rgba(0, 0, 0, 0.2);
+	z-index: 160000;
+	display: flex;
+	flex-direction: column;
+}
+
+.cfwc-modal-header {
+	padding: 20px;
+	border-bottom: 1px solid #e0e0e0;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.cfwc-modal-header h2 {
+	margin: 0;
+	font-size: 18px;
+	font-weight: 600;
+	color: #333;
+}
+
+.cfwc-modal-close {
+	background: none;
+	border: none;
+	cursor: pointer;
+	padding: 0;
+	color: #999;
+	font-size: 20px;
+}
+
+.cfwc-modal-close:hover {
+	color: #333;
+}
+
+.cfwc-modal-body {
+	padding: 20px;
+	overflow-y: auto;
+	flex: 1;
+}
+
+.cfwc-modal-footer {
+	padding: 20px;
+	border-top: 1px solid #e0e0e0;
+	text-align: right;
+}
+
+.cfwc-help-section {
+	margin-bottom: 30px;
+}
+
+.cfwc-help-section:last-child {
+	margin-bottom: 0;
+}
+
+.cfwc-help-section h3 {
+	margin: 0 0 15px 0;
+	font-size: 14px;
+	font-weight: 600;
+	color: #333;
+}
+
+.cfwc-help-section h3 .dashicons {
+	font-size: 18px;
+	vertical-align: middle;
+	margin-right: 5px;
+	color: #2271b1;
+}
+
+.cfwc-help-section h3 .dashicons-lightbulb {
+	color: #f0ad4e;
+}
+
+.cfwc-help-section ol,
+.cfwc-help-section ul {
+	margin: 0;
+	padding-left: 25px;
+	font-size: 14px;
+	line-height: 1.8;
+	color: #555;
+}
+
+.cfwc-help-section li {
+	margin-bottom: 8px;
+}
+
+.cfwc-stacking-modes {
+	margin-top: 10px;
+}
+
+.cfwc-stacking-mode {
+	margin-bottom: 10px;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.cfwc-help-section .cfwc-badge {
+	display: inline-block;
+	padding: 4px 10px;
+	border-radius: 3px;
+	font-size: 12px;
+	font-weight: 600;
+	color: #fff;
+	min-width: 70px;
+	text-align: center;
+}
+
+.cfwc-help-section .cfwc-badge-stack {
+	background: #46b450;
+}
+
+.cfwc-help-section .cfwc-badge-override {
+	background: #f0ad4e;
+}
+
+.cfwc-help-section .cfwc-badge-exclusive {
+	background: #dc3232;
+}
+
+@media screen and (max-width: 768px) {
+	.cfwc-modal-content {
+		width: 100%;
+		height: 100%;
+		max-width: none;
+		max-height: none;
+		border-radius: 0;
+		transform: none;
+		position: fixed;
+		top: 0;
+		left: 0;
+	}
+
+	#cfwc_default_origin_select {
+		width: 100% !important;
+		margin-left: 0 !important;
+		margin-top: 10px;
+	}
+}
+
+/* ==========================================================================
+	WordPress/Gutenberg snackbar repositioning (moved from admin.js inline <style>)
+	========================================================================== */
+
+body .components-snackbar-list,
+body .components-snackbar-list__notices-container {
+	position: fixed !important;
+	right: 20px !important;
+	left: auto !important;
+	bottom: 30px !important;
+	width: auto !important;
+	max-width: 400px !important;
+	z-index: 100001 !important;
+}
+
+body .components-snackbar {
+	margin-right: 0 !important;
+	margin-left: auto !important;
+}
+
+body.woocommerce_page_wc-settings .components-snackbar-list {
+	right: 20px !important;
+	left: auto !important;
+}
+
+@media (max-width: 782px) {
+	body .components-snackbar-list {
+		right: 10px !important;
+		bottom: 80px !important;
+		max-width: calc(100vw - 20px) !important;
+	}
+}
+
+.woocommerce .submit {
+	position: relative !important;
+	z-index: 99999 !important;
+}
+
+body.woocommerce_page_wc-settings {
+	padding-bottom: 100px !important;
+}
+
+/* ==========================================================================
+	Fallback admin notice (used by admin.js when wp.data unavailable)
+	========================================================================== */
+
+.cfwc-admin-notice-wrapper {
+	position: fixed;
+	right: 20px;
+	bottom: 30px;
+	max-width: 400px;
+	z-index: 100001;
+	background: #fff;
+	border-left: 4px solid #46b450;
+	box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.1);
+	padding: 12px;
+}
+
+.cfwc-admin-notice-wrapper.is-error {
+	border-left-color: #dc3232;
+}
+
+.cfwc-admin-notice-wrapper.is-warning {
+	border-left-color: #ffb900;
+}
+
+.cfwc-admin-notice-wrapper .notice {
+	margin: 0;
+	border: none;
+	box-shadow: none;
+	padding: 0;
+}
+
+.cfwc-admin-notice-wrapper .notice p {
+	margin: 0;
+}
+
+.cfwc-admin-notice-wrapper .notice-dismiss {
+	position: absolute;
+	top: 0;
+	right: 0;
+}

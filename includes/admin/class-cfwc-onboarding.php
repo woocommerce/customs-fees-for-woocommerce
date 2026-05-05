@@ -178,7 +178,7 @@ class CFWC_Onboarding {
 					<?php esc_html_e( 'Configure Rules', 'customs-fees-for-woocommerce' ); ?>
 				</a>
 				
-				<a href="#" class="cfwc-dismiss-notice" style="margin-left: 15px;">
+				<a href="#" class="cfwc-dismiss-notice">
 					<?php esc_html_e( 'Close and don\'t show', 'customs-fees-for-woocommerce' ); ?>
 				</a>
 			</p>

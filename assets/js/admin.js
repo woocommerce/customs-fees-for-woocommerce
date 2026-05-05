@@ -56,13 +56,7 @@
           .prop("disabled", false)
           .removeClass("disabled")
           .removeAttr("disabled")
-          .addClass("button-primary")
-          .css({
-            background: "#2271b1",
-            cursor: "pointer",
-            opacity: "1",
-            "pointer-events": "auto",
-          });
+          .addClass("button-primary");
       });
 
       // Pulse animation to draw attention.
@@ -118,27 +112,30 @@
       var $spacer = $row.find(".cfwc-field-spacer");
 
       // Show fields based on match type.
+      // Note: addClass/removeClass("is-hidden") manages the initial render's class;
+      // .hide()/.show() also adds/removes jQuery's own inline display, so we
+      // toggle both to avoid the class+inline-style mismatch.
       if (matchType === "all") {
         // All Products - hide both category and HS code fields, show "Not required".
-        $categorySelect.hide().removeAttr("required");
-        $hsCodeInput.hide().removeAttr("required");
-        $spacer.hide();
+        $categorySelect.addClass("is-hidden").hide().removeAttr("required");
+        $hsCodeInput.addClass("is-hidden").hide().removeAttr("required");
+        $spacer.removeClass("is-visible");
         $requiredIndicator.show().html("Not required");
         $categorySelect.attr("data-placeholder", "Select categories...");
         $hsCodeInput.attr("placeholder", "HS Code (e.g., 6109* or 61,62)");
       } else if (matchType === "category") {
         // By Category - show only category field, hide HS code.
-        $categorySelect.show().attr("required", "required");
-        $hsCodeInput.hide().removeAttr("required");
-        $spacer.hide();
+        $categorySelect.removeClass("is-hidden").show().attr("required", "required");
+        $hsCodeInput.addClass("is-hidden").hide().removeAttr("required");
+        $spacer.removeClass("is-visible");
         $requiredIndicator.show().html("Required *");
         $categorySelect.attr("data-placeholder", "Select categories...");
         $hsCodeInput.attr("placeholder", "HS Code (e.g., 6109* or 61,62)");
       } else if (matchType === "hs_code") {
         // By HS Code - show both fields but category is not required.
-        $categorySelect.show().removeAttr("required");
-        $spacer.show().css("display", "block"); // Show spacer between fields.
-        $hsCodeInput.show().attr("required", "required");
+        $categorySelect.removeClass("is-hidden").show().removeAttr("required");
+        $spacer.addClass("is-visible"); // Show spacer between fields.
+        $hsCodeInput.removeClass("is-hidden").show().attr("required", "required");
         $requiredIndicator
           .show()
           .html("Category: Not required<br>HS Code: Required *");
@@ -149,9 +146,9 @@
         $hsCodeInput.attr("placeholder", "HS Code (e.g., 6109* or 61,62)");
       } else if (matchType === "combined") {
         // Category + HS Code - show both fields with spacing.
-        $categorySelect.show().attr("required", "required");
-        $spacer.show().css("display", "block"); // Show spacer between fields.
-        $hsCodeInput.show().attr("required", "required");
+        $categorySelect.removeClass("is-hidden").show().attr("required", "required");
+        $spacer.addClass("is-visible"); // Show spacer between fields.
+        $hsCodeInput.removeClass("is-hidden").show().attr("required", "required");
         $requiredIndicator.show().html("Both required *");
         $categorySelect.attr("data-placeholder", "Select categories...");
         $hsCodeInput.attr("placeholder", "HS Code (e.g., 6109* or 61,62)");
@@ -175,10 +172,12 @@
       var $helpContainer = $(this).siblings(".description");
 
       // Hide all help texts.
-      $helpContainer.find("span").hide();
+      $helpContainer.find("span").removeClass("is-visible");
 
       // Show the relevant help text.
-      $helpContainer.find(".stacking-help-" + stackingMode).show();
+      $helpContainer
+        .find(".stacking-help-" + stackingMode)
+        .addClass("is-visible");
     });
 
     // Add preset rules (primary action - adds to existing like WooCommerce tax rates).
@@ -211,16 +210,14 @@
       if (!$(this).hasClass("confirm-replace")) {
         $(this)
           .addClass("confirm-replace")
-          .text(strings.confirm_replace || "Click again to confirm")
-          .css("background", "#d63638");
+          .text(strings.confirm_replace || "Click again to confirm");
 
         // Reset after 5 seconds.
         var $btn = $(this);
         setTimeout(function () {
           $btn
             .removeClass("confirm-replace")
-            .text(strings.replace_all || "Replace All Rules")
-            .css("background", "");
+            .text(strings.replace_all || "Replace All Rules");
         }, 5000);
         return;
       }
@@ -282,9 +279,7 @@
         // Reset button immediately (before showing success).
         $button
           .removeClass("confirm-delete")
-          .text(strings.delete_all || "Delete All Rules")
-          .css("background", "")
-          .css("color", "");
+          .text(strings.delete_all || "Delete All Rules");
 
         // Show success notice after button reset.
         setTimeout(function () {
@@ -298,14 +293,12 @@
         // First click - show inline warning text instead of blocking notification.
         $button
           .addClass("confirm-delete")
-          .text(strings.confirm_delete || "Click to Confirm Delete")
-          .css("background", "#d63638")
-          .css("color", "#fff");
+          .text(strings.confirm_delete || "Click to Confirm Delete");
 
         // Add inline warning message next to button if not already present.
         if (!$button.next(".cfwc-delete-warning").length) {
           $button.after(
-            '<span class="cfwc-delete-warning" style="color: #d63638; margin-left: 10px; font-weight: 600;">' +
+            '<span class="cfwc-delete-warning">' +
               "⚠️ This will delete ALL rules. Click again to confirm." +
               "</span>"
           );
@@ -315,9 +308,7 @@
         deleteButtonTimeout = setTimeout(function () {
           $button
             .removeClass("confirm-delete")
-            .text(strings.delete_all || "Delete All Rules")
-            .css("background", "")
-            .css("color", "");
+            .text(strings.delete_all || "Delete All Rules");
           $button.next(".cfwc-delete-warning").fadeOut(300, function () {
             $(this).remove();
           });
@@ -459,69 +450,8 @@
     // Show admin notice using WooCommerce snackbar.
     var noticeTimeout = null;
     var activeNoticeIds = []; // Track active notice IDs for proper cleanup.
-    var notificationStylesApplied = false;
-
-    // Apply notification positioning styles.
-    function applyNotificationStyles() {
-      if (notificationStylesApplied) return;
-
-      // Wait for DOM to be ready.
-      $(document).ready(function () {
-        // Inject CSS to reposition ALL types of notifications.
-        var styles =
-          '<style id="cfwc-notification-positioning">' +
-          // Move WordPress/Gutenberg snackbar notifications to right side
-          "body .components-snackbar-list, " +
-          "body .components-snackbar-list__notices-container {" +
-          "  position: fixed !important;" +
-          "  right: 20px !important;" +
-          "  left: auto !important;" +
-          "  bottom: 30px !important;" +
-          "  width: auto !important;" +
-          "  max-width: 400px !important;" +
-          "  z-index: 100001 !important;" +
-          "}" +
-          // Individual snackbar styling
-          "body .components-snackbar {" +
-          "  margin-right: 0 !important;" +
-          "  margin-left: auto !important;" +
-          "}" +
-          // WooCommerce specific snackbar positioning
-          "body.woocommerce_page_wc-settings .components-snackbar-list {" +
-          "  right: 20px !important;" +
-          "  left: auto !important;" +
-          "}" +
-          // Mobile responsive
-          "@media (max-width: 782px) {" +
-          "  body .components-snackbar-list {" +
-          "    right: 10px !important;" +
-          "    bottom: 80px !important;" + // Higher on mobile to avoid mobile save button
-          "    max-width: calc(100vw - 20px) !important;" +
-          "  }" +
-          "}" +
-          // Ensure save button area is never covered
-          ".woocommerce .submit {" +
-          "  position: relative !important;" +
-          "  z-index: 99999 !important;" +
-          "}" +
-          // Add padding to bottom of page to ensure save button is never hidden
-          "body.woocommerce_page_wc-settings {" +
-          "  padding-bottom: 100px !important;" +
-          "}" +
-          "</style>";
-
-        // Remove existing styles if any and add new ones.
-        $("#cfwc-notification-positioning").remove();
-        $("head").append(styles);
-
-        notificationStylesApplied = true;
-      });
-    }
 
     function showNotice(message, type, clearPrevious) {
-      // Apply positioning styles first.
-      applyNotificationStyles();
-
       // Default clearPrevious to true for better UX.
       if (clearPrevious === undefined) {
         clearPrevious = true;
@@ -583,14 +513,6 @@
             },
           });
 
-          // Force repositioning after creating notice (backup measure).
-          setTimeout(function () {
-            $(".components-snackbar-list").css({
-              right: "20px",
-              left: "auto",
-              bottom: "30px",
-            });
-          }, 10);
         } catch (error) {
           // Fallback if notice system fails.
           console.warn("Notice system error:", error);
@@ -606,45 +528,32 @@
 
     // Separate fallback function for cleaner code.
     function showFallbackNotice(message, type) {
-      // Apply positioning styles.
-      applyNotificationStyles();
-
       // Remove any existing notices.
       $(".cfwc-admin-notice-wrapper").remove();
 
       // Determine notice type class.
       var noticeClass = "notice-success";
-      var borderColor = "#46b450"; // Green for success
+      var wrapperModifier = "";
       if (type === "error" || type === "notice-error") {
         noticeClass = "notice-error";
-        borderColor = "#dc3232"; // Red for error
+        wrapperModifier = " is-error";
       } else if (type === "warning" || type === "notice-warning") {
         noticeClass = "notice-warning";
-        borderColor = "#ffb900"; // Yellow for warning
+        wrapperModifier = " is-warning";
       }
 
-      // Create notice wrapper positioned on right side.
+      // Create notice wrapper (styled via .cfwc-admin-notice-wrapper in admin.css).
       var noticeWrapper =
-        '<div class="cfwc-admin-notice-wrapper" style="' +
-        "position: fixed; " +
-        "right: 20px; " +
-        "bottom: 30px; " +
-        "max-width: 400px; " +
-        "z-index: 100001; " +
-        "background: #fff; " +
-        "border-left: 4px solid " +
-        borderColor +
-        "; " +
-        "box-shadow: 0 1px 1px 0 rgba(0,0,0,.1); " +
-        "padding: 12px; " +
+        '<div class="cfwc-admin-notice-wrapper' +
+        wrapperModifier +
         '">' +
         '<div class="notice ' +
         noticeClass +
-        '" style="margin: 0; border: none; box-shadow: none; padding: 0;">' +
-        '<p style="margin: 0;">' +
+        '">' +
+        "<p>" +
         message +
         "</p>" +
-        '<button type="button" class="notice-dismiss" style="position: absolute; top: 0; right: 0;"><span class="screen-reader-text">Dismiss</span></button>' +
+        '<button type="button" class="notice-dismiss"><span class="screen-reader-text">Dismiss</span></button>' +
         "</div>" +
         "</div>";
 
@@ -667,11 +576,6 @@
         });
       }, 3000);
     }
-
-    // Apply styles on page load as well.
-    $(document).ready(function () {
-      applyNotificationStyles();
-    });
 
     // Build country options.
     function getCountryOptions(selectedCountry) {
@@ -771,29 +675,28 @@
       // Label input with priority (first column).
       newRowHtml +=
         "<td>" +
-        '<input type="text" name="cfwc_rule_label" class="cfwc-rule-field" data-field="label" value="" placeholder="' +
+        '<input type="text" name="cfwc_rule_label" class="cfwc-rule-field cfwc-rule-field--label" data-field="label" value="" placeholder="' +
         (strings.fee_label || "Fee label") +
-        '" style="width: 100%; margin-bottom: 5px;" />' +
-        '<input type="number" name="cfwc_rule_priority" class="cfwc-rule-field" data-field="priority" value="0" placeholder="Priority (0-100)" title="Higher priority rules are checked first (0-100)" style="width: 100%;" min="0" max="100" />' +
-        '<span style="font-size: 11px; color: #666; margin-top: 2px; display: inline-block;">Higher numbers = higher priority</span>' +
+        '" />' +
+        '<input type="number" name="cfwc_rule_priority" class="cfwc-rule-field" data-field="priority" value="0" placeholder="Priority (0-100)" title="Higher priority rules are checked first (0-100)" min="0" max="100" />' +
+        '<span class="cfwc-field-help cfwc-field-help--inline">Higher numbers = higher priority</span>' +
         "</td>";
 
       // Countries column (From and To).
       newRowHtml += "<td>";
       newRowHtml +=
-        '<select name="cfwc_rule_from_country" class="cfwc-rule-field cfwc-country-select wc-enhanced-select" data-field="from_country" data-placeholder="' +
+        '<select name="cfwc_rule_from_country" class="cfwc-rule-field cfwc-rule-field--country cfwc-country-select wc-enhanced-select" data-field="from_country" data-placeholder="' +
         (strings.from_country || "From (any)") +
-        '" style="width: 47%;">';
+        '">';
       newRowHtml +=
         '<option value="">Any Origin</option>' + getCountryOptions("");
       newRowHtml += "</select>";
       // Add spacing between dropdowns.
+      newRowHtml += '<span class="cfwc-country-spacer">&nbsp;</span>';
       newRowHtml +=
-        '<span style="display: inline-block; width: 10px;">&nbsp;</span>';
-      newRowHtml +=
-        '<select name="cfwc_rule_to_country" class="cfwc-rule-field cfwc-country-select wc-enhanced-select" data-field="to_country" data-placeholder="' +
+        '<select name="cfwc_rule_to_country" class="cfwc-rule-field cfwc-rule-field--country cfwc-country-select wc-enhanced-select" data-field="to_country" data-placeholder="' +
         (strings.to_country || "To (any)") +
-        '" style="width: 47%;">';
+        '">';
       newRowHtml +=
         '<option value="">Any Destination</option>' + getCountryOptions("");
       newRowHtml += "</select></td>";
@@ -801,7 +704,7 @@
       // Products column (Categories & HS Code).
       newRowHtml += "<td>";
       newRowHtml +=
-        '<select name="cfwc_rule_match_type" class="cfwc-rule-field cfwc-match-type" data-field="match_type" style="width: 100%; margin-bottom: 5px;">';
+        '<select name="cfwc_rule_match_type" class="cfwc-rule-field cfwc-rule-field--match-type cfwc-match-type" data-field="match_type">';
       newRowHtml += '<option value="all">All Products</option>';
       newRowHtml += '<option value="category">By Category</option>';
       newRowHtml += '<option value="hs_code">By HS Code</option>';
@@ -809,7 +712,7 @@
       newRowHtml += "</select>";
       // Category selector (hidden by default - only show for category/combined).
       newRowHtml +=
-        '<select name="cfwc_rule_categories" class="cfwc-rule-field cfwc-category-select wc-enhanced-select" data-field="category_ids" multiple="multiple" style="width: 100%; display: none; margin-bottom: 5px;" data-placeholder="Select categories...">';
+        '<select name="cfwc_rule_categories" class="cfwc-rule-field cfwc-rule-field--category cfwc-category-select wc-enhanced-select is-hidden" data-field="category_ids" multiple="multiple" data-placeholder="Select categories...">';
       if (cfwc_admin.categories) {
         $.each(cfwc_admin.categories, function (id, name) {
           newRowHtml += '<option value="' + id + '">' + name + "</option>";
@@ -817,14 +720,12 @@
       }
       newRowHtml += "</select>";
       // Add spacer between category and HS code fields.
-      newRowHtml +=
-        '<span class="cfwc-field-spacer" style="display: none; height: 5px; width: 100%;">&nbsp;</span>';
+      newRowHtml += '<span class="cfwc-field-spacer">&nbsp;</span>';
       // HS Code pattern input (hidden by default - only show for hs_code/combined).
       newRowHtml +=
-        '<input type="text" name="cfwc_rule_hs_code" class="cfwc-rule-field cfwc-hs-code" data-field="hs_code_pattern" placeholder="HS Code (e.g., 6109* or 61,62)" style="width: 100%; display: none;" />';
+        '<input type="text" name="cfwc_rule_hs_code" class="cfwc-rule-field cfwc-hs-code is-hidden" data-field="hs_code_pattern" placeholder="HS Code (e.g., 6109* or 61,62)" />';
       // Add required indicator (hidden by default, shows "Not required" by default).
-      newRowHtml +=
-        '<span class="cfwc-field-required" style="display: block; font-size: 11px; color: #999; margin-top: 2px;">Not required</span>';
+      newRowHtml += '<span class="cfwc-field-required">Not required</span>';
       newRowHtml += "</td>";
 
       // Type selector.
@@ -840,45 +741,44 @@
 
       // Rate/Amount input.
       newRowHtml +=
-        '<td><input type="number" name="cfwc_rule_rate" class="cfwc-rule-field" data-field="rate" value="0" step="0.01" style="width: 80px;" required />' +
-        '<span style="font-size: 11px; color: #999; display: block; margin-top: 2px;">Required *</span></td>';
+        '<td><input type="number" name="cfwc_rule_rate" class="cfwc-rule-field cfwc-rule-field--rate" data-field="rate" value="0" step="0.01" required />' +
+        '<span class="cfwc-field-required">Required *</span></td>';
 
       // Valuation method.
       newRowHtml += "<td>";
-      newRowHtml += '<select name="cfwc_rule_valuation_method" class="cfwc-rule-field" data-field="valuation_method" style="width: 100%;">';
+      newRowHtml += '<select name="cfwc_rule_valuation_method" class="cfwc-rule-field" data-field="valuation_method">';
       newRowHtml += '<option value="inherit">' + escapeHtml(strings.inherit_global || "Inherit global") + "</option>";
       newRowHtml += '<option value="fob">' + escapeHtml(strings.fob || "FOB") + "</option>";
       newRowHtml += '<option value="cif">' + escapeHtml(strings.cif || "CIF") + "</option>";
       newRowHtml += '<option value="cif_insurance">' + escapeHtml(strings.cif_insurance || "CIF + Insurance") + "</option>";
       newRowHtml += "</select>";
-      newRowHtml += '<span style="font-size: 11px; color: #666; margin-top: 2px; display: block;">' + escapeHtml(strings.overrides_global_for_rule || "Overrides global for this rule") + "</span>";
+      newRowHtml += '<span class="cfwc-field-help">' + escapeHtml(strings.overrides_global_for_rule || "Overrides global for this rule") + "</span>";
       newRowHtml += "</td>";
 
       // Depends on (base_includes) - hidden for flat type.
       newRowHtml += '<td class="cfwc-base-includes-cell">';
-      newRowHtml += '<select name="cfwc_rule_base_includes" class="cfwc-rule-field cfwc-base-includes-select" data-field="base_includes" multiple="multiple" style="width: 100%;">';
+      newRowHtml += '<select name="cfwc_rule_base_includes" class="cfwc-rule-field cfwc-base-includes-select" data-field="base_includes" multiple="multiple">';
       newRowHtml += "</select>";
-      newRowHtml += '<span style="font-size: 11px; color: #666; margin-top: 2px; display: block;">' + escapeHtml(strings.select_fees_include || "Select fees to include in base") + "</span>";
+      newRowHtml += '<span class="cfwc-field-help">' + escapeHtml(strings.select_fees_include || "Select fees to include in base") + "</span>";
       newRowHtml += "</td>";
 
       // Stacking mode.
       newRowHtml += "<td>";
       newRowHtml +=
-        '<select name="cfwc_rule_stacking" class="cfwc-rule-field cfwc-stacking-select" data-field="stacking_mode" style="width: 100%;">';
+        '<select name="cfwc_rule_stacking" class="cfwc-rule-field cfwc-stacking-select" data-field="stacking_mode">';
       newRowHtml += '<option value="add">Stack (Add to other fees)</option>';
       newRowHtml +=
         '<option value="override">Override (Replace lower priority)</option>';
       newRowHtml +=
         '<option value="exclusive">Exclusive (Only this fee)</option>';
       newRowHtml += "</select>";
+      newRowHtml += '<span class="description cfwc-stacking-help">';
       newRowHtml +=
-        '<span class="description" style="font-size: 11px; color: #666; margin-top: 5px; display: block;">';
+        '<span class="stacking-help-add is-visible">Adds with other matching rules</span>';
       newRowHtml +=
-        '<span class="stacking-help-add">Adds with other matching rules</span>';
+        '<span class="stacking-help-override">Replaces lower priority rules</span>';
       newRowHtml +=
-        '<span class="stacking-help-override" style="display: none;">Replaces lower priority rules</span>';
-      newRowHtml +=
-        '<span class="stacking-help-exclusive" style="display: none;">No other rules apply</span>';
+        '<span class="stacking-help-exclusive">No other rules apply</span>';
       newRowHtml += "</span>";
       newRowHtml += "</td>";
 
@@ -982,23 +882,23 @@
       // Label input with priority (first column).
       editRowHtml +=
         "<td>" +
-        '<input type="text" name="cfwc_rule_label" class="cfwc-rule-field" data-field="label" value="' +
+        '<input type="text" name="cfwc_rule_label" class="cfwc-rule-field cfwc-rule-field--label" data-field="label" value="' +
         (rule.label || "") +
         '" placeholder="' +
         (strings.fee_label || "Fee label") +
-        '" style="width: 100%; margin-bottom: 5px;" />' +
+        '" />' +
         '<input type="number" name="cfwc_rule_priority" class="cfwc-rule-field" data-field="priority" value="' +
         (rule.priority || 0) +
-        '" placeholder="Priority (0-100)" title="Higher priority rules are checked first (0-100)" style="width: 100%;" min="0" max="100" />' +
-        '<span style="font-size: 11px; color: #666; margin-top: 2px; display: inline-block;">Higher numbers = higher priority</span>' +
+        '" placeholder="Priority (0-100)" title="Higher priority rules are checked first (0-100)" min="0" max="100" />' +
+        '<span class="cfwc-field-help cfwc-field-help--inline">Higher numbers = higher priority</span>' +
         "</td>";
 
       // Countries column (From and To).
       editRowHtml += "<td>";
       editRowHtml +=
-        '<select name="cfwc_rule_from_country" class="cfwc-rule-field cfwc-country-select wc-enhanced-select" data-field="from_country" data-placeholder="' +
+        '<select name="cfwc_rule_from_country" class="cfwc-rule-field cfwc-rule-field--country cfwc-country-select wc-enhanced-select" data-field="from_country" data-placeholder="' +
         (strings.from_country || "From (any)") +
-        '" style="width: 47%;">';
+        '">';
       editRowHtml +=
         '<option value="">Any Origin</option>' +
         getCountryOptions(
@@ -1006,12 +906,11 @@
         );
       editRowHtml += "</select>";
       // Add spacing between dropdowns.
+      editRowHtml += '<span class="cfwc-country-spacer">&nbsp;</span>';
       editRowHtml +=
-        '<span style="display: inline-block; width: 10px;">&nbsp;</span>';
-      editRowHtml +=
-        '<select name="cfwc_rule_to_country" class="cfwc-rule-field cfwc-country-select wc-enhanced-select" data-field="to_country" data-placeholder="' +
+        '<select name="cfwc_rule_to_country" class="cfwc-rule-field cfwc-rule-field--country cfwc-country-select wc-enhanced-select" data-field="to_country" data-placeholder="' +
         (strings.to_country || "To (any)") +
-        '" style="width: 47%;">';
+        '">';
       editRowHtml +=
         '<option value="">Any Destination</option>' +
         getCountryOptions(rule.to_country || rule.country || "");
@@ -1020,7 +919,7 @@
       // Products column (Categories & HS Code).
       editRowHtml += "<td>";
       editRowHtml +=
-        '<select name="cfwc_rule_match_type" class="cfwc-rule-field cfwc-match-type" data-field="match_type" style="width: 100%; margin-bottom: 5px;">';
+        '<select name="cfwc_rule_match_type" class="cfwc-rule-field cfwc-rule-field--match-type cfwc-match-type" data-field="match_type">';
       editRowHtml +=
         '<option value="all"' +
         ((rule.match_type || "all") === "all" ? " selected" : "") +
@@ -1047,9 +946,9 @@
           ? "Select categories (optional)"
           : "Select categories...";
       editRowHtml +=
-        '<select name="cfwc_rule_categories" class="cfwc-rule-field cfwc-category-select wc-enhanced-select" data-field="category_ids" multiple="multiple" style="width: 100%; margin-bottom: 5px;' +
-        (showCategories ? "" : " display: none;") +
-        '" data-placeholder="' +
+        '<select name="cfwc_rule_categories" class="cfwc-rule-field cfwc-rule-field--category cfwc-category-select wc-enhanced-select' +
+        (showCategories ? "" : " is-hidden") +
+        '" data-field="category_ids" multiple="multiple" data-placeholder="' +
         categoryPlaceholder +
         '">';
       if (cfwc_admin.categories) {
@@ -1066,19 +965,19 @@
       var showSpacer =
         rule.match_type === "combined" || rule.match_type === "hs_code";
       editRowHtml +=
-        '<span class="cfwc-field-spacer" style="' +
-        (showSpacer ? "display: block;" : "display: none;") +
-        ' height: 5px; width: 100%;">&nbsp;</span>';
+        '<span class="cfwc-field-spacer' +
+        (showSpacer ? " is-visible" : "") +
+        '">&nbsp;</span>';
 
       // HS Code pattern input (show only for hs_code/combined).
       var showHsCode =
         rule.match_type === "hs_code" || rule.match_type === "combined";
       editRowHtml +=
-        '<input type="text" name="cfwc_rule_hs_code" class="cfwc-rule-field cfwc-hs-code" data-field="hs_code_pattern" value="' +
+        '<input type="text" name="cfwc_rule_hs_code" class="cfwc-rule-field cfwc-hs-code' +
+        (showHsCode ? "" : " is-hidden") +
+        '" data-field="hs_code_pattern" value="' +
         (rule.hs_code_pattern || "") +
-        '" placeholder="HS Code (e.g., 6109* or 61,62)" style="width: 100%;' +
-        (showHsCode ? "" : " display: none;") +
-        '"' +
+        '" placeholder="HS Code (e.g., 6109* or 61,62)"' +
         (showHsCode ? " required" : "") +
         " />";
       // Add required indicator with dynamic text based on match type.
@@ -1091,9 +990,7 @@
         requiredText = "Both required *";
       }
       editRowHtml +=
-        '<span class="cfwc-field-required" style="display: block; font-size: 11px; color: #999; margin-top: 2px;">' +
-        requiredText +
-        "</span>";
+        '<span class="cfwc-field-required">' + requiredText + "</span>";
       editRowHtml += "</td>";
 
       // Type selector.
@@ -1117,37 +1014,37 @@
       var rateField = rule.type === "percentage" ? "rate" : "amount";
       var rateValue = rule.type === "percentage" ? rule.rate : rule.amount;
       editRowHtml +=
-        '<td><input type="number" name="cfwc_rule_rate" class="cfwc-rule-field" data-field="' +
+        '<td><input type="number" name="cfwc_rule_rate" class="cfwc-rule-field cfwc-rule-field--rate" data-field="' +
         rateField +
         '" value="' +
         rateValue +
-        '" step="0.01" style="width: 80px;" required />' +
-        '<span style="font-size: 11px; color: #999; display: block; margin-top: 2px;">Required *</span></td>';
+        '" step="0.01" required />' +
+        '<span class="cfwc-field-required">Required *</span></td>';
 
       // Valuation method.
       var currentValuation = rule.valuation_method || "inherit";
       editRowHtml += "<td>";
-      editRowHtml += '<select name="cfwc_rule_valuation_method" class="cfwc-rule-field" data-field="valuation_method" style="width: 100%;">';
+      editRowHtml += '<select name="cfwc_rule_valuation_method" class="cfwc-rule-field" data-field="valuation_method">';
       editRowHtml += '<option value="inherit"' + (currentValuation === "inherit" ? " selected" : "") + ">" + escapeHtml(strings.inherit_global || "Inherit global") + "</option>";
       editRowHtml += '<option value="fob"' + (currentValuation === "fob" ? " selected" : "") + ">" + escapeHtml(strings.fob || "FOB") + "</option>";
       editRowHtml += '<option value="cif"' + (currentValuation === "cif" ? " selected" : "") + ">" + escapeHtml(strings.cif || "CIF") + "</option>";
       editRowHtml += '<option value="cif_insurance"' + (currentValuation === "cif_insurance" ? " selected" : "") + ">" + escapeHtml(strings.cif_insurance || "CIF + Insurance") + "</option>";
       editRowHtml += "</select>";
-      editRowHtml += '<span style="font-size: 11px; color: #666; margin-top: 2px; display: block;">' + escapeHtml(strings.overrides_global_for_rule || "Overrides global for this rule") + "</span>";
+      editRowHtml += '<span class="cfwc-field-help">' + escapeHtml(strings.overrides_global_for_rule || "Overrides global for this rule") + "</span>";
       editRowHtml += "</td>";
 
       // Depends on (base_includes).
       var currentBaseIncludes = rule.base_includes || [];
       editRowHtml += '<td class="cfwc-base-includes-cell">';
-      editRowHtml += '<select name="cfwc_rule_base_includes" class="cfwc-rule-field cfwc-base-includes-select" data-field="base_includes" multiple="multiple" style="width: 100%;">';
+      editRowHtml += '<select name="cfwc_rule_base_includes" class="cfwc-rule-field cfwc-base-includes-select" data-field="base_includes" multiple="multiple">';
       editRowHtml += "</select>";
-      editRowHtml += '<span style="font-size: 11px; color: #666; margin-top: 2px; display: block;">' + escapeHtml(strings.select_fees_include || "Select fees to include in base") + "</span>";
+      editRowHtml += '<span class="cfwc-field-help">' + escapeHtml(strings.select_fees_include || "Select fees to include in base") + "</span>";
       editRowHtml += "</td>";
 
       // Stacking mode.
       editRowHtml += "<td>";
       editRowHtml +=
-        '<select name="cfwc_rule_stacking" class="cfwc-rule-field cfwc-stacking-select" data-field="stacking_mode" style="width: 100%;">';
+        '<select name="cfwc_rule_stacking" class="cfwc-rule-field cfwc-stacking-select" data-field="stacking_mode">';
       editRowHtml +=
         '<option value="add"' +
         ((rule.stacking_mode || "add") === "add" ? " selected" : "") +
@@ -1161,20 +1058,19 @@
         (rule.stacking_mode === "exclusive" ? " selected" : "") +
         ">Exclusive (Only this fee)</option>";
       editRowHtml += "</select>";
-      editRowHtml +=
-        '<span class="description" style="font-size: 11px; color: #666; margin-top: 5px; display: block;">';
+      editRowHtml += '<span class="description cfwc-stacking-help">';
       var currentMode = rule.stacking_mode || "add";
       editRowHtml +=
-        '<span class="stacking-help-add" style="' +
-        (currentMode === "add" ? "" : "display: none;") +
+        '<span class="stacking-help-add' +
+        (currentMode === "add" ? " is-visible" : "") +
         '">Adds with other matching rules</span>';
       editRowHtml +=
-        '<span class="stacking-help-override" style="' +
-        (currentMode === "override" ? "" : "display: none;") +
+        '<span class="stacking-help-override' +
+        (currentMode === "override" ? " is-visible" : "") +
         '">Replaces lower priority rules</span>';
       editRowHtml +=
-        '<span class="stacking-help-exclusive" style="' +
-        (currentMode === "exclusive" ? "" : "display: none;") +
+        '<span class="stacking-help-exclusive' +
+        (currentMode === "exclusive" ? " is-visible" : "") +
         '">No other rules apply</span>';
       editRowHtml += "</span>";
       editRowHtml += "</td>";
@@ -1382,7 +1278,7 @@
       deleteClickDebounce[buttonId] = true;
 
       // Disable button temporarily to prevent double-clicks.
-      $button.prop("disabled", true).css("opacity", "0.5");
+      $button.prop("disabled", true);
 
       var rules = JSON.parse($("#cfwc_rules").val() || "[]");
 
@@ -1481,7 +1377,7 @@
       // Re-enable button after a short delay.
       setTimeout(function () {
         delete deleteClickDebounce[buttonId];
-        $button.prop("disabled", false).css("opacity", "1");
+        $button.prop("disabled", false);
       }, 300);
     });
 
@@ -1511,9 +1407,9 @@
           row += "<td>" + escapeHtml(rule.label || "");
           if (rule.priority && rule.priority > 0) {
             row +=
-              ' <span style="color: #666; font-size: 11px;">(' +
+              ' <span class="cfwc-priority-meta">(' +
               rule.priority +
-              ' <span class="dashicons dashicons-info" style="font-size: 14px; vertical-align: middle; cursor: help;" ' +
+              ' <span class="dashicons dashicons-info" ' +
               'title="Higher priority rules are checked first (0-100)"></span>)</span>';
           }
           row += "</td>";
@@ -1567,7 +1463,7 @@
               }
               if (catNames.length > 0) {
                 criteria.push(
-                  '<span class="dashicons dashicons-category" style="font-size: 14px;"></span> ' +
+                  '<span class="dashicons dashicons-category cfwc-criteria-icon"></span> ' +
                     catNames.join(", ")
                 );
               }
@@ -1576,7 +1472,7 @@
             // HS Code.
             if (rule.hs_code_pattern) {
               criteria.push(
-                '<span class="dashicons dashicons-tag" style="font-size: 14px;"></span> HS: ' +
+                '<span class="dashicons dashicons-tag cfwc-criteria-icon"></span> HS: ' +
                   rule.hs_code_pattern
               );
             }
@@ -1611,9 +1507,9 @@
             cif_insurance: strings.cif_insurance_short || "CIF + Ins",
           };
           if (valuationMethod !== "inherit") {
-            row += '<td><span style="display: inline-block; padding: 3px 8px; background: #2271b1; color: #fff; border-radius: 3px; font-size: 11px; font-weight: 600; line-height: 1;" title="' + escapeHtml(strings.overrides_global || "Overrides global valuation") + '">' + escapeHtml(valuationLabels[valuationMethod] || valuationMethod) + "</span></td>";
+            row += '<td><span class="cfwc-rule-badge cfwc-rule-badge--valuation" title="' + escapeHtml(strings.overrides_global || "Overrides global valuation") + '">' + escapeHtml(valuationLabels[valuationMethod] || valuationMethod) + "</span></td>";
           } else {
-            row += '<td><em style="color: #999; font-size: 11px;">' + escapeHtml(strings.global_label || "Global") + "</em></td>";
+            row += '<td><em class="cfwc-empty-cell">' + escapeHtml(strings.global_label || "Global") + "</em></td>";
           }
 
           // Depends on (base_includes).
@@ -1635,9 +1531,9 @@
               ? (strings.dep_fee_singular || "+%d fee")
               : (strings.dep_fee_plural || "+%d fees");
             var depBadgeText = depTemplate.replace("%d", baseIncludes.length);
-            row += '<td><span style="display: inline-block; padding: 3px 8px; background: #8261a1; color: #fff; border-radius: 3px; font-size: 11px; font-weight: 600; line-height: 1;" title="' + depTitle + '">' + escapeHtml(depBadgeText) + "</span></td>";
+            row += '<td><span class="cfwc-rule-badge cfwc-rule-badge--dependency" title="' + depTitle + '">' + escapeHtml(depBadgeText) + "</span></td>";
           } else {
-            row += '<td><em style="color: #999; font-size: 11px;">-</em></td>';
+            row += '<td><em class="cfwc-empty-cell">-</em></td>';
           }
 
           // Stacking mode - Use WooCommerce-style badges to match PHP rendering.
@@ -1647,11 +1543,6 @@
             override: strings.override || "Override",
             exclusive: strings.exclusive || "Exclusive",
           };
-          var stackingColors = {
-            add: "#46b450",
-            override: "#f0ad4e",
-            exclusive: "#dc3232",
-          };
           var stackingDescriptions = {
             add: strings.stack_desc || "Adds with other matching rules",
             override: strings.override_desc || "Replaces lower priority rules",
@@ -1659,17 +1550,16 @@
           };
 
           // Get values with defaults.
-          var badgeColor = stackingColors[stackingMode] || stackingColors.add;
-          var badgeLabel = stackingLabels[stackingMode] || stackingLabels.add;
-          var badgeTitle =
-            stackingDescriptions[stackingMode] || stackingDescriptions.add;
+          var modeKey = stackingLabels[stackingMode] ? stackingMode : "add";
+          var badgeLabel = stackingLabels[modeKey];
+          var badgeTitle = stackingDescriptions[modeKey];
 
           // Render WooCommerce-style badge matching PHP output.
           row +=
             "<td>" +
-            '<span style="display: inline-block; padding: 3px 8px; background: ' +
-            badgeColor +
-            '; color: #fff; border-radius: 3px; font-size: 11px; font-weight: 600; line-height: 1;" title="' +
+            '<span class="cfwc-rule-badge cfwc-rule-badge--stacking-' +
+            modeKey +
+            '" title="' +
             badgeTitle +
             '">' +
             badgeLabel +

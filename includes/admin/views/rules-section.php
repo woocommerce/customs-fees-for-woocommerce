@@ -97,7 +97,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					</label>
 				</th>
 				<td class="forminp">
-					<select id="cfwc_default_origin_select" name="cfwc_default_origin_select" class="wc-enhanced-select" style="width: 350px; max-width: 50%;">
+					<select id="cfwc_default_origin_select" name="cfwc_default_origin_select" class="wc-enhanced-select">
 						<option value="store" <?php selected( $selected_origin, 'store' ); ?>>
 							<?php
 							printf(
@@ -160,19 +160,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 						<label>
 							<input type="radio" name="cfwc_valuation_method" value="fob" <?php checked( $valuation_method, 'fob' ); ?> />
 							<strong><?php esc_html_e( 'FOB - Product Value Only', 'customs-fees-for-woocommerce' ); ?></strong>
-							<span class="description" style="display: block; margin: 2px 0 8px 24px; color: #666;">
+							<span class="description cfwc-default-origin-help">
 								<?php esc_html_e( 'Calculate customs fees based on product prices only. Used by USA, Canada.', 'customs-fees-for-woocommerce' ); ?>
 							</span>
 						</label>
 						<label>
 							<input type="radio" name="cfwc_valuation_method" value="cif" <?php checked( $valuation_method, 'cif' ); ?> />
 							<strong><?php esc_html_e( 'CIF - Include Shipping in Customs Value', 'customs-fees-for-woocommerce' ); ?></strong>
-							<span class="description" style="display: block; margin: 2px 0 8px 24px; color: #666;">
+							<span class="description cfwc-default-origin-help">
 								<?php esc_html_e( 'Include shipping costs in the customs value calculation. Used by EU, UK, Australia, Japan, and most other countries.', 'customs-fees-for-woocommerce' ); ?>
 							</span>
 						</label>
-						<p class="description" style="margin-top: 10px;">
-							<span class="dashicons dashicons-info" style="color: #2271b1;"></span>
+						<p class="description cfwc-help-link-under">
+							<span class="dashicons dashicons-info"></span>
 							<?php esc_html_e( 'When CIF is selected, shipping costs are distributed proportionally across products based on their value.', 'customs-fees-for-woocommerce' ); ?>
 						</p>
 					</fieldset>
@@ -186,7 +186,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<input type="hidden" name="cfwc_custom_default_origin" id="cfwc_custom_default_origin" value="<?php echo esc_attr( $custom_origin ); ?>" />
 	
 	<!-- WooCommerce Style Modal for Help -->
-	<div id="cfwc-help-modal" class="cfwc-modal" style="display: none;">
+	<div id="cfwc-help-modal" class="cfwc-modal" hidden>
 		<div class="cfwc-modal-backdrop"></div>
 		<div class="cfwc-modal-content">
 			<div class="cfwc-modal-header">
@@ -200,7 +200,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<!-- How It Works -->
 				<div class="cfwc-help-section">
 					<h3>
-						<span class="dashicons dashicons-info" style="color: #2271b1;"></span>
+						<span class="dashicons dashicons-info"></span>
 						<?php esc_html_e( 'How it works', 'customs-fees-for-woocommerce' ); ?>
 					</h3>
 					<ol>
@@ -214,7 +214,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<!-- How Rules Apply -->
 				<div class="cfwc-help-section">
 					<h3>
-						<span class="dashicons dashicons-admin-generic" style="color: #2271b1;"></span>
+						<span class="dashicons dashicons-admin-generic"></span>
 						<?php esc_html_e( 'How rules apply', 'customs-fees-for-woocommerce' ); ?>
 					</h3>
 					<ul>
@@ -227,7 +227,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<!-- Pro Tips -->
 				<div class="cfwc-help-section">
 					<h3>
-						<span class="dashicons dashicons-lightbulb" style="color: #f0ad4e;"></span>
+						<span class="dashicons dashicons-lightbulb"></span>
 						<?php esc_html_e( 'Pro tips', 'customs-fees-for-woocommerce' ); ?>
 					</h3>
 					<ul>
@@ -241,7 +241,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<!-- Rule Stacking Modes -->
 				<div class="cfwc-help-section">
 					<h3>
-						<span class="dashicons dashicons-admin-settings" style="color: #2271b1;"></span>
+						<span class="dashicons dashicons-admin-settings"></span>
 						<?php esc_html_e( 'Rule stacking modes', 'customs-fees-for-woocommerce' ); ?>
 					</h3>
 					<div class="cfwc-stacking-modes">
@@ -269,172 +269,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</div>
 	</div>
 	
-	<style>
-	/* WooCommerce-style Modal */
-	.cfwc-modal {
-		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		z-index: 160000;
-	}
-	
-	.cfwc-modal-backdrop {
-		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		background: rgba(0, 0, 0, 0.6);
-		z-index: 159990;
-	}
-	
-	.cfwc-modal-content {
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		width: 90%;
-		max-width: 600px;
-		max-height: 90vh;
-		background: #fff;
-		border-radius: 4px;
-		box-shadow: 0 3px 30px rgba(0, 0, 0, 0.2);
-		z-index: 160000;
-		display: flex;
-		flex-direction: column;
-	}
-	
-	.cfwc-modal-header {
-		padding: 20px;
-		border-bottom: 1px solid #e0e0e0;
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-	}
-	
-	.cfwc-modal-header h2 {
-		margin: 0;
-		font-size: 18px;
-		font-weight: 600;
-		color: #333;
-	}
-	
-	.cfwc-modal-close {
-		background: none;
-		border: none;
-		cursor: pointer;
-		padding: 0;
-		color: #999;
-		font-size: 20px;
-	}
-	
-	.cfwc-modal-close:hover {
-		color: #333;
-	}
-	
-	.cfwc-modal-body {
-		padding: 20px;
-		overflow-y: auto;
-		flex: 1;
-	}
-	
-	.cfwc-modal-footer {
-		padding: 20px;
-		border-top: 1px solid #e0e0e0;
-		text-align: right;
-	}
-	
-	.cfwc-help-section {
-		margin-bottom: 30px;
-	}
-	
-	.cfwc-help-section:last-child {
-		margin-bottom: 0;
-	}
-	
-	.cfwc-help-section h3 {
-		margin: 0 0 15px 0;
-		font-size: 14px;
-		font-weight: 600;
-		color: #333;
-	}
-	
-	.cfwc-help-section h3 .dashicons {
-		font-size: 18px;
-		vertical-align: middle;
-		margin-right: 5px;
-	}
-	
-	.cfwc-help-section ol,
-	.cfwc-help-section ul {
-		margin: 0;
-		padding-left: 25px;
-		font-size: 14px;
-		line-height: 1.8;
-		color: #555;
-	}
-	
-	.cfwc-help-section li {
-		margin-bottom: 8px;
-	}
-	
-	.cfwc-stacking-modes {
-		margin-top: 10px;
-	}
-	
-	.cfwc-stacking-mode {
-		margin-bottom: 10px;
-		display: flex;
-		align-items: center;
-		gap: 10px;
-	}
-	
-	.cfwc-badge {
-		display: inline-block;
-		padding: 4px 10px;
-		border-radius: 3px;
-		font-size: 12px;
-		font-weight: 600;
-		color: #fff;
-		min-width: 70px;
-		text-align: center;
-	}
-	
-	.cfwc-badge-stack {
-		background: #46b450;
-	}
-	
-	.cfwc-badge-override {
-		background: #f0ad4e;
-	}
-	
-	.cfwc-badge-exclusive {
-		background: #dc3232;
-	}
-	
-	/* Mobile styles */
-	@media screen and (max-width: 768px) {
-		.cfwc-modal-content {
-			width: 100%;
-			height: 100%;
-			max-width: none;
-			max-height: none;
-			border-radius: 0;
-			transform: none;
-			position: fixed;
-			top: 0;
-			left: 0;
-		}
-		
-		#cfwc_default_origin_select {
-			width: 100% !important;
-			margin-left: 0 !important;
-			margin-top: 10px;
-		}
-	}
-	</style>
 	
 	<script>
 	jQuery(document).ready(function($) {
@@ -565,7 +399,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<h3><?php esc_html_e( 'Quick Start with Presets', 'customs-fees-for-woocommerce' ); ?></h3>
 		<p><?php esc_html_e( 'Load presets to quickly configure common import scenarios:', 'customs-fees-for-woocommerce' ); ?></p>
 		
-		<select id="cfwc-preset-select" class="wc-enhanced-select" style="width: 280px; max-width: 100%;">
+		<select id="cfwc-preset-select" class="wc-enhanced-select">
 			<option value=""><?php esc_html_e( '-- Select a preset --', 'customs-fees-for-woocommerce' ); ?></option>
 			<?php if ( ! empty( $templates ) ) : ?>
 				<?php foreach ( $templates as $template_id => $template ) : ?>
@@ -595,7 +429,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</div>
 	</div>
 	
-	<div style="margin: 40px 0 30px 0; border-top: 1px solid #c3c4c7;"></div>
+	<div class="cfwc-rules-divider"></div>
 	
 	<!-- Mixed Rules Warning -->
 	<?php
@@ -653,7 +487,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	// Display all collected notices in one area.
 	if ( ! empty( $notices ) ) :
 		?>
-		<div class="cfwc-notices-container" style="margin-bottom: 20px;">
+		<div class="cfwc-notices-container">
 			<?php foreach ( $notices as $notice ) : ?>
 				<?php
 				$is_dismissible = ! empty( $notice['dismissible'] );
@@ -663,7 +497,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					$notice_class .= ' is-dismissible cfwc-dismissible-notice';
 				}
 				?>
-				<div class="<?php echo esc_attr( $notice_class ); ?>" style="margin-bottom: 10px;" <?php echo $dismiss_key ? 'data-dismiss-key="' . esc_attr( $dismiss_key ) . '"' : ''; ?>>
+				<div class="<?php echo esc_attr( $notice_class ); ?>" <?php echo $dismiss_key ? 'data-dismiss-key="' . esc_attr( $dismiss_key ) . '"' : ''; ?>>
 					<p><?php echo wp_kses_post( $notice['content'] ); ?></p>
 					<?php if ( $is_dismissible ) : ?>
 						<button type="button" class="notice-dismiss cfwc-notice-dismiss">
@@ -679,9 +513,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	
 	<!-- Rules Table -->
 	<div class="cfwc-rules-header">
-		<div style="flex: 1;">
-			<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-				<h3 style="margin: 0;"><?php esc_html_e( 'All Rules', 'customs-fees-for-woocommerce' ); ?></h3>
+		<div class="cfwc-rules-header-info">
+			<div class="cfwc-rules-header-title">
+				<h3><?php esc_html_e( 'All Rules', 'customs-fees-for-woocommerce' ); ?></h3>
 				<button type="button" class="button cfwc-add-rule">
 					<?php esc_html_e( 'Add New Rule', 'customs-fees-for-woocommerce' ); ?>
 				</button>
@@ -689,9 +523,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<?php esc_html_e( 'Delete All Rules', 'customs-fees-for-woocommerce' ); ?>
 				</button>
 			</div>
-			<p style="margin: 0;"><?php esc_html_e( 'Configure customs fee rules based on destination countries, product origins, categories, and HS codes.', 'customs-fees-for-woocommerce' ); ?></p>
+			<p><?php esc_html_e( 'Configure customs fee rules based on destination countries, product origins, categories, and HS codes.', 'customs-fees-for-woocommerce' ); ?></p>
 		</div>
-		<div style="align-self: flex-start;">
+		<div class="cfwc-rules-header-actions">
 			<a href="#" id="cfwc-help-link" class="cfwc-help-link-under">
 				<span class="cfwc-help-text"><?php esc_html_e( 'Need help getting started?', 'customs-fees-for-woocommerce' ); ?></span>
 			</a>
@@ -702,15 +536,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<table class="widefat fixed striped cfwc-rules-table">
 			<thead>
 					<tr>
-						<th style="width: 15%;"><?php esc_html_e( 'Label', 'customs-fees-for-woocommerce' ); ?></th>
-						<th style="width: 15%;"><?php esc_html_e( 'Countries', 'customs-fees-for-woocommerce' ); ?></th>
-						<th style="width: 15%;"><?php esc_html_e( 'Products', 'customs-fees-for-woocommerce' ); ?></th>
-						<th style="width: 10%;"><?php esc_html_e( 'Type', 'customs-fees-for-woocommerce' ); ?></th>
-						<th style="width: 7%;"><?php esc_html_e( 'Rate', 'customs-fees-for-woocommerce' ); ?></th>
-						<th style="width: 10%;"><?php esc_html_e( 'Valuation', 'customs-fees-for-woocommerce' ); ?></th>
-						<th style="width: 10%;"><?php esc_html_e( 'Depends on', 'customs-fees-for-woocommerce' ); ?></th>
-						<th style="width: 10%;"><?php esc_html_e( 'Stacking', 'customs-fees-for-woocommerce' ); ?></th>
-						<th style="width: 8%;"><?php esc_html_e( 'Actions', 'customs-fees-for-woocommerce' ); ?></th>
+						<th class="cfwc-col-label"><?php esc_html_e( 'Label', 'customs-fees-for-woocommerce' ); ?></th>
+						<th class="cfwc-col-countries"><?php esc_html_e( 'Countries', 'customs-fees-for-woocommerce' ); ?></th>
+						<th class="cfwc-col-products"><?php esc_html_e( 'Products', 'customs-fees-for-woocommerce' ); ?></th>
+						<th class="cfwc-col-type"><?php esc_html_e( 'Type', 'customs-fees-for-woocommerce' ); ?></th>
+						<th class="cfwc-col-rate"><?php esc_html_e( 'Rate', 'customs-fees-for-woocommerce' ); ?></th>
+						<th class="cfwc-col-valuation"><?php esc_html_e( 'Valuation', 'customs-fees-for-woocommerce' ); ?></th>
+						<th class="cfwc-col-depends"><?php esc_html_e( 'Depends on', 'customs-fees-for-woocommerce' ); ?></th>
+						<th class="cfwc-col-stacking"><?php esc_html_e( 'Stacking', 'customs-fees-for-woocommerce' ); ?></th>
+						<th class="cfwc-col-actions"><?php esc_html_e( 'Actions', 'customs-fees-for-woocommerce' ); ?></th>
 					</tr>
 			</thead>
 			<tbody id="cfwc-rules-tbody">
@@ -724,8 +558,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 								// Match JavaScript rendering for priority.
 								$priority = $rule['priority'] ?? 0;
 								if ( $priority > 0 ) {
-									echo ' <span style="color: #666; font-size: 11px;">(' . esc_html( $priority ) .
-										' <span class="dashicons dashicons-info" style="font-size: 14px; vertical-align: middle; cursor: help;" ' .
+									echo ' <span class="cfwc-priority-meta">(' . esc_html( $priority ) .
+										' <span class="dashicons dashicons-info" ' .
 										'title="' . esc_attr__( 'Higher priority rules are checked first (0-100)', 'customs-fees-for-woocommerce' ) . '"></span>)</span>';
 								}
 								?>
@@ -784,21 +618,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 												$cat_names[] = sprintf( __( '+%d more', 'customs-fees-for-woocommerce' ), count( $cat_ids ) - 2 );
 											}
 											if ( ! empty( $cat_names ) ) {
-												$criteria[] = '<span class="dashicons dashicons-category" style="font-size: 14px;"></span> ' . implode( ', ', $cat_names );
+												$criteria[] = '<span class="dashicons dashicons-category cfwc-criteria-icon"></span> ' . implode( ', ', $cat_names );
 											}
 										}
 									}
 
 									// HS Code.
 									if ( ! empty( $rule['hs_code_pattern'] ) ) {
-										$criteria[] = '<span class="dashicons dashicons-tag" style="font-size: 14px;"></span> HS: ' . esc_html( $rule['hs_code_pattern'] );
+										$criteria[] = '<span class="dashicons dashicons-tag cfwc-criteria-icon"></span> HS: ' . esc_html( $rule['hs_code_pattern'] );
 									}
 
 									// Output criteria with allowed HTML (dashicons and breaks).
 									$allowed_html = array(
 										'span' => array(
 											'class' => array(),
-											'style' => array(),
 										),
 										'br'   => array(),
 										'em'   => array(),
@@ -826,9 +659,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 										'cif_insurance' => __( 'CIF + Ins', 'customs-fees-for-woocommerce' ),
 									);
 									if ( 'inherit' !== $valuation_method ) {
-										echo '<span style="display: inline-block; padding: 3px 8px; background: #2271b1; color: #fff; border-radius: 3px; font-size: 11px; font-weight: 600; line-height: 1;" title="' . esc_attr__( 'Overrides global valuation', 'customs-fees-for-woocommerce' ) . '">' . esc_html( $valuation_labels[ $valuation_method ] ?? $valuation_method ) . '</span>';
+										echo '<span class="cfwc-rule-badge cfwc-rule-badge--valuation" title="' . esc_attr__( 'Overrides global valuation', 'customs-fees-for-woocommerce' ) . '">' . esc_html( $valuation_labels[ $valuation_method ] ?? $valuation_method ) . '</span>';
 									} else {
-										echo '<em style="color: #999; font-size: 11px;">' . esc_html__( 'Global', 'customs-fees-for-woocommerce' ) . '</em>';
+										echo '<em class="cfwc-empty-cell">' . esc_html__( 'Global', 'customs-fees-for-woocommerce' ) . '</em>';
 									}
 									?>
 								</td>
@@ -852,9 +685,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 											_n( '+%s fee', '+%s fees', $count, 'customs-fees-for-woocommerce' ),
 											number_format_i18n( $count )
 										);
-										echo '<span style="display: inline-block; padding: 3px 8px; background: #8261a1; color: #fff; border-radius: 3px; font-size: 11px; font-weight: 600; line-height: 1;" title="' . $title . '">' . esc_html( $badge_label ) . '</span>';
+										echo '<span class="cfwc-rule-badge cfwc-rule-badge--dependency" title="' . esc_attr( $title ) . '">' . esc_html( $badge_label ) . '</span>';
 									} else {
-										echo '<em style="color: #999; font-size: 11px;">-</em>';
+										echo '<em class="cfwc-empty-cell">-</em>';
 									}
 									?>
 								</td>
@@ -869,24 +702,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 									'exclusive' => __( 'Exclusive', 'customs-fees-for-woocommerce' ),
 								);
 
-								$stacking_colors = array(
-									'add'       => '#46b450',
-									'override'  => '#f0ad4e',
-									'exclusive' => '#dc3232',
-								);
-
 								$stacking_descriptions = array(
 									'add'       => __( 'Adds with other matching rules', 'customs-fees-for-woocommerce' ),
 									'override'  => __( 'Replaces lower priority rules', 'customs-fees-for-woocommerce' ),
 									'exclusive' => __( 'Only this rule applies', 'customs-fees-for-woocommerce' ),
 								);
 
-								// Output WooCommerce-style badge.
-								$badge_color = $stacking_colors[ $stacking_mode ] ?? $stacking_colors['add'];
-								$badge_label = $stacking_labels[ $stacking_mode ] ?? $stacking_labels['add'];
-								$badge_title = $stacking_descriptions[ $stacking_mode ] ?? $stacking_descriptions['add'];
+								$mode_key    = isset( $stacking_labels[ $stacking_mode ] ) ? $stacking_mode : 'add';
+								$badge_label = $stacking_labels[ $mode_key ];
+								$badge_title = $stacking_descriptions[ $mode_key ];
 
-								echo '<span style="display: inline-block; padding: 3px 8px; background: ' . esc_attr( $badge_color ) . '; color: #fff; border-radius: 3px; font-size: 11px; font-weight: 600; line-height: 1;" title="' . esc_attr( $badge_title ) . '">';
+								echo '<span class="cfwc-rule-badge cfwc-rule-badge--stacking-' . esc_attr( $mode_key ) . '" title="' . esc_attr( $badge_title ) . '">';
 								echo esc_html( $badge_label );
 								echo '</span>';
 								?>
