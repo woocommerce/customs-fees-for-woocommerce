@@ -55,9 +55,12 @@ class CFWC_Admin {
 		// This prevents duplicate notices on activation.
 
 		// Check for rule dependency errors (cycle or unresolvable deps).
+		// The transient is kept in sync with the saved rules by
+		// CFWC_Calculator::refresh_cycle_notice() at every mutation site, so
+		// the notice persists across pageloads until a save resolves the
+		// cycle — `is-dismissible` still hides it for the current pageview.
 		$dependency_error = get_transient( 'cfwc_rules_dependency_error' );
 		if ( ! empty( $dependency_error ) ) {
-			delete_transient( 'cfwc_rules_dependency_error' );
 			echo '<div class="notice notice-warning is-dismissible"><p><strong>'
 				. esc_html__( 'Customs Fees Warning', 'customs-fees-for-woocommerce' )
 				. ':</strong> '

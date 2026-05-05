@@ -1448,6 +1448,11 @@ class CFWC_Templates {
 		// Clear cache.
 		CFWC_Calculator::clear_cache();
 
+		// Re-derive the cycle-error notice from the merged rule set. A
+		// template can introduce or resolve cycles depending on what it
+		// adds or replaces, so admin needs to reflect that immediately.
+		CFWC_Calculator::refresh_cycle_notice( $rules );
+
 		return array(
 			'success'     => true,
 			'added'       => $added_count,

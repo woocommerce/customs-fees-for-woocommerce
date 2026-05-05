@@ -878,6 +878,48 @@ class CFWC_Calculator {
 	}
 
 	/**
+	 * Returns the labels of every rule that participates in a dependency cycle.
+	 *
+	 * Mirrors the per-rule scan the calculator performs, but operates on an
+	 * arbitrary rule set (typically the freshly-saved `cfwc_rules` option) so
+	 * admin code can derive the warning state without waiting for a cart
+	 * calculation. Empty array means the rule set is acyclic.
+	 *
+	 * @since 1.2.0
+	 * @param array $rules Rule set to inspect.
+	 * @return array<int,string> Unique, re-indexed list of cyclic rule labels.
+	 */
+	public static function detect_cycle_labels( $rules ) {
+		$labels = array();
+		foreach ( (array) $rules as $rule ) {
+			$rid = isset( $rule['rule_id'] ) ? $rule['rule_id'] : '';
+			if ( '' !== $rid && self::has_cycle( $rules, $rid ) ) {
+				$labels[] = ( isset( $rule['label'] ) && '' !== $rule['label'] ) ? $rule['label'] : $rid;
+			}
+		}
+		return array_values( array_unique( $labels ) );
+	}
+
+	/**
+	 * Sync the dependency-error transient to the supplied rule set.
+	 *
+	 * Called from every rule-mutation site so the admin notice reflects the
+	 * current saved state instead of waiting for the next calculator run to
+	 * re-derive it. Sets the transient when cycles exist, deletes it otherwise.
+	 *
+	 * @since 1.2.0
+	 * @param array $rules Rule set just persisted to the `cfwc_rules` option.
+	 */
+	public static function refresh_cycle_notice( $rules ) {
+		$labels = self::detect_cycle_labels( $rules );
+		if ( ! empty( $labels ) ) {
+			set_transient( 'cfwc_rules_dependency_error', $labels, DAY_IN_SECONDS );
+		} else {
+			delete_transient( 'cfwc_rules_dependency_error' );
+		}
+	}
+
+	/**
 	 * Calculate a single fee.
 	 *
 	 * @since 1.0.0

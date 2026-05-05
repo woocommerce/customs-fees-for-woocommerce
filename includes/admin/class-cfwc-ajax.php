@@ -123,10 +123,10 @@ class CFWC_Ajax {
 		// Clear cache.
 		CFWC_Calculator::clear_cache();
 
-		// Reset the cycle-error flag — the rule set just changed, so any
-		// previous dependency-error notice is stale and should be re-derived
-		// on the next calculator run rather than flashed against new data.
-		delete_transient( 'cfwc_rules_dependency_error' );
+		// Re-derive the cycle-error notice from the just-saved rules so the
+		// admin warning reflects the current state instead of waiting for a
+		// cart calculation to set or clear it.
+		CFWC_Calculator::refresh_cycle_notice( $rules );
 
 		wp_send_json_success(
 			array(
@@ -220,10 +220,10 @@ class CFWC_Ajax {
 			// Clear cache.
 			CFWC_Calculator::clear_cache();
 
-			// Reset the cycle-error flag — the rule set just changed, so any
-			// previous dependency-error notice is stale and should be re-derived
-			// on the next calculator run rather than flashed against new data.
-			delete_transient( 'cfwc_rules_dependency_error' );
+			// Re-derive the cycle-error notice from the just-saved rules so
+			// dropping a rule that broke a cycle clears the warning, and a
+			// remaining cycle keeps the warning visible.
+			CFWC_Calculator::refresh_cycle_notice( $rules );
 
 			wp_send_json_success(
 				array(
@@ -280,10 +280,10 @@ class CFWC_Ajax {
 		// Clear cache.
 		CFWC_Calculator::clear_cache();
 
-		// Reset the cycle-error flag — the rule set just changed, so any
-		// previous dependency-error notice is stale and should be re-derived
-		// on the next calculator run rather than flashed against new data.
-		delete_transient( 'cfwc_rules_dependency_error' );
+		// Re-derive the cycle-error notice. Reordering doesn't change
+		// dependencies, but running through the same code path keeps the
+		// transient state consistent with whatever is in storage.
+		CFWC_Calculator::refresh_cycle_notice( $reordered );
 
 		wp_send_json_success(
 			array(
@@ -474,10 +474,10 @@ class CFWC_Ajax {
 		// Clear cache.
 		CFWC_Calculator::clear_cache();
 
-		// Reset the cycle-error flag — the rule set just changed, so any
-		// previous dependency-error notice is stale and should be re-derived
-		// on the next calculator run rather than flashed against new data.
-		delete_transient( 'cfwc_rules_dependency_error' );
+		// Re-derive the cycle-error notice from the imported rule set so any
+		// cycles introduced (or resolved) by the CSV are reflected in admin
+		// without waiting for a cart calculation.
+		CFWC_Calculator::refresh_cycle_notice( $new_rules );
 
 		wp_send_json_success(
 			array(

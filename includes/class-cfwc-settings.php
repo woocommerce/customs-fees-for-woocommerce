@@ -292,10 +292,10 @@ class CFWC_Settings {
 			CFWC_Calculator::clear_cache();
 		}
 
-		// Reset the cycle-error flag — the rule set just changed, so any
-		// previous dependency-error notice is stale and should be re-derived
-		// on the next calculator run rather than flashed against new data.
-		delete_transient( 'cfwc_rules_dependency_error' );
+		// Re-derive the cycle-error notice from the just-saved rules so the
+		// admin warning reflects the current state instead of waiting for a
+		// cart calculation to set or clear it.
+		CFWC_Calculator::refresh_cycle_notice( $rules );
 
 		// Clear all caches.
 		wp_cache_flush();
