@@ -5,8 +5,8 @@ Requires at least: 6.8
 Tested up to: 6.9
 Requires PHP: 7.4
 Requires Plugins: woocommerce
-WC requires at least: 10.5
-WC tested up to: 10.7
+WC requires at least: 10.6
+WC tested up to: 10.8
 Stable tag: 1.1.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -192,9 +192,10 @@ Yes, through:
 
 == Changelog ==
 
-= 1.2.0 - 2026-xx-xx =
-* Add - Per-rule valuation overrides (FOB, CIF, CIF + Insurance) with compound base support, so a rule's customs value can include other rules' computed fees.
+2026-xx-xx - version 1.2.0
+* Add    - Per-rule valuation overrides (FOB, CIF, CIF + Insurance) with compound base support, so a rule's customs value can include other rules' computed fees.
 * Update - Built-in presets for Canada, Australia, New Zealand, UK, and EU now use correct duty vs. import tax valuation bases.
+* Tweak  - WooCommerce 10.8 Compatibility.
 
 = 1.1.7 - 2026-04-13 =
 * Tweak - WooCommerce 10.7 Compatibility.
