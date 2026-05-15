@@ -1289,6 +1289,8 @@ class CFWC_Calculator {
 		 * Filter the calculated customs value.
 		 *
 		 * @since 1.1.4
+		 * @since 1.2.0 Added the $rule parameter.
+		 *
 		 * @param float   $customs_value The calculated customs value.
 		 * @param float   $line_total    Original product line total.
 		 * @param array   $cart_item     Cart item data.
