@@ -195,6 +195,7 @@ Yes, through:
 2026-xx-xx - version 1.2.0
 * Add    - Per-rule valuation overrides (FOB, CIF, CIF + Insurance) with compound base support, so a rule's customs value can include other rules' computed fees.
 * Update - Built-in presets for Canada, Australia, New Zealand, UK, and EU now use correct duty vs. import tax valuation bases.
+* Dev    - `cfwc_customs_value` filter now passes the matching rule as a 5th argument; existing 4-argument callbacks remain backwards-compatible.
 * Tweak  - WooCommerce 10.8 Compatibility.
 
 = 1.1.7 - 2026-04-13 =
