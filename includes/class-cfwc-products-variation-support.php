@@ -90,9 +90,9 @@ class CFWC_Products_Variation_Support {
 					);
 					?>
 				</label>
-				<select id="cfwc_country_of_origin_<?php echo esc_attr( $loop ); ?>" 
-						name="cfwc_country_of_origin[<?php echo esc_attr( $loop ); ?>]" 
-						class="wc-enhanced-select">
+				<select id="cfwc_country_of_origin_<?php echo esc_attr( $loop ); ?>"
+						name="cfwc_country_of_origin[<?php echo esc_attr( $loop ); ?>]"
+						class="wc-enhanced-select cfwc-select2-field">
 					<option value=""><?php esc_html_e( 'Use parent product', 'customs-fees-for-woocommerce' ); ?></option>
 					<?php
 					foreach ( WC()->countries->get_countries() as $code => $country ) {

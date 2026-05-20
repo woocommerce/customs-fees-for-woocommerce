@@ -752,19 +752,16 @@
       // Countries column (From and To).
       newRowHtml += "<td>";
       newRowHtml +=
-        '<select name="cfwc_rule_from_country" class="cfwc-rule-field cfwc-country-select wc-enhanced-select" data-field="from_country" data-placeholder="' +
+        '<select name="cfwc_rule_from_country" class="cfwc-rule-field cfwc-country-select wc-enhanced-select cfwc-select2-field" data-field="from_country" data-placeholder="' +
         (strings.from_country || "From (any)") +
-        '" style="width: 47%;">';
+        '" style="width: 100%;">';
       newRowHtml +=
         '<option value="">Any Origin</option>' + getCountryOptions("");
       newRowHtml += "</select>";
-      // Add spacing between dropdowns.
       newRowHtml +=
-        '<span style="display: inline-block; width: 10px;">&nbsp;</span>';
-      newRowHtml +=
-        '<select name="cfwc_rule_to_country" class="cfwc-rule-field cfwc-country-select wc-enhanced-select" data-field="to_country" data-placeholder="' +
+        '<select name="cfwc_rule_to_country" class="cfwc-rule-field cfwc-country-select wc-enhanced-select cfwc-select2-field" data-field="to_country" data-placeholder="' +
         (strings.to_country || "To (any)") +
-        '" style="width: 47%;">';
+        '" style="width: 100%;">';
       newRowHtml +=
         '<option value="">Any Destination</option>' + getCountryOptions("");
       newRowHtml += "</select></td>";
@@ -780,7 +777,7 @@
       newRowHtml += "</select>";
       // Category selector (hidden by default - only show for category/combined).
       newRowHtml +=
-        '<select name="cfwc_rule_categories" class="cfwc-rule-field cfwc-category-select wc-enhanced-select" data-field="category_ids" multiple="multiple" style="width: 100%; display: none; margin-bottom: 5px;" data-placeholder="Select categories...">';
+        '<select name="cfwc_rule_categories" class="cfwc-rule-field cfwc-category-select wc-enhanced-select cfwc-select2-field" data-field="category_ids" multiple="multiple" style="width: 100%; display: none; margin-bottom: 5px;" data-placeholder="Select categories...">';
       if (cfwc_admin.categories) {
         $.each(cfwc_admin.categories, function (id, name) {
           newRowHtml += '<option value="' + id + '">' + name + "</option>";
@@ -936,22 +933,19 @@
       // Countries column (From and To).
       editRowHtml += "<td>";
       editRowHtml +=
-        '<select name="cfwc_rule_from_country" class="cfwc-rule-field cfwc-country-select wc-enhanced-select" data-field="from_country" data-placeholder="' +
+        '<select name="cfwc_rule_from_country" class="cfwc-rule-field cfwc-country-select wc-enhanced-select cfwc-select2-field" data-field="from_country" data-placeholder="' +
         (strings.from_country || "From (any)") +
-        '" style="width: 47%;">';
+        '" style="width: 100%;">';
       editRowHtml +=
         '<option value="">Any Origin</option>' +
         getCountryOptions(
           rule.from_country || rule.origin_country || rule.country || ""
         );
       editRowHtml += "</select>";
-      // Add spacing between dropdowns.
       editRowHtml +=
-        '<span style="display: inline-block; width: 10px;">&nbsp;</span>';
-      editRowHtml +=
-        '<select name="cfwc_rule_to_country" class="cfwc-rule-field cfwc-country-select wc-enhanced-select" data-field="to_country" data-placeholder="' +
+        '<select name="cfwc_rule_to_country" class="cfwc-rule-field cfwc-country-select wc-enhanced-select cfwc-select2-field" data-field="to_country" data-placeholder="' +
         (strings.to_country || "To (any)") +
-        '" style="width: 47%;">';
+        '" style="width: 100%;">';
       editRowHtml +=
         '<option value="">Any Destination</option>' +
         getCountryOptions(rule.to_country || rule.country || "");
@@ -987,7 +981,7 @@
           ? "Select categories (optional)"
           : "Select categories...";
       editRowHtml +=
-        '<select name="cfwc_rule_categories" class="cfwc-rule-field cfwc-category-select wc-enhanced-select" data-field="category_ids" multiple="multiple" style="width: 100%; margin-bottom: 5px;' +
+        '<select name="cfwc_rule_categories" class="cfwc-rule-field cfwc-category-select wc-enhanced-select cfwc-select2-field" data-field="category_ids" multiple="multiple" style="width: 100%; margin-bottom: 5px;' +
         (showCategories ? "" : " display: none;") +
         '" data-placeholder="' +
         categoryPlaceholder +

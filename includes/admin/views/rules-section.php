@@ -97,7 +97,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					</label>
 				</th>
 				<td class="forminp">
-					<select id="cfwc_default_origin_select" name="cfwc_default_origin_select" class="wc-enhanced-select" style="width: 350px; max-width: 50%;">
+					<select id="cfwc_default_origin_select" name="cfwc_default_origin_select" class="wc-enhanced-select cfwc-select2-field" style="width: 350px; max-width: 50%;">
 						<option value="store" <?php selected( $selected_origin, 'store' ); ?>>
 							<?php
 							printf(
@@ -565,7 +565,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<h3><?php esc_html_e( 'Quick Start with Presets', 'customs-fees-for-woocommerce' ); ?></h3>
 		<p><?php esc_html_e( 'Load presets to quickly configure common import scenarios:', 'customs-fees-for-woocommerce' ); ?></p>
 		
-		<select id="cfwc-preset-select" class="wc-enhanced-select" style="width: 280px; max-width: 100%;">
+		<select id="cfwc-preset-select" class="wc-enhanced-select cfwc-select2-field" style="width: 280px; max-width: 100%;">
 			<option value=""><?php esc_html_e( '-- Select a preset --', 'customs-fees-for-woocommerce' ); ?></option>
 			<?php if ( ! empty( $templates ) ) : ?>
 				<?php foreach ( $templates as $template_id => $template ) : ?>
