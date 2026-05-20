@@ -192,8 +192,10 @@ Yes, through:
 
 == Changelog ==
 
-= 1.1.8 - 2026-xx-xx =
+= 1.1.9 - 2026-xx-xx =
 * Tweak - WordPress 7.0 Compatibility.
+
+= 1.1.8 - 2026-05-20 =
 * Tweak - WooCommerce 10.8 Compatibility.
 
 = 1.1.7 - 2026-xx-xx =
