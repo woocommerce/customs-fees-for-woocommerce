@@ -7,7 +7,7 @@ Requires PHP: 7.4
 Requires Plugins: woocommerce
 WC requires at least: 10.6
 WC tested up to: 10.8
-Stable tag: 1.1.5
+Stable tag: 1.1.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -198,10 +198,10 @@ Yes, through:
 = 1.1.8 - 2026-05-20 =
 * Tweak - WooCommerce 10.8 Compatibility.
 
-= 1.1.7 - 2026-xx-xx =
+= 1.1.7 - 2026-04-13 =
 * Tweak - WooCommerce 10.7 Compatibility.
 
-= 1.1.6 - 2026-xx-xx =
+= 1.1.6 - 2026-03-31 =
 * Tweak - WooCommerce 10.6 Compatibility.
 
 = 1.1.5 - 2026-02-04 =
