@@ -2,10 +2,10 @@
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Customs Fees for WooCommerce 1.1.7\n"
+"Project-Id-Version: Customs Fees for WooCommerce 1.1.9\n"
 "Report-Msgid-Bugs-To: "
 "https://wordpress.org/support/plugin/customs-fees-for-woocommerce\n"
-"POT-Creation-Date: 2026-05-05 10:11:04+00:00\n"
+"POT-Creation-Date: 2026-05-21 17:12:45+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -795,12 +795,12 @@ msgstr ""
 msgid "Only this rule applies"
 msgstr ""
 
-#: includes/class-cfwc-calculator.php:977
+#: includes/class-cfwc-calculator.php:997
 #. translators: %1$s: destination country, %2$s: origin country
 msgid "Import Fees (%1$s from %2$s)"
 msgstr ""
 
-#: includes/class-cfwc-calculator.php:985
+#: includes/class-cfwc-calculator.php:1005
 #. translators: %s: country name
 msgid "Customs & Import Fees (%s)"
 msgstr ""
