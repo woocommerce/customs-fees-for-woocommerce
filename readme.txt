@@ -1,13 +1,13 @@
 === Customs Fees for WooCommerce ===
 Contributors: woocommerce
 Tags: woocommerce, customs, import-fees, international-shipping, tariffs
-Requires at least: 6.8
-Tested up to: 6.9
+Requires at least: 6.9
+Tested up to: 7.0
 Requires PHP: 7.4
 Requires Plugins: woocommerce
 WC requires at least: 10.6
 WC tested up to: 10.8
-Stable tag: 1.1.5
+Stable tag: 1.1.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -196,7 +196,12 @@ Yes, through:
 * Add    - Per-rule valuation overrides (FOB, CIF, CIF + Insurance) with compound base support, so a rule's customs value can include other rules' computed fees.
 * Update - Built-in presets for Canada, Australia, New Zealand, UK, and EU now use correct duty vs. import tax valuation bases.
 * Dev    - `cfwc_customs_value` filter now passes the matching rule as a 5th argument; existing 4-argument callbacks remain backwards-compatible.
-* Tweak  - WooCommerce 10.8 Compatibility.
+
+= 1.1.9 - 2026-xx-xx =
+* Tweak - WordPress 7.0 Compatibility.
+
+= 1.1.8 - 2026-05-20 =
+* Tweak - WooCommerce 10.8 Compatibility.
 
 = 1.1.7 - 2026-04-13 =
 * Tweak - WooCommerce 10.7 Compatibility.

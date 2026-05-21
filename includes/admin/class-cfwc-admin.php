@@ -245,7 +245,7 @@ class CFWC_Admin {
 				'description'       => __( 'Select the country where this product was manufactured. This determines which customs rules apply.', 'customs-fees-for-woocommerce' ),
 				'options'           => array( '' => __( 'Select a country', 'customs-fees-for-woocommerce' ) ) + $countries,
 				'value'             => $origin_value,
-				'class'             => 'wc-enhanced-select',
+				'class'             => 'wc-enhanced-select cfwc-select2-field',
 				'custom_attributes' => array(
 					'data-placeholder' => __( 'Select a country', 'customs-fees-for-woocommerce' ),
 				),
