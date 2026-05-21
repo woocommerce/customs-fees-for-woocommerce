@@ -550,7 +550,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<tbody id="cfwc-rules-tbody">
 				<?php if ( ! empty( $rules ) ) : ?>
 					<?php foreach ( $rules as $index => $rule ) : ?>
-						<tr>
+						<tr class="cfwc-rule-row">
 							<td>
 								<?php
 								echo esc_html( $rule['label'] ?? '' );

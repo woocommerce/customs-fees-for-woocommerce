@@ -1382,7 +1382,7 @@
         // Has rules - show "Add to Existing Rules".
         addPresetBtn.text(strings.add_to_existing || "Add to Existing Rules");
         $.each(rules, function (index, rule) {
-          var row = "<tr>";
+          var row = '<tr class="cfwc-rule-row">';
 
           // Label with priority (first column).
           row += "<td>" + escapeHtml(rule.label || "");
