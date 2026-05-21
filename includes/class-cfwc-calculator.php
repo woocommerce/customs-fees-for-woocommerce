@@ -325,7 +325,9 @@ class CFWC_Calculator {
 					),
 					'warning'
 				);
-				set_transient( 'cfwc_rules_dependency_error', $cycle_labels, DAY_IN_SECONDS );
+				// Notice state is maintained by refresh_cycle_notice() on every
+				// rule-mutation path (settings save, ajax save/reorder/import),
+				// so the cart calculator does not need to write wp_options here.
 			}
 
 			// Round-based dependency resolution for matching rules.
