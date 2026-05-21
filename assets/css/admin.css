@@ -220,6 +220,9 @@
 	width: 100%;
 }
 
+/* Unified 5px vertical gap between stacked form controls in a rule row.
+   (Field-to-help/required text gap is the tighter 2px via the help/required
+   element's own margin-top below.) */
 .cfwc-rule-row .cfwc-rule-field--label,
 .cfwc-rule-row .cfwc-rule-field--match-type,
 .cfwc-rule-row .cfwc-rule-field--category {
@@ -232,16 +235,6 @@
 
 .cfwc-rule-row .cfwc-rule-field--rate {
 	width: 80px;
-}
-
-.cfwc-rule-row .cfwc-field-spacer {
-	display: none;
-	width: 100%;
-	height: 5px;
-}
-
-.cfwc-rule-row .cfwc-field-spacer.is-visible {
-	display: block;
 }
 
 .cfwc-rule-row .cfwc-field-help {

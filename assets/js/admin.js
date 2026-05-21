@@ -109,7 +109,6 @@
       var $categorySelect = $row.find(".cfwc-category-select");
       var $hsCodeInput = $row.find(".cfwc-hs-code");
       var $requiredIndicator = $row.find(".cfwc-field-required");
-      var $spacer = $row.find(".cfwc-field-spacer");
 
       // Show fields based on match type.
       // Note: addClass/removeClass("is-hidden") manages the initial render's class;
@@ -119,7 +118,6 @@
         // All Products - hide both category and HS code fields, show "Not required".
         $categorySelect.addClass("is-hidden").hide().removeAttr("required");
         $hsCodeInput.addClass("is-hidden").hide().removeAttr("required");
-        $spacer.removeClass("is-visible");
         $requiredIndicator.show().html("Not required");
         $categorySelect.attr("data-placeholder", "Select categories...");
         $hsCodeInput.attr("placeholder", "HS Code (e.g., 6109* or 61,62)");
@@ -127,14 +125,12 @@
         // By Category - show only category field, hide HS code.
         $categorySelect.removeClass("is-hidden").show().attr("required", "required");
         $hsCodeInput.addClass("is-hidden").hide().removeAttr("required");
-        $spacer.removeClass("is-visible");
         $requiredIndicator.show().html("Required *");
         $categorySelect.attr("data-placeholder", "Select categories...");
         $hsCodeInput.attr("placeholder", "HS Code (e.g., 6109* or 61,62)");
       } else if (matchType === "hs_code") {
         // By HS Code - show both fields but category is not required.
         $categorySelect.removeClass("is-hidden").show().removeAttr("required");
-        $spacer.addClass("is-visible"); // Show spacer between fields.
         $hsCodeInput.removeClass("is-hidden").show().attr("required", "required");
         $requiredIndicator
           .show()
@@ -145,9 +141,8 @@
         );
         $hsCodeInput.attr("placeholder", "HS Code (e.g., 6109* or 61,62)");
       } else if (matchType === "combined") {
-        // Category + HS Code - show both fields with spacing.
+        // Category + HS Code - show both fields.
         $categorySelect.removeClass("is-hidden").show().attr("required", "required");
-        $spacer.addClass("is-visible"); // Show spacer between fields.
         $hsCodeInput.removeClass("is-hidden").show().attr("required", "required");
         $requiredIndicator.show().html("Both required *");
         $categorySelect.attr("data-placeholder", "Select categories...");
@@ -691,8 +686,6 @@
       newRowHtml +=
         '<option value="">Any Origin</option>' + getCountryOptions("");
       newRowHtml += "</select>";
-      // Add spacing between dropdowns.
-      newRowHtml += '<span class="cfwc-country-spacer">&nbsp;</span>';
       newRowHtml +=
         '<select name="cfwc_rule_to_country" class="cfwc-rule-field cfwc-rule-field--country cfwc-country-select wc-enhanced-select cfwc-select2-field" data-field="to_country" data-placeholder="' +
         (strings.to_country || "To (any)") +
@@ -719,8 +712,6 @@
         });
       }
       newRowHtml += "</select>";
-      // Add spacer between category and HS code fields.
-      newRowHtml += '<span class="cfwc-field-spacer">&nbsp;</span>';
       // HS Code pattern input (hidden by default - only show for hs_code/combined).
       newRowHtml +=
         '<input type="text" name="cfwc_rule_hs_code" class="cfwc-rule-field cfwc-hs-code is-hidden" data-field="hs_code_pattern" placeholder="HS Code (e.g., 6109* or 61,62)" />';
@@ -905,8 +896,6 @@
           rule.from_country || rule.origin_country || rule.country || ""
         );
       editRowHtml += "</select>";
-      // Add spacing between dropdowns.
-      editRowHtml += '<span class="cfwc-country-spacer">&nbsp;</span>';
       editRowHtml +=
         '<select name="cfwc_rule_to_country" class="cfwc-rule-field cfwc-rule-field--country cfwc-country-select wc-enhanced-select cfwc-select2-field" data-field="to_country" data-placeholder="' +
         (strings.to_country || "To (any)") +
@@ -960,14 +949,6 @@
         });
       }
       editRowHtml += "</select>";
-
-      // Add spacer between category and HS code fields.
-      var showSpacer =
-        rule.match_type === "combined" || rule.match_type === "hs_code";
-      editRowHtml +=
-        '<span class="cfwc-field-spacer' +
-        (showSpacer ? " is-visible" : "") +
-        '">&nbsp;</span>';
 
       // HS Code pattern input (show only for hs_code/combined).
       var showHsCode =
