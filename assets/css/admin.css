@@ -222,10 +222,13 @@
 
 /* Unified 5px vertical gap between stacked form controls in a rule row.
    (Field-to-help/required text gap is the tighter 2px via the help/required
-   element's own margin-top below.) */
+   element's own margin-top below.)
+   For Select2-enhanced fields the original <select> is display:none, so the
+   gap is applied to the visible .select2-container sibling instead. */
 .cfwc-rule-row .cfwc-rule-field--label,
 .cfwc-rule-row .cfwc-rule-field--match-type,
-.cfwc-rule-row .cfwc-rule-field--category {
+.cfwc-rule-row .cfwc-rule-field--category,
+.cfwc-rule-row .cfwc-rule-field--category + .select2-container {
 	margin-bottom: 5px;
 }
 
@@ -767,14 +770,20 @@ body[class*="branch-7"] .cfwc-rules-table tbody tr {
 	height: 50px;
 }
 
+/* Single-line form controls keep a fixed 40px height. */
 body[class*="branch-7"] .cfwc-rule-editing input[type="text"],
 body[class*="branch-7"] .cfwc-rule-editing input[type="number"],
 body[class*="branch-7"] .cfwc-rule-editing select:not(.select2-hidden-accessible),
 body[class*="branch-7"] .cfwc-select2-field + .select2-container .select2-selection--single,
-body[class*="branch-7"] .cfwc-select2-field + .select2-container .select2-selection--multiple,
 body[class*="branch-7"] .cfwc-rule-editing .select2-container--default .select2-selection--single,
 body[class*="branch-7"] .cfwc-preset-loader .select2-container .select2-selection--single {
 	height: 40px;
+}
+
+/* Multi-selects (Select2 chips) grow vertically with their content. */
+body[class*="branch-7"] .cfwc-select2-field + .select2-container .select2-selection--multiple {
+	height: auto;
+	min-height: 40px;
 }
 
 body[class*="branch-7"] .cfwc-select2-field + .select2-container .select2-selection--single .select2-selection__rendered,
