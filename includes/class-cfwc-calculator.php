@@ -865,12 +865,13 @@ class CFWC_Calculator {
 
 		$rule  = $rule_map[ $start_id ];
 		$queue = isset( $rule['base_includes'] ) && is_array( $rule['base_includes'] )
-			? $rule['base_includes']
+			? array_values( $rule['base_includes'] )
 			: array();
 		$seen  = array();
+		$head  = 0;
 
-		while ( ! empty( $queue ) ) {
-			$current = array_shift( $queue );
+		while ( $head < count( $queue ) ) {
+			$current = $queue[ $head++ ];
 
 			if ( $current === $start_id ) {
 				return true;
