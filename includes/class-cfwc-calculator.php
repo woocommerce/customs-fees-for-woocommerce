@@ -836,17 +836,21 @@ class CFWC_Calculator {
 	}
 
 	/**
-	 * Detect cycles in base_includes dependencies for a set of rules.
+	 * Detect whether a rule participates in a `base_includes` cycle.
 	 *
-	 * Uses DFS to detect any circular references between rules.
+	 * Walks the dependency graph breadth-first from `$start_id` and returns
+	 * true only if a path leads back to `$start_id` itself — i.e. `$start_id`
+	 * is part of a cycle. Rules that are merely upstream of a cycle (they
+	 * reach a cycle but do not loop back to themselves) correctly return
+	 * false; the calculator's round-loop already handles their unresolvable
+	 * dependencies via the own-base fallback.
 	 *
 	 * @since 1.2.0
-	 * @param array  $rules      Rules to check.
-	 * @param string $start_id   Rule ID to start checking from.
-	 * @param array  $visited    Already visited rule IDs.
-	 * @return bool True if a cycle is detected.
+	 * @param array  $rules    Rules to check.
+	 * @param string $start_id Rule ID to test for cycle membership.
+	 * @return bool True if `$start_id` participates in a cycle.
 	 */
-	public static function has_cycle( $rules, $start_id, $visited = array() ) {
+	public static function has_cycle( $rules, $start_id ) {
 		$rule_map = array();
 		foreach ( $rules as $rule ) {
 			$rid = isset( $rule['rule_id'] ) ? $rule['rule_id'] : '';
@@ -859,20 +863,33 @@ class CFWC_Calculator {
 			return false;
 		}
 
-		$rule = $rule_map[ $start_id ];
-		$deps = isset( $rule['base_includes'] ) && is_array( $rule['base_includes'] ) ? $rule['base_includes'] : array();
+		$rule  = $rule_map[ $start_id ];
+		$queue = isset( $rule['base_includes'] ) && is_array( $rule['base_includes'] )
+			? $rule['base_includes']
+			: array();
+		$seen  = array();
 
-		foreach ( $deps as $dep_id ) {
-			if ( $dep_id === $start_id ) {
+		while ( ! empty( $queue ) ) {
+			$current = array_shift( $queue );
+
+			if ( $current === $start_id ) {
 				return true;
 			}
-			if ( in_array( $dep_id, $visited, true ) ) {
-				return true;
+			if ( isset( $seen[ $current ] ) ) {
+				continue;
 			}
-			$path   = $visited;
-			$path[] = $dep_id;
-			if ( self::has_cycle( $rules, $dep_id, $path ) ) {
-				return true;
+			$seen[ $current ] = true;
+
+			if ( ! isset( $rule_map[ $current ] ) ) {
+				continue;
+			}
+
+			$cur_rule = $rule_map[ $current ];
+			$cur_deps = isset( $cur_rule['base_includes'] ) && is_array( $cur_rule['base_includes'] )
+				? $cur_rule['base_includes']
+				: array();
+			foreach ( $cur_deps as $dep ) {
+				$queue[] = $dep;
 			}
 		}
 
