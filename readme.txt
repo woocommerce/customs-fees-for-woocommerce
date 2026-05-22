@@ -194,6 +194,7 @@ Yes, through:
 
 = 1.2.0 - 2026-xx-xx =
 * Fix - Rules with a blank destination country ("Any") or blank origin and destination ("Any → Any") being silently discarded on save and disappearing after page reload.
+* Fix - Show confirmation dialog when leaving page or saving settings with an unsaved rule open.
 
 = 1.1.9 - 2026-xx-xx =
 * Tweak - WordPress 7.0 Compatibility.

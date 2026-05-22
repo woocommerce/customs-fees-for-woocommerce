@@ -344,6 +344,11 @@ GNU General Public License for more details.
 
 ## Changelog
 
+### Version 1.2.0
+
+- Fixed rules with a blank destination country ("Any") or blank origin and destination ("Any → Any") being silently discarded on save and disappearing after page reload.
+- Fixed missing confirmation dialog when leaving page or saving settings with an unsaved rule open.
+
 ### Version 1.1.6 - May 2026
 
 **Bug Fixes**
