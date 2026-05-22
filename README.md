@@ -344,6 +344,21 @@ GNU General Public License for more details.
 
 ## Changelog
 
+### Version 1.1.6 - May 2026
+
+**Bug Fixes**
+
+- Fixed rules with a blank destination country ("Any") being silently discarded on save and disappearing after page reload.
+- Fixed rules with a blank origin and destination ("Any → Any") also not persisting after save.
+
+### Version 1.1.5 - February 2026
+
+- Added `cfwc_show_hs_code_in_email` filter to control HS Code display in order emails.
+- Added `cfwc_show_origin_in_email` filter to control Country of Origin display in order emails.
+- Fixed rules not saving when clicking "Save changes" in Customs & Import Fees settings.
+- WooCommerce 10.5 compatibility.
+- Filters pass the order item and product objects for conditional logic.
+
 ### Version 1.1.4 - January 2026
 
 **New Feature: CIF Customs Valuation**
