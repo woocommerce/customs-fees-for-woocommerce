@@ -349,12 +349,21 @@ GNU General Public License for more details.
 - Fixed rules with a blank destination country ("Any") or blank origin and destination ("Any → Any") being silently discarded on save and disappearing after page reload.
 - Fixed missing confirmation dialog when leaving page or saving settings with an unsaved rule open.
 
-### Version 1.1.6 - May 2026
+### Version 1.1.9 - May 2026
 
-**Bug Fixes**
+- WordPress 7.0 Compatibility.
 
-- Fixed rules with a blank destination country ("Any") being silently discarded on save and disappearing after page reload.
-- Fixed rules with a blank origin and destination ("Any → Any") also not persisting after save.
+### Version 1.1.8 - May 2026
+
+- WooCommerce 10.8 Compatibility.
+
+### Version 1.1.7 - April 2026
+
+- WooCommerce 10.7 Compatibility.
+
+### Version 1.1.6 - March 2026
+
+- WooCommerce 10.6 Compatibility.
 
 ### Version 1.1.5 - February 2026
 
