@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Customs Fees for WooCommerce 1.1.9\n"
 "Report-Msgid-Bugs-To: "
 "https://wordpress.org/support/plugin/customs-fees-for-woocommerce\n"
-"POT-Creation-Date: 2026-05-21 17:12:45+00:00\n"
+"POT-Creation-Date: 2026-05-22 11:33:56+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -170,7 +170,7 @@ msgid "Remember to click \"Save changes\" to persist these rules."
 msgstr ""
 
 #: includes/admin/class-cfwc-admin.php:455
-#: includes/class-cfwc-templates.php:1518
+#: includes/class-cfwc-templates.php:1523
 msgid "Failed to apply preset."
 msgstr ""
 
@@ -1506,21 +1506,21 @@ msgstr ""
 msgid "EU Duty (Import)"
 msgstr ""
 
-#: includes/class-cfwc-templates.php:1490
+#: includes/class-cfwc-templates.php:1495
 #. translators: %1$d: number of rules added, %2$d: number of duplicates skipped
 msgid "Added %1$d new rules. Skipped %2$d duplicates."
 msgstr ""
 
-#: includes/class-cfwc-templates.php:1495
+#: includes/class-cfwc-templates.php:1500
 msgid "All preset rules already exist. No rules added."
 msgstr ""
 
-#: includes/class-cfwc-templates.php:1499
+#: includes/class-cfwc-templates.php:1504
 #. translators: %d: number of rules added
 msgid "%d preset rules added successfully."
 msgstr ""
 
-#: includes/class-cfwc-templates.php:1504
+#: includes/class-cfwc-templates.php:1509
 msgid "All rules replaced with preset."
 msgstr ""
 

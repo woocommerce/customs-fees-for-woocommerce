@@ -1345,11 +1345,17 @@ class CFWC_Templates {
 			: $template['rules'];
 
 		if ( $append ) {
-			// Check for duplicates when appending.
-			$rules = $existing_rules;
-
-			// Build set of existing rule_ids so we can suffix collisions and
-			// rewrite intra-batch base_includes references to the new IDs.
+			// Two-pass append. Pass 1 normalizes each incoming rule and
+			// classifies it as either a true duplicate of an existing rule
+			// (same from/to/label) or a colliding rule_id that needs
+			// suffixing, populating a single $id_remap that covers both
+			// cases. Pass 2 applies the remap to rule_id and base_includes
+			// and appends the survivors. Doing this in two passes is what
+			// lets a compound preset like "Canada GST & Duty" remap the
+			// GST rule's base_includes onto a pre-existing duty rule with a
+			// different rule_id, regardless of the order the preset lists
+			// them in.
+			$rules             = $existing_rules;
 			$existing_rule_ids = array();
 			foreach ( $existing_rules as $existing_rule ) {
 				if ( ! empty( $existing_rule['rule_id'] ) ) {
@@ -1357,16 +1363,53 @@ class CFWC_Templates {
 				}
 			}
 
-			$id_remap = array();
-			foreach ( $template_rules as $new_rule ) {
-				$original_id = $new_rule['rule_id'] ?? '';
-				if ( '' === $original_id ) {
-					continue;
+			$id_remap     = array();
+			$is_duplicate = array();
+			$normalized   = array();
+
+			foreach ( $template_rules as $index => $new_rule ) {
+				if ( ! isset( $new_rule['from_country'] ) && isset( $new_rule['origin_country'] ) ) {
+					$new_rule['from_country'] = $new_rule['origin_country'];
 				}
-				if ( isset( $existing_rule_ids[ $original_id ] ) ) {
+				if ( ! isset( $new_rule['to_country'] ) && isset( $new_rule['country'] ) ) {
+					$new_rule['to_country'] = $new_rule['country'];
+				}
+				$normalized[ $index ] = $new_rule;
+
+				$new_from    = $new_rule['from_country'] ?? '';
+				$new_to      = $new_rule['to_country'] ?? '';
+				$new_label   = $new_rule['label'] ?? '';
+				$original_id = $new_rule['rule_id'] ?? '';
+
+				// Exact-duplicate detection: same from/to/label as an
+				// existing rule. Record the existing rule's id so any
+				// sibling that depends on this template rule can be
+				// rewired to the existing one.
+				foreach ( $existing_rules as $existing_rule ) {
+					$existing_from  = $existing_rule['from_country'] ?? $existing_rule['origin_country'] ?? $existing_rule['country'] ?? '';
+					$existing_to    = $existing_rule['to_country'] ?? $existing_rule['country'] ?? '';
+					$existing_label = $existing_rule['label'] ?? '';
+
+					if ( $existing_from === $new_from &&
+						$existing_to === $new_to &&
+						$existing_label === $new_label ) {
+						$is_duplicate[ $index ] = true;
+						if ( '' !== $original_id && ! empty( $existing_rule['rule_id'] ) ) {
+							$id_remap[ $original_id ] = $existing_rule['rule_id'];
+						}
+						break;
+					}
+				}
+
+				// rule_id collision suffixing for the survivors. A rule
+				// already marked as an exact duplicate doesn't need a
+				// suffix — it will be skipped — but its id is still in
+				// $id_remap above so dependents resolve to the existing
+				// rule's id.
+				if ( ! isset( $is_duplicate[ $index ] ) && '' !== $original_id && isset( $existing_rule_ids[ $original_id ] ) ) {
 					$suffix    = 2;
 					$candidate = $original_id . '_' . $suffix;
-					while ( isset( $existing_rule_ids[ $candidate ] ) || isset( $id_remap[ $candidate ] ) ) {
+					while ( isset( $existing_rule_ids[ $candidate ] ) || in_array( $candidate, $id_remap, true ) ) {
 						++$suffix;
 						$candidate = $original_id . '_' . $suffix;
 					}
@@ -1374,18 +1417,7 @@ class CFWC_Templates {
 				}
 			}
 
-			foreach ( $template_rules as $new_rule ) {
-				// Convert old format to new format if needed.
-				if ( ! isset( $new_rule['from_country'] ) && isset( $new_rule['origin_country'] ) ) {
-					$new_rule['from_country'] = $new_rule['origin_country'];
-				}
-				if ( ! isset( $new_rule['to_country'] ) && isset( $new_rule['country'] ) ) {
-					$new_rule['to_country'] = $new_rule['country'];
-				}
-
-				// Apply rule_id remap (collision-suffixed) and rewrite
-				// base_includes references that point at remapped sibling
-				// rules so dependency edges within this batch stay intact.
+			foreach ( $normalized as $index => $new_rule ) {
 				$original_id = $new_rule['rule_id'] ?? '';
 				if ( '' !== $original_id && isset( $id_remap[ $original_id ] ) ) {
 					$new_rule['rule_id'] = $id_remap[ $original_id ];
@@ -1399,43 +1431,16 @@ class CFWC_Templates {
 					);
 				}
 
-				// Check if rule already exists (same country pair + label combination).
-				$is_duplicate = false;
-				foreach ( $existing_rules as $existing_rule ) {
-					$existing_from       = $existing_rule['from_country'] ?? $existing_rule['origin_country'] ?? $existing_rule['country'] ?? '';
-					$existing_to         = $existing_rule['to_country'] ?? $existing_rule['country'] ?? '';
-					$new_from            = $new_rule['from_country'] ?? $new_rule['origin_country'] ?? $new_rule['country'] ?? '';
-					$new_to              = $new_rule['to_country'] ?? $new_rule['country'] ?? '';
-					$existing_match_type = $existing_rule['match_type'] ?? 'all';
-					$new_match_type      = $new_rule['match_type'] ?? 'all';
-
-					// Check for exact duplicate.
-					if ( $existing_from === $new_from &&
-						$existing_to === $new_to &&
-						$existing_rule['label'] === $new_rule['label'] ) {
-						$is_duplicate = true;
-						++$duplicate_count;
-						break;
-					}
-
-					// Check for conflicting general rules (both applying to all products from all origins).
-					if ( empty( $existing_from ) && empty( $new_from ) &&
-						$new_to === $existing_to &&
-						'all' === $existing_match_type && 'all' === $new_match_type ) {
-						// Two general rules for the same destination - skip the new one.
-						$is_duplicate = true;
-						++$duplicate_count;
-						break;
-					}
+				if ( isset( $is_duplicate[ $index ] ) ) {
+					++$duplicate_count;
+					continue;
 				}
 
-				if ( ! $is_duplicate ) {
-					$rules[] = $new_rule;
-					if ( ! empty( $new_rule['rule_id'] ) ) {
-						$existing_rule_ids[ $new_rule['rule_id'] ] = true;
-					}
-					++$added_count;
+				$rules[] = $new_rule;
+				if ( ! empty( $new_rule['rule_id'] ) ) {
+					$existing_rule_ids[ $new_rule['rule_id'] ] = true;
 				}
+				++$added_count;
 			}
 		} else {
 			// Replace all rules.
