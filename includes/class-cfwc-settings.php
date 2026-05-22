@@ -254,8 +254,8 @@ class CFWC_Settings {
 						'stacking_mode'   => isset( $rule['stacking_mode'] ) ? sanitize_text_field( $rule['stacking_mode'] ) : 'add',
 					);
 
-					// Only add if either old country field or new to_country field is set.
-					if ( ! empty( $sanitized_rule['country'] ) || ! empty( $sanitized_rule['to_country'] ) ) {
+					// Only add if at least one country field is set, or the rule has a non-zero rate/amount.
+					if ( ! empty( $sanitized_rule['country'] ) || ! empty( $sanitized_rule['to_country'] ) || ! empty( $sanitized_rule['from_country'] ) || $sanitized_rule['rate'] > 0 || $sanitized_rule['amount'] > 0 ) {
 						$rules[] = $sanitized_rule;
 					}
 				}
