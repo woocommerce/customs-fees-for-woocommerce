@@ -192,6 +192,9 @@ Yes, through:
 
 == Changelog ==
 
+= 1.1.6 - 2026-xx-xx =
+* Fix - Rules with a blank destination country ("Any") or blank origin and destination ("Any → Any") being silently discarded on save and disappearing after page reload.
+
 = 1.1.5 - 2026-02-04 =
 * Add - `cfwc_show_hs_code_in_email` filter to control HS Code display in order emails.
 * Add - `cfwc_show_origin_in_email` filter to control Country of Origin display in order emails.
