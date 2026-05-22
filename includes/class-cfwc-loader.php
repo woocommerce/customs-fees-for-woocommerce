@@ -371,11 +371,12 @@ class CFWC_Loader {
 		// Get plugin URL with defensive check for PHPStan.
 		$plugin_url = defined( 'CFWC_PLUGIN_URL' ) ? CFWC_PLUGIN_URL : plugin_dir_url( __DIR__ );
 		$version    = defined( 'CFWC_VERSION' ) ? CFWC_VERSION : '1.0.0';
+		$suffix     = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
 		// Enqueue styles.
 		wp_enqueue_style(
 			'cfwc-admin',
-			$plugin_url . 'assets/css/admin.css',
+			$plugin_url . 'assets/css/admin' . $suffix . '.css',
 			array(),
 			$version
 		);
@@ -383,7 +384,7 @@ class CFWC_Loader {
 		// Enqueue scripts.
 		wp_enqueue_script(
 			'cfwc-admin',
-			$plugin_url . 'assets/js/admin.js',
+			$plugin_url . 'assets/js/admin' . $suffix . '.js',
 			array( 'jquery', 'jquery-ui-dialog', 'jquery-ui-sortable' ),
 			$version,
 			true

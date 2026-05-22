@@ -15,14 +15,29 @@ jobs:
       # 1. Checkout the repository code
       - name: 👉 Checkout code
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
-      # 2. Build release package using the build script
+      # 2. Setup pnpm
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10
+
+      # 3. Setup Node.js
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: '.nvmrc'
+
+      # 4. Install dependencies
+      - name: Install PNPM dependencies
+        run: pnpm install --frozen-lockfile
+
+      # 5. Build release package
       - name: 📦 Build release package
-        run: |
-          chmod +x bin/build-release.sh
-          ./bin/build-release.sh
+        run: pnpm build
 
-      # 3. Upload the zipped project as a release asset
+      # 6. Upload the zipped project as a release asset
       - name: 📤 Upload Release Asset
         uses: softprops/action-gh-release@v2
         with:
@@ -30,6 +45,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # 4. All good
+      # 7. All good
       - name: 🎉 All good
         run: echo "All good!"

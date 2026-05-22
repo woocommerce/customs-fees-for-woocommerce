@@ -1,7 +1,19 @@
 *** Customs Fees for WooCommerce Changelog ***
 
-2026-xx-xx - version 1.1.6
+2026-xx-xx - version 1.2.0
 * Fix - Rules with a blank destination country ("Any") or blank origin and destination ("Any → Any") being silently discarded on save and disappearing after page reload.
+
+2026-05-20 - version 1.1.9
+* Tweak - WordPress 7.0 Compatibility.
+
+2026-05-20 - version 1.1.8
+* Tweak - WooCommerce 10.8 Compatibility.
+
+2026-04-13 - version 1.1.7
+* Tweak - WooCommerce 10.7 Compatibility.
+
+2026-03-31 - version 1.1.6
+* Tweak - WooCommerce 10.6 Compatibility.
 
 2026-02-04 - version 1.1.5
 * Add - `cfwc_show_hs_code_in_email` filter to control HS Code display in order emails.

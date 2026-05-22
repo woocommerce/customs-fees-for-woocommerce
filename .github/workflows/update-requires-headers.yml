@@ -2,8 +2,8 @@ name: Update Requires Headers
 
 on:
   schedule:
-    - cron: '0 0 * * *'
-  workflow_dispatch:
+    - cron: '0 0 * * *' # Run every day at midnight UTC
+  workflow_dispatch: # Allow manual trigger
 
 env:
   PLUGIN_FILE_NAME: "customs-fees-for-woocommerce.php"
