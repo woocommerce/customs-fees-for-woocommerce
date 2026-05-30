@@ -5,334 +5,142 @@
  * @since 1.0.0
  */
 
-/* Rules Table General Styles */
+/* ==========================================================================
+   Animations
+   ========================================================================== */
+
+@keyframes fadeIn {
+	from { opacity: 0; }
+	to   { opacity: 1; }
+}
+
+/* ==========================================================================
+   Rules section + table layout
+   ========================================================================== */
+
+.cfwc-rules-section {
+	max-width: 100%;
+	overflow: visible;
+}
+
+.cfwc-rules-table-wrapper {
+	position: relative;
+	max-width: 100%;
+	margin: 0 0 10px;
+	overflow-x: auto;
+}
+
 .cfwc-rules-table {
 	width: 100%;
+	min-width: 700px;
 	margin-top: 20px;
+	table-layout: fixed;
+	border-collapse: collapse;
 }
 
 .cfwc-rules-table th {
 	text-align: left;
 }
 
-.cfwc-rules-table .button-small {
-	margin: 0 5px;
-}
-
-/* Template Selector */
-.cfwc-template-selector {
-	margin: 20px 0;
-	padding: 15px;
-	background: #f7f7f7;
-	border-radius: 4px;
-}
-
-.cfwc-template-selector select {
-	min-width: 300px;
-}
-
-/* Preset Loader Section */
-.cfwc-preset-loader {
-	/* Removed background, border, and padding for cleaner look */
-	margin-top: 40px;
-	margin-bottom: 30px;
-}
-
-.cfwc-preset-loader h3 {
-	margin-top: 0;
-	margin-bottom: 15px;
-	font-size: 1.3em;
-}
-
-.cfwc-preset-loader p {
-	margin-bottom: 20px;
-}
-
-/* Admin Notice Styles - Fixed positioning and width */
-.cfwc-admin-notice {
-	position: relative;
-	margin: 5px 0 15px;
-	padding: 12px 40px 12px 12px;
-	border: 1px solid transparent;
-	border-left-width: 4px;
-	box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.1);
-	background: #fff;
-	display: block;
-}
-
-.cfwc-admin-notice.error {
-	border-left-color: #dc3232;
-}
-
-.cfwc-admin-notice.warning {
-	border-left-color: #ffb900;
-}
-
-.cfwc-admin-notice.info {
-	border-left-color: #00a0d2;
-}
-
-.cfwc-admin-notice.success {
-	border-left-color: #46b450;
-}
-
-.cfwc-admin-notice .notice-message {
-	margin: 0;
-	padding: 0;
-}
-
-.cfwc-admin-notice button.notice-dismiss {
-	position: absolute;
-	top: 0;
-	right: 1px;
-	border: none;
-	margin: 0;
-	padding: 9px;
-	background: none;
-	color: #b4b9be;
-	cursor: pointer;
-	width: 36px;
-	height: 36px;
-	text-align: center;
-}
-
-.cfwc-admin-notice button.notice-dismiss:before {
-	content: "\f153";
-	font: normal 16px/20px dashicons;
-	speak: never;
-	display: block;
-	width: 20px;
-	height: 20px;
-	text-align: center;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-}
-
-.cfwc-admin-notice button.notice-dismiss:hover {
-	color: #c00;
-}
-
-.cfwc-admin-notice button.notice-dismiss:focus {
-	outline: none;
-	box-shadow: 0 0 0 1px #5b9dd9, 0 0 2px 1px rgba(30, 140, 190, 0.8);
-}
-
-/* Delete All Button Styles */
-/* Delete all button styles moved to line 495 */
-
-/* Delete Button Hover State */
-.cfwc-delete-rule:hover {
-	color: #d63638;
-	border-color: #d63638;
-}
-
-/* Table Row Fade Effect */
-.cfwc-rules-table tbody tr {
-	transition: opacity 0.3s;
-}
-
-/* Table Styling Improvements */
-.cfwc-rules-table table {
-	table-layout: fixed;
-}
-
-.cfwc-rules-table th,
-.cfwc-rules-table td {
-	padding: 10px;
-	vertical-align: middle;
-}
-
-/* Editing Row Styles */
-.cfwc-rule-editing {
-	background: #f0f8ff;
-	border: 1px solid #0073aa;
-}
-
-.cfwc-rule-editing td {
-	padding: 10px 5px;
-}
-
-.cfwc-rule-field {
-	width: 100%;
-	max-width: 100%;
-}
-
-/* WooCommerce Native Select2 Styling - Match WooCommerce exactly */
-.cfwc-rule-editing .wc-enhanced-select,
-.cfwc-country-select,
-.cfwc-origin-select {
-	min-width: 150px !important;
-	max-width: 100% !important;
-	width: 100% !important;
-}
-
-/* Product Edit Page - Country of Origin Select2 */
-#_cfwc_country_of_origin {
-	width: 250px;
-}
-
-/* Select2 Container for our field specifically */
-span[aria-labelledby="select2-_cfwc_country_of_origin-container"] {
-	width: 250px !important;
-}
-
-/* Select2 Container - alternative selector */
-#_cfwc_country_of_origin + .select2-container {
-	width: 250px !important;
-}
-
-/* The select2 dropdown for Country of Origin specifically */
-#select2-_cfwc_country_of_origin-results {
-	max-width: 250px !important;
-}
-
-/*
- * Select2 height normalization for WP 7.0+.
- */
-body[class*="branch-7"] .cfwc-select2-field + .select2-container .select2-selection--single {
-	height: 40px;
-}
-
-body[class*="branch-7"] .cfwc-select2-field + .select2-container .select2-selection--single .select2-selection__rendered {
-	line-height: 38px;
-}
-
-body[class*="branch-7"] .cfwc-select2-field + .select2-container .select2-selection--single .select2-selection__arrow {
-	height: 38px;
-}
-
-body[class*="branch-7"] .cfwc-select2-field + .select2-container .select2-selection--multiple {
-	min-height: 40px;
-}
-
-body[class*="branch-7"] .cfwc-rule-editing input[type="text"],
-body[class*="branch-7"] .cfwc-rule-editing input[type="number"],
-body[class*="branch-7"] .cfwc-rule-editing select:not(.select2-hidden-accessible) {
-	min-height: 40px;
-}
-
-/* From / To country selects stack vertically — add a 5px gap to the visible Select2 widget after the From field. */
-.cfwc-country-select[data-field="from_country"] + .select2-container {
-	margin-bottom: 5px;
-}
-
-/* WooCommerce Snackbar Container - Align with Save button */
-.components-snackbar-list {
-	position: fixed;
-	bottom: 20px;
-	left: 180px; /* Align with Save changes button */
-	right: 20px;
-	display: flex;
-	justify-content: flex-start; /* Align to left like save button */
-	gap: 15px; /* Space between multiple notifications */
-	z-index: 100001; /* Above WP admin elements */
-	pointer-events: none; /* Allow clicking through container */
-}
-
-/* Adjust for collapsed admin menu */
-.folded .components-snackbar-list {
-	left: 56px; /* Collapsed menu width + padding */
-}
-
-/* Mobile responsive */
-@media screen and (max-width: 782px) {
-	.components-snackbar-list {
-	left: 10px; /* Small padding on mobile */
-	right: 10px;
-	}
-}
-
-/* Auto-collapsed menu (960px-782px) */
-@media screen and (max-width: 960px) and (min-width: 783px) {
-	.auto-fold .components-snackbar-list {
-	left: 56px; /* Auto-collapsed menu width + padding */
-	}
-}
-
-.components-snackbar-list .components-snackbar {
-	pointer-events: auto; /* But allow clicking snackbar itself */
-	max-width: 600px; /* Limit width for readability */
-	margin: 0; /* Reset any default margins */
-}
-
-/* Ensure snackbar doesn't interfere with save button */
-.woocommerce-save-button {
-	position: relative;
-	z-index: 10;
-}
-
-/* Preset Select Styling */
-#cfwc-preset-select {
-	min-width: 200px;
-}
-
-/* Rules Table - Stable Layout Solution */
-.cfwc-rules-section {
-	max-width: 100%;
-	overflow: visible;
-}
-
-/* Table wrapper */
-.cfwc-rules-table-wrapper {
-	max-width: 100%;
-	overflow-x: auto;
-	margin: 0 0 10px 0;
-	/* Prevent viewport overflow */
-	position: relative;
-}
-
-/* Main table styling */
-.cfwc-rules-table {
-	width: 100%;
-	table-layout: fixed; /* Critical: prevents column width changes */
-	border-collapse: collapse;
-	min-width: 700px; /* Minimum for readability */
-}
-
-/* Fixed column widths - same for view and edit modes */
 .cfwc-rules-table th,
 .cfwc-rules-table td {
 	padding: 8px;
 	vertical-align: middle;
 }
 
+.cfwc-rules-table .button-small {
+	margin: 0 5px;
+}
+
+/* Layout-shift prevention: fixed row height in view mode (edit row sets height:auto). */
+.cfwc-rules-table tbody tr {
+	height: 38px;
+	transition: opacity 0.3s;
+}
+
+/* Legacy 6-column layout (nth-child) — kept for backwards compatibility. */
 .cfwc-rules-table th:nth-child(1),
-.cfwc-rules-table td:nth-child(1) {
-	width: 18%; /* Label */
-	min-width: 120px;
-}
-
+.cfwc-rules-table td:nth-child(1),
 .cfwc-rules-table th:nth-child(2),
-.cfwc-rules-table td:nth-child(2) {
-	width: 18%; /* Destination */
-	min-width: 120px;
-}
-
+.cfwc-rules-table td:nth-child(2),
 .cfwc-rules-table th:nth-child(3),
 .cfwc-rules-table td:nth-child(3) {
-	width: 18%; /* Origin */
+	width: 18%;
 	min-width: 120px;
 }
 
 .cfwc-rules-table th:nth-child(4),
 .cfwc-rules-table td:nth-child(4) {
-	width: 12%; /* Type */
+	width: 12%;
 	min-width: 90px;
 }
 
 .cfwc-rules-table th:nth-child(5),
 .cfwc-rules-table td:nth-child(5) {
-	width: 14%; /* Rate/Amount */
+	width: 14%;
 	min-width: 100px;
 }
 
 .cfwc-rules-table th:nth-child(6),
 .cfwc-rules-table td:nth-child(6) {
-	width: 20%; /* Actions */
+	width: 20%;
 	min-width: 160px;
 }
 
-/* Normal row styling */
+/* Current 9-column layout via cfwc-col-* classes. */
+.cfwc-rules-table .cfwc-col-label,
+.cfwc-rules-table .cfwc-col-countries,
+.cfwc-rules-table .cfwc-col-products {
+	width: 15%;
+}
+
+.cfwc-rules-table .cfwc-col-type,
+.cfwc-rules-table .cfwc-col-valuation,
+.cfwc-rules-table .cfwc-col-depends,
+.cfwc-rules-table .cfwc-col-stacking {
+	width: 10%;
+}
+
+.cfwc-rules-table .cfwc-col-rate {
+	width: 7%;
+}
+
+.cfwc-rules-table .cfwc-col-actions {
+	width: 8%;
+}
+
+/* Inline cell content */
+.cfwc-rules-table .cfwc-priority-meta {
+	color: #666;
+	font-size: 11px;
+}
+
+.cfwc-rules-table .cfwc-priority-meta .dashicons {
+	font-size: 14px;
+	vertical-align: middle;
+	cursor: help;
+}
+
+.cfwc-rules-table .cfwc-criteria-icon {
+	font-size: 14px;
+}
+
+.cfwc-rules-table .cfwc-empty-cell {
+	color: #999;
+	font-size: 11px;
+}
+
+.no-rules td {
+	padding: 20px;
+	color: #646970;
+	font-style: italic;
+	text-align: center;
+}
+
+/* ==========================================================================
+   Rule row (view mode)
+   ========================================================================== */
+
 .cfwc-rule-row td {
 	background: #fff;
 	transition: background-color 0.2s;
@@ -342,144 +150,157 @@ body[class*="branch-7"] .cfwc-rule-editing select:not(.select2-hidden-accessible
 	background: #f8f9fa;
 }
 
-/* Edit row styling - prevent overflow */
+/* ==========================================================================
+   Rule row (editing mode)
+   ========================================================================== */
+
 .cfwc-rule-editing {
+	height: auto;
 	background: #f0f6fc !important;
+	border: 1px solid #0073aa;
 }
 
 .cfwc-rule-editing td {
-	padding: 6px 4px;
 	position: relative;
-	overflow: visible; /* Allow dropdowns to show */
+	padding: 6px 4px;
+	overflow: visible;
 }
 
-/* Input fields - contained within cells */
 .cfwc-rule-editing input[type="text"],
 .cfwc-rule-editing input[type="number"] {
 	width: calc(100% - 4px);
 	max-width: 100%;
-	box-sizing: border-box;
 	padding: 4px 6px;
 	font-size: 13px;
 	border: 1px solid #8c8f94;
-	margin: 0;
+	box-sizing: border-box;
 }
 
-/* Regular select elements */
 .cfwc-rule-editing select:not(.select2-hidden-accessible) {
 	width: 100%;
 	max-width: 100%;
-	box-sizing: border-box;
 	padding: 4px;
 	font-size: 13px;
 	border: 1px solid #8c8f94;
+	box-sizing: border-box;
 }
 
-/* Select2 specific fixes */
+/* Select2 / SelectWoo widgets inside the editing row. */
+.cfwc-rule-editing .wc-enhanced-select,
+.cfwc-country-select {
+	width: 100% !important;
+	min-width: 150px !important;
+	max-width: 100% !important;
+}
+
 .cfwc-rule-editing .select2-container {
+	display: block !important;
 	width: 100% !important;
 	max-width: 100% !important;
-	display: block !important;
 	box-sizing: border-box !important;
 }
 
 .cfwc-rule-editing .select2-container--default .select2-selection--single {
 	height: 28px;
-	line-height: 26px;
 	padding: 0 20px 0 5px;
 	font-size: 13px;
+	line-height: 26px;
 }
 
-/* WP 7.0+ override for the rules-editing row Select2. */
-body[class*="branch-7"] .cfwc-rule-editing .select2-container--default .select2-selection--single {
-	height: 40px;
-	line-height: 38px;
+/* ==========================================================================
+   Rule row form fields (JS-rendered edit/add rows)
+   ========================================================================== */
+
+.cfwc-rule-field {
+	width: 100%;
+	max-width: 100%;
 }
 
-body[class*="branch-7"] .cfwc-rule-editing .select2-container--default .select2-selection--single .select2-selection__rendered {
-	line-height: 38px;
+.cfwc-rule-row .cfwc-rule-field {
+	width: 100%;
 }
 
-body[class*="branch-7"] .cfwc-rule-editing .select2-container--default .select2-selection--single .select2-selection__arrow {
-	height: 38px;
+/* Unified 5px vertical gap between stacked form controls in a rule row.
+   (Field-to-help/required text gap is the tighter 2px via the help/required
+   element's own margin-top below.)
+   For Select2-enhanced fields the original <select> is display:none, so the
+   gap is applied to the visible .select2-container sibling instead. */
+.cfwc-rule-row .cfwc-rule-field--label,
+.cfwc-rule-row .cfwc-rule-field--match-type,
+.cfwc-rule-row .cfwc-rule-field--category,
+.cfwc-rule-row .cfwc-rule-field--category + .select2-container {
+	margin-bottom: 5px;
 }
 
-/* Prevent Select2 dropdown from causing overflow */
-.select2-container--open .select2-dropdown {
-	min-width: 200px !important;
-	max-width: 400px !important;
+.cfwc-rule-row .cfwc-rule-field--country {
+	width: 47%;
 }
 
-/* Custom class for our dropdowns */
-.cfwc-select2-dropdown {
-	max-width: 400px !important;
+.cfwc-rule-row .cfwc-rule-field--rate {
+	width: 80px;
 }
 
-/* Actions column */
-.cfwc-actions {
-	white-space: nowrap;
+.cfwc-rule-row .cfwc-field-help {
+	display: block;
+	margin-top: 2px;
+	color: #666;
+	font-size: 11px;
 }
 
-.cfwc-actions button {
-	margin: 0 2px;
-	padding: 3px 8px;
-	font-size: 12px;
+.cfwc-rule-row .cfwc-field-help--inline {
+	display: inline-block;
 }
 
-/* Prevent layout shift when switching modes */
-.cfwc-rules-table tbody tr {
-	height: 38px; /* Fixed height to prevent jumping */
+.cfwc-rule-row .cfwc-field-required {
+	display: block;
+	margin-top: 2px;
+	color: #999;
+	font-size: 11px;
 }
 
-/* WP 7.0+ row height to accommodate 40px form fields. */
-body[class*="branch-7"] .cfwc-rules-table tbody tr {
-	height: 50px;
-}
-
-.cfwc-rule-editing {
-	height: auto; /* Allow edit row to be taller if needed */
-}
-
-/* No results row */
-.no-rules td {
-	text-align: center;
-	padding: 20px;
-	color: #646970;
-	font-style: italic;
-}
-
-/* Responsive behavior */
-@media screen and (max-width: 1024px) {
-	.cfwc-rules-table {
-	font-size: 12px;
-	}
-
-	.cfwc-rules-table th,
-	.cfwc-rules-table td {
-	padding: 6px 4px;
-	}
-
-	.cfwc-rule-editing input,
-	.cfwc-rule-editing select {
-	font-size: 12px;
-	}
-}
-
-/* Preset Description */
-#cfwc-preset-description {
-	margin-top: 10px;
+.cfwc-rule-row .cfwc-stacking-help span {
 	display: none;
 }
 
-/* Rules Header Layout */
+.cfwc-rule-row .cfwc-stacking-help span.is-visible {
+	display: inline;
+}
+
+.cfwc-rule-row .is-hidden {
+	display: none;
+}
+
+/* ==========================================================================
+   Rule badges
+   ========================================================================== */
+
+.cfwc-rule-badge {
+	display: inline-block;
+	padding: 3px 8px;
+	color: #fff;
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 1;
+	border-radius: 3px;
+}
+
+.cfwc-rule-badge--valuation        { background: #2271b1; }
+.cfwc-rule-badge--dependency       { background: #8261a1; }
+.cfwc-rule-badge--stacking-add     { background: #46b450; }
+.cfwc-rule-badge--stacking-override{ background: #f0ad4e; }
+.cfwc-rule-badge--stacking-exclusive { background: #dc3232; }
+
+/* ==========================================================================
+   Rules header (title + actions row)
+   ========================================================================== */
+
 .cfwc-rules-header {
 	display: flex;
-	justify-content: space-between;
-	align-items: flex-start;
-	margin-top: 30px;
-	margin-bottom: 20px;
 	flex-wrap: wrap;
 	gap: 15px;
+	justify-content: space-between;
+	align-items: flex-start;
+	margin: 30px 0 20px;
 }
 
 .cfwc-rules-header h3 {
@@ -493,12 +314,42 @@ body[class*="branch-7"] .cfwc-rules-table tbody tr {
 	font-size: 14px;
 }
 
+.cfwc-rules-header-info {
+	flex: 1;
+}
+
+.cfwc-rules-header-title {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-bottom: 10px;
+}
+
+.cfwc-rules-header-title h3,
+.cfwc-rules-header-info p {
+	margin: 0;
+}
+
+.cfwc-rules-header-actions {
+	align-self: flex-start;
+}
+
+.cfwc-rules-divider {
+	margin: 40px 0 30px;
+	border-top: 1px solid #c3c4c7;
+}
+
+/* ==========================================================================
+   Help link under header
+   ========================================================================== */
+
 .cfwc-help-link-under {
-	color: #2271b1;
-	text-decoration: none;
-	font-size: 13px;
 	display: inline-flex;
 	align-items: center;
+	margin-top: 10px;
+	color: #2271b1;
+	font-size: 13px;
+	text-decoration: none;
 }
 
 .cfwc-help-link-under:hover {
@@ -510,7 +361,14 @@ body[class*="branch-7"] .cfwc-rules-table tbody tr {
 	text-decoration: underline;
 }
 
-/* Add New Rule and Delete All Buttons when beside title */
+.cfwc-help-link-under .dashicons-info {
+	color: #2271b1;
+}
+
+/* ==========================================================================
+   Buttons (add / delete / confirm states)
+   ========================================================================== */
+
 .cfwc-add-rule,
 .cfwc-delete-all {
 	white-space: nowrap;
@@ -522,7 +380,6 @@ body[class*="branch-7"] .cfwc-rules-table tbody tr {
 	color: #0a4b78;
 }
 
-/* Delete All button styling */
 .cfwc-delete-all {
 	color: #d63638;
 	border-color: #d63638;
@@ -540,32 +397,58 @@ body[class*="branch-7"] .cfwc-rules-table tbody tr {
 	color: #fff !important;
 }
 
-/* Inline delete warning message */
+.cfwc-delete-rule:hover {
+	color: #d63638;
+	border-color: #d63638;
+}
+
 .cfwc-delete-warning {
 	margin-left: 10px;
 	color: #d63638;
-	font-weight: 600;
 	font-size: 13px;
+	font-weight: 600;
 	animation: fadeIn 0.3s ease-in;
 }
 
-@keyframes fadeIn {
-	from {
-	opacity: 0;
-	}
-	to {
-	opacity: 1;
-	}
+.button.confirm-delete,
+.button.confirm-replace {
+	background: #d63638;
+	border-color: #d63638;
+	color: #fff;
 }
 
-/* Help link icon removed for cleaner look */
+.button.confirm-delete:hover,
+.button.confirm-replace:hover {
+	background: #b32d2e;
+	color: #fff;
+}
 
-/* Column widths are now defined above in the main table styles */
+/* ==========================================================================
+   Preset loader
+   ========================================================================== */
 
-/* Preset Button Styles */
+.cfwc-preset-loader {
+	margin: 40px 0 30px;
+}
+
+.cfwc-preset-loader h3 {
+	margin: 0 0 15px;
+	font-size: 1.3em;
+}
+
+.cfwc-preset-loader p {
+	margin-bottom: 20px;
+}
+
 .cfwc-preset-loader button {
 	margin-right: 10px;
 	margin-bottom: 5px;
+}
+
+.cfwc-preset-loader select,
+.cfwc-preset-loader .select2-container {
+	min-width: 280px;
+	margin-right: 10px;
 }
 
 .cfwc-preset-loader .cfwc-replace-preset {
@@ -586,144 +469,524 @@ body[class*="branch-7"] .cfwc-rules-table tbody tr {
 	color: #fff !important;
 }
 
-.cfwc-preset-loader select,
-.cfwc-preset-loader .select2-container {
-	min-width: 280px;
-	margin-right: 10px;
-}
-
-/* Style the Select2 container to match WooCommerce */
+/* Match WooCommerce Select2 dimensions. */
 .cfwc-preset-loader .select2-container .select2-selection--single {
 	height: 32px;
 	line-height: 30px;
 }
 
-.cfwc-preset-loader
-	.select2-container--default
-	.select2-selection--single
-	.select2-selection__rendered {
-	padding-left: 8px;
+.cfwc-preset-loader .select2-container--default .select2-selection--single .select2-selection__rendered {
 	padding-right: 20px;
+	padding-left: 8px;
 	line-height: 30px;
 }
 
-.cfwc-preset-loader
-	.select2-container--default
-	.select2-selection--single
-	.select2-selection__arrow {
+.cfwc-preset-loader .select2-container--default .select2-selection--single .select2-selection__arrow {
 	height: 30px;
 }
 
-/* WP 7.0+ overrides for the preset-loader Select2. */
-body[class*="branch-7"] .cfwc-preset-loader .select2-container .select2-selection--single {
-	height: 40px;
-	line-height: 38px;
+#cfwc-preset-select {
+	width: 280px;
+	max-width: 100%;
 }
 
+#cfwc-preset-description {
+	display: none;
+	margin-top: 10px;
+}
+
+/* ==========================================================================
+   Default origin select
+   ========================================================================== */
+
+#cfwc_default_origin_select {
+	width: 350px;
+	max-width: 50%;
+}
+
+.cfwc-default-origin-help {
+	display: block;
+	margin: 2px 0 8px 24px;
+	color: #666;
+}
+
+/* ==========================================================================
+   Notices container
+   ========================================================================== */
+
+.cfwc-notices-container {
+	margin-bottom: 20px;
+}
+
+.cfwc-notices-container > .notice {
+	margin-bottom: 10px;
+}
+
+/* ==========================================================================
+   Product edit screen (Country of Origin Select2)
+   ========================================================================== */
+
+#_cfwc_country_of_origin {
+	width: 250px;
+}
+
+#_cfwc_country_of_origin + .select2-container,
+span[aria-labelledby="select2-_cfwc_country_of_origin-container"] {
+	width: 250px !important;
+}
+
+#select2-_cfwc_country_of_origin-results {
+	max-width: 250px !important;
+}
+
+.cfwc-product-fields-heading {
+	margin: 10px 12px 5px;
+	font-size: 14px;
+	font-weight: 600;
+}
+
+.cfwc-hs-code-help {
+	margin: -10px 0 10px 154px;
+	color: #666;
+	font-size: 12px;
+}
+
+/* ==========================================================================
+   Admin meta box (edit screen) / order item meta
+   ========================================================================== */
+
+.cfwc-fees-breakdown-list {
+	margin: 10px 0;
+	padding-left: 20px;
+}
+
+.cfwc-fees-breakdown-list li {
+	margin: 5px 0;
+}
+
+.cfwc-fees-divider {
+	margin: 10px 0;
+}
+
+.cfwc-section-divider {
+	margin: 15px 0;
+}
+
+.cfwc-product-customs-list {
+	margin: 10px 0 0 20px;
+}
+
+.cfwc-order-item-meta {
+	margin-top: 0.5em;
+}
+
+/* ==========================================================================
+   Onboarding notice
+   ========================================================================== */
+
+.cfwc-dismiss-notice {
+	margin-left: 15px;
+}
+
+/* ==========================================================================
+   Save button stacking (above snackbar)
+   ========================================================================== */
+
+.woocommerce-save-button {
+	position: relative;
+	z-index: 10;
+}
+
+/* ==========================================================================
+   Modal (WooCommerce-style)
+   ========================================================================== */
+
+.cfwc-modal {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	z-index: 160000;
+}
+
+.cfwc-modal-backdrop {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	z-index: 159990;
+	background: rgba(0, 0, 0, 0.6);
+}
+
+.cfwc-modal-content {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	z-index: 160000;
+	display: flex;
+	flex-direction: column;
+	width: 90%;
+	max-width: 600px;
+	max-height: 90vh;
+	background: #fff;
+	border-radius: 4px;
+	box-shadow: 0 3px 30px rgba(0, 0, 0, 0.2);
+	transform: translate(-50%, -50%);
+}
+
+.cfwc-modal-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 20px;
+	border-bottom: 1px solid #e0e0e0;
+}
+
+.cfwc-modal-header h2 {
+	margin: 0;
+	color: #333;
+	font-size: 18px;
+	font-weight: 600;
+}
+
+.cfwc-modal-close {
+	padding: 0;
+	background: none;
+	border: none;
+	color: #999;
+	font-size: 20px;
+	cursor: pointer;
+}
+
+.cfwc-modal-close:hover {
+	color: #333;
+}
+
+.cfwc-modal-body {
+	flex: 1;
+	padding: 20px;
+	overflow-y: auto;
+}
+
+.cfwc-modal-footer {
+	padding: 20px;
+	border-top: 1px solid #e0e0e0;
+	text-align: right;
+}
+
+/* ==========================================================================
+   Help section (inside modal)
+   ========================================================================== */
+
+.cfwc-help-section {
+	margin-bottom: 30px;
+}
+
+.cfwc-help-section:last-child {
+	margin-bottom: 0;
+}
+
+.cfwc-help-section h3 {
+	margin: 0 0 15px;
+	color: #333;
+	font-size: 14px;
+	font-weight: 600;
+}
+
+.cfwc-help-section h3 .dashicons {
+	margin-right: 5px;
+	color: #2271b1;
+	font-size: 18px;
+	vertical-align: middle;
+}
+
+.cfwc-help-section h3 .dashicons-lightbulb {
+	color: #f0ad4e;
+}
+
+.cfwc-help-section ol,
+.cfwc-help-section ul {
+	margin: 0;
+	padding-left: 25px;
+	color: #555;
+	font-size: 14px;
+	line-height: 1.8;
+}
+
+.cfwc-help-section li {
+	margin-bottom: 8px;
+}
+
+.cfwc-help-section .cfwc-badge {
+	display: inline-block;
+	min-width: 70px;
+	padding: 4px 10px;
+	color: #fff;
+	font-size: 12px;
+	font-weight: 600;
+	text-align: center;
+	border-radius: 3px;
+}
+
+.cfwc-help-section .cfwc-badge-stack     { background: #46b450; }
+.cfwc-help-section .cfwc-badge-override  { background: #f0ad4e; }
+.cfwc-help-section .cfwc-badge-exclusive { background: #dc3232; }
+
+.cfwc-stacking-modes {
+	margin-top: 10px;
+}
+
+.cfwc-stacking-mode {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-bottom: 10px;
+}
+
+/* ==========================================================================
+   Select2 dropdown overflow guard
+   ========================================================================== */
+
+.select2-container--open .select2-dropdown {
+	min-width: 200px !important;
+	max-width: 400px !important;
+}
+
+/* ==========================================================================
+   Country select stacking gap (From above To)
+   ========================================================================== */
+
+.cfwc-country-select[data-field="from_country"] + .select2-container {
+	margin-bottom: 5px;
+}
+
+/* ==========================================================================
+   WP 7.0+ form-control height normalization (40px target)
+   ========================================================================== */
+
+body[class*="branch-7"] .cfwc-rules-table tbody tr {
+	height: 50px;
+}
+
+/* Single-line form controls keep a fixed 40px height. */
+body[class*="branch-7"] .cfwc-rule-editing input[type="text"],
+body[class*="branch-7"] .cfwc-rule-editing input[type="number"],
+body[class*="branch-7"] .cfwc-rule-editing select:not(.select2-hidden-accessible),
+body[class*="branch-7"] .cfwc-select2-field + .select2-container .select2-selection--single,
+body[class*="branch-7"] .cfwc-rule-editing .select2-container--default .select2-selection--single,
+body[class*="branch-7"] .cfwc-preset-loader .select2-container .select2-selection--single {
+	height: 40px;
+}
+
+/* Multi-selects (Select2 chips) grow vertically with their content. */
+body[class*="branch-7"] .cfwc-select2-field + .select2-container .select2-selection--multiple {
+	height: auto;
+	min-height: 40px;
+}
+
+body[class*="branch-7"] .cfwc-select2-field + .select2-container .select2-selection--single .select2-selection__rendered,
+body[class*="branch-7"] .cfwc-rule-editing .select2-container--default .select2-selection--single,
+body[class*="branch-7"] .cfwc-rule-editing .select2-container--default .select2-selection--single .select2-selection__rendered,
+body[class*="branch-7"] .cfwc-preset-loader .select2-container .select2-selection--single,
 body[class*="branch-7"] .cfwc-preset-loader .select2-container--default .select2-selection--single .select2-selection__rendered {
 	line-height: 38px;
 }
 
+body[class*="branch-7"] .cfwc-select2-field + .select2-container .select2-selection--single .select2-selection__arrow,
+body[class*="branch-7"] .cfwc-rule-editing .select2-container--default .select2-selection--single .select2-selection__arrow,
 body[class*="branch-7"] .cfwc-preset-loader .select2-container--default .select2-selection--single .select2-selection__arrow {
 	height: 38px;
 }
 
-/* Mobile Responsive Styles */
-@media screen and (max-width: 768px) {
-	/* Default Product Origin Section */
-	#cfwc_default_origin_select {
-	width: 100% !important;
-	margin-left: 0 !important;
-	margin-top: 10px;
-	}
+/* ==========================================================================
+   Snackbar (WordPress/Gutenberg) — pin to bottom-right
+   ========================================================================== */
 
-	/* Rules Header - Stack on mobile */
-	.cfwc-rules-header {
-	flex-direction: column;
-	align-items: flex-start;
-	}
-
-	.cfwc-add-rule,
-	.cfwc-delete-all {
-	width: auto;
-	min-width: 100px;
-	font-size: 13px;
-	padding: 3px 8px;
-	}
-
-	/* Preset buttons responsive */
-	.cfwc-preset-loader {
-	display: flex;
-	flex-direction: column;
-	gap: 10px;
-	}
-
-	.cfwc-preset-loader select,
-	.cfwc-preset-loader .select2-container {
-	width: 100% !important;
-	min-width: 0;
-	margin-right: 0;
-	margin-bottom: 10px;
-	}
-
-	.cfwc-preset-loader button {
-	width: 100%;
-	margin-right: 0;
-	}
-
-	/* Rules table - make it scrollable on mobile */
-	.cfwc-rules-table-wrapper {
-	overflow-x: auto;
-	-webkit-overflow-scrolling: touch;
-	}
-
-	.cfwc-rules-table {
-	min-width: 700px; /* Maintain minimum width for readability */
-	}
-
-	/* Modal full screen on mobile */
-	.cfwc-modal-content {
-	width: 100%;
-	height: 100%;
-	max-width: none;
-	max-height: none;
-	border-radius: 0;
-	transform: none;
-	position: fixed;
-	top: 0;
-	left: 0;
-	}
-
-	/* Form fields in rules */
-	.cfwc-rule-form input[type="text"],
-	.cfwc-rule-form input[type="number"],
-	.cfwc-rule-form select {
-	width: 100%;
-	margin-bottom: 5px;
-	}
-
-	.cfwc-stacking-select {
-	width: 100%;
-	}
+body .components-snackbar-list,
+body .components-snackbar-list__notices-container {
+	position: fixed !important;
+	right: 20px !important;
+	bottom: 30px !important;
+	left: auto !important;
+	z-index: 100001 !important;
+	width: auto !important;
+	max-width: 400px !important;
 }
 
-@media screen and (max-width: 480px) {
-	/* Even smaller screens */
+body.woocommerce_page_wc-settings .components-snackbar-list {
+	right: 20px !important;
+	left: auto !important;
+}
+
+body .components-snackbar {
+	margin-right: 0 !important;
+	margin-left: auto !important;
+}
+
+.components-snackbar-list {
+	display: flex;
+	gap: 15px;
+	justify-content: flex-start;
+	pointer-events: none;
+}
+
+.components-snackbar-list .components-snackbar {
+	max-width: 600px;
+	margin: 0;
+	pointer-events: auto;
+}
+
+body.woocommerce_page_wc-settings {
+	padding-bottom: 100px !important;
+}
+
+/* ==========================================================================
+   Fallback admin notice (used by admin.js when wp.data unavailable)
+   ========================================================================== */
+
+.cfwc-admin-notice-wrapper {
+	position: fixed;
+	right: 20px;
+	bottom: 30px;
+	z-index: 100001;
+	max-width: 400px;
+	padding: 12px;
+	background: #fff;
+	border-left: 4px solid #46b450;
+	box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.1);
+}
+
+.cfwc-admin-notice-wrapper.is-error   { border-left-color: #dc3232; }
+.cfwc-admin-notice-wrapper.is-warning { border-left-color: #ffb900; }
+
+.cfwc-admin-notice-wrapper .notice {
+	margin: 0;
+	padding: 0;
+	border: none;
+	box-shadow: none;
+}
+
+.cfwc-admin-notice-wrapper .notice p {
+	margin: 0;
+}
+
+.cfwc-admin-notice-wrapper .notice-dismiss {
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media screen and (max-width: 1024px) {
 	.cfwc-rules-table {
-	font-size: 12px;
+		font-size: 12px;
 	}
 
 	.cfwc-rules-table th,
 	.cfwc-rules-table td {
-	padding: 5px;
+		padding: 6px 4px;
+	}
+
+	.cfwc-rule-editing input,
+	.cfwc-rule-editing select {
+		font-size: 12px;
+	}
+}
+
+@media screen and (max-width: 782px) {
+	body .components-snackbar-list {
+		right: 10px !important;
+		bottom: 80px !important;
+		max-width: calc(100vw - 20px) !important;
+	}
+}
+
+@media screen and (max-width: 768px) {
+	#cfwc_default_origin_select {
+		width: 100% !important;
+		margin-top: 10px;
+		margin-left: 0 !important;
+	}
+
+	.cfwc-rules-header {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
+	.cfwc-add-rule,
+	.cfwc-delete-all {
+		width: auto;
+		min-width: 100px;
+		padding: 3px 8px;
+		font-size: 13px;
+	}
+
+	.cfwc-preset-loader {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+
+	.cfwc-preset-loader select,
+	.cfwc-preset-loader .select2-container {
+		width: 100% !important;
+		min-width: 0;
+		margin-right: 0;
+		margin-bottom: 10px;
+	}
+
+	.cfwc-preset-loader button {
+		width: 100%;
+		margin-right: 0;
+	}
+
+	.cfwc-rules-table-wrapper {
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+	}
+
+	.cfwc-rules-table {
+		min-width: 700px;
+	}
+
+	.cfwc-stacking-select {
+		width: 100%;
+	}
+
+	.cfwc-modal-content {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		max-width: none;
+		max-height: none;
+		border-radius: 0;
+		transform: none;
+	}
+}
+
+@media screen and (max-width: 480px) {
+	.cfwc-rules-table {
+		font-size: 12px;
+	}
+
+	.cfwc-rules-table th,
+	.cfwc-rules-table td {
+		padding: 5px;
 	}
 
 	.cfwc-help-link-under {
-	font-size: 12px;
+		font-size: 12px;
 	}
 
 	.button {
-	padding: 5px 10px;
-	font-size: 13px;
+		padding: 5px 10px;
+		font-size: 13px;
 	}
 }

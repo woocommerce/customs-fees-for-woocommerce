@@ -933,24 +933,30 @@ class CFWC_Templates {
 				'description' => __( 'UK import VAT (20%) and duty for international shipments', 'customs-fees-for-woocommerce' ),
 				'rules'       => array(
 					array(
+						'rule_id'        => 'uk_vat_vat',
 						'country'        => 'GB',
-						'origin_country' => '',  // Applies to all origins.
+						'origin_country' => '',
 						'type'           => 'percentage',
 						'rate'           => 20,
 						'amount'         => 0,
 						'label'          => __( 'UK VAT (Import)', 'customs-fees-for-woocommerce' ),
 						'taxable'        => false,
 						'tax_class'      => '',
+						'valuation_method' => 'cif',
+						'base_includes'  => array( 'uk_vat_duty' ),
 					),
 					array(
+						'rule_id'        => 'uk_vat_duty',
 						'country'        => 'GB',
-						'origin_country' => '',  // Applies to all origins.
+						'origin_country' => '',
 						'type'           => 'percentage',
 						'rate'           => 5,
 						'amount'         => 0,
 						'label'          => __( 'UK Duty (Import)', 'customs-fees-for-woocommerce' ),
 						'taxable'        => false,
 						'tax_class'      => '',
+						'valuation_method' => 'cif',
+						'base_includes'  => array(),
 					),
 				),
 			),
@@ -959,24 +965,30 @@ class CFWC_Templates {
 				'description' => __( 'Canadian GST and import duties', 'customs-fees-for-woocommerce' ),
 				'rules'       => array(
 					array(
+						'rule_id'        => 'canada_gst_gst',
 						'country'        => 'CA',
-						'origin_country' => '',  // Applies to all origins.
+						'origin_country' => '',
 						'type'           => 'percentage',
 						'rate'           => 5,
 						'amount'         => 0,
 						'label'          => __( 'Canada GST (Import)', 'customs-fees-for-woocommerce' ),
 						'taxable'        => false,
 						'tax_class'      => '',
+						'valuation_method' => 'cif',
+						'base_includes'  => array( 'canada_gst_duty' ),
 					),
 					array(
+						'rule_id'        => 'canada_gst_duty',
 						'country'        => 'CA',
-						'origin_country' => '',  // Applies to all origins.
+						'origin_country' => '',
 						'type'           => 'percentage',
 						'rate'           => 8,
 						'amount'         => 0,
 						'label'          => __( 'Canada Duty (Import)', 'customs-fees-for-woocommerce' ),
 						'taxable'        => false,
 						'tax_class'      => '',
+						'valuation_method' => 'fob',
+						'base_includes'  => array(),
 					),
 				),
 			),
@@ -1173,18 +1185,98 @@ class CFWC_Templates {
 			),
 
 			'australia_gst'            => array(
-				'name'        => __( 'Australia GST', 'customs-fees-for-woocommerce' ),
-				'description' => __( 'Australian GST (10%) on imported goods', 'customs-fees-for-woocommerce' ),
+				'name'        => __( 'Australia GST & Duty', 'customs-fees-for-woocommerce' ),
+				'description' => __( 'Australian GST (10%) and duty on imported goods', 'customs-fees-for-woocommerce' ),
 				'rules'       => array(
 					array(
+						'rule_id'        => 'aus_gst',
 						'country'        => 'AU',
-						'origin_country' => '',  // Applies to all origins.
+						'origin_country' => '',
 						'type'           => 'percentage',
 						'rate'           => 10,
 						'amount'         => 0,
 						'label'          => __( 'Australia GST (Import)', 'customs-fees-for-woocommerce' ),
 						'taxable'        => false,
 						'tax_class'      => '',
+						'valuation_method' => 'cif',
+						'base_includes'  => array( 'aus_duty' ),
+					),
+					array(
+						'rule_id'        => 'aus_duty',
+						'country'        => 'AU',
+						'origin_country' => '',
+						'type'           => 'percentage',
+						'rate'           => 5,
+						'amount'         => 0,
+						'label'          => __( 'Australia Duty (Import)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => false,
+						'tax_class'      => '',
+						'valuation_method' => 'fob',
+						'base_includes'  => array(),
+					),
+				),
+			),
+			'new_zealand_gst'          => array(
+				'name'        => __( 'New Zealand GST & Duty', 'customs-fees-for-woocommerce' ),
+				'description' => __( 'New Zealand GST (15%) and duty on imported goods', 'customs-fees-for-woocommerce' ),
+				'rules'       => array(
+					array(
+						'rule_id'        => 'nz_gst',
+						'country'        => 'NZ',
+						'origin_country' => '',
+						'type'           => 'percentage',
+						'rate'           => 15,
+						'amount'         => 0,
+						'label'          => __( 'New Zealand GST (Import)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => false,
+						'tax_class'      => '',
+						'valuation_method' => 'cif',
+						'base_includes'  => array( 'nz_duty' ),
+					),
+					array(
+						'rule_id'        => 'nz_duty',
+						'country'        => 'NZ',
+						'origin_country' => '',
+						'type'           => 'percentage',
+						'rate'           => 5,
+						'amount'         => 0,
+						'label'          => __( 'New Zealand Duty (Import)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => false,
+						'tax_class'      => '',
+						'valuation_method' => 'fob',
+						'base_includes'  => array(),
+					),
+				),
+			),
+			'eu_vat'                   => array(
+				'name'        => __( 'EU VAT & Duty', 'customs-fees-for-woocommerce' ),
+				'description' => __( 'EU import VAT (20%) and duty for international shipments', 'customs-fees-for-woocommerce' ),
+				'rules'       => array(
+					array(
+						'rule_id'        => 'eu_vat_vat',
+						'country'        => 'EU',
+						'origin_country' => '',
+						'type'           => 'percentage',
+						'rate'           => 20,
+						'amount'         => 0,
+						'label'          => __( 'EU VAT (Import)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => false,
+						'tax_class'      => '',
+						'valuation_method' => 'cif',
+						'base_includes'  => array( 'eu_vat_duty' ),
+					),
+					array(
+						'rule_id'        => 'eu_vat_duty',
+						'country'        => 'EU',
+						'origin_country' => '',
+						'type'           => 'percentage',
+						'rate'           => 5,
+						'amount'         => 0,
+						'label'          => __( 'EU Duty (Import)', 'customs-fees-for-woocommerce' ),
+						'taxable'        => false,
+						'tax_class'      => '',
+						'valuation_method' => 'cif',
+						'base_includes'  => array(),
 					),
 				),
 			),
@@ -1247,65 +1339,124 @@ class CFWC_Templates {
 		$added_count     = 0;
 		$duplicate_count = 0;
 
-		if ( $append ) {
-			// Check for duplicates when appending.
-			$rules = $existing_rules;
+		// Normalize template rules before applying.
+		$template_rules = class_exists( 'CFWC_Settings' ) && method_exists( 'CFWC_Settings', 'migrate_rules' )
+			? CFWC_Settings::migrate_rules( $template['rules'] )
+			: $template['rules'];
 
-			foreach ( $template['rules'] as $new_rule ) {
-				// Convert old format to new format if needed.
+		if ( $append ) {
+			// Two-pass append. Pass 1 normalizes each incoming rule and
+			// classifies it as either a true duplicate of an existing rule
+			// (same from/to/label) or a colliding rule_id that needs
+			// suffixing, populating a single $id_remap that covers both
+			// cases. Pass 2 applies the remap to rule_id and base_includes
+			// and appends the survivors. Doing this in two passes is what
+			// lets a compound preset like "Canada GST & Duty" remap the
+			// GST rule's base_includes onto a pre-existing duty rule with a
+			// different rule_id, regardless of the order the preset lists
+			// them in.
+			$rules             = $existing_rules;
+			$existing_rule_ids = array();
+			foreach ( $existing_rules as $existing_rule ) {
+				if ( ! empty( $existing_rule['rule_id'] ) ) {
+					$existing_rule_ids[ $existing_rule['rule_id'] ] = true;
+				}
+			}
+
+			$id_remap     = array();
+			$is_duplicate = array();
+			$normalized   = array();
+
+			foreach ( $template_rules as $index => $new_rule ) {
 				if ( ! isset( $new_rule['from_country'] ) && isset( $new_rule['origin_country'] ) ) {
 					$new_rule['from_country'] = $new_rule['origin_country'];
 				}
 				if ( ! isset( $new_rule['to_country'] ) && isset( $new_rule['country'] ) ) {
 					$new_rule['to_country'] = $new_rule['country'];
 				}
+				$normalized[ $index ] = $new_rule;
 
-				// Check if rule already exists (same country pair + label combination).
-				$is_duplicate = false;
+				$new_from    = $new_rule['from_country'] ?? '';
+				$new_to      = $new_rule['to_country'] ?? '';
+				$new_label   = $new_rule['label'] ?? '';
+				$original_id = $new_rule['rule_id'] ?? '';
+
+				// Exact-duplicate detection: same from/to/label as an
+				// existing rule. Record the existing rule's id so any
+				// sibling that depends on this template rule can be
+				// rewired to the existing one.
 				foreach ( $existing_rules as $existing_rule ) {
-					$existing_from       = $existing_rule['from_country'] ?? $existing_rule['origin_country'] ?? $existing_rule['country'] ?? '';
-					$existing_to         = $existing_rule['to_country'] ?? $existing_rule['country'] ?? '';
-					$new_from            = $new_rule['from_country'] ?? $new_rule['origin_country'] ?? $new_rule['country'] ?? '';
-					$new_to              = $new_rule['to_country'] ?? $new_rule['country'] ?? '';
-					$existing_match_type = $existing_rule['match_type'] ?? 'all';
-					$new_match_type      = $new_rule['match_type'] ?? 'all';
+					$existing_from  = $existing_rule['from_country'] ?? $existing_rule['origin_country'] ?? $existing_rule['country'] ?? '';
+					$existing_to    = $existing_rule['to_country'] ?? $existing_rule['country'] ?? '';
+					$existing_label = $existing_rule['label'] ?? '';
 
-					// Check for exact duplicate.
 					if ( $existing_from === $new_from &&
 						$existing_to === $new_to &&
-						$existing_rule['label'] === $new_rule['label'] ) {
-						$is_duplicate = true;
-						++$duplicate_count;
-						break;
-					}
-
-					// Check for conflicting general rules (both applying to all products from all origins).
-					if ( empty( $existing_from ) && empty( $new_from ) &&
-						$new_to === $existing_to &&
-						'all' === $existing_match_type && 'all' === $new_match_type ) {
-						// Two general rules for the same destination - skip the new one.
-						$is_duplicate = true;
-						++$duplicate_count;
+						$existing_label === $new_label ) {
+						$is_duplicate[ $index ] = true;
+						if ( '' !== $original_id && ! empty( $existing_rule['rule_id'] ) ) {
+							$id_remap[ $original_id ] = $existing_rule['rule_id'];
+						}
 						break;
 					}
 				}
 
-				if ( ! $is_duplicate ) {
-					$rules[] = $new_rule;
-					++$added_count;
+				// rule_id collision suffixing for the survivors. A rule
+				// already marked as an exact duplicate doesn't need a
+				// suffix — it will be skipped — but its id is still in
+				// $id_remap above so dependents resolve to the existing
+				// rule's id.
+				if ( ! isset( $is_duplicate[ $index ] ) && '' !== $original_id && isset( $existing_rule_ids[ $original_id ] ) ) {
+					$suffix    = 2;
+					$candidate = $original_id . '_' . $suffix;
+					while ( isset( $existing_rule_ids[ $candidate ] ) || in_array( $candidate, $id_remap, true ) ) {
+						++$suffix;
+						$candidate = $original_id . '_' . $suffix;
+					}
+					$id_remap[ $original_id ] = $candidate;
 				}
+			}
+
+			foreach ( $normalized as $index => $new_rule ) {
+				$original_id = $new_rule['rule_id'] ?? '';
+				if ( '' !== $original_id && isset( $id_remap[ $original_id ] ) ) {
+					$new_rule['rule_id'] = $id_remap[ $original_id ];
+				}
+				if ( ! empty( $new_rule['base_includes'] ) && is_array( $new_rule['base_includes'] ) ) {
+					$new_rule['base_includes'] = array_map(
+						function ( $dep_id ) use ( $id_remap ) {
+							return $id_remap[ $dep_id ] ?? $dep_id;
+						},
+						$new_rule['base_includes']
+					);
+				}
+
+				if ( isset( $is_duplicate[ $index ] ) ) {
+					++$duplicate_count;
+					continue;
+				}
+
+				$rules[] = $new_rule;
+				if ( ! empty( $new_rule['rule_id'] ) ) {
+					$existing_rule_ids[ $new_rule['rule_id'] ] = true;
+				}
+				++$added_count;
 			}
 		} else {
 			// Replace all rules.
-			$rules       = $template['rules'];
-			$added_count = count( $template['rules'] );
+			$rules       = $template_rules;
+			$added_count = count( $template_rules );
 		}
 
 		update_option( 'cfwc_rules', $rules );
 
 		// Clear cache.
-		$calculator = new CFWC_Calculator();
-		$calculator->clear_cache();
+		CFWC_Calculator::clear_cache();
+
+		// Re-derive the cycle-error notice from the merged rule set. A
+		// template can introduce or resolve cycles depending on what it
+		// adds or replaces, so admin needs to reflect that immediately.
+		CFWC_Calculator::refresh_cycle_notice( $rules );
 
 		return array(
 			'success'     => true,

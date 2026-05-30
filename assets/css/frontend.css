@@ -340,3 +340,62 @@ ul.cfwc-fees-breakdown li:before,
 	padding: 8px;
 	}
 }
+
+/* ==========================================================================
+	Order details: customer-facing customs info box (class-cfwc-display.php)
+	========================================================================== */
+
+.cfwc-customs-info-box {
+	margin: 30px 0;
+	padding: 20px;
+	background-color: #e8f4f8;
+	border-left: 4px solid #0073aa;
+}
+
+.cfwc-customs-info-box__title {
+	margin: 0 0 10px;
+	color: #0073aa;
+	font-size: 16px;
+}
+
+.cfwc-customs-info-box__lead {
+	margin: 0 0 10px;
+	color: #666;
+	font-size: 14px;
+}
+
+.cfwc-customs-info-box__total {
+	margin: 0 0 10px;
+	color: #333;
+	font-size: 14px;
+}
+
+.cfwc-customs-info-box__disclaimer {
+	margin: 0;
+	color: #999;
+	font-size: 12px;
+	font-style: italic;
+}
+
+/* ==========================================================================
+	Order details: fee breakdown wrapper / line items
+	========================================================================== */
+
+.cfwc-fees-breakdown-wrapper {
+	display: block;
+}
+
+.cfwc-fees-breakdown-wrapper .cfwc-fee-item {
+	display: block;
+	margin: 0 0 5px 0;
+	padding: 0;
+}
+
+/* ==========================================================================
+	Order item small meta line (HS code / origin under item name)
+	========================================================================== */
+
+.cfwc-order-item-extra {
+	color: #666;
+	font-size: 0.9em;
+}

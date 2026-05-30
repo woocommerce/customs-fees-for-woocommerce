@@ -21,6 +21,8 @@
             "composer.lock",
             "node_modules",
             "customs-fees-for-woocommerce.zip",
+            "phpunit.xml",
+            "phpunit.xml.dist",
             ".*",
             "AGENTS.md",
             "CLAUDE.md"
@@ -30,11 +32,23 @@
         "szepeviktor/phpstan-wordpress": "*",
         "phpstan/phpstan": "*",
         "phpstan/extension-installer": "*",
-        "php-stubs/woocommerce-stubs": "^10.1"
+        "php-stubs/woocommerce-stubs": "^10.1",
+        "phpunit/phpunit": "^9.6",
+        "yoast/phpunit-polyfills": "^2.0"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "WooCommerce\\CustomsFees\\Tests\\": "tests/"
+        }
     },
     "config": {
         "allow-plugins": {
             "phpstan/extension-installer": true
         }
+    },
+    "scripts": {
+        "test": [
+            "bash tests/bin/run-tests.sh"
+        ]
     }
 }

@@ -40,6 +40,18 @@ class CFWC_Rule_Matcher {
 	const STACK_EXCLUSIVE = 'exclusive'; // Only this rule applies.
 
 	/**
+	 * Rule IDs that matched the cart item but were removed by stacking modes
+	 * (override/exclusive) during the most recent find_matching_rules() call.
+	 *
+	 * Lets the calculator tell a deliberately dropped base_includes dependency
+	 * apart from one that simply never matched, so it can warn about the former.
+	 *
+	 * @since 1.2.0
+	 * @var array<int,string>
+	 */
+	private $last_stacking_dropped = array();
+
+	/**
 	 * Find matching rules for a product.
 	 *
 	 * @since 1.1.4
@@ -52,9 +64,11 @@ class CFWC_Rule_Matcher {
 	public function find_matching_rules( $product, $from_country, $to_country, $all_rules ) {
 		$matching_rules = array();
 
-		foreach ( $all_rules as $rule_id => $rule ) {
+		foreach ( $all_rules as $key => $rule ) {
 			if ( $this->does_rule_match( $rule, $product, $from_country, $to_country ) ) {
-				$rule['rule_id']  = $rule_id;
+				if ( empty( $rule['rule_id'] ) ) {
+					$rule['rule_id'] = (string) $key;
+				}
 				$matching_rules[] = $rule;
 			}
 		}
@@ -81,7 +95,54 @@ class CFWC_Rule_Matcher {
 		}
 
 		// Handle stacking modes.
-		return $this->apply_stacking_modes( $matching_rules );
+		$final_rules = $this->apply_stacking_modes( $matching_rules );
+
+		// Record which matched rules were removed by stacking so the calculator
+		// can warn when a surviving rule depends (via base_includes) on one of
+		// them — otherwise that dependency is silently dropped and the dependent
+		// fee is computed on an un-compounded base.
+		$this->record_stacking_dropped( $matching_rules, $final_rules );
+
+		return $final_rules;
+	}
+
+	/**
+	 * Record the rule IDs that matched but were dropped by stacking modes.
+	 *
+	 * Stores the set difference between the matched rules (pre-stacking) and the
+	 * surviving rules (post-stacking) in $last_stacking_dropped.
+	 *
+	 * @since 1.2.0
+	 * @param array $matched   Rules that matched before stacking was applied.
+	 * @param array $survivors Rules that remain after stacking was applied.
+	 */
+	private function record_stacking_dropped( $matched, $survivors ) {
+		$surviving_ids = array();
+		foreach ( $survivors as $rule ) {
+			if ( ! empty( $rule['rule_id'] ) ) {
+				$surviving_ids[ $rule['rule_id'] ] = true;
+			}
+		}
+
+		$dropped = array();
+		foreach ( $matched as $rule ) {
+			$rid = isset( $rule['rule_id'] ) ? $rule['rule_id'] : '';
+			if ( '' !== $rid && ! isset( $surviving_ids[ $rid ] ) ) {
+				$dropped[ $rid ] = true;
+			}
+		}
+
+		$this->last_stacking_dropped = array_keys( $dropped );
+	}
+
+	/**
+	 * Get the rule IDs dropped by stacking during the last find_matching_rules() call.
+	 *
+	 * @since 1.2.0
+	 * @return array<int,string> Dropped rule IDs (empty when nothing was stacking-filtered).
+	 */
+	public function get_last_stacking_dropped() {
+		return $this->last_stacking_dropped;
 	}
 
 	/**
@@ -435,6 +496,176 @@ class CFWC_Rule_Matcher {
 		}
 
 		return $final_rules;
+	}
+
+	/**
+	 * Detect base_includes dependencies that are broken by stacking modes.
+	 *
+	 * Case (a) of the stacking/compounding interaction: a rule still applies
+	 * after stacking, but a rule it depends on (via base_includes) was removed
+	 * by a higher-priority override/exclusive rule for the same destination — so
+	 * the surviving rule's fee is computed on an incomplete (un-compounded) base.
+	 *
+	 * This runs at save time, so it only inspects rules that PROVABLY co-occur
+	 * for some concrete product: general rules (match_type 'all'), grouped by
+	 * destination and then by overlapping origin scope. Within a destination,
+	 * an origin-restricted rule co-occurs with any-origin rules (and same-origin
+	 * rules) for products of that origin, so each origin is analysed as
+	 * "any-origin rules + that origin's rules" — exactly the set such a product
+	 * matches. Rules restricted to *different* origins never co-occur and are
+	 * never analysed together, so there are no false positives. Category/HS-code
+	 * rules match per-product and are left to the calculator's runtime warning.
+	 *
+	 * The inverse case — where the dependent rule is itself dropped, so the fee
+	 * disappears entirely — is intentionally NOT reported here: replacing rules
+	 * is the documented purpose of override/exclusive stacking, so flagging it
+	 * would nag on deliberate configurations.
+	 *
+	 * @since 1.2.0
+	 * @param array $rules Rule set to inspect (typically the saved cfwc_rules).
+	 * @return array<int,string> Labels of surviving rules with a stacking-dropped dependency.
+	 */
+	public static function detect_broken_dependencies( $rules ) {
+		if ( ! is_array( $rules ) || empty( $rules ) ) {
+			return array();
+		}
+
+		$matcher        = new self();
+		$by_destination = array();
+
+		foreach ( $rules as $key => $rule ) {
+			// Only general rules can be statically proven to co-occur.
+			$match_type = $rule['match_type'] ?? self::MATCH_ALL;
+			if ( self::MATCH_ALL !== $match_type ) {
+				continue;
+			}
+
+			$dest = $rule['to_country'] ?? $rule['country'] ?? '';
+			if ( '' === $dest ) {
+				continue;
+			}
+
+			if ( empty( $rule['rule_id'] ) ) {
+				$rule['rule_id'] = (string) $key;
+			}
+
+			$by_destination[ $dest ][] = $rule;
+		}
+
+		$broken = array();
+
+		foreach ( $by_destination as $group ) {
+			// Split by origin scope: any-origin rules co-occur with everything;
+			// origin-restricted rules co-occur only within their own origin.
+			$any_origin = array();
+			$by_origin  = array();
+			foreach ( $group as $rule ) {
+				$from = $rule['from_country'] ?? $rule['origin_country'] ?? '';
+				if ( '' === $from ) {
+					$any_origin[] = $rule;
+				} else {
+					$by_origin[ $from ][] = $rule;
+				}
+			}
+
+			// One analysis set per concrete origin (plus the any-origin baseline
+			// when no origin-restricted rules exist for this destination).
+			$sets = array();
+			if ( empty( $by_origin ) ) {
+				$sets[] = $any_origin;
+			} else {
+				foreach ( $by_origin as $origin_rules ) {
+					$sets[] = array_merge( $any_origin, $origin_rules );
+				}
+			}
+
+			foreach ( $sets as $set ) {
+				foreach ( $matcher->find_broken_dependencies_in_set( $set ) as $label ) {
+					$broken[] = $label;
+				}
+			}
+		}
+
+		return array_values( array_unique( $broken ) );
+	}
+
+	/**
+	 * Find surviving rules whose dependency is dropped by stacking, in one set.
+	 *
+	 * The caller passes a set of rules that all provably co-occur for some
+	 * product (same destination, overlapping origin). This reproduces the
+	 * runtime ordering + stacking and returns the labels of any surviving rule
+	 * whose base_includes references a rule that stacking removed (case (a)).
+	 *
+	 * @since 1.2.0
+	 * @param array $set Co-occurring rules to analyse.
+	 * @return array<int,string> Labels of surviving rules with a dropped dependency.
+	 */
+	private function find_broken_dependencies_in_set( $set ) {
+		if ( count( $set ) < 2 ) {
+			return array();
+		}
+
+		usort( $set, array( $this, 'sort_by_priority' ) );
+		$survivors = $this->apply_stacking_modes( $set );
+
+		$survivor_ids = array();
+		foreach ( $survivors as $survivor ) {
+			if ( ! empty( $survivor['rule_id'] ) ) {
+				$survivor_ids[ $survivor['rule_id'] ] = true;
+			}
+		}
+
+		// Dropped = matched in this set but not surviving.
+		$dropped = array();
+		foreach ( $set as $candidate ) {
+			$candidate_id = $candidate['rule_id'] ?? '';
+			if ( '' !== $candidate_id && ! isset( $survivor_ids[ $candidate_id ] ) ) {
+				$dropped[ $candidate_id ] = true;
+			}
+		}
+
+		if ( empty( $dropped ) ) {
+			return array();
+		}
+
+		$found = array();
+		foreach ( $survivors as $survivor ) {
+			$deps = isset( $survivor['base_includes'] ) && is_array( $survivor['base_includes'] )
+				? $survivor['base_includes']
+				: array();
+
+			foreach ( $deps as $dep_id ) {
+				if ( isset( $dropped[ $dep_id ] ) ) {
+					$found[] = ( isset( $survivor['label'] ) && '' !== $survivor['label'] )
+						? $survivor['label']
+						: $survivor['rule_id'];
+					break;
+				}
+			}
+		}
+
+		return $found;
+	}
+
+	/**
+	 * Derive a stable signature for a set of broken-dependency labels.
+	 *
+	 * Used to key a merchant's dismissal of the broken-dependency notice to the
+	 * specific conflict they saw: if the set of affected rules later changes,
+	 * the signature changes and the notice re-surfaces. Order-independent.
+	 *
+	 * @since 1.2.0
+	 * @param array $labels Labels returned by detect_broken_dependencies().
+	 * @return string Signature hash (empty string for an empty set).
+	 */
+	public static function broken_dependency_signature( $labels ) {
+		$labels = array_map( 'strval', (array) $labels );
+		if ( empty( $labels ) ) {
+			return '';
+		}
+		sort( $labels );
+		return md5( implode( '|', $labels ) );
 	}
 
 	/**

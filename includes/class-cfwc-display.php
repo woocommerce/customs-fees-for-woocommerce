@@ -188,9 +188,9 @@ class CFWC_Display {
 						$value_html .= '</table>';
 					} else {
 						// Regular display for web pages.
-						$value_html = '<div class="cfwc-fees-breakdown-wrapper" style="display: block;">';
+						$value_html = '<div class="cfwc-fees-breakdown-wrapper">';
 						foreach ( $breakdown as $fee_item ) {
-							$value_html .= '<div class="cfwc-fee-item" style="display: block; margin: 0 0 5px 0; padding: 0;">';
+							$value_html .= '<div class="cfwc-fee-item">';
 							$value_html .= '<span class="cfwc-fee-label">' . esc_html( $fee_item['label'] ) . ':</span> ';
 							$value_html .= '<strong>' . wc_price( $fee_item['amount'], array( 'currency' => $order->get_currency() ) ) . '</strong>';
 							$value_html .= '</div>';
@@ -350,6 +350,7 @@ class CFWC_Display {
 
 		if ( ! empty( $extra_info ) ) {
 			// Add to product name.
+			// Inline style: email clients strip <style> blocks and ignore external CSS.
 			$args['product'] .= '<br><small style="color: #666; font-size: 0.9em;">' . implode( ' | ', $extra_info ) . '</small>';
 		}
 
