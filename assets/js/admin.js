@@ -1236,6 +1236,29 @@
       updateRulesTable(rules);
     });
 
+    // Guard: warn if "Save changes" is clicked while a rule panel is open.
+    $("#mainform").on("submit", function (e) {
+      if (editingIndex !== null) {
+        var confirmed = confirm(
+          strings.unsaved_rule_confirm ||
+            "You have an unsaved rule. If you proceed, your changes to this rule will be lost. Continue?"
+        );
+        if (!confirmed) {
+          e.preventDefault();
+        }
+      }
+    });
+
+    // Guard: warn if navigating away while a rule panel is open.
+    $(window).on("beforeunload", function () {
+      if (editingIndex !== null) {
+        return (
+          strings.unsaved_rule_leave ||
+          "You have an unsaved rule. If you leave, your changes will be lost."
+        );
+      }
+    });
+
     // Delete rule functionality - Instant delete like WooCommerce tax table.
     var deleteNoticeTimer = null;
     var deleteClickDebounce = {}; // Track debounce per button.
