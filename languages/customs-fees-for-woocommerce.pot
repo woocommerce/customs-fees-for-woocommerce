@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Customs Fees for WooCommerce 1.1.9\n"
 "Report-Msgid-Bugs-To: "
 "https://wordpress.org/support/plugin/customs-fees-for-woocommerce\n"
-"POT-Creation-Date: 2026-05-22 11:33:56+00:00\n"
+"POT-Creation-Date: 2026-05-29 10:17:08+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -14,78 +14,87 @@ msgstr ""
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "X-Generator: node-wp-i18n 1.2.8\n"
 
-#: includes/admin/class-cfwc-admin.php:65
+#: includes/admin/class-cfwc-admin.php:68
+#: includes/admin/class-cfwc-admin.php:137
 msgid "Customs Fees Warning"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:84
-#: includes/admin/class-cfwc-admin.php:111
-#: includes/admin/class-cfwc-admin.php:199 includes/class-cfwc-display.php:68
+#: includes/admin/class-cfwc-admin.php:131
+#. translators: %s: comma-separated list of affected rule names.
+msgid ""
+"These rules depend on another rule that your stacking settings remove, so "
+"their fee is calculated on an incomplete base: %s. Review the priority and "
+"stacking mode of any override or exclusive rules for the same destination."
+msgstr ""
+
+#: includes/admin/class-cfwc-admin.php:193
+#: includes/admin/class-cfwc-admin.php:220
+#: includes/admin/class-cfwc-admin.php:308 includes/class-cfwc-display.php:68
 #: includes/class-cfwc-display.php:145 includes/class-cfwc-display.php:171
 #: includes/class-cfwc-display.php:225 includes/class-cfwc-display.php:384
 #: includes/class-cfwc-loader.php:279 includes/class-cfwc-settings.php:65
 msgid "Customs & Import Fees"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:126
+#: includes/admin/class-cfwc-admin.php:235
 msgid "Fees Breakdown:"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:136
+#: includes/admin/class-cfwc-admin.php:245
 msgid "Total:"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:139
+#: includes/admin/class-cfwc-admin.php:248
 msgid "Total Customs Fees:"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:141
+#: includes/admin/class-cfwc-admin.php:250
 msgid "These fees were calculated based on the destination country and cart value."
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:143
+#: includes/admin/class-cfwc-admin.php:252
 msgid "No customs fees applied to this order."
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:150
+#: includes/admin/class-cfwc-admin.php:259
 msgid "Product Customs Information:"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:172
-#: includes/admin/class-cfwc-admin.php:532 includes/class-cfwc-display.php:295
+#: includes/admin/class-cfwc-admin.php:281
+#: includes/admin/class-cfwc-admin.php:641 includes/class-cfwc-display.php:295
 #: includes/class-cfwc-display.php:342
 msgid "HS Code:"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:179
-#: includes/admin/class-cfwc-admin.php:539 includes/class-cfwc-display.php:301
+#: includes/admin/class-cfwc-admin.php:288
+#: includes/admin/class-cfwc-admin.php:648 includes/class-cfwc-display.php:301
 #: includes/class-cfwc-display.php:348
 msgid "Origin:"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:204
+#: includes/admin/class-cfwc-admin.php:313
 msgid "HS/Tariff Code"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:205
+#: includes/admin/class-cfwc-admin.php:314
 msgid "e.g., 6109.10 or 6109.10.0012"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:207
+#: includes/admin/class-cfwc-admin.php:316
 msgid ""
 "Harmonized System code for customs classification. This helps calculate "
 "accurate import duties."
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:214
+#: includes/admin/class-cfwc-admin.php:323
 msgid "You can "
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:216
+#: includes/admin/class-cfwc-admin.php:325
 msgid "find HS codes here"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:243
+#: includes/admin/class-cfwc-admin.php:352
 #: includes/admin/class-cfwc-onboarding.php:281
 #: includes/admin/class-cfwc-onboarding.php:361
 #: includes/class-cfwc-export-import.php:59
@@ -96,238 +105,238 @@ msgstr ""
 msgid "Country of Origin"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:245
+#: includes/admin/class-cfwc-admin.php:354
 msgid ""
 "Select the country where this product was manufactured. This determines "
 "which customs rules apply."
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:246
-#: includes/admin/class-cfwc-admin.php:250
 #: includes/admin/class-cfwc-admin.php:355
-#: includes/admin/class-cfwc-admin.php:440
+#: includes/admin/class-cfwc-admin.php:359
+#: includes/admin/class-cfwc-admin.php:464
+#: includes/admin/class-cfwc-admin.php:549
 msgid "Select a country"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:441
+#: includes/admin/class-cfwc-admin.php:550
 msgid "Please select a preset first."
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:442
+#: includes/admin/class-cfwc-admin.php:551
 #: includes/admin/views/rules-section.php:417
 msgid "Import Preset Rules"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:443
+#: includes/admin/class-cfwc-admin.php:552
 #: includes/admin/views/rules-section.php:419
 msgid "Add to Existing Rules"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:444
+#: includes/admin/class-cfwc-admin.php:553
 msgid "Adding preset rules..."
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:445
+#: includes/admin/class-cfwc-admin.php:554
 msgid "Replacing all rules with preset..."
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:446
+#: includes/admin/class-cfwc-admin.php:555
 msgid "Click again to confirm"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:447
+#: includes/admin/class-cfwc-admin.php:556
 #: includes/admin/views/rules-section.php:424
 msgid "Replace All Rules"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:448
+#: includes/admin/class-cfwc-admin.php:557
 msgid "No rules to delete."
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:449
+#: includes/admin/class-cfwc-admin.php:558
 msgid "All rules deleted. Remember to click \"Save changes\" to persist."
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:450
+#: includes/admin/class-cfwc-admin.php:559
 #: includes/admin/views/rules-section.php:523
 msgid "Delete All Rules"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:451
+#: includes/admin/class-cfwc-admin.php:560
 msgid "Warning: This will delete all existing rules. Click again to confirm."
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:452
+#: includes/admin/class-cfwc-admin.php:561
 msgid "Click to Confirm Delete"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:453
+#: includes/admin/class-cfwc-admin.php:562
 msgid "Preset applied successfully!"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:454
+#: includes/admin/class-cfwc-admin.php:563
 msgid "Remember to click \"Save changes\" to persist these rules."
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:455
+#: includes/admin/class-cfwc-admin.php:564
 #: includes/class-cfwc-templates.php:1523
 msgid "Failed to apply preset."
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:456
+#: includes/admin/class-cfwc-admin.php:565
 msgid "An error occurred while applying the preset."
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:457
+#: includes/admin/class-cfwc-admin.php:566
 msgid "Check browser console for details."
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:458
+#: includes/admin/class-cfwc-admin.php:567
 msgid "Dismiss this notice"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:459
+#: includes/admin/class-cfwc-admin.php:568
 msgid "Select country..."
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:460
+#: includes/admin/class-cfwc-admin.php:569
 msgid "All Origins"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:461
+#: includes/admin/class-cfwc-admin.php:570
 msgid "EU Countries"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:462
+#: includes/admin/class-cfwc-admin.php:571
 msgid "Specific Country"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:463
+#: includes/admin/class-cfwc-admin.php:572
 msgid "Fee label"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:464
+#: includes/admin/class-cfwc-admin.php:573
 msgid "Choose a country..."
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:465
+#: includes/admin/class-cfwc-admin.php:574
 msgid "Choose origin..."
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:466
+#: includes/admin/class-cfwc-admin.php:575
 msgid "Percentage"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:467
+#: includes/admin/class-cfwc-admin.php:576
 msgid "Flat"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:468
+#: includes/admin/class-cfwc-admin.php:577
 msgid "Save"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:469
+#: includes/admin/class-cfwc-admin.php:578
 msgid "Cancel"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:470
+#: includes/admin/class-cfwc-admin.php:579
 #: includes/admin/views/rules-section.php:722
 msgid "Edit"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:471
+#: includes/admin/class-cfwc-admin.php:580
 #: includes/admin/views/rules-section.php:725
 msgid "Delete"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:472
+#: includes/admin/class-cfwc-admin.php:581
 msgid "Rule saved. Remember to click \"Save changes\" to persist."
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:473
+#: includes/admin/class-cfwc-admin.php:582
 msgid "Rule deleted successfully. Remember to click \"Save changes\" to persist."
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:474
+#: includes/admin/class-cfwc-admin.php:583
 msgid "Click the delete button again to confirm deletion."
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:475
+#: includes/admin/class-cfwc-admin.php:584
 #: includes/admin/views/rules-section.php:732
 msgid "No rules configured. Use the preset loader above or add rules manually."
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:476
+#: includes/admin/class-cfwc-admin.php:585
 #: includes/class-cfwc-products-variation-support.php:64
 #: includes/class-cfwc-products-variation-support.php:87
 msgid "Not set"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:477
+#: includes/admin/class-cfwc-admin.php:586
 msgid "Valuation method"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:478
+#: includes/admin/class-cfwc-admin.php:587
 #: includes/admin/views/rules-section.php:545
 msgid "Depends on"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:479
+#: includes/admin/class-cfwc-admin.php:588
 msgid "Inherit global"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:480
+#: includes/admin/class-cfwc-admin.php:589
 #: includes/admin/views/rules-section.php:662
 msgid "Overrides global valuation"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:481
+#: includes/admin/class-cfwc-admin.php:590
 msgid "Overrides global for this rule"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:482
+#: includes/admin/class-cfwc-admin.php:591
 msgid "Select fees to include in base"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:483
+#: includes/admin/class-cfwc-admin.php:592
 msgid "Rule dependency cycle detected. Some rules may not calculate correctly."
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:484
+#: includes/admin/class-cfwc-admin.php:593
 #: includes/admin/views/rules-section.php:657
 msgid "FOB"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:485
+#: includes/admin/class-cfwc-admin.php:594
 #: includes/admin/views/rules-section.php:658
 msgid "CIF"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:486
+#: includes/admin/class-cfwc-admin.php:595
 msgid "CIF + Insurance"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:487
+#: includes/admin/class-cfwc-admin.php:596
 #: includes/admin/views/rules-section.php:659
 msgid "CIF + Ins"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:488
+#: includes/admin/class-cfwc-admin.php:597
 #: includes/admin/views/rules-section.php:664
 msgid "Global"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:490
+#: includes/admin/class-cfwc-admin.php:599
 #. translators: %d: count of dependency fees included in the base
 msgid "+%d fee"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:492
+#: includes/admin/class-cfwc-admin.php:601
 #. translators: %d: count of dependency fees included in the base
 msgid "+%d fees"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:565
+#: includes/admin/class-cfwc-admin.php:674
 #: includes/admin/class-cfwc-onboarding.php:274
 #: includes/admin/class-cfwc-onboarding.php:355
 #: includes/class-cfwc-emails.php:186 includes/class-cfwc-export-import.php:58
@@ -339,7 +348,7 @@ msgstr ""
 msgid "HS Code"
 msgstr ""
 
-#: includes/admin/class-cfwc-admin.php:569 includes/class-cfwc-emails.php:201
+#: includes/admin/class-cfwc-admin.php:678 includes/class-cfwc-emails.php:201
 #: includes/class-cfwc-products.php:106
 msgid "Origin"
 msgstr ""
@@ -795,12 +804,12 @@ msgstr ""
 msgid "Only this rule applies"
 msgstr ""
 
-#: includes/class-cfwc-calculator.php:997
+#: includes/class-cfwc-calculator.php:1034
 #. translators: %1$s: destination country, %2$s: origin country
 msgid "Import Fees (%1$s from %2$s)"
 msgstr ""
 
-#: includes/class-cfwc-calculator.php:1005
+#: includes/class-cfwc-calculator.php:1042
 #. translators: %s: country name
 msgid "Customs & Import Fees (%s)"
 msgstr ""
