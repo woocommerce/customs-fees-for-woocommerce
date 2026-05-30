@@ -29,6 +29,9 @@ class CFWC_Admin {
 		// Add admin notices.
 		add_action( 'admin_notices', array( $this, 'admin_notices' ) );
 
+		// Persist dismissal of the broken-dependency notice.
+		add_action( 'wp_ajax_cfwc_dismiss_broken_dependency', array( $this, 'ajax_dismiss_broken_dependency' ) );
+
 		// Add order admin meta boxes.
 		add_action( 'add_meta_boxes', array( $this, 'add_order_meta_boxes' ) );
 
@@ -67,6 +70,112 @@ class CFWC_Admin {
 				. esc_html( implode( ', ', (array) $dependency_error ) )
 				. '</p></div>';
 		}
+
+		// A surviving rule's base_includes dependency was removed by a higher-
+		// priority override/exclusive rule, so its fee compounds on an incomplete
+		// base. Computed on demand on the settings screen only (see method).
+		$this->maybe_show_broken_dependency_notice();
+	}
+
+	/**
+	 * Show the broken-dependency notice on the Customs Fees settings screen.
+	 *
+	 * Unlike the cycle notice, this is derived on demand from the saved rules
+	 * rather than cached in a transient: the check is a cheap pure function, so
+	 * it is always current and needs no invalidation. It runs only on the
+	 * Customs & Import Fees settings section to avoid any cost on other admin
+	 * pages, where the notice would not be actionable anyway.
+	 *
+	 * Dismissal is persisted via the `cfwc_dismissed_broken_dependency` option,
+	 * keyed to the signature of the affected rules so the notice re-surfaces if
+	 * the conflict later changes, and is cleared automatically once resolved.
+	 *
+	 * @since 1.2.0
+	 */
+	public function maybe_show_broken_dependency_notice() {
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+		if ( ! $screen || 'woocommerce_page_wc-settings' !== $screen->id ) {
+			return;
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only screen gate; no state change.
+		$tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['tab'] ) ) : '';
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only screen gate; no state change.
+		$section = isset( $_GET['section'] ) ? sanitize_text_field( wp_unslash( $_GET['section'] ) ) : '';
+		if ( 'tax' !== $tab || 'customs' !== $section ) {
+			return;
+		}
+
+		if ( ! current_user_can( 'manage_woocommerce' ) || ! class_exists( 'CFWC_Rule_Matcher' ) ) {
+			return;
+		}
+
+		$broken = CFWC_Rule_Matcher::detect_broken_dependencies( get_option( 'cfwc_rules', array() ) );
+
+		if ( empty( $broken ) ) {
+			// Conflict resolved (or never existed): drop any stale dismissal so a
+			// future re-introduction of a conflict is shown again.
+			delete_option( 'cfwc_dismissed_broken_dependency' );
+			return;
+		}
+
+		$signature = CFWC_Rule_Matcher::broken_dependency_signature( $broken );
+
+		// Respect the merchant's decision to keep this exact configuration.
+		if ( get_option( 'cfwc_dismissed_broken_dependency' ) === $signature ) {
+			return;
+		}
+
+		$message = sprintf(
+			/* translators: %s: comma-separated list of affected rule names. */
+			__( 'These rules depend on another rule that your stacking settings remove, so their fee is calculated on an incomplete base: %s. Review the priority and stacking mode of any override or exclusive rules for the same destination.', 'customs-fees-for-woocommerce' ),
+			implode( ', ', (array) $broken )
+		);
+		?>
+		<div class="notice notice-warning is-dismissible cfwc-broken-dependency-notice">
+			<p>
+				<strong><?php esc_html_e( 'Customs Fees Warning', 'customs-fees-for-woocommerce' ); ?>:</strong>
+				<?php echo esc_html( $message ); ?>
+			</p>
+		</div>
+		<script type="text/javascript">
+		jQuery( function ( $ ) {
+			$( '.cfwc-broken-dependency-notice' ).on( 'click', '.notice-dismiss', function () {
+				$.post( ajaxurl, {
+					action: 'cfwc_dismiss_broken_dependency',
+					nonce: '<?php echo esc_js( wp_create_nonce( 'cfwc_dismiss_broken_dependency' ) ); ?>'
+				} );
+			} );
+		} );
+		</script>
+		<?php
+	}
+
+	/**
+	 * Persist dismissal of the broken-dependency notice.
+	 *
+	 * Recomputes the current signature server-side so a dismissal only suppresses
+	 * the configuration the merchant actually saw, not a value supplied by the
+	 * client.
+	 *
+	 * @since 1.2.0
+	 */
+	public function ajax_dismiss_broken_dependency() {
+		check_ajax_referer( 'cfwc_dismiss_broken_dependency', 'nonce' );
+
+		if ( ! current_user_can( 'manage_woocommerce' ) || ! class_exists( 'CFWC_Rule_Matcher' ) ) {
+			wp_die();
+		}
+
+		$broken = CFWC_Rule_Matcher::detect_broken_dependencies( get_option( 'cfwc_rules', array() ) );
+		if ( ! empty( $broken ) ) {
+			update_option(
+				'cfwc_dismissed_broken_dependency',
+				CFWC_Rule_Matcher::broken_dependency_signature( $broken )
+			);
+		}
+
+		wp_die();
 	}
 
 	/**

@@ -211,6 +211,10 @@ class CFWC_Calculator {
 				$rules
 			);
 
+			// Capture any rules the matcher removed via override/exclusive
+			// stacking, so we can warn below if a surviving rule depended on one.
+			$stacking_dropped = $rule_matcher->get_last_stacking_dropped();
+
 			// Calculate fees for this product.
 			// Check if we should use original price (before discounts).
 			$use_original_price = get_option( 'cfwc_use_original_price', 'no' );
@@ -328,6 +332,34 @@ class CFWC_Calculator {
 				// Notice state is maintained by refresh_cycle_notice() on every
 				// rule-mutation path (settings save, ajax save/reorder/import),
 				// so the cart calculator does not need to write wp_options here.
+			}
+
+			// Warn when a surviving rule declares a base_includes dependency on a
+			// rule that was just removed by a higher-priority override/exclusive
+			// rule for this destination. The dependency is silently filtered out
+			// during resolution below, so the dependent fee computes on an
+			// un-compounded base (e.g. GST no longer compounds on duty). This is
+			// a compliance-relevant under-statement with no other signal, so log
+			// it; checkout still completes on the own-base fallback.
+			if ( ! empty( $stacking_dropped ) ) {
+				$dropped_lookup = array_flip( $stacking_dropped );
+				foreach ( $matching_rules as $mr ) {
+					$mr_deps = isset( $mr['base_includes'] ) && is_array( $mr['base_includes'] )
+						? $mr['base_includes']
+						: array();
+					foreach ( $mr_deps as $dep_id ) {
+						if ( isset( $dropped_lookup[ $dep_id ] ) ) {
+							$this->log_debug(
+								sprintf(
+									'    WARNING: Rule "%s" depends on rule_id "%s", which was removed by a higher-priority override/exclusive rule for this destination. The dependent fee will be calculated on an un-compounded base. Review the stacking modes if this rule should compound on it.',
+									isset( $mr['label'] ) && '' !== $mr['label'] ? $mr['label'] : ( $mr['rule_id'] ?? '' ),
+									$dep_id
+								),
+								'warning'
+							);
+						}
+					}
+				}
 			}
 
 			// Round-based dependency resolution for matching rules.
@@ -926,6 +958,11 @@ class CFWC_Calculator {
 	 * Called from every rule-mutation site so the admin notice reflects the
 	 * current saved state instead of waiting for the next calculator run to
 	 * re-derive it. Sets the transient when cycles exist, deletes it otherwise.
+	 *
+	 * The stacking-broken-dependency notice does NOT use this transient: it is
+	 * computed on demand on the Customs Fees settings screen (see
+	 * CFWC_Admin::maybe_show_broken_dependency_notice()), so there is no cache
+	 * to keep in sync here.
 	 *
 	 * @since 1.2.0
 	 * @param array $rules Rule set just persisted to the `cfwc_rules` option.
