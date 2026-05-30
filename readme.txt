@@ -193,8 +193,11 @@ Yes, through:
 == Changelog ==
 
 = 1.2.0 - 2026-xx-xx =
+* Add    - Per-rule valuation overrides (FOB, CIF, CIF + Insurance) with compound base support, so a rule's customs value can include other rules' computed fees.
 * Fix - Rules with a blank destination country ("Any") or blank origin and destination ("Any → Any") being silently discarded on save and disappearing after page reload.
 * Fix - Show confirmation dialog when leaving page or saving settings with an unsaved rule open.
+* Update - Built-in presets for Canada, Australia, New Zealand, UK, and EU now use correct duty vs. import tax valuation bases.
+* Dev    - `cfwc_customs_value` filter now passes the matching rule as a 5th argument; existing 4-argument callbacks remain backwards-compatible.
 
 = 1.1.9 - 2026-xx-xx =
 * Tweak - WordPress 7.0 Compatibility.

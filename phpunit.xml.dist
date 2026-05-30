@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+	bootstrap="tests/bootstrap.php"
+	backupGlobals="false"
+	colors="true"
+	verbose="true">
+	<testsuites>
+		<testsuite name="Customs Fees Unit Tests">
+			<directory suffix="Test.php">./tests/Unit</directory>
+		</testsuite>
+	</testsuites>
+	<coverage>
+		<include>
+			<directory suffix=".php">./includes</directory>
+		</include>
+	</coverage>
+</phpunit>

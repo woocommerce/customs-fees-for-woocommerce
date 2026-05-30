@@ -29,6 +29,9 @@ class CFWC_Admin {
 		// Add admin notices.
 		add_action( 'admin_notices', array( $this, 'admin_notices' ) );
 
+		// Persist dismissal of the broken-dependency notice.
+		add_action( 'wp_ajax_cfwc_dismiss_broken_dependency', array( $this, 'ajax_dismiss_broken_dependency' ) );
+
 		// Add order admin meta boxes.
 		add_action( 'add_meta_boxes', array( $this, 'add_order_meta_boxes' ) );
 
@@ -53,6 +56,126 @@ class CFWC_Admin {
 	public function admin_notices() {
 		// Activation notices are now handled by CFWC_Onboarding class.
 		// This prevents duplicate notices on activation.
+
+		// Check for rule dependency errors (cycle or unresolvable deps).
+		// The transient is kept in sync with the saved rules by
+		// CFWC_Calculator::refresh_cycle_notice() at every mutation site, so
+		// the notice persists across pageloads until a save resolves the
+		// cycle — `is-dismissible` still hides it for the current pageview.
+		$dependency_error = get_transient( 'cfwc_rules_dependency_error' );
+		if ( ! empty( $dependency_error ) ) {
+			echo '<div class="notice notice-warning is-dismissible"><p><strong>'
+				. esc_html__( 'Customs Fees Warning', 'customs-fees-for-woocommerce' )
+				. ':</strong> '
+				. esc_html( implode( ', ', (array) $dependency_error ) )
+				. '</p></div>';
+		}
+
+		// A surviving rule's base_includes dependency was removed by a higher-
+		// priority override/exclusive rule, so its fee compounds on an incomplete
+		// base. Computed on demand on the settings screen only (see method).
+		$this->maybe_show_broken_dependency_notice();
+	}
+
+	/**
+	 * Show the broken-dependency notice on the Customs Fees settings screen.
+	 *
+	 * Unlike the cycle notice, this is derived on demand from the saved rules
+	 * rather than cached in a transient: the check is a cheap pure function, so
+	 * it is always current and needs no invalidation. It runs only on the
+	 * Customs & Import Fees settings section to avoid any cost on other admin
+	 * pages, where the notice would not be actionable anyway.
+	 *
+	 * Dismissal is persisted via the `cfwc_dismissed_broken_dependency` option,
+	 * keyed to the signature of the affected rules so the notice re-surfaces if
+	 * the conflict later changes, and is cleared automatically once resolved.
+	 *
+	 * @since 1.2.0
+	 */
+	public function maybe_show_broken_dependency_notice() {
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+		if ( ! $screen || 'woocommerce_page_wc-settings' !== $screen->id ) {
+			return;
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only screen gate; no state change.
+		$tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['tab'] ) ) : '';
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only screen gate; no state change.
+		$section = isset( $_GET['section'] ) ? sanitize_text_field( wp_unslash( $_GET['section'] ) ) : '';
+		if ( 'tax' !== $tab || 'customs' !== $section ) {
+			return;
+		}
+
+		if ( ! current_user_can( 'manage_woocommerce' ) || ! class_exists( 'CFWC_Rule_Matcher' ) ) {
+			return;
+		}
+
+		$broken = CFWC_Rule_Matcher::detect_broken_dependencies( get_option( 'cfwc_rules', array() ) );
+
+		if ( empty( $broken ) ) {
+			// Conflict resolved (or never existed): drop any stale dismissal so a
+			// future re-introduction of a conflict is shown again.
+			delete_option( 'cfwc_dismissed_broken_dependency' );
+			return;
+		}
+
+		$signature = CFWC_Rule_Matcher::broken_dependency_signature( $broken );
+
+		// Respect the merchant's decision to keep this exact configuration.
+		if ( get_option( 'cfwc_dismissed_broken_dependency' ) === $signature ) {
+			return;
+		}
+
+		$message = sprintf(
+			/* translators: %s: comma-separated list of affected rule names. */
+			__( 'These rules depend on another rule that your stacking settings remove, so their fee is calculated on an incomplete base: %s. Review the priority and stacking mode of any override or exclusive rules for the same destination.', 'customs-fees-for-woocommerce' ),
+			implode( ', ', (array) $broken )
+		);
+		?>
+		<div class="notice notice-warning is-dismissible cfwc-broken-dependency-notice">
+			<p>
+				<strong><?php esc_html_e( 'Customs Fees Warning', 'customs-fees-for-woocommerce' ); ?>:</strong>
+				<?php echo esc_html( $message ); ?>
+			</p>
+		</div>
+		<script type="text/javascript">
+		jQuery( function ( $ ) {
+			$( '.cfwc-broken-dependency-notice' ).on( 'click', '.notice-dismiss', function () {
+				$.post( ajaxurl, {
+					action: 'cfwc_dismiss_broken_dependency',
+					nonce: '<?php echo esc_js( wp_create_nonce( 'cfwc_dismiss_broken_dependency' ) ); ?>'
+				} );
+			} );
+		} );
+		</script>
+		<?php
+	}
+
+	/**
+	 * Persist dismissal of the broken-dependency notice.
+	 *
+	 * Recomputes the current signature server-side so a dismissal only suppresses
+	 * the configuration the merchant actually saw, not a value supplied by the
+	 * client.
+	 *
+	 * @since 1.2.0
+	 */
+	public function ajax_dismiss_broken_dependency() {
+		check_ajax_referer( 'cfwc_dismiss_broken_dependency', 'nonce' );
+
+		if ( ! current_user_can( 'manage_woocommerce' ) || ! class_exists( 'CFWC_Rule_Matcher' ) ) {
+			wp_die();
+		}
+
+		$broken = CFWC_Rule_Matcher::detect_broken_dependencies( get_option( 'cfwc_rules', array() ) );
+		if ( ! empty( $broken ) ) {
+			update_option(
+				'cfwc_dismissed_broken_dependency',
+				CFWC_Rule_Matcher::broken_dependency_signature( $broken )
+			);
+		}
+
+		wp_die();
 	}
 
 	/**
@@ -110,15 +233,15 @@ class CFWC_Admin {
 			if ( ! empty( $breakdown ) && is_array( $breakdown ) ) {
 				// Show detailed breakdown.
 				echo '<strong>' . esc_html__( 'Fees Breakdown:', 'customs-fees-for-woocommerce' ) . '</strong>';
-				echo '<ul style="margin: 10px 0; padding-left: 20px;">';
+				echo '<ul class="cfwc-fees-breakdown-list">';
 				foreach ( $breakdown as $fee_item ) {
-					echo '<li style="margin: 5px 0;">';
+					echo '<li>';
 					echo esc_html( $fee_item['label'] ) . ': ';
 					echo '<strong>' . wp_kses_post( wc_price( $fee_item['amount'] ) ) . '</strong>';
 					echo '</li>';
 				}
 				echo '</ul>';
-				echo '<hr style="margin: 10px 0;">';
+				echo '<hr class="cfwc-fees-divider">';
 				echo '<p><strong>' . esc_html__( 'Total:', 'customs-fees-for-woocommerce' ) . '</strong> ' . wp_kses_post( wc_price( $total_fees ) ) . '</p>';
 			} else {
 				// Fallback to simple total.
@@ -132,9 +255,9 @@ class CFWC_Admin {
 		// Display HS codes and origin for order items.
 		$items = $order->get_items();
 		if ( ! empty( $items ) ) {
-			echo '<hr style="margin: 15px 0;">';
+			echo '<hr class="cfwc-section-divider">';
 			echo '<p><strong>' . esc_html__( 'Product Customs Information:', 'customs-fees-for-woocommerce' ) . '</strong></p>';
-			echo '<ul style="margin: 10px 0 0 20px;">';
+			echo '<ul class="cfwc-product-customs-list">';
 
 			foreach ( $items as $item ) {
 				if ( ! is_a( $item, 'WC_Order_Item_Product' ) ) {
@@ -182,7 +305,7 @@ class CFWC_Admin {
 		echo '<div class="options_group show_if_simple show_if_variable">';
 
 		// Add a heading without grey background to match WooCommerce style.
-		echo '<h4 style="margin: 10px 12px 5px; font-size: 14px; font-weight: 600;">' . esc_html__( 'Customs & Import Fees', 'customs-fees-for-woocommerce' ) . '</h4>';
+		echo '<h4 class="cfwc-product-fields-heading">' . esc_html__( 'Customs & Import Fees', 'customs-fees-for-woocommerce' ) . '</h4>';
 
 		woocommerce_wp_text_input(
 			array(
@@ -196,7 +319,7 @@ class CFWC_Admin {
 		);
 
 		// Add help text with link after HS Code field.
-		echo '<p class="cfwc-hs-code-help" style="margin-left: 154px; margin-top: -10px; margin-bottom: 10px; font-size: 12px; color: #666;">';
+		echo '<p class="cfwc-hs-code-help">';
 		echo esc_html__( 'You can ', 'customs-fees-for-woocommerce' );
 		echo '<a href="https://hts.usitc.gov/" target="_blank" rel="noopener noreferrer">';
 		echo esc_html__( 'find HS codes here', 'customs-fees-for-woocommerce' );
@@ -460,6 +583,22 @@ class CFWC_Admin {
 					'delete_confirm'             => __( 'Click the delete button again to confirm deletion.', 'customs-fees-for-woocommerce' ),
 					'no_rules'                   => __( 'No rules configured. Use the preset loader above or add rules manually.', 'customs-fees-for-woocommerce' ),
 					'not_set'                    => __( 'Not set', 'customs-fees-for-woocommerce' ),
+					'valuation_method'           => __( 'Valuation method', 'customs-fees-for-woocommerce' ),
+					'depends_on'                 => __( 'Depends on', 'customs-fees-for-woocommerce' ),
+					'inherit_global'             => __( 'Inherit global', 'customs-fees-for-woocommerce' ),
+					'overrides_global'           => __( 'Overrides global valuation', 'customs-fees-for-woocommerce' ),
+					'overrides_global_for_rule'  => __( 'Overrides global for this rule', 'customs-fees-for-woocommerce' ),
+					'select_fees_include'        => __( 'Select fees to include in base', 'customs-fees-for-woocommerce' ),
+					'cycle_warning'              => __( 'Rule dependency cycle detected. Some rules may not calculate correctly.', 'customs-fees-for-woocommerce' ),
+					'fob'                        => __( 'FOB', 'customs-fees-for-woocommerce' ),
+					'cif'                        => __( 'CIF', 'customs-fees-for-woocommerce' ),
+					'cif_insurance'              => __( 'CIF + Insurance', 'customs-fees-for-woocommerce' ),
+					'cif_insurance_short'        => __( 'CIF + Ins', 'customs-fees-for-woocommerce' ),
+					'global_label'               => __( 'Global', 'customs-fees-for-woocommerce' ),
+					/* translators: %d: count of dependency fees included in the base */
+					'dep_fee_singular'           => __( '+%d fee', 'customs-fees-for-woocommerce' ),
+					/* translators: %d: count of dependency fees included in the base */
+					'dep_fee_plural'             => __( '+%d fees', 'customs-fees-for-woocommerce' ),
 				),
 			)
 		);
@@ -494,7 +633,7 @@ class CFWC_Admin {
 
 		// Display as meta data similar to SKU.
 		if ( $hs_code || $origin ) {
-			echo '<div class="cfwc-order-item-meta" style="margin-top: 0.5em;">';
+			echo '<div class="cfwc-order-item-meta">';
 			echo '<table cellspacing="0" class="display_meta">';
 
 			if ( $hs_code ) {

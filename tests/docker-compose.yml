@@ -1,0 +1,16 @@
+name: cfwc_tests
+
+volumes:
+    dockerdirectory:
+
+services:
+    test_db:
+        image: mariadb:10.11
+        env_file:
+            - test.env
+        ports:
+            - 4416:3306
+    test_adminer:
+        image: adminer
+        ports:
+            - "8062:8080"
