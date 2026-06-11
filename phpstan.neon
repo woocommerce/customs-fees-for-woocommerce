@@ -3,7 +3,7 @@ includes:
 	# - vendor/szepeviktor/phpstan-wordpress/extension.neon
 
 parameters:
-	level: 0
+	level: 2
 	paths:
 		- .
 		- customs-fees-for-woocommerce.php
@@ -27,5 +27,5 @@ parameters:
 	
 	# Common WordPress-specific ignores
 	ignoreErrors:
-		# Ignore WooCommerce internal class not found (HPOS related)
-		- '#Class Automattic\\WooCommerce\\Internal\\DataStores\\Orders\\CustomOrdersTableController not found#'
+		# Ignore WooCommerce internal class not found (HPOS related) -- absent from stubs
+		- '#Automattic\\WooCommerce\\Internal\\DataStores\\Orders\\CustomOrdersTableController#'

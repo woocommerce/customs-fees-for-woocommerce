@@ -409,11 +409,6 @@ class CFWC_Ajax {
 			// Add escape parameter (backslash) for PHP 8.4+ compatibility.
 			$data = str_getcsv( $line, ',', '"', '\\' );
 
-			// Skip rows that have no data at all.
-			if ( empty( $data ) ) {
-				continue;
-			}
-
 			// Tolerate row width drift: pad short rows (Excel/Sheets often
 			// strips trailing empty columns on save) and truncate long ones
 			// so the header_map lookups stay in bounds.
