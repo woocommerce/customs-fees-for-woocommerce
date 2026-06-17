@@ -47,6 +47,9 @@
         }
     },
     "scripts": {
+        "phpstan": [
+            "./vendor/bin/phpstan analyse --level=2"
+        ],
         "test": [
             "bash tests/bin/run-tests.sh"
         ]
