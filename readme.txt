@@ -5,8 +5,8 @@ Requires at least: 6.9
 Tested up to: 7.0
 Requires PHP: 7.4
 Requires Plugins: woocommerce
-WC requires at least: 10.6
-WC tested up to: 10.8
+WC requires at least: 10.7
+WC tested up to: 10.9
 Stable tag: 1.1.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -194,6 +194,7 @@ Yes, through:
 
 = 1.2.1 - 2026-xx-xx =
 * Fix    - Rules with a blank destination country ("Any") or blank origin and destination ("Any → Any") being silently discarded on save and disappearing after page reload.
+* Tweak  - WooCommerce 10.9 Compatibility.
 
 = 1.2.0 - 2026-06-01 =
 * Add    - Per-rule valuation overrides (FOB, CIF, CIF + Insurance) with compound base support, so a rule's customs value can include other rules' computed fees.
