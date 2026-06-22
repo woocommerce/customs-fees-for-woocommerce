@@ -1,6 +1,6 @@
 *** Customs Fees for WooCommerce Changelog ***
 
-2026-xx-xx - version 1.2.1
+2026-06-22 - version 1.2.1
 * Fix    - Rules with a blank destination country ("Any") or blank origin and destination ("Any → Any") being silently discarded on save and disappearing after page reload.
 * Tweak  - WooCommerce 10.9 Compatibility.
 
