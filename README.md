@@ -344,7 +344,7 @@ GNU General Public License for more details.
 
 ## Changelog
 
-### Version 1.2.1
+### Version 1.3.0
 
 - Updated the China to US tariff preset rates to reflect the current import regime after the IEEPA tariffs were struck down in February 2026; the apparel rate is corrected from 69% to about 24%.
 
