@@ -129,6 +129,25 @@ class China_Preset_Rates_Test extends \WC_Unit_Test_Case {
 	}
 
 	/**
+	 * @testdox The china_to_us preset still has exactly one rule per category after the appliance split.
+	 *
+	 * Guards against accidental duplication when the appliance rule was split into a
+	 * steel-derivative rule (8418/8450/8451) and an industrial-machinery rule (8419).
+	 */
+	public function test_rule_count_is_stable(): void {
+		$template = $this->sut->get_template( 'china_to_us' );
+		$this->assertCount( 16, $template['rules'], 'The china_to_us preset should have exactly 16 rules.' );
+	}
+
+	/**
+	 * @testdox The china_to_us preset name reflects the post-IEEPA (2026) recalibration.
+	 */
+	public function test_preset_name_reflects_2026(): void {
+		$template = $this->sut->get_template( 'china_to_us' );
+		$this->assertStringContainsString( '2026', $template['name'], 'The preset name should reflect the 2026 recalibration.' );
+	}
+
+	/**
 	 * @testdox The struck-down IEEPA "fentanyl" surcharge is no longer referenced in the preset.
 	 */
 	public function test_no_fentanyl_reference(): void {

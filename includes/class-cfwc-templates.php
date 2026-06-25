@@ -220,7 +220,7 @@ class CFWC_Templates {
 						'taxable'         => true,
 						'tax_class'       => '',
 					),
-					// Industrial Machinery - ~28% (MFN ~1.5% + Section 301 25%; not on the Section 232 derivative list).
+					// Industrial Machinery - ~28% (MFN ~1.5% + Section 301 25%; most 8419 lines are outside the Section 232 derivative list, unlike fridges/washers/dryers).
 					array(
 						'from_country'    => 'CN',
 						'to_country'      => 'US',
