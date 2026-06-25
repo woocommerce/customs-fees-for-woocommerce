@@ -195,6 +195,7 @@ Yes, through:
 = 1.2.1 - 2026-xx-xx =
 * Fix    - Rules with a blank destination country ("Any") or blank origin and destination ("Any → Any") being silently discarded on save and disappearing after page reload.
 * Tweak  - WooCommerce 10.9 Compatibility.
+* Update - China to US tariff preset rates refreshed to reflect the current import regime after the IEEPA tariffs were struck down in February 2026; the apparel rate is corrected from 69% to about 24%.
 
 = 1.2.0 - 2026-06-01 =
 * Add    - Per-rule valuation overrides (FOB, CIF, CIF + Insurance) with compound base support, so a rule's customs value can include other rules' computed fees.
