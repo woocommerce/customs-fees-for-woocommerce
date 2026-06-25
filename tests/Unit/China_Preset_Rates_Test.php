@@ -3,10 +3,14 @@
  * Unit tests for the china_to_us preset rates in CFWC_Templates.
  *
  * Covers CUSFEES-20: the China -> US preset rates were calibrated during the
- * IEEPA tariff period (April 2025 - February 2026). IEEPA tariffs were struck
- * down in February 2026, so the preset must reflect the durable post-IEEPA
+ * IEEPA tariff period (February 2025 - February 2026). IEEPA tariffs were struck
+ * down on 20 February 2026, so the preset must reflect the durable post-IEEPA
  * regime (MFN base + Section 301 + Section 232). The apparel rule in
  * particular was overstated at 69 percent and should be ~24 percent.
+ *
+ * The asserted rates are the intended *representative* per-category preset
+ * values (most MFN/Section 301 components vary by HS line), not exact legal
+ * duties. These tests guard the intended configuration, not statutory precision.
  *
  * @package Customs_Fees_For_WooCommerce
  */
@@ -67,7 +71,7 @@ class China_Preset_Rates_Test extends \WC_Unit_Test_Case {
 	}
 
 	/**
-	 * @testdox The china_to_us preset reflects the post-IEEPA durable tariff rates.
+	 * @testdox The china_to_us preset uses the intended representative post-IEEPA durable rates.
 	 *
 	 * @dataProvider provide_expected_rates
 	 *
@@ -86,7 +90,13 @@ class China_Preset_Rates_Test extends \WC_Unit_Test_Case {
 	}
 
 	/**
-	 * Expected post-IEEPA rates per HS pattern.
+	 * Intended representative post-IEEPA rates per HS pattern.
+	 *
+	 * Values are per-category representatives (MFN base + Section 301, plus
+	 * Section 232 where applicable), not exact HTS duties. EVs are MFN 2.5% +
+	 * Section 301 100% (= 102.5%); appliances are Annex I-B derivatives at
+	 * Section 232 25% on full value (~51.5%); steel/aluminum are the primary
+	 * metal high-end (finished Annex I-B derivatives run lower, ~53%).
 	 *
 	 * @return array<string,array{0:string,1:float}>
 	 */
@@ -95,14 +105,14 @@ class China_Preset_Rates_Test extends \WC_Unit_Test_Case {
 			'apparel'      => array( '61*,62*', 24.0 ),
 			'electronics'  => array( '85*', 25.0 ),
 			'solar'        => array( '8541*,8542*', 50.0 ),
-			'ev'           => array( '8703.80*', 100.0 ),
+			'ev'           => array( '8703.80*', 102.5 ),
 			'auto_parts'   => array( '8708*', 52.5 ),
 			'steel'        => array( '72*,73*', 78.0 ),
 			'aluminum'     => array( '76*', 78.0 ),
 			'batteries'    => array( '8506*,8507*', 28.0 ),
 			'syringes'     => array( '9018.31*,9018.32*', 100.0 ),
 			'appl_machine' => array( '8419*', 28.0 ),
-			'appl_metal'   => array( '8418*,8450*,8451*', 76.0 ),
+			'appl_metal'   => array( '8418*,8450*,8451*', 51.5 ),
 			'footwear'     => array( '64*', 27.0 ),
 			'leather'      => array( '4202*', 35.0 ),
 			'toys'         => array( '95*', 7.5 ),
@@ -166,5 +176,27 @@ class China_Preset_Rates_Test extends \WC_Unit_Test_Case {
 				);
 			}
 		}
+	}
+
+	/**
+	 * @testdox The preset description discloses the representative basis and excludes the temporary Section 122 surcharge.
+	 */
+	public function test_description_discloses_section_122_exclusion(): void {
+		$template = $this->sut->get_template( 'china_to_us' );
+		$this->assertStringNotContainsStringIgnoringCase(
+			'No additional US import rules needed',
+			$template['description'],
+			'The description must not claim no additional rules apply while the temporary Section 122 surcharge is in effect.'
+		);
+		$this->assertStringContainsString(
+			'Section 122',
+			$template['description'],
+			'The description should disclose that the temporary Section 122 surcharge is excluded.'
+		);
+		$this->assertStringContainsStringIgnoringCase(
+			'representative',
+			$template['description'],
+			'The description should state that the rates are representative, not exact duties.'
+		);
 	}
 }
