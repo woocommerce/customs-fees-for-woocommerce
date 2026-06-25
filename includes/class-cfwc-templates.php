@@ -206,17 +206,31 @@ class CFWC_Templates {
 						'taxable'         => true,
 						'tax_class'       => '',
 					),
-					// Consumer Appliances - ~28% (MFN ~1.5% + Section 301 25%; Section 232 applies to steel content only).
+					// Consumer Appliances (steel-derivative) - ~76% (MFN + Section 301 25% + Section 232 50% on full value since April 2026).
 					array(
 						'from_country'    => 'CN',
 						'to_country'      => 'US',
 						'match_type'      => 'hs_code',
-						'hs_code_pattern' => '8418*,8419*,8450*,8451*',  // Refrigerators, machinery, washers, dryers.
+						'hs_code_pattern' => '8418*,8450*,8451*',  // Refrigerators, washers, dryers (Section 232 derivative list).
 						'type'            => 'percentage',
-						'rate'            => 28,  // MFN plus Section 301 (Section 232 on steel content varies).
+						'rate'            => 76,  // MFN plus Section 301 plus Section 232 (full customs value since April 2026).
+						'priority'        => 30,
+						'stacking_mode'   => 'exclusive',
+						'label'           => __( 'China Appliances (Section 301 + 232)', 'customs-fees-for-woocommerce' ),
+						'taxable'         => true,
+						'tax_class'       => '',
+					),
+					// Industrial Machinery - ~28% (MFN ~1.5% + Section 301 25%; not on the Section 232 derivative list).
+					array(
+						'from_country'    => 'CN',
+						'to_country'      => 'US',
+						'match_type'      => 'hs_code',
+						'hs_code_pattern' => '8419*',  // Machinery for temperature-change treatment of materials.
+						'type'            => 'percentage',
+						'rate'            => 28,  // MFN plus Section 301.
 						'priority'        => 25,
 						'stacking_mode'   => 'exclusive',
-						'label'           => __( 'China Consumer Appliances', 'customs-fees-for-woocommerce' ),
+						'label'           => __( 'China Industrial Machinery (Section 301)', 'customs-fees-for-woocommerce' ),
 						'taxable'         => true,
 						'tax_class'       => '',
 					),
@@ -262,14 +276,14 @@ class CFWC_Templates {
 						'taxable'         => true,
 						'tax_class'       => '',
 					),
-					// Chemical Products - ~30% (MFN ~5% + Section 301 List 1/2/3 25%).
+					// Chemical Products - ~28% (MFN ~3% + Section 301 List 3 25%).
 					array(
 						'from_country'    => 'CN',
 						'to_country'      => 'US',
 						'match_type'      => 'hs_code',
 						'hs_code_pattern' => '28*,29*,38*',  // Various chemicals.
 						'type'            => 'percentage',
-						'rate'            => 30,  // MFN plus Section 301.
+						'rate'            => 28,  // MFN plus Section 301 List 3.
 						'priority'        => 25,
 						'stacking_mode'   => 'exclusive',
 						'label'           => __( 'China Chemical Products (Section 301)', 'customs-fees-for-woocommerce' ),

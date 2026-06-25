@@ -101,11 +101,12 @@ class China_Preset_Rates_Test extends \WC_Unit_Test_Case {
 			'aluminum'     => array( '76*', 78.0 ),
 			'batteries'    => array( '8506*,8507*', 28.0 ),
 			'syringes'     => array( '9018.31*,9018.32*', 100.0 ),
-			'appliances'   => array( '8418*,8419*,8450*,8451*', 28.0 ),
+			'appl_machine' => array( '8419*', 28.0 ),
+			'appl_metal'   => array( '8418*,8450*,8451*', 76.0 ),
 			'footwear'     => array( '64*', 27.0 ),
 			'leather'      => array( '4202*', 35.0 ),
 			'toys'         => array( '95*', 7.5 ),
-			'chemicals'    => array( '28*,29*,38*', 30.0 ),
+			'chemicals'    => array( '28*,29*,38*', 28.0 ),
 		);
 	}
 
