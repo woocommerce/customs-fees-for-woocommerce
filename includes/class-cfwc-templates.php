@@ -77,20 +77,20 @@ class CFWC_Templates {
 			),
 
 			'china_to_us'              => array(
-				'name'        => __( 'China to US Import Tariffs (2025)', 'customs-fees-for-woocommerce' ),
-				'description' => __( '⚠️ COMPLETE PRESET: Clear existing rules before applying! This preset includes ALL China→US tariffs (Section 301, 232, fentanyl). No additional US import rules needed.', 'customs-fees-for-woocommerce' ),
+				'name'        => __( 'China to US Import Tariffs (2026)', 'customs-fees-for-woocommerce' ),
+				'description' => __( '⚠️ COMPLETE PRESET: Clear existing rules before applying! Applies representative China→US tariffs for the durable regime after the IEEPA tariffs were struck down in February 2026 (MFN base + Section 301, plus Section 232 where applicable). Rates are per-category representatives, not exact HTS duties. Excludes the temporary Section 122 import surcharge in effect through 24 July 2026. Confirm exact duties for your products.', 'customs-fees-for-woocommerce' ),
 				'rules'       => array(
-					// Apparel/Clothing - 7.5% to 70% (Section 301 + baseline, particularly high ~69%).
+					// Apparel/Clothing - ~24% (MFN base ~16.5% + Section 301 List 4A 7.5%).
 					array(
 						'from_country'    => 'CN',
 						'to_country'      => 'US',
 						'match_type'      => 'hs_code',
 						'hs_code_pattern' => '61*,62*',  // Apparel & Clothing.
 						'type'            => 'percentage',
-						'rate'            => 69,  // High rate for apparel.
+						'rate'            => 24,  // MFN base plus Section 301 List 4A.
 						'priority'        => 30,
 						'stacking_mode'   => 'exclusive',
-						'label'           => __( 'China Apparel (Section 301 + Fentanyl)', 'customs-fees-for-woocommerce' ),
+						'label'           => __( 'China Apparel (Section 301)', 'customs-fees-for-woocommerce' ),
 						'taxable'         => true,
 						'tax_class'       => '',
 					),
@@ -122,126 +122,144 @@ class CFWC_Templates {
 						'taxable'         => true,
 						'tax_class'       => '',
 					),
-					// Electric Vehicles - 100%.
+					// Electric Vehicles - 102.5% (MFN 2.5% + Section 301 100%).
 					array(
 						'from_country'    => 'CN',
 						'to_country'      => 'US',
 						'match_type'      => 'hs_code',
 						'hs_code_pattern' => '8703.80*',  // Electric vehicles.
 						'type'            => 'percentage',
-						'rate'            => 100,  // 100% tariff on EVs.
+						'rate'            => 102.5,  // MFN 2.5% + Section 301 100%. Excludes Section 232 auto 25% (a complete vehicle would total 127.5%).
 						'priority'        => 40,  // Highest priority.
 						'stacking_mode'   => 'exclusive',
-						'label'           => __( 'China Electric Vehicles (100%)', 'customs-fees-for-woocommerce' ),
+						'label'           => __( 'China Electric Vehicles (Section 301)', 'customs-fees-for-woocommerce' ),
 						'taxable'         => true,
 						'tax_class'       => '',
 					),
-					// Auto Parts - 25%.
+					// Auto Parts - ~52.5% (MFN 2.5% + Section 301 25% + Section 232 auto-parts 25%).
 					array(
 						'from_country'    => 'CN',
 						'to_country'      => 'US',
 						'match_type'      => 'hs_code',
 						'hs_code_pattern' => '8708*',  // Auto parts.
 						'type'            => 'percentage',
-						'rate'            => 25,  // Auto parts rate.
+						'rate'            => 52.5,  // Section 301 plus Section 232 auto-parts.
 						'priority'        => 25,
 						'stacking_mode'   => 'exclusive',
-						'label'           => __( 'China Auto Parts (25%)', 'customs-fees-for-woocommerce' ),
+						'label'           => __( 'China Auto Parts (Section 301 + 232)', 'customs-fees-for-woocommerce' ),
 						'taxable'         => true,
 						'tax_class'       => '',
 					),
-					// Steel Products - 25% to 50% (Section 232).
+					// Steel Products - ~78% high-end for PRIMARY steel (Annex I-A, Section 232 50%): MFN ~3% + Section 301 25% + Section 232 50%.
+					// Most finished Chapter 73 articles are Annex I-B derivatives at Section 232 25% (~53% total). Kept high as a conservative representative.
 					array(
 						'from_country'    => 'CN',
 						'to_country'      => 'US',
 						'match_type'      => 'hs_code',
 						'hs_code_pattern' => '72*,73*',  // Steel & Iron Products.
 						'type'            => 'percentage',
-						'rate'            => 25,  // Section 232 steel tariffs.
+						'rate'            => 78,  // Primary metal (Annex I-A) high-end; finished Annex I-B derivatives are ~53%.
 						'priority'        => 25,
 						'stacking_mode'   => 'exclusive',
-						'label'           => __( 'China Steel (Section 232)', 'customs-fees-for-woocommerce' ),
+						'label'           => __( 'China Steel (Section 301 + 232)', 'customs-fees-for-woocommerce' ),
 						'taxable'         => true,
 						'tax_class'       => '',
 					),
-					// Aluminum Products - 25% to 50% (Section 232).
+					// Aluminum Products - ~78% high-end for PRIMARY aluminum (Annex I-A, Section 232 50%): MFN ~3% + Section 301 25% + Section 232 50%.
+					// Most finished aluminum articles are Annex I-B derivatives at Section 232 25% (~53% total). Kept high as a conservative representative.
 					array(
 						'from_country'    => 'CN',
 						'to_country'      => 'US',
 						'match_type'      => 'hs_code',
 						'hs_code_pattern' => '76*',  // Aluminum Products.
 						'type'            => 'percentage',
-						'rate'            => 25,  // Section 232 aluminum tariffs.
+						'rate'            => 78,  // Primary metal (Annex I-A) high-end; finished Annex I-B derivatives are ~53%.
 						'priority'        => 25,
 						'stacking_mode'   => 'exclusive',
-						'label'           => __( 'China Aluminum (Section 232)', 'customs-fees-for-woocommerce' ),
+						'label'           => __( 'China Aluminum (Section 301 + 232)', 'customs-fees-for-woocommerce' ),
 						'taxable'         => true,
 						'tax_class'       => '',
 					),
-					// Batteries (Non-lithium and Lithium) - 25%.
+					// Batteries (Non-lithium and Lithium) - ~28% (MFN ~3.4% + Section 301 25%).
 					array(
 						'from_country'    => 'CN',
 						'to_country'      => 'US',
 						'match_type'      => 'hs_code',
 						'hs_code_pattern' => '8506*,8507*',  // Batteries.
 						'type'            => 'percentage',
-						'rate'            => 25,  // Section 301 increase Sept 27, 2024.
+						'rate'            => 28,  // MFN plus Section 301 (lithium at 25% from Jan 2026).
 						'priority'        => 25,
 						'stacking_mode'   => 'exclusive',
-						'label'           => __( 'China Batteries (25%)', 'customs-fees-for-woocommerce' ),
+						'label'           => __( 'China Batteries (Section 301)', 'customs-fees-for-woocommerce' ),
 						'taxable'         => true,
 						'tax_class'       => '',
 					),
-					// Medical Devices - Syringes/Needles 50%, Medical Gloves 25%.
+					// Medical Devices - Syringes/Needles 100% (Section 301).
 					array(
 						'from_country'    => 'CN',
 						'to_country'      => 'US',
 						'match_type'      => 'hs_code',
 						'hs_code_pattern' => '9018.31*,9018.32*',  // Syringes and needles.
 						'type'            => 'percentage',
-						'rate'            => 50,  // 50% on syringes/needles from 2026.
+						'rate'            => 100,  // Section 301 100% finalized Sept 27, 2024.
 						'priority'        => 30,
 						'stacking_mode'   => 'exclusive',
-						'label'           => __( 'China Medical Syringes/Needles (50%)', 'customs-fees-for-woocommerce' ),
+						'label'           => __( 'China Medical Syringes/Needles (100%)', 'customs-fees-for-woocommerce' ),
 						'taxable'         => true,
 						'tax_class'       => '',
 					),
-					// Consumer Appliances - 25% to 50%.
+					// Consumer Appliances (steel derivatives) - ~51.5% (MFN ~1.5% + Section 301 25% + Section 232 25%).
+					// 8418/8450/8451 are listed in Annex I-B (Section 232 25% on full customs value since 6 Apr 2026), NOT the 50% Annex I-A tier.
 					array(
 						'from_country'    => 'CN',
 						'to_country'      => 'US',
 						'match_type'      => 'hs_code',
-						'hs_code_pattern' => '8418*,8419*,8450*,8451*',  // Refrigerators, machinery, washers, dryers.
+						'hs_code_pattern' => '8418*,8450*,8451*',  // Refrigerators, washers, dryers (Section 232 Annex I-B derivatives).
 						'type'            => 'percentage',
-						'rate'            => 25,  // Section 232 steel derivative items.
-						'priority'        => 25,
+						'rate'            => 51.5,  // MFN ~1.5% + Section 301 25% + Section 232 25% (Annex I-B, full customs value since 6 Apr 2026).
+						'priority'        => 30,
 						'stacking_mode'   => 'exclusive',
-						'label'           => __( 'China Consumer Appliances', 'customs-fees-for-woocommerce' ),
+						'label'           => __( 'China Appliances (Section 301 + 232)', 'customs-fees-for-woocommerce' ),
 						'taxable'         => true,
 						'tax_class'       => '',
 					),
-					// Footwear - 7.5% to 15%.
+					// Industrial Machinery - ~28% (MFN ~1.5% + Section 301 25%) for the non-derivative subset.
+					// Note: some 8419 codes (e.g. 8419.50 heat exchangers, 8419.90.10 water-heater parts) ARE in Annex I-B at Section 232 25%, so those run ~51%.
+					array(
+						'from_country'    => 'CN',
+						'to_country'      => 'US',
+						'match_type'      => 'hs_code',
+						'hs_code_pattern' => '8419*',  // Machinery for temperature-change treatment of materials.
+						'type'            => 'percentage',
+						'rate'            => 28,  // MFN + Section 301 (representative; some 8419 subheadings carry Section 232 25%).
+						'priority'        => 25,
+						'stacking_mode'   => 'exclusive',
+						'label'           => __( 'China Industrial Machinery (Section 301)', 'customs-fees-for-woocommerce' ),
+						'taxable'         => true,
+						'tax_class'       => '',
+					),
+					// Footwear - ~27% (MFN varies widely by material ~20% + Section 301 List 4A 7.5%).
 					array(
 						'from_country'    => 'CN',
 						'to_country'      => 'US',
 						'match_type'      => 'hs_code',
 						'hs_code_pattern' => '64*',  // Footwear.
 						'type'            => 'percentage',
-						'rate'            => 7.5,  // Section 301 List 4A tariffs.
+						'rate'            => 27,  // MFN plus Section 301 List 4A (highly material-dependent).
 						'priority'        => 20,
 						'stacking_mode'   => 'exclusive',
 						'label'           => __( 'China Footwear (Section 301)', 'customs-fees-for-woocommerce' ),
 						'taxable'         => true,
 						'tax_class'       => '',
 					),
-					// Leather goods and bags - 25%.
+					// Leather goods and bags - ~35% (MFN ~10% + Section 301 List 3 25%; textile bags skew higher).
 					array(
 						'from_country'    => 'CN',
 						'to_country'      => 'US',
 						'match_type'      => 'hs_code',
 						'hs_code_pattern' => '4202*',  // Trunks, bags, cases, wallets, etc.
 						'type'            => 'percentage',
-						'rate'            => 25,
+						'rate'            => 35,  // MFN plus Section 301 List 3.
 						'priority'        => 25,
 						'stacking_mode'   => 'exclusive',
 						'label'           => __( 'China Leather Goods & Bags', 'customs-fees-for-woocommerce' ),
@@ -262,27 +280,28 @@ class CFWC_Templates {
 						'taxable'         => true,
 						'tax_class'       => '',
 					),
-					// Chemical Products - 25%.
+					// Chemical Products - ~28% (MFN ~3% + Section 301 List 3 25%).
 					array(
 						'from_country'    => 'CN',
 						'to_country'      => 'US',
 						'match_type'      => 'hs_code',
 						'hs_code_pattern' => '28*,29*,38*',  // Various chemicals.
 						'type'            => 'percentage',
-						'rate'            => 25,  // Section 301 chemicals.
+						'rate'            => 28,  // MFN plus Section 301 List 3.
 						'priority'        => 25,
 						'stacking_mode'   => 'exclusive',
-						'label'           => __( 'China Chemical Products (25%)', 'customs-fees-for-woocommerce' ),
+						'label'           => __( 'China Chemical Products (Section 301)', 'customs-fees-for-woocommerce' ),
 						'taxable'         => true,
 						'tax_class'       => '',
 					),
-					// General baseline (MFN) - ~7% (fallback for unspecified products).
+					// General baseline (MFN-only floor) - ~3% (fallback for unspecified products).
+					// Most China-origin goods also carry Section 301 (+7.5% List 4A to +25% List 3), so actual duty is usually higher.
 					array(
 						'from_country'  => 'CN',
 						'to_country'    => 'US',
 						'match_type'    => 'all',  // Fallback for other products.
 						'type'          => 'percentage',
-						'rate'          => 7,  // WTO baseline tariff.
+						'rate'          => 3,  // Trade-weighted Column-1 MFN average (excludes Section 301).
 						'priority'      => 5,  // Lowest priority (fallback).
 						'stacking_mode' => 'exclusive',  // Prevents stacking confusion.
 						'label'         => __( 'China General Import (MFN)', 'customs-fees-for-woocommerce' ),
