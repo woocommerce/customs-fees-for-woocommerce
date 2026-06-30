@@ -1,6 +1,6 @@
 *** Customs Fees for WooCommerce Changelog ***
 
-2026-xx-xx - version 1.3.0
+2026-06-30 - version 1.3.0
 * Update - China to US tariff preset rates refreshed to reflect the current import regime after the IEEPA tariffs were struck down in February 2026; the apparel rate is corrected from 69% to about 24%.
 
 2026-06-22 - version 1.2.1
