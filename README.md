@@ -344,6 +344,11 @@ GNU General Public License for more details.
 
 ## Changelog
 
+### Version 1.3.1
+
+- Added "EU Countries" as a selectable option in the rule editor's origin and destination country dropdowns, so EU-wide rules (such as the "EU VAT & Duty" preset) can be created and edited. Previously editing such a rule silently reset its destination to "Any", which applied the fee to every country.
+- Fixed the rule editor misreading a destination-only rule's legacy country field as its origin when editing.
+
 ### Version 1.3.0
 
 - Updated the China to US tariff preset rates to reflect the current import regime after the IEEPA tariffs were struck down in February 2026; the apparel rate is corrected from 69% to about 24%.
