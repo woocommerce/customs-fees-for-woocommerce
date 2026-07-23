@@ -5,8 +5,8 @@ Requires at least: 6.9
 Tested up to: 7.0
 Requires PHP: 7.4
 Requires Plugins: woocommerce
-WC requires at least: 10.7
-WC tested up to: 10.9
+WC requires at least: 10.8
+WC tested up to: 11.0
 Stable tag: 1.1.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -191,6 +191,9 @@ Yes, through:
 8. Email with customs fee information
 
 == Changelog ==
+
+= 1.3.1 - 2026-xx-xx =
+* Tweak - WooCommerce 11.0 Compatibility.
 
 = 1.3.0 - 2026-xx-xx =
 * Update - China to US tariff preset rates refreshed to reflect the current import regime after the IEEPA tariffs were struck down in February 2026; the apparel rate is corrected from 69% to about 24%.

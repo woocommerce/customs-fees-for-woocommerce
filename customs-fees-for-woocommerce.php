@@ -14,8 +14,8 @@
  * Requires at least: 6.9
  * Tested up to:      7.0
  * Requires PHP:      7.4
- * WC requires at least: 10.7
- * WC tested up to:   10.9
+ * WC requires at least: 10.8
+ * WC tested up to:   11.0
  * Woo: 18734005702334:78cd9350327fbb9496bc3fbfd7335b53
  *
  * @package CustomsFeesForWooCommerce
