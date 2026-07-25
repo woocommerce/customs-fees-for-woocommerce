@@ -5,8 +5,8 @@ Requires at least: 6.9
 Tested up to: 7.0
 Requires PHP: 7.4
 Requires Plugins: woocommerce
-WC requires at least: 10.7
-WC tested up to: 10.9
+WC requires at least: 10.8
+WC tested up to: 11.0
 Stable tag: 1.1.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -195,6 +195,7 @@ Yes, through:
 = 1.3.1 - 2026-xx-xx =
 * Fix    - Add "EU Countries" as a selectable option in the rule editor's origin and destination country dropdowns, so EU-wide rules (such as the "EU VAT & Duty" preset) can be created and edited. Previously editing such a rule silently reset its destination to "Any", which applied the fee to every country.
 * Fix    - The rule editor no longer misreads a destination-only rule's legacy country field as its origin when editing (the "EU VAT & Duty" preset incorrectly showed "EU" in the From field).
+* Tweak  - WooCommerce 11.0 Compatibility.
 
 = 1.3.0 - 2026-xx-xx =
 * Update - China to US tariff preset rates refreshed to reflect the current import regime after the IEEPA tariffs were struck down in February 2026; the apparel rate is corrected from 69% to about 24%.
