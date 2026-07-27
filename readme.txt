@@ -192,6 +192,9 @@ Yes, through:
 
 == Changelog ==
 
+= 1.3.2 - 2026-xx-xx =
+* Tweak - Remove product block editor compatibility declaration.
+
 = 1.3.1 - 2026-xx-xx =
 * Tweak - WooCommerce 11.0 Compatibility.
 
