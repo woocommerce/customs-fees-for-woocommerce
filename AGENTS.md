@@ -51,7 +51,7 @@ docs/                   # Developer docs: CIF.md, HOWTO_DEBUG.md, QUICK_START.md
 - **Settings** live under WooCommerce > Settings > Tax > Customs Fees.
 - **Fee breakdown** stored in `WC()->session` for display in cart/checkout.
 - **Product meta**: `_cfwc_hs_code` and `_cfwc_country_of_origin` on postmeta.
-- HPOS, Cart/Checkout blocks, and product block editor compatibility declared.
+- HPOS and Cart/Checkout blocks compatibility declared.
 
 ## Commands
 
