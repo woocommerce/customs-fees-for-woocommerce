@@ -19,8 +19,8 @@
 | Layer | Tool |
 |-------|------|
 | PHP | >= 7.4 (no namespaces, `CFWC_` prefix convention) |
-| WordPress | >= 6.9, tested up to 7.0 |
-| WooCommerce | >= 10.8, tested up to 11.0 |
+| WordPress | see `Requires at least` / `Tested up to` headers in `customs-fees-for-woocommerce.php` |
+| WooCommerce | see `WC requires at least` / `WC tested up to` headers in `customs-fees-for-woocommerce.php` |
 | Node | 22.14.0 (pinned in `.nvmrc`) |
 | Package manager | pnpm >= 10.4.1 |
 | JS minification | UglifyJS (`uglify-js`) |
@@ -37,9 +37,9 @@ includes/admin/         # Admin-only classes (loaded conditionally via is_admin(
 includes/admin/views/   # Admin view templates (rules-section.php)
 assets/css/             # Source CSS (admin.css, admin-improvements.css, frontend.css)
 assets/js/              # Source JS (admin.js, frontend.js)
-languages/              # POT file only -- translations loaded by WordPress automatically
+languages/              # POT file only; translations are not auto-loaded (see Empty load_textdomain() note)
 docs/                   # Developer docs: CIF.md, HOWTO_DEBUG.md, QUICK_START.md, TESTING.md
-.github/workflows/      # CI: QIT tests, build, release, merge-to-main
+.github/workflows/      # CI: QIT tests, build, release, merge-to-trunk
 ```
 
 ### Architecture Notes
@@ -109,7 +109,7 @@ npx wp-env logs
 
 ### Branches
 
-- `main` -- stable, release-ready code.
+- `trunk` -- stable, release-ready code.
 - Feature/fix branches: `add/CUSFEES-*`, `tweak/CUSFEES-*`, `fix/CUSFEES-*`.
 
 ### Pull Requests
@@ -132,7 +132,7 @@ QIT (Quality Insights Toolkit) E2E tests run remotely via `.github/workflows/qit
 
 - **No namespaces by design**: The plugin predates namespace adoption and uses the `CFWC_` prefix convention consistently. Do not refactor to namespaces without explicit approval.
 - **Manual require_once loading**: `CFWC_Loader::load_dependencies()` handles all includes. Admin classes are conditionally loaded behind `is_admin()`.
-- **Empty `load_textdomain()`**: Intentionally empty -- WordPress 4.6+ auto-loads translations for WordPress.org-hosted plugins. Do not add `load_plugin_textdomain()` calls.
+- **Empty `load_textdomain()`**: The main plugin class does not call `load_plugin_textdomain()`. This plugin is not hosted on WordPress.org, so the WordPress 4.6+ just-in-time auto-loading that covers .org-hosted plugins does not apply here. Without a `load_plugin_textdomain()` call, only translations installed globally in `WP_LANG_DIR/plugins/` are found; bundled `.mo` files in `languages/` are not loaded. This is currently harmless because `languages/` ships only a `.pot` and no `.mo` files, but the first shipped translation would be silently ignored. Whether to implement `load_plugin_textdomain()` is a separate decision (own ticket).
 - **Stub AJAX handlers in Loader**: `ajax_save_rules`, `ajax_delete_rule`, `ajax_load_template` in `CFWC_Loader` are stubs. Actual AJAX handling is in `CFWC_Ajax`.
 - **composer archive for packaging**: Release ZIPs are built via `composer archive` with exclusion rules in `composer.json`. The `.gitattributes` file also controls `export-ignore`.
 - **Rules dual storage**: Rules are stored via `cfwc_rules` option and cached via `cfwc_rules_cache` transient.

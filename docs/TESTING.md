@@ -33,8 +33,8 @@ This guide provides comprehensive testing procedures to ensure Customs Fees for 
 ### Recommended test environment
 
 - **Local development**: Local by Flywheel, DevKinsta, or XAMPP
-- **WordPress**: Latest stable version and minimum supported (6.0)
-- **WooCommerce**: Latest stable version and minimum supported (8.0)
+- **WordPress**: Latest stable version and minimum supported (6.9)
+- **WooCommerce**: Latest stable version and minimum supported (10.8)
 - **PHP**: Test on 7.4, 8.0, 8.1, and 8.2
 - **Database**: MySQL 5.6+ or MariaDB 10.0+
 
@@ -282,9 +282,9 @@ Create three USD $10 fees and test each mode:
 
 ### 1. WordPress compatibility
 
-#### Test: Minimum version (6.0)
+#### Test: Minimum version (6.9)
 
-1. Install on WordPress 6.0
+1. Install on WordPress 6.9
 2. Test all features
 3. **Expected**: Full functionality
 
@@ -411,26 +411,6 @@ Run unit tests:
 composer test
 ```
 
-Test coverage:
-
-```bash
-composer test-coverage
-```
-
-### JavaScript tests
-
-Run Jest tests:
-
-```bash
-npm test
-```
-
-Watch mode:
-
-```bash
-npm test -- --watch
-```
-
 ### End-to-end tests
 
 Using Playwright:
@@ -547,8 +527,8 @@ Using Debug Bar:
 
 #### Compatibility
 
-- [ ] WordPress 6.0+
-- [ ] WooCommerce 8.0+
+- [ ] WordPress 6.9+
+- [ ] WooCommerce 10.8+
 - [ ] PHP 7.4, 8.0, 8.1, 8.2
 - [ ] HPOS enabled
 - [ ] HPOS disabled
