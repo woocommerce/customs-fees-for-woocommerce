@@ -211,13 +211,6 @@ class CFWC_Loader {
 				CFWC_PLUGIN_FILE,
 				true
 			);
-
-			// Product block editor compatibility.
-			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility(
-				'product_block_editor',
-				CFWC_PLUGIN_FILE,
-				true
-			);
 		}
 	}
 

@@ -12,21 +12,21 @@
 
 **Plugin**: Customs Fees for WooCommerce
 **Purpose**: Calculate and display customs/import fees at WooCommerce checkout based on product origin, destination country, HS codes, and category rules.
-**Version**: 1.1.5
+**Version**: see the `Version` header in `customs-fees-for-woocommerce.php` (bumped by release tooling)
 
 ### Stack
 
 | Layer | Tool |
 |-------|------|
 | PHP | >= 7.4 (no namespaces, `CFWC_` prefix convention) |
-| WordPress | >= 6.8, tested up to 6.9 |
-| WooCommerce | >= 10.4, tested up to 10.6 |
+| WordPress | >= 6.9, tested up to 7.0 |
+| WooCommerce | >= 10.8, tested up to 11.0 |
 | Node | 22.14.0 (pinned in `.nvmrc`) |
 | Package manager | pnpm >= 10.4.1 |
 | JS minification | UglifyJS (`uglify-js`) |
 | CSS minification | clean-css-cli |
 | i18n | node-wp-i18n |
-| Static analysis | PHPStan level 0 with `phpstan-wordpress` + `woocommerce-stubs` |
+| Static analysis | PHPStan level 2 with `phpstan-wordpress` + `woocommerce-stubs` |
 | Release packaging | `composer archive` |
 
 ### Key Directories
@@ -51,7 +51,7 @@ docs/                   # Developer docs: CIF.md, HOWTO_DEBUG.md, QUICK_START.md
 - **Settings** live under WooCommerce > Settings > Tax > Customs Fees.
 - **Fee breakdown** stored in `WC()->session` for display in cart/checkout.
 - **Product meta**: `_cfwc_hs_code` and `_cfwc_country_of_origin` on postmeta.
-- HPOS, Cart/Checkout blocks, and product block editor compatibility declared.
+- HPOS and Cart/Checkout blocks compatibility declared.
 
 ## Commands
 
@@ -86,8 +86,8 @@ vendor/bin/phpstan analyse
 # Lint PHP (PHPCS)
 # Not yet configured -- no .phpcs.xml in repo
 
-# Run PHP unit tests
-# Not yet implemented -- no tests/ directory or phpunit.xml
+# Run PHP unit tests (PHPUnit, config in phpunit.xml.dist, suites in tests/Unit/)
+composer test
 
 # Start wp-env
 npx wp-env start
@@ -149,4 +149,4 @@ QIT (Quality Insights Toolkit) E2E tests run remotely via `.github/workflows/qit
 
 ## Skills and Additional Guidance
 
-Developer docs in `docs/`: CIF.md (valuation feature), HOWTO_DEBUG.md (logging), QUICK_START.md (setup), TESTING.md (manual test scenarios - no automated tests exist yet).
+Developer docs in `docs/`: CIF.md (valuation feature), HOWTO_DEBUG.md (logging), QUICK_START.md (setup), TESTING.md (manual test scenarios; automated unit tests live in `tests/Unit/`).
