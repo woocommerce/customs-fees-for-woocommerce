@@ -45,8 +45,8 @@ With the U.S. ending its de minimis exemption on **August 29, 2025**, all intern
 
 ### Minimum requirements
 
-- WordPress 6.0 or higher
-- WooCommerce 9.0 or higher
+- WordPress 6.9 or higher
+- WooCommerce 10.8 or higher
 - PHP 7.4 or higher
 
 ### Manual installation
