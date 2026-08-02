@@ -35,7 +35,7 @@ This guide provides comprehensive testing procedures to ensure Customs Fees for 
 - **Local development**: Local by Flywheel, DevKinsta, or XAMPP
 - **WordPress**: Latest stable version and minimum supported (6.9)
 - **WooCommerce**: Latest stable version and minimum supported (10.8)
-- **PHP**: Test on 7.4, 8.0, 8.1, and 8.2
+- **PHP**: Test on 7.4 (minimum supported), 8.3, and 8.4
 - **Database**: MySQL 5.6+ or MariaDB 10.0+
 
 ### Essential test data
@@ -413,17 +413,7 @@ composer test
 
 ### End-to-end tests
 
-Using Playwright:
-
-```bash
-npm run test:e2e
-```
-
-Specific test:
-
-```bash
-npm run test:e2e -- --grep "checkout"
-```
+There is no local E2E suite. End-to-end coverage runs through WooCommerce QIT in CI (see the `qit` workflows in `.github/workflows/`).
 
 ### Continuous integration
 
@@ -529,7 +519,7 @@ Using Debug Bar:
 
 - [ ] WordPress 6.9+
 - [ ] WooCommerce 10.8+
-- [ ] PHP 7.4, 8.0, 8.1, 8.2
+- [ ] PHP 7.4, 8.3, 8.4
 - [ ] HPOS enabled
 - [ ] HPOS disabled
 - [ ] Block checkout
