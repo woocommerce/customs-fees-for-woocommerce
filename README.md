@@ -364,7 +364,6 @@ GNU General Public License for more details.
 ### Version 1.2.0 - June 2026
 
 - Added per-rule valuation overrides (FOB, CIF, CIF + Insurance) with compound base support, so a rule's customs value can include other rules' computed fees.
-- Fixed rules with a blank destination country ("Any") or blank origin and destination ("Any → Any") being silently discarded on save and disappearing after page reload.
 - Fixed missing confirmation dialog when leaving page or saving settings with an unsaved rule open.
 - Updated built-in presets for Canada, Australia, New Zealand, UK, and EU to use correct duty vs. import tax valuation bases.
 - The `cfwc_customs_value` filter now passes the matching rule as a 5th argument; existing 4-argument callbacks remain backwards-compatible.
