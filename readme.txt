@@ -7,7 +7,7 @@ Requires PHP: 7.4
 Requires Plugins: woocommerce
 WC requires at least: 10.8
 WC tested up to: 11.0
-Stable tag: 1.1.8
+Stable tag: 1.3.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -74,8 +74,7 @@ Plugin calculates each fee separately and shows total
 
 = Compatibility =
 
-* WordPress 6.0 or higher.
-* WooCommerce 9.0 or higher.
+* WordPress and WooCommerce: see the "Requires at least" and "WC requires at least" headers at the top of this file.
 * PHP 7.4 or higher.
 * Works with Classic and Block-based checkout.
 * Compatible with major shipping plugins.
@@ -195,13 +194,13 @@ Yes, through:
 = 1.3.2 - 2026-xx-xx =
 * Tweak - Remove product block editor compatibility declaration.
 
-= 1.3.1 - 2026-xx-xx =
+= 1.3.1 - 2026-07-27 =
 * Tweak - WooCommerce 11.0 Compatibility.
 
-= 1.3.0 - 2026-xx-xx =
+= 1.3.0 - 2026-06-30 =
 * Update - China to US tariff preset rates refreshed to reflect the current import regime after the IEEPA tariffs were struck down in February 2026; the apparel rate is corrected from 69% to about 24%.
 
-= 1.2.1 - 2026-xx-xx =
+= 1.2.1 - 2026-06-22 =
 * Fix    - Rules with a blank destination country ("Any") or blank origin and destination ("Any → Any") being silently discarded on save and disappearing after page reload.
 * Tweak  - WooCommerce 10.9 Compatibility.
 
