@@ -1,6 +1,6 @@
 *** Customs Fees for WooCommerce Changelog ***
 
-2026-xx-xx - version 1.3.2
+2026-08-05 - version 1.3.2
 * Tweak - Remove product block editor compatibility declaration.
 
 2026-07-27 - version 1.3.1
