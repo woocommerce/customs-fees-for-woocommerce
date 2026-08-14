@@ -1,9 +1,9 @@
-name: Merge to Main CI
+name: Merge to Trunk CI
 
 on:
   pull_request:
     branches:
-      - main
+      - trunk
     types:
       - closed
 

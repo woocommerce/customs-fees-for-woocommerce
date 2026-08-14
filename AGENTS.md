@@ -39,7 +39,7 @@ assets/css/             # Source CSS (admin.css, admin-improvements.css, fronten
 assets/js/              # Source JS (admin.js, frontend.js)
 languages/              # POT file only; translations are not auto-loaded (see Empty load_textdomain() note)
 docs/                   # Developer docs: CIF.md, HOWTO_DEBUG.md, QUICK_START.md, TESTING.md
-.github/workflows/      # CI: QIT tests, build, release, merge-to-main
+.github/workflows/      # CI: QIT tests, build, release, merge-to-trunk
 ```
 
 ### Architecture Notes
