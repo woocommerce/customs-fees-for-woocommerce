@@ -417,18 +417,13 @@ There is no local E2E suite. End-to-end coverage runs through WooCommerce QIT in
 
 ### Continuous integration
 
-GitHub Actions workflow runs on:
+CI runs WooCommerce QIT (Quality Insights Toolkit) tests remotely. There are no PHPUnit, PHPCS, or JavaScript test steps in CI -- PHPUnit runs locally only, via `composer test`.
 
-- Pull requests
-- Main branch commits
-- Release tags
+- `merge_to_trunk.yml` -- after a PR merges to `trunk`, builds the plugin and runs the QIT activation, security, phpcompatibility, validation, and phpstan tests.
+- `cron_qit.yml` -- weekly (Sundays at 02:00 UTC), runs the same tests plus woo-api, woo-e2e, and malware against WP stable / WC nightly.
+- `qit.yml` -- runs individual QIT tests on demand, via workflow dispatch or `needs: qit ... test` PR labels.
 
-Tests include:
-
-- PHPUnit (PHP 7.4, 8.0, 8.1, 8.2)
-- JavaScript tests
-- PHPCS coding standards
-- Plugin check validation
+The first two call `qit_runner.yml`, which defaults to PHP 8.4, while `qit.yml` runs the QIT CLI directly; the PHP versions in the recommended test environment above are manual-testing guidance and are not exercised by CI.
 
 ---
 
@@ -545,9 +540,8 @@ Using Debug Bar:
 
 #### Code quality
 
-- [ ] PHPCS passing
+- [ ] PHPStan passing
 - [ ] PHPUnit tests passing
-- [ ] JavaScript tests passing
 - [ ] No deprecated functions
 - [ ] Documentation complete
 
