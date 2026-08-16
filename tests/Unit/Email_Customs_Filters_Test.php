@@ -22,16 +22,34 @@ namespace WooCommerce\CustomsFees\Tests\Unit;
 class Email_Customs_Filters_Test extends \WC_Unit_Test_Case {
 
 	/**
-	 * Reset email-context action counters, screen, and filters between tests.
+	 * Reset email-context state before each test: earlier tests in the run
+	 * may have fired the email actions (did_action() counters are sticky for
+	 * the whole PHP process) or set an admin screen.
+	 */
+	public function setUp(): void {
+		parent::setUp();
+		$this->reset_email_context();
+	}
+
+	/**
+	 * Reset email-context state after each test to protect the rest of the
+	 * suite.
 	 */
 	public function tearDown(): void {
+		$this->reset_email_context();
+		parent::tearDown();
+	}
+
+	/**
+	 * Clear the email action counters, current screen, and email filters.
+	 */
+	private function reset_email_context(): void {
 		global $wp_actions, $current_screen;
 		unset( $wp_actions['woocommerce_email_header'] );
 		unset( $wp_actions['woocommerce_email_order_details'] );
 		$current_screen = null; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 		remove_all_filters( 'cfwc_show_hs_code_in_email' );
 		remove_all_filters( 'cfwc_show_origin_in_email' );
-		parent::tearDown();
 	}
 
 	/**
@@ -104,7 +122,7 @@ class Email_Customs_Filters_Test extends \WC_Unit_Test_Case {
 		$item = $this->order_item_with_customs_meta();
 
 		set_current_screen( 'edit-post' );
-		do_action( 'woocommerce_email_order_details', null, false, true, null );
+		do_action( 'woocommerce_email_order_details', $item->get_order(), false, true, null );
 
 		$name = $this->filtered_item_name( $item );
 
