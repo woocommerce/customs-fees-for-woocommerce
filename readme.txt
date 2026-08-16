@@ -191,8 +191,10 @@ Yes, through:
 
 == Changelog ==
 
-= 1.3.2 - 2026-xx-xx =
+= 1.3.3 - 2026-xx-xx =
 * Fix - Origin and HS code shown in order emails despite the cfwc_show_origin_in_email and cfwc_show_hs_code_in_email filters, and customs info duplicated, when emails were generated from an admin request.
+
+= 1.3.2 - 2026-08-05 =
 * Tweak - Remove product block editor compatibility declaration.
 
 = 1.3.1 - 2026-07-27 =
