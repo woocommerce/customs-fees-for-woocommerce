@@ -19,7 +19,7 @@
 | Layer | Tool |
 |-------|------|
 | PHP | >= 7.4 (no namespaces, `CFWC_` prefix convention) |
-| WordPress | >= 6.9, tested up to 7.0 |
+| WordPress | >= 7.0, tested up to 7.1 |
 | WooCommerce | >= 10.8, tested up to 11.0 |
 | Node | 22.14.0 (pinned in `.nvmrc`) |
 | Package manager | pnpm >= 10.4.1 |

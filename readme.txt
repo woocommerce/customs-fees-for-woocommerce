@@ -1,8 +1,8 @@
 === Customs Fees for WooCommerce ===
 Contributors: woocommerce
 Tags: woocommerce, customs, import-fees, international-shipping, tariffs
-Requires at least: 6.9
-Tested up to: 7.0
+Requires at least: 7.0
+Tested up to: 7.1
 Requires PHP: 7.4
 Requires Plugins: woocommerce
 WC requires at least: 10.8
@@ -193,6 +193,7 @@ Yes, through:
 
 = 1.3.2 - 2026-xx-xx =
 * Tweak - Remove product block editor compatibility declaration.
+* Tweak - WordPress 7.1 Compatibility.
 
 = 1.3.1 - 2026-07-27 =
 * Tweak - WooCommerce 11.0 Compatibility.

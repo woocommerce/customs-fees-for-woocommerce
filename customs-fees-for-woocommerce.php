@@ -11,8 +11,8 @@
  * Text Domain:       customs-fees-for-woocommerce
  * Domain Path:       /languages
  * Requires Plugins:  woocommerce
- * Requires at least: 6.9
- * Tested up to:      7.0
+ * Requires at least: 7.0
+ * Tested up to:      7.1
  * Requires PHP:      7.4
  * WC requires at least: 10.8
  * WC tested up to:   11.0
