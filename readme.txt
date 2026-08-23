@@ -194,7 +194,7 @@ Yes, through:
 = 1.3.3 - 2026-xx-xx =
 * Tweak - WordPress 7.1 Compatibility.
 
-= 1.3.2 - 2026-xx-xx =
+= 1.3.2 - 2026-08-05 =
 * Tweak - Remove product block editor compatibility declaration.
 
 = 1.3.1 - 2026-07-27 =
