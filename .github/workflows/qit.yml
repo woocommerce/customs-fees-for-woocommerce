@@ -40,6 +40,7 @@ jobs:
     needs: build
     name: Run QIT
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     env:
       NO_COLOR: 1
