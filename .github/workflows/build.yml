@@ -15,6 +15,7 @@ jobs:
   build:
     name: Build plugin artifact (zip file)
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     outputs:
       plugin_name: ${{ inputs.plugin_name }}
     env:
