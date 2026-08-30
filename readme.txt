@@ -5,8 +5,8 @@ Requires at least: 7.0
 Tested up to: 7.1
 Requires PHP: 7.4
 Requires Plugins: woocommerce
-WC requires at least: 10.8
-WC tested up to: 11.0
+WC requires at least: 10.9
+WC tested up to: 11.1
 Stable tag: 1.3.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -190,6 +190,9 @@ Yes, through:
 8. Email with customs fee information
 
 == Changelog ==
+
+= 1.3.4 - 2026-xx-xx =
+* Tweak - WooCommerce 11.1 Compatibility.
 
 = 1.3.3 - 2026-xx-xx =
 * Tweak - WordPress 7.1 Compatibility.
