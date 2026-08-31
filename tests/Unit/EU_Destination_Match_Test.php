@@ -166,4 +166,105 @@ class EU_Destination_Match_Test extends \WC_Unit_Test_Case {
 			);
 		}
 	}
+
+	/**
+	 * @testdox Saving the settings keeps the destination of a legacy `country`-only rule.
+	 *
+	 * A rule applied from a preset carries its destination in the legacy
+	 * `country` field and has no `to_country`. Saving the settings page must
+	 * not turn that into an empty `to_country`: every destination read is
+	 * `to_country ?? country`, so an empty new-format value shadows the
+	 * legacy one and the fee starts applying to every country.
+	 */
+	public function test_saving_settings_keeps_legacy_eu_destination(): void {
+		$posted = array(
+			array(
+				'rule_id'        => 'eu_vat_vat',
+				'country'        => 'EU',
+				'origin_country' => '',
+				'type'           => 'percentage',
+				'rate'           => 20,
+				'label'          => 'EU VAT (Import)',
+			),
+		);
+
+		$saved = $this->save_posted_rules( $posted );
+
+		$this->assertSame( 'EU', $saved[0]['to_country'], 'The legacy destination should be carried into to_country.' );
+		$this->assertSame(
+			array( 'eu_import' ),
+			wp_list_pluck( $this->matcher->find_matching_rules( $this->make_product(), 'CN', 'DE', array( $this->as_rule( $saved[0] ) ) ), 'rule_id' ),
+			'The saved rule should still match an EU destination.'
+		);
+		$this->assertSame(
+			array(),
+			wp_list_pluck( $this->matcher->find_matching_rules( $this->make_product(), 'CN', 'US', array( $this->as_rule( $saved[0] ) ) ), 'rule_id' ),
+			'The saved rule must not match a non-EU destination.'
+		);
+	}
+
+	/**
+	 * @testdox Saving the settings honours an explicit "Any destination" choice.
+	 *
+	 * The editor always posts `to_country`, so an empty one is a deliberate
+	 * choice and must win over whatever the legacy `country` field still holds.
+	 */
+	public function test_saving_settings_honours_explicit_any_destination(): void {
+		$posted = array(
+			array(
+				'rule_id'      => 'eu_vat_vat',
+				'country'      => 'EU',
+				'to_country'   => '',
+				'from_country' => 'CN',
+				'type'         => 'percentage',
+				'rate'         => 20,
+				'label'        => 'EU VAT (Import)',
+			),
+		);
+
+		$saved = $this->save_posted_rules( $posted );
+
+		$this->assertSame( '', $saved[0]['to_country'], 'An explicit empty destination should be kept.' );
+		$this->assertSame( '', $saved[0]['country'], 'The legacy field should follow the explicit destination.' );
+		$this->assertSame(
+			array( 'eu_import' ),
+			wp_list_pluck( $this->matcher->find_matching_rules( $this->make_product(), 'CN', 'US', array( $this->as_rule( $saved[0] ) ) ), 'rule_id' ),
+			'A rule saved with any destination should match a non-EU destination.'
+		);
+	}
+
+	/**
+	 * Run the posted rules through the settings save and return what was stored.
+	 *
+	 * @param array $posted Rules as the admin page posts them.
+	 * @return array Stored rules.
+	 */
+	private function save_posted_rules( array $posted ): array {
+		global $current_section;
+
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+
+		$current_section     = 'customs';
+		$_POST['cfwc_rules'] = wp_slash( wp_json_encode( $posted ) );
+
+		$settings = new \CFWC_Settings();
+		$settings->save_customs_settings();
+
+		unset( $_POST['cfwc_rules'] );
+		$current_section = '';
+
+		return get_option( 'cfwc_rules', array() );
+	}
+
+	/**
+	 * Give a stored rule the shared test rule_id so the assertions read the same.
+	 *
+	 * @param array $rule Stored rule.
+	 * @return array Rule data.
+	 */
+	private function as_rule( array $rule ): array {
+		$rule['rule_id'] = 'eu_import';
+
+		return $rule;
+	}
 }
