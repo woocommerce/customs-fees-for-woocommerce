@@ -193,6 +193,7 @@ Yes, through:
 
 = 1.3.4 - 2026-xx-xx =
 * Fix - Origin and HS code shown in order emails despite the cfwc_show_origin_in_email and cfwc_show_hs_code_in_email filters, and customs info duplicated, when emails were generated from an admin request.
+* Tweak - Emails generated from admin requests now use the standard email format for item customs info, showing the two-letter origin code.
 * Tweak - WooCommerce 11.1 Compatibility.
 
 = 1.3.3 - 2026-xx-xx =
