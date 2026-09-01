@@ -100,10 +100,11 @@ jobs:
     needs: qit-tests
     name: Handle success
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     env:
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
     steps:
-      - uses: act10ns/slack@v2
+      - uses: act10ns/slack@d96404edccc6d6467fc7f8134a420c851b1e9054 # v2
         with:
           status: success
           message: 'Test Runner Workflow <{{workflowUrl}}|{{workflow}}> with run ID <{{workflowRunUrl}}|{{runId}}> passed.'
@@ -113,10 +114,11 @@ jobs:
     needs: qit-tests
     name: Handle cancellation
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     env:
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
     steps:
-      - uses: act10ns/slack@v2
+      - uses: act10ns/slack@d96404edccc6d6467fc7f8134a420c851b1e9054 # v2
         with:
           status: cancelled
           message: 'Test Runner Workflow <{{workflowUrl}}|{{workflow}}> with run ID <{{workflowRunUrl}}|{{runId}}> cancelled.'
@@ -126,10 +128,11 @@ jobs:
     needs: qit-tests
     name: Handle failure
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     env:
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
     steps:
-      - uses: act10ns/slack@v2
+      - uses: act10ns/slack@d96404edccc6d6467fc7f8134a420c851b1e9054 # v2
         with:
           status: failure
           message: 'Test Runner Workflow <{{workflowUrl}}|{{workflow}}> with run ID <{{workflowRunUrl}}|{{runId}}> failed.'
