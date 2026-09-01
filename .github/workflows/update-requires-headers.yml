@@ -7,7 +7,7 @@ on:
 
 env:
   PLUGIN_FILE_NAME: "customs-fees-for-woocommerce.php"
-  MAIN_BRANCH: "main"
+  MAIN_BRANCH: "trunk"
 
 jobs:
   update-headers:
