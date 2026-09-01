@@ -1,12 +1,12 @@
 === Customs Fees for WooCommerce ===
 Contributors: woocommerce
 Tags: woocommerce, customs, import-fees, international-shipping, tariffs
-Requires at least: 6.9
-Tested up to: 7.0
+Requires at least: 7.0
+Tested up to: 7.1
 Requires PHP: 7.4
 Requires Plugins: woocommerce
-WC requires at least: 10.8
-WC tested up to: 11.0
+WC requires at least: 10.9
+WC tested up to: 11.1
 Stable tag: 1.3.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -191,8 +191,12 @@ Yes, through:
 
 == Changelog ==
 
-= 1.3.3 - 2026-xx-xx =
+= 1.3.4 - 2026-xx-xx =
 * Fix - Origin and HS code shown in order emails despite the cfwc_show_origin_in_email and cfwc_show_hs_code_in_email filters, and customs info duplicated, when emails were generated from an admin request.
+* Tweak - WooCommerce 11.1 Compatibility.
+
+= 1.3.3 - 2026-xx-xx =
+* Tweak - WordPress 7.1 Compatibility.
 
 = 1.3.2 - 2026-08-05 =
 * Tweak - Remove product block editor compatibility declaration.

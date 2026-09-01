@@ -344,9 +344,14 @@ GNU General Public License for more details.
 
 ## Changelog
 
-### Version 1.3.3
+### Version 1.3.4
 
 - Fixed the cfwc_show_origin_in_email and cfwc_show_hs_code_in_email filters being ignored, and customs info being duplicated, in order emails generated from an admin request.
+- WooCommerce 11.1 Compatibility.
+
+### Version 1.3.3
+
+- WordPress 7.1 Compatibility.
 
 ### Version 1.3.2
 
