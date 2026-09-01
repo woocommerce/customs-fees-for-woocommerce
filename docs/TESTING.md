@@ -422,6 +422,8 @@ CI runs WooCommerce QIT (Quality Insights Toolkit) tests remotely. There are no 
 - `merge_to_trunk.yml` -- after a PR merges to `trunk`, builds the plugin and runs the QIT activation, security, phpcompatibility, validation, and phpstan tests.
 - `cron_qit.yml` -- weekly (Sundays at 02:00 UTC), runs the same tests plus woo-api, woo-e2e, and malware against WP stable / WC nightly.
 - `qit.yml` -- runs individual QIT tests on demand, via workflow dispatch or `needs: qit ... test` PR labels.
+- `manual_qit.yml` -- workflow dispatch only, runs a selectable QIT test set against a chosen branch.
+- `update-requires-headers.yml` -- daily, keeps the WP/WC version requirement headers current and opens a PR when they change.
 
 The first two call `qit_runner.yml`, which defaults to PHP 8.4, while `qit.yml` runs the QIT CLI directly; the PHP versions in the recommended test environment above are manual-testing guidance and are not exercised by CI.
 
