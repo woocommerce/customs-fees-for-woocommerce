@@ -344,7 +344,11 @@ GNU General Public License for more details.
 
 ## Changelog
 
-### Version 1.3.2 - Unreleased
+### Version 1.3.3
+
+- WordPress 7.1 Compatibility.
+
+### Version 1.3.2
 
 - Removed the obsolete product block editor compatibility declaration, following the removal of that feature in WooCommerce 11.0.
 
