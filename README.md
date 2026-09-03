@@ -45,8 +45,8 @@ With the U.S. ending its de minimis exemption on **August 29, 2025**, all intern
 
 ### Minimum requirements
 
-- WordPress 6.9 or higher
-- WooCommerce 10.8 or higher
+- WordPress: see the `Requires at least` header in `customs-fees-for-woocommerce.php`
+- WooCommerce: see the `WC requires at least` header in `customs-fees-for-woocommerce.php`
 - PHP 7.4 or higher
 
 ### Manual installation
@@ -352,18 +352,25 @@ GNU General Public License for more details.
 
 - Removed the obsolete product block editor compatibility declaration, following the removal of that feature in WooCommerce 11.0.
 
-### Version 1.3.1
+### Version 1.3.1 - July 2026
 
-- WooCommerce 11.0 Compatibility.
+- WooCommerce 11.0 compatibility.
 
-### Version 1.3.0
+### Version 1.3.0 - June 2026
 
 - Updated the China to US tariff preset rates to reflect the current import regime after the IEEPA tariffs were struck down in February 2026; the apparel rate is corrected from 69% to about 24%.
 
-### Version 1.2.0
+### Version 1.2.1 - June 2026
 
 - Fixed rules with a blank destination country ("Any") or blank origin and destination ("Any → Any") being silently discarded on save and disappearing after page reload.
+- WooCommerce 10.9 compatibility.
+
+### Version 1.2.0 - June 2026
+
+- Added per-rule valuation overrides (FOB, CIF, CIF + Insurance) with compound base support, so a rule's customs value can include other rules' computed fees.
 - Fixed missing confirmation dialog when leaving page or saving settings with an unsaved rule open.
+- Updated built-in presets for Canada, Australia, New Zealand, UK, and EU to use correct duty vs. import tax valuation bases.
+- The `cfwc_customs_value` filter now passes the matching rule as a 5th argument; existing 4-argument callbacks remain backwards-compatible.
 
 ### Version 1.1.9 - May 2026
 
