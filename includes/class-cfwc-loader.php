@@ -236,20 +236,27 @@ class CFWC_Loader {
 		// Debug logging for calculated fees.
 		$this->debug_log( 'Calculated Fees', $fees );
 
+		// Only the main cart owns the session breakdown; a cloned (recurring) cart must not overwrite it.
+		$is_main_cart = isset( WC()->cart ) && $cart === WC()->cart;
+
 		if ( empty( $fees ) ) {
 			// Clear the breakdown from session if no fees.
-			WC()->session->set( 'cfwc_fees_breakdown', array() );
+			if ( $is_main_cart ) {
+				WC()->session->set( 'cfwc_fees_breakdown', array() );
+			}
 			return;
 		}
 
-		// Store tooltip text in session.
-		if ( class_exists( 'CFWC_Settings' ) ) {
-			$tooltip_text = CFWC_Settings::get_default_help_text();
-			WC()->session->set( 'cfwc_tooltip_text', $tooltip_text );
-		}
+		if ( $is_main_cart ) {
+			// Store tooltip text in session.
+			if ( class_exists( 'CFWC_Settings' ) ) {
+				$tooltip_text = CFWC_Settings::get_default_help_text();
+				WC()->session->set( 'cfwc_tooltip_text', $tooltip_text );
+			}
 
-		// Store the fee breakdown in session for display.
-		WC()->session->set( 'cfwc_fees_breakdown', $fees );
+			// Store the fee breakdown in session for display.
+			WC()->session->set( 'cfwc_fees_breakdown', $fees );
+		}
 
 		// Calculate total customs fees.
 		$total_amount = 0;
@@ -267,8 +274,8 @@ class CFWC_Loader {
 			}
 		}
 
-		// Add a single combined fee for all customs.
-		WC()->cart->add_fee(
+		// Add a single combined fee to the cart being calculated (may be a Subscriptions recurring clone, not WC()->cart).
+		$cart->add_fee(
 			__( 'Customs & Import Fees', 'customs-fees-for-woocommerce' ),
 			$total_amount,
 			$any_taxable,
