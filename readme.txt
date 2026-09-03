@@ -192,6 +192,7 @@ Yes, through:
 == Changelog ==
 
 = 1.3.4 - 2026-xx-xx =
+* Fix - Customs fee was missing from the subscription recurring total and renewal orders with WooCommerce Subscriptions.
 * Tweak - WooCommerce 11.1 Compatibility.
 
 = 1.3.3 - 2026-xx-xx =

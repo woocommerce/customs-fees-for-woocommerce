@@ -344,6 +344,11 @@ GNU General Public License for more details.
 
 ## Changelog
 
+### Version 1.3.4
+
+- Fixed the customs fee missing from the subscription recurring total and renewal orders with WooCommerce Subscriptions.
+- WooCommerce 11.1 Compatibility.
+
 ### Version 1.3.3
 
 - WordPress 7.1 Compatibility.
