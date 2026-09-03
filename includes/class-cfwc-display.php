@@ -69,8 +69,7 @@ class CFWC_Display {
 			return $cart_totals_fee_html;
 		}
 
-		// Get the breakdown from session.
-		$breakdown = WC()->session->get( 'cfwc_fees_breakdown', array() );
+		$breakdown = $this->get_fee_breakdown( $fee );
 		if ( empty( $breakdown ) ) {
 			return $cart_totals_fee_html;
 		}
@@ -146,13 +145,44 @@ class CFWC_Display {
 			return;
 		}
 
-		$breakdown = WC()->session->get( 'cfwc_fees_breakdown', array() );
+		$breakdown = $this->get_fee_breakdown( $fee );
 		if ( ! empty( $breakdown ) ) {
 			// Save breakdown to the fee item itself as well.
 			$item->add_meta_data( '_cfwc_breakdown', $breakdown );
 			// Also ensure it's on the order.
 			$order->update_meta_data( '_cfwc_fees_breakdown', $breakdown );
 		}
+	}
+
+	/**
+	 * Get the breakdown for a cart fee object.
+	 *
+	 * The fee carries the breakdown of the cart it was computed for, which
+	 * differs from the session copy on a Subscriptions recurring cart. A fee
+	 * built elsewhere (a renewal cart re-adds it from the order) falls back to
+	 * the session copy only when that copy adds up to the fee amount.
+	 *
+	 * @since 1.3.4
+	 * @param object $fee Cart fee object.
+	 * @return array Breakdown entries, empty when none apply.
+	 */
+	private function get_fee_breakdown( $fee ) {
+		if ( ! empty( $fee->cfwc_breakdown ) && is_array( $fee->cfwc_breakdown ) ) {
+			return $fee->cfwc_breakdown;
+		}
+
+		$breakdown = (array) WC()->session->get( 'cfwc_fees_breakdown', array() );
+		$sum       = 0.0;
+		foreach ( $breakdown as $entry ) {
+			$sum += is_array( $entry ) ? (float) ( $entry['amount'] ?? 0 ) : 0.0;
+		}
+
+		$amount = (float) ( $fee->amount ?? $fee->total ?? 0 );
+		if ( abs( $sum - $amount ) > 0.005 ) {
+			return array();
+		}
+
+		return $breakdown;
 	}
 
 	/**

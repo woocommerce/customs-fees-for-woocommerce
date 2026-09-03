@@ -1,5 +1,8 @@
 *** Customs Fees for WooCommerce Changelog ***
 
+2026-xx-xx - version 1.3.5
+* Fix - Customs fee was missing from the subscription recurring total and renewal orders with WooCommerce Subscriptions.
+
 2026-09-03 - version 1.3.4
 * Tweak - WooCommerce 11.1 Compatibility.
 
