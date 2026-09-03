@@ -266,6 +266,14 @@ class CFWC_Display {
 	 * @return string Modified item name.
 	 */
 	public function add_hs_code_to_order_item_display( $item_name, $item, $is_visible = true ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- Required by hook signature.
+		// Emails are handled by CFWC_Emails, which applies the
+		// cfwc_show_hs_code_in_email and cfwc_show_origin_in_email filters.
+		// Emails can render while is_admin() is true (status change, resend,
+		// admin-ajax, Action Scheduler), so detect email context directly.
+		if ( CFWC_Emails::is_rendering_email() ) {
+			return $item_name;
+		}
+
 		// Only add to order pages, not emails.
 		if ( ! is_wc_endpoint_url( 'view-order' ) && ! is_order_received_page() && ! is_admin() ) {
 			return $item_name;
