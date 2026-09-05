@@ -191,6 +191,11 @@ Yes, through:
 
 == Changelog ==
 
+= 1.3.5 - 2026-xx-xx =
+* Fix    - Add "EU Countries" as a selectable option in the rule editor's origin and destination country dropdowns, so EU-wide rules (such as the "EU VAT & Duty" preset) can be created and edited. Previously editing such a rule silently reset its destination to "Any", which applied the fee to every country.
+* Fix    - The rule editor no longer misreads a destination-only rule's legacy country field as its origin when editing (the "EU VAT & Duty" preset incorrectly showed "EU" in the From field).
+* Fix    - Saving the customs settings no longer clears the destination of a rule that keeps it in the legacy country field, which made preset rules such as "EU VAT & Duty" charge their fee on every order instead of EU orders only.
+
 = 1.3.4 - 2026-xx-xx =
 * Tweak - WooCommerce 11.1 Compatibility.
 

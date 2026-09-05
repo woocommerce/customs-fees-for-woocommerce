@@ -344,6 +344,12 @@ GNU General Public License for more details.
 
 ## Changelog
 
+### Version 1.3.5
+
+- Added "EU Countries" as a selectable option in the rule editor's origin and destination country dropdowns, so EU-wide rules (such as the "EU VAT & Duty" preset) can be created and edited. Previously editing such a rule silently reset its destination to "Any", which applied the fee to every country.
+- Fixed the rule editor misreading a destination-only rule's legacy country field as its origin when editing.
+- Fixed saving the customs settings clearing the destination of a rule that keeps it in the legacy country field, which made preset rules such as "EU VAT & Duty" charge their fee on every order instead of EU orders only.
+
 ### Version 1.3.3
 
 - WordPress 7.1 Compatibility.
