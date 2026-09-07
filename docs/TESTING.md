@@ -33,9 +33,9 @@ This guide provides comprehensive testing procedures to ensure Customs Fees for 
 ### Recommended test environment
 
 - **Local development**: Local by Flywheel, DevKinsta, or XAMPP
-- **WordPress**: Latest stable version and minimum supported (6.0)
-- **WooCommerce**: Latest stable version and minimum supported (8.0)
-- **PHP**: Test on 7.4, 8.0, 8.1, and 8.2
+- **WordPress**: Latest stable version and minimum supported (6.9)
+- **WooCommerce**: Latest stable version and minimum supported (10.8)
+- **PHP**: Test on 7.4 (minimum supported), 8.3, and 8.4
 - **Database**: MySQL 5.6+ or MariaDB 10.0+
 
 ### Essential test data
@@ -282,9 +282,9 @@ Create three USD $10 fees and test each mode:
 
 ### 1. WordPress compatibility
 
-#### Test: Minimum version (6.0)
+#### Test: Minimum version (6.9)
 
-1. Install on WordPress 6.0
+1. Install on WordPress 6.9
 2. Test all features
 3. **Expected**: Full functionality
 
@@ -411,54 +411,21 @@ Run unit tests:
 composer test
 ```
 
-Test coverage:
-
-```bash
-composer test-coverage
-```
-
-### JavaScript tests
-
-Run Jest tests:
-
-```bash
-npm test
-```
-
-Watch mode:
-
-```bash
-npm test -- --watch
-```
-
 ### End-to-end tests
 
-Using Playwright:
-
-```bash
-npm run test:e2e
-```
-
-Specific test:
-
-```bash
-npm run test:e2e -- --grep "checkout"
-```
+There is no local E2E suite. End-to-end coverage runs through WooCommerce QIT in CI (see the `qit` workflows in `.github/workflows/`).
 
 ### Continuous integration
 
-GitHub Actions workflow runs on:
+CI runs WooCommerce QIT (Quality Insights Toolkit) tests remotely. There are no PHPUnit, PHPCS, or JavaScript test steps in CI -- PHPUnit runs locally only, via `composer test`.
 
-- Pull requests
-- Main branch commits
-- Release tags
+- `merge_to_trunk.yml` -- after a PR merges to `trunk`, builds the plugin and runs the QIT activation, security, phpcompatibility, validation, and phpstan tests.
+- `cron_qit.yml` -- weekly (Sundays at 02:00 UTC), runs the same tests plus woo-api, woo-e2e, and malware against WP stable / WC nightly.
+- `qit.yml` -- runs individual QIT tests on demand, via workflow dispatch or `needs: qit ... test` PR labels.
+- `manual_qit.yml` -- workflow dispatch only, runs a selectable QIT test set against a chosen branch.
+- `maintenance-update-version-requirements.yml` -- daily, keeps the WP/WC/PHP version requirement headers current and opens a PR when a bump is needed.
 
-Tests include:
-
-- PHPUnit (PHP 7.4, 8.0, 8.1, 8.2)
-- JavaScript tests
-- PHPCS coding standards
-- Plugin check validation
+The first two call `qit_runner.yml`, which defaults to PHP 8.4, while `qit.yml` runs the QIT CLI directly; the PHP versions in the recommended test environment above are manual-testing guidance and are not exercised by CI.
 
 ---
 
@@ -547,9 +514,9 @@ Using Debug Bar:
 
 #### Compatibility
 
-- [ ] WordPress 6.0+
-- [ ] WooCommerce 8.0+
-- [ ] PHP 7.4, 8.0, 8.1, 8.2
+- [ ] WordPress 6.9+
+- [ ] WooCommerce 10.8+
+- [ ] PHP 7.4, 8.3, 8.4
 - [ ] HPOS enabled
 - [ ] HPOS disabled
 - [ ] Block checkout
@@ -575,9 +542,8 @@ Using Debug Bar:
 
 #### Code quality
 
-- [ ] PHPCS passing
+- [ ] PHPStan passing
 - [ ] PHPUnit tests passing
-- [ ] JavaScript tests passing
 - [ ] No deprecated functions
 - [ ] Documentation complete
 
