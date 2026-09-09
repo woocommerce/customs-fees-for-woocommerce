@@ -261,6 +261,18 @@ class CFWC_Settings {
 							: array(),
 					);
 
+					// Keep the two destination fields in step. The legacy `country`
+					// field is the destination, and every read of it is
+					// `to_country ?? country`, so writing an empty `to_country` for a
+					// rule posted in the legacy shape (a preset rule that has never
+					// been through the editor) would shadow the legacy value and make
+					// the fee apply to every country.
+					if ( isset( $rule['to_country'] ) ) {
+						$sanitized_rule['country'] = $sanitized_rule['to_country'];
+					} else {
+						$sanitized_rule['to_country'] = $sanitized_rule['country'];
+					}
+
 					// Only add if at least one country field is set, or the rule has a non-zero rate/amount.
 					if ( ! empty( $sanitized_rule['country'] ) || ! empty( $sanitized_rule['to_country'] ) || ! empty( $sanitized_rule['from_country'] ) || $sanitized_rule['rate'] > 0 || $sanitized_rule['amount'] > 0 ) {
 						$rules[] = $sanitized_rule;
