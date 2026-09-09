@@ -1,8 +1,14 @@
 *** Customs Fees for WooCommerce Changelog ***
 
-2026-xx-xx - version 1.3.5
-* Fix - Origin and HS code shown in order emails despite the cfwc_show_origin_in_email and cfwc_show_hs_code_in_email filters, and customs info duplicated, when emails were generated from an admin request.
+2026-xx-xx - version 1.3.6
+* Fix    - Origin and HS code shown in order and fulfillment emails despite the cfwc_show_origin_in_email and cfwc_show_hs_code_in_email filters, and customs info duplicated, when emails were generated from an admin request.
 * Tweak - Emails generated from admin requests now use the standard email format for item customs info, showing the two-letter origin code.
+* Tweak - Item HS code and origin are no longer added to plain text and multipart order emails, where those two filters cannot run.
+
+2026-09-07 - version 1.3.5
+* Fix    - Add "EU Countries" as a selectable option in the rule editor's origin and destination country dropdowns, so EU-wide rules (such as the "EU VAT & Duty" preset) can be created and edited. Previously editing such a rule silently reset its destination to "Any", which applied the fee to every country.
+* Fix    - The rule editor no longer misreads a destination-only rule's legacy country field as its origin when editing (the "EU VAT & Duty" preset incorrectly showed "EU" in the From field).
+* Fix    - Saving the customs settings no longer clears the destination of a rule that keeps it in the legacy country field, which made preset rules such as "EU VAT & Duty" charge their fee on every order instead of EU orders only.
 
 2026-09-03 - version 1.3.4
 * Tweak - WooCommerce 11.1 Compatibility.
@@ -25,7 +31,6 @@
 
 2026-06-01 - version 1.2.0
 * Add    - Per-rule valuation overrides (FOB, CIF, CIF + Insurance) with compound base support, so a rule's customs value can include other rules' computed fees.
-* Fix    - Rules with a blank destination country ("Any") or blank origin and destination ("Any → Any") being silently discarded on save and disappearing after page reload.
 * Fix    - Show confirmation dialog when leaving page or saving settings with an unsaved rule open.
 * Update - Built-in presets for Canada, Australia, New Zealand, UK, and EU now use correct duty vs. import tax valuation bases.
 * Dev    - `cfwc_customs_value` filter now passes the matching rule as a 5th argument; existing 4-argument callbacks remain backwards-compatible.

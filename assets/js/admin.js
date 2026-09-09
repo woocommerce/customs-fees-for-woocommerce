@@ -578,6 +578,17 @@
         '<option value="">' +
         (strings.select_country_placeholder || "Select country...") +
         "</option>";
+      // "EU Countries" is a supported pseudo-code for both the From and To
+      // fields (the rule matcher expands "EU" to all EU member states). Offer
+      // it explicitly so it can be selected manually and stays selected when
+      // editing a rule that already targets the EU (e.g. the "EU VAT & Duty"
+      // preset), instead of silently falling back to "Any".
+      html +=
+        '<option value="EU"' +
+        (selectedCountry === "EU" ? " selected" : "") +
+        ">" +
+        (strings.eu_countries || "EU Countries") +
+        "</option>";
       for (var code in countries) {
         html +=
           '<option value="' +
@@ -588,36 +599,6 @@
           countries[code] +
           "</option>";
       }
-      return html;
-    }
-
-    // Build origin country options (including special options).
-    function getOriginOptions(selectedOrigin) {
-      var html =
-        '<option value="">' +
-        (strings.all_origins || "All Origins") +
-        "</option>";
-      html +=
-        '<option value="EU"' +
-        (selectedOrigin === "EU" ? " selected" : "") +
-        ">" +
-        (strings.eu_countries || "EU Countries") +
-        "</option>";
-      html +=
-        '<optgroup label="' +
-        (strings.specific_country || "Specific Country") +
-        '">';
-      for (var code in countries) {
-        html +=
-          '<option value="' +
-          code +
-          '"' +
-          (code === selectedOrigin ? " selected" : "") +
-          ">" +
-          countries[code] +
-          "</option>";
-      }
-      html += "</optgroup>";
       return html;
     }
 
@@ -892,9 +873,11 @@
         '">';
       editRowHtml +=
         '<option value="">Any Origin</option>' +
-        getCountryOptions(
-          rule.from_country || rule.origin_country || rule.country || ""
-        );
+        // Origin falls back to the legacy `origin_country` only. Do NOT fall
+        // back to `country`: that legacy field holds the *destination*, so
+        // using it here would render a destination-only rule (e.g. the
+        // "EU VAT & Duty" preset) as if it also restricted the origin.
+        getCountryOptions(rule.from_country || rule.origin_country || "");
       editRowHtml += "</select>";
       editRowHtml +=
         '<select name="cfwc_rule_to_country" class="cfwc-rule-field cfwc-rule-field--country cfwc-country-select wc-enhanced-select cfwc-select2-field" data-field="to_country" data-placeholder="' +
