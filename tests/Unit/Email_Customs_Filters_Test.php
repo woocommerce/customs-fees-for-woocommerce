@@ -20,6 +20,9 @@ namespace WooCommerce\CustomsFees\Tests\Unit;
  * @covers \CFWC_Emails::add_hs_code_to_order_item
  * @covers \CFWC_Emails::is_rendering_email
  * @covers \CFWC_Emails::is_rendering_html_email
+ * @covers \CFWC_Emails::capture_email_format
+ * @covers \CFWC_Emails::capture_fulfillment_email_format
+ * @covers \CFWC_Emails::release_email_format
  */
 class Email_Customs_Filters_Test extends \WC_Unit_Test_Case {
 
@@ -74,8 +77,39 @@ class Email_Customs_Filters_Test extends \WC_Unit_Test_Case {
 		};
 
 		add_action( 'woocommerce_email_order_details', $capture, 20 );
+		ob_start();
 		do_action( 'woocommerce_email_order_details', $item->get_order(), false, $plain_text, null );
+		ob_end_clean();
 		remove_action( 'woocommerce_email_order_details', $capture, 20 );
+
+		return $name;
+	}
+
+	/**
+	 * Run the item name filter while woocommerce_email_fulfillment_details is
+	 * executing, as the fulfillment email item templates do.
+	 *
+	 * WooCommerce fires this action as ( $order, $fulfillment, $sent_to_admin,
+	 * $plain_text, $email ), so the plain text flag sits one position later
+	 * than on woocommerce_email_order_details. Passing all four positionally is
+	 * the point of these tests: read one position off and a fulfillment email
+	 * sent to an admin would silently be treated as plain text.
+	 *
+	 * @param \WC_Order_Item_Product $item       Order item.
+	 * @param bool                   $plain_text Render as plain text email.
+	 * @return string Filtered item name.
+	 */
+	private function item_name_during_fulfillment_email( \WC_Order_Item_Product $item, bool $plain_text = false ): string {
+		$name    = '';
+		$capture = function () use ( &$name, $item ): void {
+			$name = $this->filtered_item_name( $item );
+		};
+
+		add_action( 'woocommerce_email_fulfillment_details', $capture, 20 );
+		ob_start();
+		do_action( 'woocommerce_email_fulfillment_details', $item->get_order(), null, false, $plain_text, null );
+		ob_end_clean();
+		remove_action( 'woocommerce_email_fulfillment_details', $capture, 20 );
 
 		return $name;
 	}
@@ -174,5 +208,62 @@ class Email_Customs_Filters_Test extends \WC_Unit_Test_Case {
 		$this->assertStringContainsString( 'cfwc-order-customs', $name, 'After an email, a page render must get CFWC_Display markup, not be treated as an email.' );
 		$this->assertSame( 1, substr_count( $name, 'HS Code' ), 'After an email, a page render must show the HS code exactly once.' );
 		$this->assertSame( 1, substr_count( $name, 'Origin' ), 'After an email, a page render must show the origin exactly once.' );
+	}
+
+	/** @testdox Both email filters set to false remove the HS code and origin from an admin-context HTML fulfillment email. */
+	public function test_email_filters_hide_customs_info_in_fulfillment_email(): void {
+		$item = $this->order_item_with_customs_meta();
+
+		set_current_screen( 'edit-post' );
+		add_filter( 'cfwc_show_hs_code_in_email', '__return_false' );
+		add_filter( 'cfwc_show_origin_in_email', '__return_false' );
+
+		$name = $this->item_name_during_fulfillment_email( $item );
+
+		$this->assertStringNotContainsString( 'HS Code', $name, 'cfwc_show_hs_code_in_email false must remove the HS code from the fulfillment email item name.' );
+		$this->assertStringNotContainsString( 'Origin', $name, 'cfwc_show_origin_in_email false must remove the origin from the fulfillment email item name.' );
+	}
+
+	/** @testdox With default filter values, customs info appears exactly once in an admin-context HTML fulfillment email. */
+	public function test_customs_info_appears_once_in_fulfillment_email(): void {
+		$item = $this->order_item_with_customs_meta();
+
+		set_current_screen( 'edit-post' );
+
+		$name = $this->item_name_during_fulfillment_email( $item );
+
+		$this->assertSame( 1, substr_count( $name, 'HS Code' ), 'CFWC_Display must not duplicate the HS code already added by CFWC_Emails in a fulfillment email.' );
+		$this->assertSame( 1, substr_count( $name, 'Origin' ), 'CFWC_Display must not duplicate the origin already added by CFWC_Emails in a fulfillment email.' );
+		$this->assertStringNotContainsString( 'cfwc-order-customs', $name, 'A fulfillment email must not carry the CFWC_Display markup.' );
+	}
+
+	/** @testdox A plain text fulfillment email rendered in an admin request gets no injected HTML. */
+	public function test_plain_text_fulfillment_email_gets_no_html(): void {
+		$item = $this->order_item_with_customs_meta();
+
+		set_current_screen( 'edit-post' );
+
+		$name = $this->item_name_during_fulfillment_email( $item, true );
+
+		$this->assertSame( $item->get_name(), $name, 'Neither class may inject HTML into a plain text fulfillment email item name.' );
+	}
+
+	/** @testdox An HTML email keeps its own format when a plain text email is rendered inside it. */
+	public function test_nested_plain_text_email_does_not_change_the_outer_html_email(): void {
+		$item = $this->order_item_with_customs_meta();
+
+		set_current_screen( 'edit-post' );
+
+		// Render a plain text fulfillment email from inside the outer HTML
+		// order email, the shape a plugin that mails an inline copy produces.
+		$nested = function () use ( $item ): void {
+			$this->item_name_during_fulfillment_email( $item, true );
+		};
+		add_action( 'woocommerce_email_order_details', $nested, 5 );
+		$name = $this->item_name_during_email( $item );
+		remove_action( 'woocommerce_email_order_details', $nested, 5 );
+
+		$this->assertSame( 1, substr_count( $name, 'HS Code' ), 'A nested plain text render must not strip the HS code from the outer HTML email.' );
+		$this->assertSame( 1, substr_count( $name, 'Origin' ), 'A nested plain text render must not strip the origin from the outer HTML email.' );
 	}
 }

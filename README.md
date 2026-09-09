@@ -348,7 +348,7 @@ GNU General Public License for more details.
 
 - Fixed the cfwc_show_origin_in_email and cfwc_show_hs_code_in_email filters being ignored, and customs info being duplicated, in order and fulfillment emails generated from an admin request.
 - Emails generated from admin requests now use the standard email format for item customs info, showing the two-letter origin code.
-- Item HS code and origin are no longer added to plain text and multipart order emails, where those two filters cannot run.
+- Item HS code and origin are no longer added to plain text emails, or to the plain text part of multipart emails, where the HTML markup could not render.
 
 ### Version 1.3.5
 

@@ -193,8 +193,8 @@ Yes, through:
 
 = 1.3.6 - 2026-xx-xx =
 * Fix    - Origin and HS code shown in order and fulfillment emails despite the cfwc_show_origin_in_email and cfwc_show_hs_code_in_email filters, and customs info duplicated, when emails were generated from an admin request.
-* Tweak - Emails generated from admin requests now use the standard email format for item customs info, showing the two-letter origin code.
-* Tweak - Item HS code and origin are no longer added to plain text and multipart order emails, where those two filters cannot run.
+* Tweak  - Emails generated from admin requests now use the standard email format for item customs info, showing the two-letter origin code.
+* Tweak  - Item HS code and origin are no longer added to plain text emails, or to the plain text part of multipart emails, where the HTML markup could not render.
 
 = 1.3.5 - 2026-xx-xx =
 * Fix    - Add "EU Countries" as a selectable option in the rule editor's origin and destination country dropdowns, so EU-wide rules (such as the "EU VAT & Duty" preset) can be created and edited. Previously editing such a rule silently reset its destination to "Any", which applied the fee to every country.

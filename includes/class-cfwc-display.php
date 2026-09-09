@@ -270,7 +270,7 @@ class CFWC_Display {
 		// cfwc_show_hs_code_in_email and cfwc_show_origin_in_email filters.
 		// Emails can render while is_admin() is true (status change, resend,
 		// admin-ajax, Action Scheduler), so detect email context directly.
-		if ( CFWC_Emails::is_rendering_email() ) {
+		if ( class_exists( 'CFWC_Emails' ) && CFWC_Emails::is_rendering_email() ) {
 			return $item_name;
 		}
 
