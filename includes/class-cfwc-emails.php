@@ -21,12 +21,31 @@ if ( ! defined( 'ABSPATH' ) ) {
 class CFWC_Emails {
 
 	/**
+	 * Plain text flag for each email render currently in flight.
+	 *
+	 * A stack, not a single flag: a callback on the email actions may render a
+	 * second email inline, and the inner render must not leave its format
+	 * behind for the rest of the outer one.
+	 *
+	 * @since 1.3.6
+	 * @var bool[]
+	 */
+	private static $email_format_stack = array();
+
+	/**
 	 * Initialize email handler.
 	 *
 	 * @since 1.0.0
 	 */
 	public function init() {
 		// REMOVED: add_filter for woocommerce_get_order_item_totals - handled by class-cfwc-display.php to avoid duplication.
+
+		// Record the email format before item names render, and drop it again once
+		// the render is done, so a nested email cannot outlive its own render.
+		add_action( 'woocommerce_email_order_details', array( __CLASS__, 'capture_email_format' ), 0, 3 );
+		add_action( 'woocommerce_email_fulfillment_details', array( __CLASS__, 'capture_fulfillment_email_format' ), 0, 4 );
+		add_action( 'woocommerce_email_order_details', array( __CLASS__, 'release_email_format' ), PHP_INT_MAX );
+		add_action( 'woocommerce_email_fulfillment_details', array( __CLASS__, 'release_email_format' ), PHP_INT_MAX );
 
 		// Add HS Codes to order item names in emails.
 		add_filter( 'woocommerce_order_item_name', array( $this, 'add_hs_code_to_order_item' ), 10, 3 );
@@ -111,6 +130,90 @@ class CFWC_Emails {
 	}
 
 	/**
+	 * Record whether the email being rendered is plain text.
+	 *
+	 * @internal
+	 *
+	 * @since 1.3.6
+	 * @param WC_Order $order         Order object.
+	 * @param bool     $sent_to_admin Whether sent to admin.
+	 * @param bool     $plain_text    Whether the email is plain text.
+	 */
+	public static function capture_email_format( $order, $sent_to_admin = false, $plain_text = false ) {
+		unset( $order, $sent_to_admin );
+		self::$email_format_stack[] = (bool) $plain_text;
+	}
+
+	/**
+	 * Record whether the fulfillment email being rendered is plain text.
+	 *
+	 * The fulfillment action passes the fulfillment as its second argument, so
+	 * the plain text flag sits one position later than on the order action.
+	 *
+	 * @internal
+	 *
+	 * @since 1.3.6
+	 * @param WC_Order $order         Order object.
+	 * @param mixed    $fulfillment   Fulfillment object.
+	 * @param bool     $sent_to_admin Whether sent to admin.
+	 * @param bool     $plain_text    Whether the email is plain text.
+	 */
+	public static function capture_fulfillment_email_format( $order, $fulfillment = null, $sent_to_admin = false, $plain_text = false ) {
+		unset( $order, $fulfillment, $sent_to_admin );
+		self::$email_format_stack[] = (bool) $plain_text;
+	}
+
+	/**
+	 * Discard the format recorded for the email render that just finished.
+	 *
+	 * @internal
+	 *
+	 * @since 1.3.6
+	 */
+	public static function release_email_format() {
+		array_pop( self::$email_format_stack );
+	}
+
+	/**
+	 * Whether an order email is currently rendering.
+	 *
+	 * doing_action() is only true while the action runs, so pages rendered
+	 * later in the same request are not mistaken for emails. The actions fire
+	 * for both HTML and plain text templates.
+	 *
+	 * @since 1.3.6
+	 * @return bool
+	 */
+	public static function is_rendering_email() {
+		return doing_action( 'woocommerce_email_order_details' )
+			|| doing_action( 'woocommerce_email_fulfillment_details' );
+	}
+
+	/**
+	 * Whether an HTML order email is currently rendering.
+	 *
+	 * @since 1.3.6
+	 * @return bool
+	 */
+	private static function is_rendering_html_email() {
+		return self::is_rendering_email() && ! self::current_render_is_plain_text();
+	}
+
+	/**
+	 * Whether the innermost email render in flight is plain text.
+	 *
+	 * @since 1.3.6
+	 * @return bool
+	 */
+	private static function current_render_is_plain_text() {
+		if ( empty( self::$email_format_stack ) ) {
+			return false;
+		}
+
+		return (bool) self::$email_format_stack[ count( self::$email_format_stack ) - 1 ];
+	}
+
+	/**
 	 * Add HS Code to order item display in emails.
 	 *
 	 * @since 1.0.0
@@ -127,8 +230,8 @@ class CFWC_Emails {
 			return $item_name;
 		}
 
-		// Only for emails (check if we're in an email context).
-		if ( ! did_action( 'woocommerce_email_header' ) ) {
+		// Only while an HTML email is rendering; the markup below is HTML.
+		if ( ! self::is_rendering_html_email() ) {
 			return $item_name;
 		}
 
