@@ -124,7 +124,28 @@ class CFWC_Display {
 	public function save_fee_breakdown_to_order( $order, $data ) {
 		// $data is required by the hook signature but not used.
 		unset( $data );
-		$breakdown = WC()->session->get( 'cfwc_fees_breakdown', array() );
+
+		// Core builds the fee lines before this hook fires, so the fee item has
+		// already stored the breakdown of the cart the order was built from.
+		if ( ! empty( $order->get_meta( '_cfwc_fees_breakdown', true ) ) ) {
+			return;
+		}
+
+		$total = 0.0;
+		$found = false;
+		foreach ( $order->get_fees() as $item ) {
+			if ( __( 'Customs & Import Fees', 'customs-fees-for-woocommerce' ) === $item->get_name() ) {
+				$total += (float) $item->get_total();
+				$found  = true;
+			}
+		}
+
+		// Without a customs fee on the order there is nothing for a breakdown to describe.
+		if ( ! $found ) {
+			return;
+		}
+
+		$breakdown = $this->get_session_breakdown( $total );
 		if ( ! empty( $breakdown ) ) {
 			$order->update_meta_data( '_cfwc_fees_breakdown', $breakdown );
 		}
@@ -157,18 +178,31 @@ class CFWC_Display {
 	/**
 	 * Get the breakdown for a cart fee object.
 	 *
-	 * The fee carries the breakdown of the cart it was computed for, which
-	 * differs from the session copy on a Subscriptions recurring cart. A fee
-	 * built elsewhere (a renewal cart re-adds it from the order) falls back to
-	 * the session copy only when that copy adds up to the fee amount.
-	 *
-	 * @since 1.3.4
-	 * @param object $fee Cart fee object.
+	 * @since 1.3.6
+	 * @param stdClass $fee Cart fee object.
 	 * @return array Breakdown entries, empty when none apply.
 	 */
 	private function get_fee_breakdown( $fee ) {
+		// The fee carries the breakdown of the cart it was computed for, which differs
+		// from the session copy on a Subscriptions recurring cart.
 		if ( ! empty( $fee->cfwc_breakdown ) && is_array( $fee->cfwc_breakdown ) ) {
 			return $fee->cfwc_breakdown;
+		}
+
+		// A fee built elsewhere, such as a renewal cart re-adding it from the order.
+		return $this->get_session_breakdown( (float) ( $fee->amount ?? 0 ) );
+	}
+
+	/**
+	 * Get the session breakdown when it describes a fee of the given amount.
+	 *
+	 * @since 1.3.6
+	 * @param float $amount Fee amount the breakdown must add up to.
+	 * @return array Breakdown entries, empty when the session copy describes another cart.
+	 */
+	private function get_session_breakdown( $amount ) {
+		if ( ! WC()->session ) {
+			return array();
 		}
 
 		$breakdown = (array) WC()->session->get( 'cfwc_fees_breakdown', array() );
@@ -177,8 +211,9 @@ class CFWC_Display {
 			$sum += is_array( $entry ) ? (float) ( $entry['amount'] ?? 0 ) : 0.0;
 		}
 
-		$amount = (float) ( $fee->amount ?? $fee->total ?? 0 );
-		if ( abs( $sum - $amount ) > 0.005 ) {
+		// Half a minor unit of the store currency, so the comparison follows its precision.
+		$tolerance = pow( 10, -wc_get_price_decimals() ) / 2;
+		if ( abs( $sum - $amount ) >= $tolerance ) {
 			return array();
 		}
 
