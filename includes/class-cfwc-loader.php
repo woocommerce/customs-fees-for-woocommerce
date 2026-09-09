@@ -230,50 +230,66 @@ class CFWC_Loader {
 			return;
 		}
 
-		// Calculate fees using calculator.
-		$fees = $this->calculator->calculate_fees( $cart );
+		// A cloned cart (a Subscriptions recurring cart) does not own the session and may ship nothing.
+		$is_main_cart = $cart === WC()->cart;
+
+		if ( ! $is_main_cart && ! $this->should_charge_cloned_cart( $cart ) ) {
+			return;
+		}
+
+		// Calculate fees using calculator. Entries come back through the cfwc_calculated_fees
+		// filter, so drop anything the display and order meta could not render.
+		$fees = $this->usable_fee_entries( $this->calculator->calculate_fees( $cart ) );
 
 		// Debug logging for calculated fees.
 		$this->debug_log( 'Calculated Fees', $fees );
 
+		if ( $is_main_cart ) {
+			WC()->session->set( 'cfwc_fees_breakdown', $fees );
+			if ( ! empty( $fees ) && class_exists( 'CFWC_Settings' ) ) {
+				WC()->session->set( 'cfwc_tooltip_text', CFWC_Settings::get_default_help_text() );
+			}
+		}
+
 		if ( empty( $fees ) ) {
-			// Clear the breakdown from session if no fees.
-			WC()->session->set( 'cfwc_fees_breakdown', array() );
 			return;
 		}
 
-		// Store tooltip text in session.
-		if ( class_exists( 'CFWC_Settings' ) ) {
-			$tooltip_text = CFWC_Settings::get_default_help_text();
-			WC()->session->set( 'cfwc_tooltip_text', $tooltip_text );
-		}
-
-		// Store the fee breakdown in session for display.
-		WC()->session->set( 'cfwc_fees_breakdown', $fees );
-
-		// Calculate total customs fees.
-		$total_amount = 0;
+		$total_amount = 0.0;
 		$any_taxable  = false;
 		$tax_class    = '';
 
 		foreach ( $fees as $fee ) {
-			$total_amount += $fee['amount'];
-			if ( isset( $fee['taxable'] ) && $fee['taxable'] ) {
+			$total_amount += (float) $fee['amount'];
+			if ( ! empty( $fee['taxable'] ) ) {
 				$any_taxable = true;
 			}
 			// Use the first tax class found.
-			if ( empty( $tax_class ) && isset( $fee['tax_class'] ) ) {
-				$tax_class = $fee['tax_class'];
+			if ( empty( $tax_class ) && ! empty( $fee['tax_class'] ) ) {
+				$tax_class = (string) $fee['tax_class'];
 			}
 		}
 
-		// Add a single combined fee for all customs.
-		WC()->cart->add_fee(
-			__( 'Customs & Import Fees', 'customs-fees-for-woocommerce' ),
-			$total_amount,
-			$any_taxable,
-			$tax_class
+		// Add a single combined fee to the cart being calculated, carrying its own breakdown for display and order meta.
+		$added = $cart->fees_api()->add_fee(
+			array(
+				'name'           => __( 'Customs & Import Fees', 'customs-fees-for-woocommerce' ),
+				'amount'         => $total_amount,
+				'taxable'        => $any_taxable,
+				'tax_class'      => $tax_class,
+				'cfwc_breakdown' => $fees,
+			)
 		);
+
+		// The cart already carries a fee of this name, such as one a renewal cart restored
+		// from its order. That fee stands, so the session must not describe ours instead.
+		if ( is_wp_error( $added ) ) {
+			if ( $is_main_cart ) {
+				WC()->session->set( 'cfwc_fees_breakdown', array() );
+			}
+			$this->debug_log( 'Combined Fee Not Added', $added->get_error_message() );
+			return;
+		}
 
 		// Debug log.
 		$this->debug_log(
@@ -283,6 +299,44 @@ class CFWC_Loader {
 				'breakdown_count' => count( $fees ),
 			)
 		);
+	}
+
+	/**
+	 * Keep only the fee entries the display and order meta can render.
+	 *
+	 * @since 1.3.6
+	 * @param mixed $fees Fee entries, as returned through the cfwc_calculated_fees filter.
+	 * @return array Entries with a label and a numeric amount.
+	 */
+	private function usable_fee_entries( $fees ) {
+		$usable = array();
+
+		foreach ( (array) $fees as $fee ) {
+			if ( is_array( $fee ) && isset( $fee['label'], $fee['amount'] ) && is_numeric( $fee['amount'] ) ) {
+				$usable[] = $fee;
+			}
+		}
+
+		return $usable;
+	}
+
+	/**
+	 * Whether a cloned cart should be charged a customs fee.
+	 *
+	 * @since 1.3.6
+	 * @param WC_Cart $cart Cart object.
+	 * @return bool
+	 */
+	private function should_charge_cloned_cart( $cart ) {
+		// Core reports needs_shipping() false for every cart when the store has no
+		// shipping methods, so the flag is only meaningful once shipping is configured.
+		if ( ! wc_shipping_enabled() || 0 === wc_get_shipping_method_count( true ) ) {
+			return true;
+		}
+
+		// Subscriptions marks a one-time-shipping recurring cart as not shipping through
+		// the woocommerce_cart_needs_shipping filter, which is the only signal it gives.
+		return (bool) $cart->needs_shipping();
 	}
 
 	/**
