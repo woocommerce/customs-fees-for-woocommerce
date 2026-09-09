@@ -38,6 +38,7 @@ class CFWC_Emails {
 
 		// Record the email format before item names render.
 		add_action( 'woocommerce_email_order_details', array( __CLASS__, 'capture_email_format' ), 0, 3 );
+		add_action( 'woocommerce_email_fulfillment_details', array( __CLASS__, 'capture_fulfillment_email_format' ), 0, 4 );
 
 		// Add HS Codes to order item names in emails.
 		add_filter( 'woocommerce_order_item_name', array( $this, 'add_hs_code_to_order_item' ), 10, 3 );
@@ -124,6 +125,7 @@ class CFWC_Emails {
 	/**
 	 * Record whether the email being rendered is plain text.
 	 *
+	 * @internal
 	 * @since 1.3.4
 	 * @param WC_Order $order         Order object.
 	 * @param bool     $sent_to_admin Whether sent to admin.
@@ -135,17 +137,36 @@ class CFWC_Emails {
 	}
 
 	/**
+	 * Record whether the fulfillment email being rendered is plain text.
+	 *
+	 * The fulfillment action passes the fulfillment as its second argument, so
+	 * the plain text flag sits one position later than on the order action.
+	 *
+	 * @internal
+	 * @since 1.3.6
+	 * @param WC_Order $order         Order object.
+	 * @param mixed    $fulfillment   Fulfillment object.
+	 * @param bool     $sent_to_admin Whether sent to admin.
+	 * @param bool     $plain_text    Whether the email is plain text.
+	 */
+	public static function capture_fulfillment_email_format( $order, $fulfillment = null, $sent_to_admin = false, $plain_text = false ) {
+		unset( $order, $fulfillment, $sent_to_admin );
+		self::$rendering_plain_text = (bool) $plain_text;
+	}
+
+	/**
 	 * Whether an order email is currently rendering.
 	 *
 	 * doing_action() is only true while the action runs, so pages rendered
-	 * later in the same request are not mistaken for emails. The action fires
+	 * later in the same request are not mistaken for emails. The actions fire
 	 * for both HTML and plain text templates.
 	 *
 	 * @since 1.3.4
 	 * @return bool
 	 */
 	public static function is_rendering_email() {
-		return doing_action( 'woocommerce_email_order_details' );
+		return doing_action( 'woocommerce_email_order_details' )
+			|| doing_action( 'woocommerce_email_fulfillment_details' );
 	}
 
 	/**
