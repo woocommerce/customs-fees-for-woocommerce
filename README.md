@@ -1,3 +1,6 @@
+[![CI](https://github.com/woocommerce/customs-fees-for-woocommerce/actions/workflows/merge_to_trunk.yml/badge.svg)](https://github.com/woocommerce/customs-fees-for-woocommerce/actions/workflows/merge_to_trunk.yml)
+[![CI](https://github.com/woocommerce/customs-fees-for-woocommerce/actions/workflows/cron_qit.yml/badge.svg)](https://github.com/woocommerce/customs-fees-for-woocommerce/actions/workflows/cron_qit.yml)
+
 # Customs Fees for WooCommerce
 
 Automatically calculate and display import duties, customs fees, and taxes for international WooCommerce orders.
