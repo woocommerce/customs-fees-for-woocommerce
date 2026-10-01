@@ -191,8 +191,10 @@ Yes, through:
 
 == Changelog ==
 
-= 1.3.6 - 2026-xx-xx =
+= 1.3.7 - 2026-xx-xx =
 * Tweak - WooCommerce 11.2 Compatibility.
+
+= 1.3.6 - 2026-09-16 =
 * Fix    - Origin and HS code shown in order and fulfillment emails despite the cfwc_show_origin_in_email and cfwc_show_hs_code_in_email filters, and customs info duplicated, when emails were generated from an admin request.
 * Tweak  - Emails generated from admin requests now use the standard email format for item customs info, showing the two-letter origin code.
 * Tweak  - Item HS code and origin are no longer added to plain text emails, or to the plain text part of multipart emails, where the HTML markup could not render.
@@ -203,10 +205,10 @@ Yes, through:
 * Fix    - The rule editor no longer misreads a destination-only rule's legacy country field as its origin when editing (the "EU VAT & Duty" preset incorrectly showed "EU" in the From field).
 * Fix    - Saving the customs settings no longer clears the destination of a rule that keeps it in the legacy country field, which made preset rules such as "EU VAT & Duty" charge their fee on every order instead of EU orders only.
 
-= 1.3.4 - 2026-xx-xx =
+= 1.3.4 - 2026-09-03 =
 * Tweak - WooCommerce 11.1 Compatibility.
 
-= 1.3.3 - 2026-xx-xx =
+= 1.3.3 - 2026-08-24 =
 * Tweak - WordPress 7.1 Compatibility.
 
 = 1.3.2 - 2026-08-05 =
