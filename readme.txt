@@ -6,7 +6,7 @@ Tested up to: 7.1
 Requires PHP: 7.4
 Requires Plugins: woocommerce
 WC requires at least: 10.9
-WC tested up to: 11.1
+WC tested up to: 11.2
 Stable tag: 1.3.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -192,6 +192,7 @@ Yes, through:
 == Changelog ==
 
 = 1.3.6 - 2026-xx-xx =
+* Tweak - WooCommerce 11.2 Compatibility.
 * Fix    - Origin and HS code shown in order and fulfillment emails despite the cfwc_show_origin_in_email and cfwc_show_hs_code_in_email filters, and customs info duplicated, when emails were generated from an admin request.
 * Tweak  - Emails generated from admin requests now use the standard email format for item customs info, showing the two-letter origin code.
 * Tweak  - Item HS code and origin are no longer added to plain text emails, or to the plain text part of multipart emails, where the HTML markup could not render.

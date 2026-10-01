@@ -347,6 +347,10 @@ GNU General Public License for more details.
 
 ## Changelog
 
+### Version 1.3.7
+
+- Tweak - WooCommerce 11.2 Compatibility.
+
 ### Version 1.3.6
 - Fixed the cfwc_show_origin_in_email and cfwc_show_hs_code_in_email filters being ignored, and customs info being duplicated, in order and fulfillment emails generated from an admin request.
 - Emails generated from admin requests now use the standard email format for item customs info, showing the two-letter origin code.
