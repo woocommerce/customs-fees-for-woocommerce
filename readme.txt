@@ -7,7 +7,6 @@ Requires PHP: 7.4
 Requires Plugins: woocommerce
 WC requires at least: 10.9
 WC tested up to: 11.2
-Stable tag: 1.3.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -188,116 +187,6 @@ Yes, through:
 6. Order confirmation with customs fees included
 7. Admin order view with fee details
 8. Email with customs fee information
-
-== Changelog ==
-
-= 1.3.7 - 2026-xx-xx =
-* Tweak - WooCommerce 11.2 Compatibility.
-
-= 1.3.6 - 2026-09-16 =
-* Fix    - Origin and HS code shown in order and fulfillment emails despite the cfwc_show_origin_in_email and cfwc_show_hs_code_in_email filters, and customs info duplicated, when emails were generated from an admin request.
-* Tweak  - Emails generated from admin requests now use the standard email format for item customs info, showing the two-letter origin code.
-* Tweak  - Item HS code and origin are no longer added to plain text emails, or to the plain text part of multipart emails, where the HTML markup could not render.
-* Fix    - Customs fee was missing from the subscription recurring total and renewal orders with WooCommerce Subscriptions.
-
-= 1.3.5 - 2026-09-07 =
-* Fix    - Add "EU Countries" as a selectable option in the rule editor's origin and destination country dropdowns, so EU-wide rules (such as the "EU VAT & Duty" preset) can be created and edited. Previously editing such a rule silently reset its destination to "Any", which applied the fee to every country.
-* Fix    - The rule editor no longer misreads a destination-only rule's legacy country field as its origin when editing (the "EU VAT & Duty" preset incorrectly showed "EU" in the From field).
-* Fix    - Saving the customs settings no longer clears the destination of a rule that keeps it in the legacy country field, which made preset rules such as "EU VAT & Duty" charge their fee on every order instead of EU orders only.
-
-= 1.3.4 - 2026-09-03 =
-* Tweak - WooCommerce 11.1 Compatibility.
-
-= 1.3.3 - 2026-08-24 =
-* Tweak - WordPress 7.1 Compatibility.
-
-= 1.3.2 - 2026-08-05 =
-* Tweak - Remove product block editor compatibility declaration.
-
-= 1.3.1 - 2026-07-27 =
-* Tweak - WooCommerce 11.0 Compatibility.
-
-= 1.3.0 - 2026-06-30 =
-* Update - China to US tariff preset rates refreshed to reflect the current import regime after the IEEPA tariffs were struck down in February 2026; the apparel rate is corrected from 69% to about 24%.
-
-= 1.2.1 - 2026-06-22 =
-* Fix    - Rules with a blank destination country ("Any") or blank origin and destination ("Any → Any") being silently discarded on save and disappearing after page reload.
-* Tweak  - WooCommerce 10.9 Compatibility.
-
-= 1.2.0 - 2026-06-01 =
-* Add    - Per-rule valuation overrides (FOB, CIF, CIF + Insurance) with compound base support, so a rule's customs value can include other rules' computed fees.
-* Fix    - Show confirmation dialog when leaving page or saving settings with an unsaved rule open.
-* Update - Built-in presets for Canada, Australia, New Zealand, UK, and EU now use correct duty vs. import tax valuation bases.
-* Dev    - `cfwc_customs_value` filter now passes the matching rule as a 5th argument; existing 4-argument callbacks remain backwards-compatible.
-
-= 1.1.9 - 2026-05-20 =
-* Tweak - WordPress 7.0 Compatibility.
-
-= 1.1.8 - 2026-05-20 =
-* Tweak - WooCommerce 10.8 Compatibility.
-
-= 1.1.7 - 2026-04-13 =
-* Tweak - WooCommerce 10.7 Compatibility.
-
-= 1.1.6 - 2026-03-31 =
-* Tweak - WooCommerce 10.6 Compatibility.
-
-= 1.1.5 - 2026-02-04 =
-* Add - `cfwc_show_hs_code_in_email` filter to control HS Code display in order emails.
-* Add - `cfwc_show_origin_in_email` filter to control Country of Origin display in order emails.
-* Fix - Rules not saving when clicking "Save changes" in Customs & Import Fees settings.
-* Tweak - WooCommerce 10.5 compatibility.
-* Dev - Filters pass the order item and product objects for conditional logic.
-
-= 1.1.4 - 2026-01-15 =
-* Add - CIF (Cost, Insurance, Freight) customs valuation method support.
-* Add - New setting to choose between FOB (product value only) and CIF (product + shipping) calculation methods.
-* Add - Shipping costs are proportionally distributed across products when CIF is enabled.
-* Add - `cfwc_customs_value` filter to customize customs value calculations.
-* Add - `cfwc_insurance_value` filter for third-party insurance plugin integration.
-* Add - `cfwc_fee_label` filter to customize fee labels at checkout.
-* Add - `cfwc_product_origin` filter to override product origin programmatically.
-* Update - Made "Setup Status" notice on settings page dismissible.
-* Update - Improved code quality with PHPCS and PHPStan compliance.
-* Dev - CIF is an opt-in feature; default behavior (FOB) remains unchanged.
-
-= 1.1.3 - 2025-12-11 =
-* Added new setting to calculate customs fees on original price (before discounts).
-* Useful for promotions where products are discounted but tariffs should still be based on full product value.
-* Tested up to WordPress 6.9 and WooCommerce 10.4.0.
-
-= 1.1.2 - 2025-11-02 =
-* Fixed HS code matching for product variations in rule processing
-* Variations now properly match HS code-based rules with correct inheritance from parent products
-* Fixed HS code and origin display for variable products in cart and checkout
-
-= 1.1.1 - 2025-10-07 =
-* Fixed issue where downloadable products with physical shipping were incorrectly excluded from customs fee calculations
-* Downloadable products that require shipping now properly have customs fees applied
-* Virtual products continue to be excluded as expected
-
-= 1.1.0 - 2025-09-14 =
-* Added full support for variable products with parent-level defaults and variation-level overrides
-* Enhanced inheritance pattern for HS codes and origin countries in product variations
-* Improved UX with clear parent value display in variation settings
-* Fixed issue where variable products weren't applying customs fees
-
-= 1.0.0 - 2025-09-05 =
-* Initial release
-* Core customs fee calculation engine
-* Product origin country and HS code management
-* 30+ preset templates for major trade routes
-* Percentage-based fee calculations
-* HPOS compatibility
-* Cart and checkout block support
-* Detailed fee breakdown display
-* Stacking rules (add, override, exclusive)
-* Category and HS code rule matching
-* Comprehensive admin interface
-* Improved UX with clear parent value display in variation settings
-* Virtual/downloadable product exclusion
-* Email integration with fee breakdown
-* Debug logging system
 
 == Advanced Features ==
 
