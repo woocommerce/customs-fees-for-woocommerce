@@ -24,6 +24,11 @@
     "cleancss": "for f in $npm_package_config_paths_css; do echo Processing $f; file=${f%.css}; node_modules/.bin/cleancss -o $file.min.css $f; done",
     "makepot": "wpi18n makepot --domain-path languages --pot-file customs-fees-for-woocommerce.pot --type plugin --main-file customs-fees-for-woocommerce.php --exclude node_modules,tests,docs",
     "build:qit": "composer install --no-dev -o && pnpm run uglify && pnpm run cleancss && pnpm run makepot && pnpm run archive:qit && pnpm run postarchive",
+    "build:e2e": "pnpm run build:qit",
+    "test:e2e": "COMPOSER_PROCESS_TIMEOUT=0 composer run qit:e2e",
+    "test:e2e:install": "cd tests/e2e && npm ci && npx playwright install chromium",
+    "test:e2e:local": "cd tests/e2e && BASE_URL=${BASE_URL:-$(node bin/resolve-base-url.js)} npx playwright test --project=e2e",
+    "test:e2e:local:show": "cd tests/e2e && BASE_URL=${BASE_URL:-$(node bin/resolve-base-url.js)} npx playwright test --headed --project=e2e --workers=1",
     "archive:qit": "composer archive --file=$npm_package_name --format=zip && pnpm run zip:phpstan_config",
     "zip:phpstan_config": "zip -r $npm_package_name.zip .phpstan/dist/* -j"
   },

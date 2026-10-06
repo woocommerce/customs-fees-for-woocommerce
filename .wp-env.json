@@ -1,9 +1,13 @@
 {
-	"core": "WordPress/WordPress#6.8",
-	"plugins": [
-		".",
-		"https://downloads.wordpress.org/plugin/woocommerce.latest-stable.zip"
-	],
+	"core": null,
+	"plugins": [],
+	"mappings": {
+		"wp-content/plugins/woocommerce": "https://downloads.wordpress.org/plugin/woocommerce.latest-stable.zip",
+		"wp-content/plugins/customs-fees-for-woocommerce": "."
+	},
+	"lifecycleScripts": {
+		"afterStart": "node_modules/.bin/wp-env run cli wp plugin activate woocommerce customs-fees-for-woocommerce"
+	},
 	"config": {
 		"WP_DEBUG": true,
 		"WP_DEBUG_LOG": true,
