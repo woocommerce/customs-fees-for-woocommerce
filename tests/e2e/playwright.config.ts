@@ -68,6 +68,8 @@ const setupProjects = [
 export default defineConfig( {
 	testDir: './tests',
 	outputDir: TESTS_RESULTS_PATH,
+	// Empties the customs rules and resets the checkout page after the run.
+	globalTeardown: './fixtures/global-teardown.ts',
 	// Specs share the store's own checkout page and the customs rule set, so
 	// they must never run concurrently.
 	fullyParallel: false,
