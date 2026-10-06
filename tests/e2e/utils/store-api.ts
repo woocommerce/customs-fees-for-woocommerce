@@ -21,7 +21,10 @@ export const GB_ADDRESS: CustomerAddress = {
 	last_name: 'Importer',
 	address_1: '1 Parliament Street',
 	city: 'London',
-	state: '',
+	// Non-empty on purpose: update-customer ignores an empty billing state,
+	// so '' would leave the US address's "CA" on the billing address and the
+	// Blocks checkout would refuse to submit it.
+	state: 'Greater London',
 	postcode: 'SW1A 2AA',
 	country: 'GB',
 };
