@@ -23,7 +23,7 @@
     "precleancss": "rm -f $npm_package_config_paths_css_min",
     "cleancss": "for f in $npm_package_config_paths_css; do echo Processing $f; file=${f%.css}; node_modules/.bin/cleancss -o $file.min.css $f; done",
     "makepot": "wpi18n makepot --domain-path languages --pot-file customs-fees-for-woocommerce.pot --type plugin --main-file customs-fees-for-woocommerce.php --exclude node_modules,tests,docs",
-    "build:qit": "composer install --no-dev -o && pnpm run makepot && pnpm run archive:qit && pnpm run postarchive",
+    "build:qit": "composer install --no-dev -o && pnpm run uglify && pnpm run cleancss && pnpm run makepot && pnpm run archive:qit && pnpm run postarchive",
     "archive:qit": "composer archive --file=$npm_package_name --format=zip && pnpm run zip:phpstan_config",
     "zip:phpstan_config": "zip -r $npm_package_name.zip .phpstan/dist/* -j"
   },

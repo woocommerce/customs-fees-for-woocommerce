@@ -10,6 +10,8 @@
             "!/languages",
             "bin",
             "tests",
+            "qit.json",
+            "docs",
             "/vendor",
             "README.md",
             "package.json",
