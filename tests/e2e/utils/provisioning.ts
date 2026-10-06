@@ -163,21 +163,24 @@ const ensureFreeShippingZone = async ( rest: RestClient ): Promise< void > => {
 export const ensureStoreProvisioned = async (
 	rest: RestClient
 ): Promise< ProvisionedStore > => {
-	// 1. A US store, so US is the domestic (no customs fee) destination; USD
+	// 1. Refuse a store with tax rates before changing anything, so a store
+	//    that is not disposable is left exactly as it was.
+	await ensureNoTaxRates( rest );
+
+	// 2. A US store, so US is the domestic (no customs fee) destination; USD
 	//    with the default "$100.00" formatting the assertions use.
 	await setSetting( rest, 'general', 'woocommerce_default_country', 'US:CA' );
 	await setSetting( rest, 'general', 'woocommerce_currency', 'USD' );
 	await setSetting( rest, 'general', 'woocommerce_currency_pos', 'left' );
 	await setSetting( rest, 'general', 'woocommerce_price_num_decimals', '2' );
 
-	// 2. Taxes on (the settings screen needs it) but with no rates.
+	// 3. Taxes on: the Customs Fees settings screen needs it.
 	await ensureTaxesEnabled( rest );
-	await ensureNoTaxRates( rest );
 
-	// 3. Free shipping to both destinations, so shipping adds nothing.
+	// 4. Free shipping to both destinations, so shipping adds nothing.
 	await ensureFreeShippingZone( rest );
 
-	// 4. Out of "coming soon" mode: a fresh WooCommerce install starts there,
+	// 5. Out of "coming soon" mode: a fresh WooCommerce install starts there,
 	//    and its admin banner sits over #place_order. Site visibility has no
 	//    /wc/v3/settings route; the admin screen writes it through this one.
 	await rest.fetch( {
@@ -186,7 +189,7 @@ export const ensureStoreProvisioned = async (
 		data: { woocommerce_coming_soon: 'no' },
 	} );
 
-	// 5. Cash on delivery: the only core gateway with no credentials and no
+	// 6. Cash on delivery: the only core gateway with no credentials and no
 	//    redirect. Every gateway ships disabled.
 	await rest.fetch( {
 		path: '/wc/v3/payment_gateways/cod',
