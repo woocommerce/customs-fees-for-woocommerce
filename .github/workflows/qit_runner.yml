@@ -391,6 +391,9 @@ jobs:
                   # the current working directory, not the config file location,
                   # so run from the sparse checkout (where qit.json and tests/e2e
                   # live); the binary, zip, and results stay addressed absolutely.
+                  # --print-report-url is deliberately not passed: the report URL
+                  # carries an access token and this repo's logs and artifacts
+                  # are public. Failures are surfaced from the CTRF report below.
                   cd "${GITHUB_WORKSPACE}/custom-tests"
 
                   "${GITHUB_WORKSPACE}/vendor/bin/qit" run:e2e \
@@ -401,7 +404,6 @@ jobs:
                     --wp="${wp_version}" \
                     --woo="${woo_version}" \
                     --php_version="${PHP_VERSION}" \
-                    --print-report-url \
                     ${ADDITIONAL_PLUGINS} \
                     ${EXTRA_OPTIONS} \
                     -n \
