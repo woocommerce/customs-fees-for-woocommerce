@@ -1,9 +1,10 @@
 import { chromium, type Browser, type FullConfig } from '@playwright/test';
 import fs from 'node:fs';
 import { ADMIN_STORAGE_STATE_PATH } from '../utils/paths';
-import { createRestClient } from '../utils/rest';
+import { createRestClient, type RestClient } from '../utils/rest';
 import { ensureCheckoutPageIs } from '../utils/checkout-page';
 import { setRules } from '../utils/customs-rules';
+import { assertDisposableStore } from '../utils/provisioning';
 
 // Fail-soft by design: leaving the store dirty is the status quo this
 // improves on, so an error here must neither redden a green run nor mask the
@@ -44,18 +45,35 @@ export default async function globalTeardown(
 		} );
 		const page = await context.newPage();
 
-		await attempt( 'emptying the customs rules', () =>
-			setRules( page, [] )
-		);
-		// The stock Checkout block is WooCommerce's fresh-install default.
-		await attempt( 'resetting the checkout page to the Checkout block', async () => {
-			const rest = await createRestClient( context );
+		let rest: RestClient;
+		try {
+			rest = await createRestClient( context );
+		} catch ( error ) {
+			// eslint-disable-next-line no-console
+			console.warn( '[global-teardown] could not open a REST client:', error );
+			return;
+		}
+
+		try {
+			// A store the specs refused must not be reset either.
 			try {
-				await ensureCheckoutPageIs( rest, 'blocks' );
-			} finally {
-				await rest.dispose();
+				await assertDisposableStore( rest );
+			} catch ( error ) {
+				// eslint-disable-next-line no-console
+				console.warn( '[global-teardown] skipped:', error );
+				return;
 			}
-		} );
+
+			await attempt( 'emptying the customs rules', () =>
+				setRules( page, [] )
+			);
+			// The stock Checkout block is WooCommerce's fresh-install default.
+			await attempt( 'resetting the checkout page to the Checkout block', () =>
+				ensureCheckoutPageIs( rest, 'blocks' )
+			);
+		} finally {
+			await rest.dispose();
+		}
 	} finally {
 		await browser.close();
 	}

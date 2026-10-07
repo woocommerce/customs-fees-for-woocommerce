@@ -11,6 +11,11 @@ import {
 
 const RULE_LABEL = 'E2E Settings Rule';
 
+// Set once ensureTaxesEnabled() has passed its disposable-store check.
+// Playwright runs afterEach even when beforeEach throws, so without this a
+// refused store would still have its rules emptied.
+let storeClaimed = false;
+
 test.describe( 'Customs rules editor', () => {
 	test.beforeEach( async ( { context, page } ) => {
 		const rest = await createRestClient( context );
@@ -19,11 +24,15 @@ test.describe( 'Customs rules editor', () => {
 		} finally {
 			await rest.dispose();
 		}
+		storeClaimed = true;
 		await setRules( page, [] );
 	} );
 
 	test.afterEach( async ( { page } ) => {
-		await setRules( page, [] );
+		if ( storeClaimed ) {
+			await setRules( page, [] );
+			storeClaimed = false;
+		}
 	} );
 
 	test( 'a rule added in the editor persists after Save changes', async ( {

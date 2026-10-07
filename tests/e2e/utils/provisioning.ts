@@ -46,20 +46,17 @@ export const setSetting = async (
 };
 
 /**
- * Turn WooCommerce taxes on.
+ * Refuse a store that is not disposable, before the suite writes anything.
  *
- * WC_Settings_Tax::add_settings_page() drops the whole Tax tab while taxes are
- * off, and the Customs Fees settings are a section of that tab - so with taxes
- * off the screen this suite drives does not exist.
- */
-export const ensureTaxesEnabled = ( rest: RestClient ): Promise< void > =>
-	setSetting( rest, 'general', 'woocommerce_calc_taxes', 'yes' );
-
-/**
  * Taxes must be on (see ensureTaxesEnabled), so exact totals depend on the
- * store having no tax rates. Fail loudly rather than delete a store's rates.
+ * store having no tax rates; a store that has them is treated as one whose
+ * data matters. Every path that writes store state - specs and global
+ * teardown alike - calls this first, so a refused run leaves the store's
+ * settings, customs rules and checkout page exactly as they were.
  */
-const ensureNoTaxRates = async ( rest: RestClient ): Promise< void > => {
+export const assertDisposableStore = async (
+	rest: RestClient
+): Promise< void > => {
 	const rates = await rest.fetch< unknown[] >( {
 		path: '/wc/v3/taxes?per_page=1',
 	} );
@@ -69,6 +66,18 @@ const ensureNoTaxRates = async ( rest: RestClient ): Promise< void > => {
 				"and the suite will not delete a store's rates. Run it against a disposable store (wp-env or QIT)."
 		);
 	}
+};
+
+/**
+ * Turn WooCommerce taxes on.
+ *
+ * WC_Settings_Tax::add_settings_page() drops the whole Tax tab while taxes are
+ * off, and the Customs Fees settings are a section of that tab - so with taxes
+ * off the screen this suite drives does not exist.
+ */
+export const ensureTaxesEnabled = async ( rest: RestClient ): Promise< void > => {
+	await assertDisposableStore( rest );
+	await setSetting( rest, 'general', 'woocommerce_calc_taxes', 'yes' );
 };
 
 const PRODUCT_DATA = {
@@ -165,7 +174,7 @@ export const ensureStoreProvisioned = async (
 ): Promise< ProvisionedStore > => {
 	// 1. Refuse a store with tax rates before changing anything, so a store
 	//    that is not disposable is left exactly as it was.
-	await ensureNoTaxRates( rest );
+	await assertDisposableStore( rest );
 
 	// 2. A US store, so US is the domestic (no customs fee) destination; USD
 	//    with the default "$100.00" formatting the assertions use.
