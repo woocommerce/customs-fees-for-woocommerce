@@ -437,11 +437,13 @@ jobs:
                   fi
 
                   # An executed package can still assert nothing: Playwright exits 0
-                  # when every test is skipped. Requiring passing tests and no
+                  # when every test is skipped. The count includes the auth setup,
+                  # so "1 passed" alone can mean every real test was skipped;
+                  # requiring no skips closes that. Requiring passing tests and no
                   # failures also closes the gap where a real failure is masked by
                   # the exit-3 warning below.
-                  if ! grep -qE 'Tests:[[:space:]]*[1-9][0-9]* passed, 0 failed' "${results_file}"; then
-                      echo "::error::Custom E2E run reported no passing tests, or reported failures."
+                  if ! grep -qE 'Tests:[[:space:]]*[1-9][0-9]* passed, 0 failed, 0 skipped' "${results_file}"; then
+                      echo "::error::Custom E2E run reported no passing tests, failures, or skipped tests."
                       exit 1
                   fi
 
