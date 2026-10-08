@@ -1,0 +1,21 @@
+{
+	"$schema": "https://raw.githubusercontent.com/woocommerce/qit-cli/trunk/src/src/PreCommand/Schemas/test-package-manifest-schema.json",
+	"package": "customs-fees-for-woocommerce/e2e",
+	"package_type": "test",
+	"test_type": "e2e",
+	"description": "Smoke, rules-editor, and checkout customs-fee E2E coverage for customs-fees-for-woocommerce.",
+	"requires": {
+		"network": false
+	},
+	"test": {
+		"phases": {
+			"run": [
+				"npx playwright test"
+			]
+		},
+		"results": {
+			"ctrf-json": "./results/ctrf.json",
+			"blob-dir": "./results/blob"
+		}
+	}
+}

@@ -1,0 +1,13 @@
+{
+	"$schema": "https://raw.githubusercontent.com/woocommerce/qit-cli/trunk/src/src/PreCommand/Schemas/qit-schema.json",
+	"environments": {
+		"default": {
+			"wp": "stable",
+			"woo": "stable",
+			"php": "8.4",
+			"plugins": [
+				"woocommerce"
+			]
+		}
+	}
+}

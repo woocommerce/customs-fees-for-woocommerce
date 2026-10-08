@@ -127,7 +127,15 @@ npx wp-env logs
 
 ## E2E Testing
 
-QIT (Quality Insights Toolkit) E2E tests run remotely via `.github/workflows/qit.yml` but there are no local E2E tests or Playwright config yet.
+A Playwright suite lives in `tests/e2e/`, packaged as a QIT custom E2E test package. See `tests/e2e/README.md`.
+
+- Local (wp-env): `pnpm exec wp-env start`, `pnpm run test:e2e:install` once, then `pnpm run test:e2e:local`.
+- Through QIT: `pnpm run test:e2e` (needs `qit connect`).
+- CI: weekly Cron QIT, and Manual Test Runner → `Custom Plugin E2E (tests/e2e)`. Not run per PR.
+- `tests/e2e/` is an isolated **npm** package written in **TypeScript**: a deliberate exception to the PHP/plain-JS stack, since it is never bundled or shipped (`tests` is in `archive.exclude`). Don't run `npm install` at the repo root.
+- Several utilities are byte-identical copies from sibling extensions (listed in `tests/e2e/README.md`); don't edit them locally.
+- `build:qit` must build the minified assets: the plugin enqueues `.min` files whenever `SCRIPT_DEBUG` is off, as it is in QIT.
+- `.wp-env.json` must keep WooCommerce in `wp-content/plugins/woocommerce/`: `Customs_Fees_WooCommerce::is_woocommerce_active()` only recognises `woocommerce/woocommerce.php`.
 
 ## Architectural Decisions
 

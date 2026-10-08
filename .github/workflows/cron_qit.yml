@@ -30,6 +30,7 @@ jobs:
       test-phpstan: true
       test-woo-api: true
       test-woo-e2e: true
+      test-e2e: true
       test-malware: true
       test-plugin-check: false # only run for WPORG
 

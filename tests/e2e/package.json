@@ -1,0 +1,15 @@
+{
+	"name": "customs-fees-for-woocommerce-e2e",
+	"private": true,
+	"description": "QIT E2E test package for customs-fees-for-woocommerce.",
+	"devDependencies": {
+		"@playwright/test": "1.57.0",
+		"@types/node": "^22.14.0",
+		"playwright-ctrf-json-reporter": "^0.0.29",
+		"typescript": "^5.9.3"
+	},
+	"scripts": {
+		"test:e2e": "playwright test",
+		"typecheck": "tsc -p tsconfig.json"
+	}
+}
