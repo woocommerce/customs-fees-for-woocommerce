@@ -21,7 +21,12 @@ test.describe( 'Smoke', () => {
 		await page.goto( 'wp-admin/plugins.php' );
 		await expectNoPhpErrors( page );
 
-		const row = page.locator( `tr[data-plugin="${ PLUGIN_FILE }"]` );
+		// wp_plugin_update_rows() adds a second row with the same data-plugin
+		// (tr.plugin-update-tr) whenever an update is available, which the
+		// Woo: header makes likely on any run behind the published version.
+		const row = page.locator(
+			`tr[data-plugin="${ PLUGIN_FILE }"]:not(.plugin-update-tr)`
+		);
 		await expect( row ).toHaveCount( 1 );
 		await expect( row ).toHaveClass( /\bactive\b/ );
 	} );
