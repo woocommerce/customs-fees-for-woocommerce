@@ -347,6 +347,10 @@ GNU General Public License for more details.
 
 ## Changelog
 
+### Version 1.3.8
+
+- Tweak - Raise minimum requirements to WordPress 7.0, WooCommerce 11.0, PHP 7.4.
+
 ### Version 1.3.7
 
 - Tweak - WooCommerce 11.2 Compatibility.
