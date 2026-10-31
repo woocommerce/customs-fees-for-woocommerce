@@ -347,10 +347,6 @@ GNU General Public License for more details.
 
 ## Changelog
 
-### Version 1.3.8
-
-- Dev - Bump PHPStan to 2.3.4.
-
 ### Version 1.3.7
 
 - Tweak - WooCommerce 11.2 Compatibility.
