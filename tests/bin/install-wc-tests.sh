@@ -250,7 +250,7 @@ install_wc() {
     echo "Installing WooCommerce $WC_VERSION → $WC_CLONE_DIR"
     echo "------------------------------------------------------------"
 
-    rm -rf "$WC_CLONE_DIR"
+    rm -rf "${WC_CLONE_DIR:?}"
 
     run_quiet "Cloning WooCommerce..." \
         git clone --depth=1 --branch="$WC_VERSION" https://github.com/woocommerce/woocommerce.git "$WC_CLONE_DIR" \
@@ -294,7 +294,7 @@ install_wp_core() {
         return
     fi
 
-    rm -rf "$WP_CORE_DIR"
+    rm -rf "${WP_CORE_DIR:?}"
     mkdir -p "$WP_CORE_DIR"
 
     if [[ $WP_VERSION == 'nightly' || $WP_VERSION == 'trunk' ]]; then
