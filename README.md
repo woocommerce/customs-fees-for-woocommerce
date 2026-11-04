@@ -347,6 +347,10 @@ GNU General Public License for more details.
 
 ## Changelog
 
+### Version 1.3.8
+
+- Tweak - WooCommerce 11.3 Compatibility.
+
 ### Version 1.3.7
 
 - Tweak - WooCommerce 11.2 Compatibility.
