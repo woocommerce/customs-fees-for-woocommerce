@@ -53,6 +53,7 @@
             "./vendor/bin/phpstan analyse --level=2"
         ],
         "test": [
+            "Composer\\Config::disableProcessTimeout",
             "bash tests/bin/run-tests.sh"
         ],
         "qit:e2e": [
