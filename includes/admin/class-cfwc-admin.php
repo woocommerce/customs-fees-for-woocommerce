@@ -307,10 +307,15 @@ class CFWC_Admin {
 		// Add a heading without grey background to match WooCommerce style.
 		echo '<h4 class="cfwc-product-fields-heading">' . esc_html__( 'Customs & Import Fees', 'customs-fees-for-woocommerce' ) . '</h4>';
 
+		// WooCommerce 11.3+ adds its own customs fields to the Shipping tab. Say which ones the fee uses.
+		if ( self::wc_has_product_customs_fields() ) {
+			echo '<p class="cfwc-product-fields-note">' . esc_html__( 'Customs fees are calculated from the two fields below. The Commodity code and Country of origin fields in the Shipping tab are not used for fees.', 'customs-fees-for-woocommerce' ) . '</p>';
+		}
+
 		woocommerce_wp_text_input(
 			array(
 				'id'          => '_cfwc_hs_code',
-				'label'       => __( 'HS/Tariff Code', 'customs-fees-for-woocommerce' ),
+				'label'       => __( 'HS/Tariff Code (Customs Fees)', 'customs-fees-for-woocommerce' ),
 				'placeholder' => __( 'e.g., 6109.10 or 6109.10.0012', 'customs-fees-for-woocommerce' ),
 				'desc_tip'    => true,
 				'description' => __( 'Harmonized System code for customs classification. This helps calculate accurate import duties.', 'customs-fees-for-woocommerce' ),
@@ -349,7 +354,7 @@ class CFWC_Admin {
 		woocommerce_wp_select(
 			array(
 				'id'                => '_cfwc_country_of_origin',
-				'label'             => __( 'Country of Origin', 'customs-fees-for-woocommerce' ),
+				'label'             => __( 'Country of Origin (Customs Fees)', 'customs-fees-for-woocommerce' ),
 				'desc_tip'          => true,
 				'description'       => __( 'Select the country where this product was manufactured. This determines which customs rules apply.', 'customs-fees-for-woocommerce' ),
 				'options'           => array( '' => __( 'Select a country', 'customs-fees-for-woocommerce' ) ) + $countries,
@@ -362,6 +367,19 @@ class CFWC_Admin {
 		);
 
 		echo '</div>';
+	}
+
+	/**
+	 * Whether WooCommerce has its own product customs fields (added in WooCommerce 11.3).
+	 *
+	 * The plugin does not read those fields, so the product editor shows a note
+	 * that only the plugin's fields are used for fees.
+	 *
+	 * @since 1.3.8
+	 * @return bool
+	 */
+	private static function wc_has_product_customs_fields() {
+		return method_exists( 'WC_Product', 'get_customs_country_of_origin' );
 	}
 
 	/**
