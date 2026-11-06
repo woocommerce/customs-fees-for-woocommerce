@@ -88,6 +88,28 @@ class CSV_Import_Mapping_Test extends \WC_Unit_Test_Case {
 	}
 
 	/**
+	 * Remove WooCommerce 11.3's core customs columns from the default mapping.
+	 *
+	 * `composer test` installs the latest WooCommerce, so the test environment
+	 * may already have core's columns. This keeps the WC 11.2 behavior testable
+	 * on any WooCommerce version. Priority 1 runs before the plugin's callback.
+	 */
+	private function simulate_pre_wc_113_core_columns(): void {
+		add_filter(
+			'woocommerce_csv_product_import_mapping_default_columns',
+			static function ( $columns ) {
+				return array_filter(
+					(array) $columns,
+					static function ( $field ) {
+						return ! in_array( $field, array( 'customs_commodity_code', 'customs_country_of_origin', 'customs_description' ), true );
+					}
+				);
+			},
+			1
+		);
+	}
+
+	/**
 	 * Run WooCommerce's real column auto-mapping for a list of headers.
 	 *
 	 * @param string[] $headers CSV headers.
@@ -274,6 +296,8 @@ class CSV_Import_Mapping_Test extends \WC_Unit_Test_Case {
 	 * @testdox Without core customs columns (WC 11.2 and earlier), legacy headers still map to the plugin's fields.
 	 */
 	public function test_legacy_headers_map_to_plugin_fields_without_core_columns(): void {
+		$this->simulate_pre_wc_113_core_columns();
+
 		$map = $this->auto_map( array( 'HS Code', 'hs code', 'Country of Origin', 'country of origin', 'Origin' ) );
 
 		$this->assertSame(
