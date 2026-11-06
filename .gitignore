@@ -49,3 +49,6 @@ wp-config.php
 .env
 .env.local
 .wp-env.override.json
+
+# Per-checkout WP test config, written by tests/bin/run-tests.sh
+tests/.wp-tests-config.php
