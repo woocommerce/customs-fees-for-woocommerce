@@ -347,6 +347,10 @@ GNU General Public License for more details.
 
 ## Changelog
 
+### Version 1.3.8
+
+- Tweak - Product and variation editors now label the plugin's HS code and country of origin fields "(Customs Fees)". On WooCommerce 11.3+, they also say that WooCommerce's own Commodity code and Country of origin fields are not used for customs fees.
+
 ### Version 1.3.7
 
 - Tweak - WooCommerce 11.2 Compatibility.
