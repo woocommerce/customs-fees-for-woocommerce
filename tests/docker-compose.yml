@@ -1,16 +1,32 @@
-name: cfwc_tests
+# Throwaway MariaDB for the PHPUnit suite. Managed by tests/bin/install-wc-tests.sh;
+# `composer test` starts it on demand.
+#
+# Pin an explicit project name. Without it Compose derives the project from the
+# parent directory ("tests"), which collides with sibling extensions whose
+# compose files also live in tests/ — a `down --remove-orphans` from one would
+# tear down another's DB container. A unique name keeps this plugin isolated.
+# WC_TEST_COMPOSE_PROJECT, WC_TEST_DB_PORT and WC_TEST_ADMINER_PORT override the
+# name and ports, so a second checkout of this plugin can run its suite at the
+# same time.
+name: ${WC_TEST_COMPOSE_PROJECT:-cfwc_tests}
 
 volumes:
     dockerdirectory:
 
 services:
     test_db:
+        container_name: ${WC_TEST_COMPOSE_PROJECT:-cfwc_tests}_sql
         image: mariadb:10.11
         env_file:
             - test.env
         ports:
-            - 4416:3306
+            # Bind to loopback only. The throwaway test DB and the (unauthenticated)
+            # Adminer below must not be reachable from the LAN. 4436 and 8036 avoid
+            # the ports used by sibling extensions (ShipStation 4406,
+            # WooCommerce Services 4416, FedEx 4426, WooCommerce Shipping 4446,
+            # USPS 4477).
+            - "127.0.0.1:${WC_TEST_DB_PORT:-4436}:3306"
     test_adminer:
         image: adminer
         ports:
-            - "8062:8080"
+            - "127.0.0.1:${WC_TEST_ADMINER_PORT:-8036}:8080"
