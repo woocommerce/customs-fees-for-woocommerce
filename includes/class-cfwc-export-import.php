@@ -44,7 +44,27 @@ class CFWC_Export_Import {
 		// Import hooks.
 		add_filter( 'woocommerce_csv_product_import_mapping_options', array( $this, 'add_import_mapping_options' ), 10 );
 		add_filter( 'woocommerce_csv_product_import_mapping_default_columns', array( $this, 'add_import_column_mapping' ), 10 );
+		add_filter( 'woocommerce_csv_product_import_mapped_columns', array( $this, 'map_legacy_country_of_origin_header' ), 10, 2 );
 		add_filter( 'woocommerce_product_import_pre_insert_product_object', array( $this, 'process_import' ), 10, 2 );
+	}
+
+	/**
+	 * Get the labels of the plugin's CSV columns.
+	 *
+	 * Used as the export column headers and as the import mapping options.
+	 * The "Customs Fees:" prefix keeps them distinct from WooCommerce's own
+	 * "Commodity code (HS code)" and "Country of origin" columns (WC 11.3+).
+	 * The importer matches headers case-insensitively, so a plain
+	 * "Country of Origin" header would collide with WooCommerce's column.
+	 *
+	 * @since 1.3.8
+	 * @return array<string, string> Labels keyed by column ID.
+	 */
+	private function get_column_labels() {
+		return array(
+			'cfwc_hs_code'           => __( 'Customs Fees: HS Code', 'customs-fees-for-woocommerce' ),
+			'cfwc_country_of_origin' => __( 'Customs Fees: Country of Origin', 'customs-fees-for-woocommerce' ),
+		);
 	}
 
 	/**
@@ -55,9 +75,7 @@ class CFWC_Export_Import {
 	 * @return array Modified columns.
 	 */
 	public function add_export_column_names( $columns ) {
-		$columns['cfwc_hs_code']           = __( 'HS Code', 'customs-fees-for-woocommerce' );
-		$columns['cfwc_country_of_origin'] = __( 'Country of Origin', 'customs-fees-for-woocommerce' );
-		return $columns;
+		return array_merge( (array) $columns, $this->get_column_labels() );
 	}
 
 	/**
@@ -68,9 +86,7 @@ class CFWC_Export_Import {
 	 * @return array Modified columns.
 	 */
 	public function add_export_columns( $columns ) {
-		$columns['cfwc_hs_code']           = __( 'HS Code', 'customs-fees-for-woocommerce' );
-		$columns['cfwc_country_of_origin'] = __( 'Country of Origin', 'customs-fees-for-woocommerce' );
-		return $columns;
+		return array_merge( (array) $columns, $this->get_column_labels() );
 	}
 
 	/**
@@ -117,40 +133,114 @@ class CFWC_Export_Import {
 	 * @return array Modified options.
 	 */
 	public function add_import_mapping_options( $options ) {
-		$options['cfwc_hs_code']           = __( 'HS Code', 'customs-fees-for-woocommerce' );
-		$options['cfwc_country_of_origin'] = __( 'Country of Origin', 'customs-fees-for-woocommerce' );
-		return $options;
+		return array_merge( (array) $options, $this->get_column_labels() );
 	}
 
 	/**
 	 * Add automatic column mapping for import.
 	 * Maps various column name variations to our fields.
 	 *
+	 * A header that is already mapped to another field is left alone. Since
+	 * WC 11.3, WooCommerce maps "Country of origin" to its own
+	 * customs_country_of_origin field. The importer lowercases headers, so
+	 * the plugin's "Country of Origin" alias used to replace that mapping and
+	 * send WooCommerce's column into the plugin's field.
+	 *
 	 * @since 1.1.0
 	 * @param array $columns Existing mappings.
 	 * @return array Modified mappings.
 	 */
 	public function add_import_column_mapping( $columns ) {
-		// HS Code variations.
-		$columns[ __( 'HS Code', 'customs-fees-for-woocommerce' ) ] = 'cfwc_hs_code';
-		$columns['HS Code']         = 'cfwc_hs_code';
-		$columns['hs code']         = 'cfwc_hs_code';
-		$columns['HS/Tariff Code']  = 'cfwc_hs_code';
-		$columns['Tariff Code']     = 'cfwc_hs_code';
-		$columns['HTS Code']        = 'cfwc_hs_code';
-		$columns['Harmonized Code'] = 'cfwc_hs_code';
+		$columns = (array) $columns;
+		$labels  = $this->get_column_labels();
 
-		// Country of Origin variations.
-		$columns[ __( 'Country of Origin', 'customs-fees-for-woocommerce' ) ] = 'cfwc_country_of_origin';
-		$columns['Country of Origin']      = 'cfwc_country_of_origin';
-		$columns['country of origin']      = 'cfwc_country_of_origin';
-		$columns['Origin Country']         = 'cfwc_country_of_origin';
-		$columns['Origin']                 = 'cfwc_country_of_origin';
-		$columns['Made in']                = 'cfwc_country_of_origin';
-		$columns['Country of Manufacture'] = 'cfwc_country_of_origin';
-		$columns['Manufacturing Country']  = 'cfwc_country_of_origin';
+		$aliases = array(
+			// Current export headers, translated and English.
+			$labels['cfwc_hs_code']            => 'cfwc_hs_code',
+			'Customs Fees: HS Code'            => 'cfwc_hs_code',
+			$labels['cfwc_country_of_origin']  => 'cfwc_country_of_origin',
+			'Customs Fees: Country of Origin'  => 'cfwc_country_of_origin',
+
+			// Export headers before 1.3.8, and other HS code variations.
+			__( 'HS Code', 'customs-fees-for-woocommerce' ) => 'cfwc_hs_code',
+			'HS Code'                          => 'cfwc_hs_code',
+			'HS/Tariff Code'                   => 'cfwc_hs_code',
+			'Tariff Code'                      => 'cfwc_hs_code',
+			'HTS Code'                         => 'cfwc_hs_code',
+			'Harmonized Code'                  => 'cfwc_hs_code',
+
+			// Export headers before 1.3.8, and other country of origin variations.
+			__( 'Country of Origin', 'customs-fees-for-woocommerce' ) => 'cfwc_country_of_origin',
+			'Country of Origin'                => 'cfwc_country_of_origin',
+			'Origin Country'                   => 'cfwc_country_of_origin',
+			'Origin'                           => 'cfwc_country_of_origin',
+			'Made in'                          => 'cfwc_country_of_origin',
+			'Country of Manufacture'           => 'cfwc_country_of_origin',
+			'Manufacturing Country'            => 'cfwc_country_of_origin',
+		);
+
+		// Headers that are already mapped, keyed the way the importer matches them.
+		$mapped = array();
+		foreach ( $columns as $header => $field ) {
+			$mapped[ strtolower( (string) $header ) ] = $field;
+		}
+
+		foreach ( $aliases as $header => $field ) {
+			$key = strtolower( (string) $header );
+
+			if ( isset( $mapped[ $key ] ) && $mapped[ $key ] !== $field ) {
+				continue;
+			}
+
+			$columns[ $header ] = $field;
+			$mapped[ $key ]     = $field;
+		}
 
 		return $columns;
+	}
+
+	/**
+	 * Map the plugin's legacy "Country of Origin" export header to the plugin's field.
+	 *
+	 * Before 1.3.8 the plugin exported its origin as "Country of Origin", with
+	 * country names as values. On WC 11.3+ the importer matches that header
+	 * case-insensitively to WooCommerce's "Country of origin" column, so files
+	 * exported by older versions would fill WooCommerce's field instead, and
+	 * WooCommerce rejects rows that hold a country name there.
+	 *
+	 * WooCommerce writes "Country of origin" (lowercase "o"), so only an exact,
+	 * case-sensitive match of the plugin's legacy header is mapped back. Any
+	 * other spelling keeps WooCommerce's mapping.
+	 *
+	 * @since 1.3.8
+	 * @param array $headers     Mapped fields, keyed by column index or raw header.
+	 * @param array $raw_headers Raw CSV headers.
+	 * @return array Mapped fields.
+	 */
+	public function map_legacy_country_of_origin_header( $headers, $raw_headers ) {
+		if ( ! is_array( $headers ) || ! is_array( $raw_headers ) ) {
+			return $headers;
+		}
+
+		$legacy_headers = array(
+			'Country of Origin',
+			__( 'Country of Origin', 'customs-fees-for-woocommerce' ),
+		);
+
+		foreach ( $raw_headers as $key => $raw_header ) {
+			if ( ! in_array( $raw_header, $legacy_headers, true ) ) {
+				continue;
+			}
+
+			// auto_map_columns() keys the result by column index or by raw header.
+			$index = array_key_exists( $key, $headers ) ? $key : $raw_header;
+
+			if ( isset( $headers[ $index ] ) && 'customs_country_of_origin' === $headers[ $index ] ) {
+				$headers[ $index ] = 'cfwc_country_of_origin';
+			}
+		}
+
+		return $headers;
 	}
 
 	/**
