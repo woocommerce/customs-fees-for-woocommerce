@@ -352,6 +352,7 @@ GNU General Public License for more details.
 - Fix - Importing a product CSV with WooCommerce's "Country of origin" column no longer overwrites the product's Customs Fees country of origin, and the value now fills WooCommerce's own field.
 - Tweak - The product CSV export now names the plugin's columns "Customs Fees: HS Code" and "Customs Fees: Country of Origin", so they do not collide with WooCommerce's customs columns. CSV files exported by earlier versions still import into the plugin's fields.
 - Tweak - Product and variation editors now label the plugin's HS code and country of origin fields "(Customs Fees)". On WooCommerce 11.3+, they also say that WooCommerce's own Commodity code and Country of origin fields are not used for customs fees.
+- Tweak - WooCommerce 11.3 Compatibility.
 
 ### Version 1.3.7
 
