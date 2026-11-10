@@ -545,6 +545,12 @@ span[aria-labelledby="select2-_cfwc_country_of_origin-container"] {
 	font-weight: 600;
 }
 
+#woocommerce-product-data .woocommerce_options_panel p.cfwc-product-fields-note {
+	margin: 0 12px 5px;
+	padding: 0;
+	color: #646970;
+}
+
 .cfwc-hs-code-help {
 	margin: -10px 0 10px 154px;
 	color: #666;
