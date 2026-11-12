@@ -107,20 +107,22 @@ $cfwc_preview_product->update_meta_data( '_cfwc_hs_code', '6109.10' );
 $cfwc_preview_product->save();
 
 // The preview visitor is logged in as this user. A US address fills in the checkout form.
-$cfwc_preview_customer = new WC_Customer( 1 );
-$cfwc_preview_customer->set_props(
-	array(
-		'billing_first_name' => 'Playground',
-		'billing_last_name'  => 'Tester',
-		'billing_address_1'  => '60 29th Street',
-		'billing_city'       => 'San Francisco',
-		'billing_state'      => 'CA',
-		'billing_postcode'   => '94110',
-		'billing_country'    => 'US',
-		'billing_email'      => 'admin@localhost.com',
-		'billing_phone'      => '555-0100',
-	)
+$cfwc_preview_address  = array(
+	'first_name' => 'Playground',
+	'last_name'  => 'Tester',
+	'address_1'  => '60 29th Street',
+	'city'       => 'San Francisco',
+	'state'      => 'CA',
+	'postcode'   => '94110',
+	'country'    => 'US',
+	'phone'      => '555-0100',
 );
+$cfwc_preview_customer = new WC_Customer( 1 );
+foreach ( $cfwc_preview_address as $cfwc_preview_field => $cfwc_preview_value ) {
+	$cfwc_preview_customer->{"set_billing_$cfwc_preview_field"}( $cfwc_preview_value );
+	$cfwc_preview_customer->{"set_shipping_$cfwc_preview_field"}( $cfwc_preview_value );
+}
+$cfwc_preview_customer->set_billing_email( 'admin@localhost.com' );
 $cfwc_preview_customer->save();
 
 // Put the product in that user's cart, so the Cart and Checkout pages show the fee straight away.

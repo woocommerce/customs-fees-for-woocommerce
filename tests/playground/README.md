@@ -12,7 +12,7 @@ The "Test the build" workflow (`.github/workflows/test_the_build.yml`) comments 
 - Free shipping everywhere and cash on delivery.
 - Two rules for goods made in China: 10% to the United States and 20% to the United Kingdom.
 - A $100 "Sample imported T-shirt" made in China, already in the admin's cart.
-- A US billing address on the admin user, which fills in the checkout form.
+- A US billing and shipping address on the admin user, which fills in the checkout form.
 
 So the cart shows a $10 customs fee, a UK address makes it $20, and any other country removes it.
 
