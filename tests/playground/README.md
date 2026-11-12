@@ -32,5 +32,5 @@ Wait for the "Ready!" line, then open `/wp-admin/admin.php?page=wc-settings&tab=
 ## Limits
 
 - The links download the build through Playground's artifact proxy, which finds it by branch name. A fork's pull request with the same branch name can end up behind a link. Never put credentials in these files, and never ask the visitor for any.
-- A Playground site sends no emails, so the customs lines in order emails cannot be checked there.
+- Emails are not delivered. In the browser, the Email panel of the Playground toolbar shows them. A local run has no such panel, and `wp_mail()` fails there.
 - The links stop working when the artifact expires, 14 days after the run.

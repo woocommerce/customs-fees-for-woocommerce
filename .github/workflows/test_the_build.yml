@@ -245,7 +245,7 @@ jobs:
           - :gear: [Open the settings](${PLAYGROUND_SETTINGS_URL}): WooCommerce > Settings > Tax > Customs Fees, with two rules for goods made in China: 10% to the United States and 20% to the United Kingdom.
           - :shopping_cart: [Open the cart](${PLAYGROUND_CART_URL}): the cart holds a \$100 "Sample imported T-shirt" made in China, with a \$10 customs fee. At checkout, ship to the United Kingdom for a \$20 fee, or to any other country for none.
 
-          :information_source: Both links open the same made-up store, logged in as its admin: a US store with taxes enabled and no tax rates, free shipping everywhere and cash on delivery. Each click starts a new store, and reloading the Playground page starts over. It sends no emails, so the customs lines in order emails cannot be checked there. WooCommerce Subscriptions is not installed. The links stop working 14 days after the last build.
+          :information_source: Both links open the same made-up store, logged in as its admin: a US store with taxes enabled and no tax rates, free shipping everywhere and cash on delivery. Order emails are not delivered: read them in the Email panel of the Playground toolbar. Each click or reload starts a new store, and Playground offers to restore the previous one from an autosave in your browser. WooCommerce Subscriptions is not installed. The links stop working 14 days after the last build.
 
           ---
 
