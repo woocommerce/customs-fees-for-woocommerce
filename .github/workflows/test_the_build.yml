@@ -1,0 +1,168 @@
+name: Test the build
+
+on:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+env:
+  PLUGIN_SLUG: customs-fees-for-woocommerce
+
+jobs:
+  # The only job that runs code from the pull request. Its token is read-only.
+  build:
+    name: Build
+    permissions:
+      contents: read
+    uses: ./.github/workflows/build.yml
+    with:
+      plugin_name: customs-fees-for-woocommerce
+
+  publish:
+    name: Publish the build and comment on the PR
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      # These files are copied into an artifact and read as data. Nothing from the pull request runs in this job.
+      - name: Checkout the Playground preview files
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          sparse-checkout: tests/playground
+          persist-credentials: false
+
+      - name: Download the build
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: ${{ env.PLUGIN_SLUG }}
+          path: build
+
+      # The version tells a tester which pull request and commit a site is running.
+      - name: Set the dev version
+        env:
+          PR_NUMBER: ${{ github.event.number }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          unzip -q "build/${PLUGIN_SLUG}.zip" -d release
+          MAIN_FILE="release/${PLUGIN_SLUG}/${PLUGIN_SLUG}.php"
+
+          VERSION=$( sed -n 's/^ \* Version: *//p' "$MAIN_FILE" | head -n 1 | tr -d '\r' )
+          IFS=. read -r MAJOR MINOR PATCH <<<"$VERSION"
+          # A pre-release suffix such as "-beta.1" is dropped before the patch number is raised.
+          DEV_VERSION="${MAJOR}.${MINOR}.$(( ${PATCH%%[!0-9]*} + 1 ))-dev_PR-${PR_NUMBER}_commit-${PR_HEAD_SHA:0:7}"
+
+          sed -i "s/^\( \* Version: *\).*$/\1${DEV_VERSION}/" "$MAIN_FILE"
+          sed -i "s/define( 'CFWC_VERSION', '[^']*' )/define( 'CFWC_VERSION', '${DEV_VERSION}' )/" "$MAIN_FILE"
+
+          grep -q "^ \* Version: *${DEV_VERSION}$" "$MAIN_FILE"
+          grep -q "'CFWC_VERSION', '${DEV_VERSION}'" "$MAIN_FILE"
+
+          echo "Dev version: ${DEV_VERSION}" >> "$GITHUB_STEP_SUMMARY"
+
+      # The Playground links download this artifact on every click, so it is kept for 14 days. The run ID
+      # in the name ties each link to the files of one run. The setup script travels with the build
+      # because it is not part of the plugin zip.
+      - name: Collect the files for the Playground previews
+        run: |
+          mkdir playground-preview
+          ( cd release && zip -q -r "../playground-preview/${PLUGIN_SLUG}.zip" "${PLUGIN_SLUG}" )
+          cp tests/playground/setup.php playground-preview/setup.php
+
+      - name: Upload the files for the Playground previews as an artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: playground-preview-${{ github.run_id }}
+          path: playground-preview
+          if-no-files-found: error
+          retention-days: 14
+
+      # WordPress Playground runs in the visitor's browser and can only fetch public URLs. Its artifact
+      # proxy serves this workflow's artifacts for the pull request and finds the workflow by name, hence
+      # GITHUB_WORKFLOW rather than a literal that a rename would silently break.
+      #
+      # The proxy picks the build by branch name, so a link can end up serving the build of a fork whose
+      # branch has the same name. The Blueprint must never hold credentials or ask for them.
+      - name: Build the WordPress Playground preview links
+        id: playground
+        env:
+          PR_NUMBER: ${{ github.event.number }}
+        run: |
+          ARTIFACT_URL=$( jq -rn \
+            --arg org "$GITHUB_REPOSITORY_OWNER" \
+            --arg repo "${GITHUB_REPOSITORY#*/}" \
+            --arg workflow "$GITHUB_WORKFLOW" \
+            --arg pr "$PR_NUMBER" \
+            --arg artifact "playground-preview-${GITHUB_RUN_ID}" \
+            '"https://playground.wordpress.net/plugin-proxy.php?org=\($org|@uri)&repo=\($repo|@uri)&workflow=\($workflow|@uri)&pr=\($pr|@uri)&artifact=\($artifact|@uri)"' )
+
+          # The Blueprint in the repository expects the files in /tmp/pr. Here they come from the artifact,
+          # which is a zip that wraps what was uploaded.
+          playground_url() {
+            jq -r --arg artifact_url "$ARTIFACT_URL" --arg landing_page "$1" '
+              ( if $landing_page != "" then .landingPage = $landing_page else . end )
+              | .steps |= [ {
+                  step: "unzip",
+                  zipFile: { resource: "url", url: $artifact_url, caption: "Downloading the Customs Fees build for this PR" },
+                  extractToPath: "/tmp/pr"
+                } ] + .
+              # jq leaves parentheses alone before version 1.7, and one would end the Markdown link.
+              | "https://playground.wordpress.net/#" + ( tojson | @uri | gsub( "\\("; "%28" ) | gsub( "\\)"; "%29" ) )
+            ' tests/playground/blueprint.json
+          }
+
+          {
+            echo "settings_url=$( playground_url "" )"
+            echo "cart_url=$( playground_url "/cart/" )"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Write the comment
+        env:
+          PLAYGROUND_SETTINGS_URL: ${{ steps.playground.outputs.settings_url }}
+          PLAYGROUND_CART_URL: ${{ steps.playground.outputs.cart_url }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          cat > "$RUNNER_TEMP/test-the-build.md" <<EOF
+          ### Test the build
+
+          #### WordPress Playground - runs in your browser
+
+          - :gear: [Open the settings](${PLAYGROUND_SETTINGS_URL}): WooCommerce > Settings > Tax > Customs Fees, with two rules for goods made in China: 10% to the United States and 20% to the United Kingdom.
+          - :shopping_cart: [Open the cart](${PLAYGROUND_CART_URL}): the cart holds a \$100 "Sample imported T-shirt" made in China, with a \$10 customs fee. At checkout, ship to the United Kingdom for a \$20 fee, or to any other country for none.
+
+          :information_source: Both links open the same made-up store, logged in as its admin: a US store with taxes enabled and no tax rates, free shipping everywhere and cash on delivery. Order emails are not delivered: read them in the Email panel of the Playground toolbar. Each click or reload starts a new store, and Playground offers to restore the previous one from an autosave in your browser. WooCommerce Subscriptions is not installed. The links stop working 14 days after the last build.
+
+          ---
+
+          Build info:
+
+          - Latest commit: ${PR_HEAD_SHA}
+          - Build time: $( date -u "+%Y-%m-%d %H:%M:%S UTC" )
+
+          _Note: the build is updated when a new commit is pushed to this PR._
+          EOF
+
+          cat "$RUNNER_TEMP/test-the-build.md" >> "$GITHUB_STEP_SUMMARY"
+
+      # The token of a pull request from a fork cannot write comments; the job summary has the same text.
+      - name: Add or update the comment in the PR
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.number }}
+        run: |
+          COMMENT_IDS=$( gh api "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments" --paginate \
+            --jq '.[] | select( .user.login == "github-actions[bot]" and ( .body | startswith( "### Test the build" ) ) ) | .id' )
+          COMMENT_ID=$( head -n 1 <<<"$COMMENT_IDS" )
+
+          if [ -n "$COMMENT_ID" ]; then
+            gh api "repos/${GITHUB_REPOSITORY}/issues/comments/${COMMENT_ID}" -X PATCH -F "body=@${RUNNER_TEMP}/test-the-build.md" --silent
+          else
+            gh api "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments" -F "body=@${RUNNER_TEMP}/test-the-build.md" --silent
+          fi
