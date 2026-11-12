@@ -1,0 +1,278 @@
+name: Test the build
+
+on:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+env:
+  # Also the name the plugin has to be registered under in the Jetpack Beta Builder.
+  PLUGIN_SLUG: customs-fees-for-woocommerce
+
+jobs:
+  # The only job that runs code from the pull request. Its token is read-only.
+  build:
+    name: Build
+    permissions:
+      contents: read
+    uses: ./.github/workflows/build.yml
+    with:
+      plugin_name: customs-fees-for-woocommerce
+
+  publish:
+    name: Publish the build and comment on the PR
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      # These files are copied into an artifact and read as data. Nothing from the pull request runs in this job.
+      - name: Checkout the Playground preview files
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          sparse-checkout: tests/playground
+          persist-credentials: false
+
+      - name: Download the build
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: ${{ env.PLUGIN_SLUG }}
+          path: build
+
+      # The version tells a tester which pull request and commit a site is running.
+      - name: Set the dev version
+        id: dev-version
+        env:
+          PR_NUMBER: ${{ github.event.number }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          unzip -q "build/${PLUGIN_SLUG}.zip" -d release
+          MAIN_FILE="release/${PLUGIN_SLUG}/${PLUGIN_SLUG}.php"
+
+          VERSION=$( sed -n 's/^ \* Version: *//p' "$MAIN_FILE" | head -n 1 | tr -d '\r' )
+          IFS=. read -r MAJOR MINOR PATCH <<<"$VERSION"
+          # A pre-release suffix such as "-beta.1" is dropped before the patch number is raised.
+          DEV_VERSION="${MAJOR}.${MINOR}.$(( ${PATCH%%[!0-9]*} + 1 ))-dev_PR-${PR_NUMBER}_commit-${PR_HEAD_SHA:0:7}"
+
+          sed -i "s/^\( \* Version: *\).*$/\1${DEV_VERSION}/" "$MAIN_FILE"
+          sed -i "s/define( 'CFWC_VERSION', '[^']*' )/define( 'CFWC_VERSION', '${DEV_VERSION}' )/" "$MAIN_FILE"
+
+          grep -q "^ \* Version: *${DEV_VERSION}$" "$MAIN_FILE"
+          grep -q "'CFWC_VERSION', '${DEV_VERSION}'" "$MAIN_FILE"
+
+          echo "Dev version: ${DEV_VERSION}" >> "$GITHUB_STEP_SUMMARY"
+          echo "version=${DEV_VERSION}" >> "$GITHUB_OUTPUT"
+
+      # The Playground links download this artifact on every click, so it is kept for 14 days. The run ID
+      # in the name ties each link to the files of one run. The setup script travels with the build
+      # because it is not part of the plugin zip.
+      - name: Collect the files for the Playground previews
+        run: |
+          mkdir playground-preview
+          ( cd release && zip -q -r "../playground-preview/${PLUGIN_SLUG}.zip" "${PLUGIN_SLUG}" )
+          cp tests/playground/setup.php playground-preview/setup.php
+
+      - name: Upload the files for the Playground previews as an artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: playground-preview-${{ github.run_id }}
+          path: playground-preview
+          if-no-files-found: error
+          retention-days: 14
+
+      # Pull requests from forks and from Dependabot do not receive the secret.
+      - name: Check for the Jetpack Beta Builder secret
+        id: beta-builder-secret
+        env:
+          SECRET: ${{ secrets.JETPACK_BETA_BUILDER_SECRET }}
+        run: |
+          if [ -n "$SECRET" ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Jetpack Beta installs a dev build next to the released plugin, in a folder of its own.
+      - name: Collect the files for the Jetpack Beta Builder
+        if: steps.beta-builder-secret.outputs.available == 'true'
+        run: |
+          mkdir plugins
+          cd release
+          mv "${PLUGIN_SLUG}" "${PLUGIN_SLUG}-dev"
+          zip -q -r "../plugins/${PLUGIN_SLUG}-dev.zip" "${PLUGIN_SLUG}-dev"
+
+      - name: Upload the zip file as an artifact for the Jetpack Beta Builder
+        if: steps.beta-builder-secret.outputs.available == 'true'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: plugins # The name the Jetpack Beta Builder looks for.
+          path: plugins
+          if-no-files-found: error
+          # The Jetpack Beta Builder copies it right away.
+          retention-days: 1
+
+      # A refusal does not fail the job: the Playground links still work, and the comment says that
+      # the first two options are not available for this build.
+      - name: Inform the Jetpack Beta Builder webhook
+        id: beta-builder
+        if: steps.beta-builder-secret.outputs.available == 'true'
+        env:
+          SECRET: ${{ secrets.JETPACK_BETA_BUILDER_SECRET }}
+          DEV_VERSION: ${{ steps.dev-version.outputs.version }}
+          PR_NUMBER: ${{ github.event.number }}
+          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: |
+          PLUGIN_DATA=$( jq -cn --arg slug "$PLUGIN_SLUG" --arg version "$DEV_VERSION" '{ ($slug): { version: $version } }' )
+
+          # GITHUB_REF is "refs/pull/<number>/merge" here, and builds are looked up by branch name.
+          if curl --fail --silent --show-error -L \
+            --url "https://betadownload.jetpack.me/gh-action.php?run_id=${GITHUB_RUN_ID}&pr=${PR_NUMBER}&commit=${GITHUB_SHA}" \
+            --form-string "repo=${GITHUB_REPOSITORY}" \
+            --form-string "branch=${PR_HEAD_REF}" \
+            --form-string "plugins=${PLUGIN_DATA}" \
+            --form-string "secret=${SECRET}"; then
+            echo "accepted=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "accepted=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::The Jetpack Beta Builder did not accept this build."
+          fi
+
+      # WordPress Playground runs in the visitor's browser and can only fetch public URLs. Its artifact
+      # proxy serves this workflow's artifacts for the pull request and finds the workflow by name, hence
+      # GITHUB_WORKFLOW rather than a literal that a rename would silently break.
+      #
+      # The proxy picks the build by branch name, so a link can end up serving the build of a fork whose
+      # branch has the same name. The Blueprint must never hold credentials or ask for them.
+      - name: Build the WordPress Playground preview links
+        id: playground
+        env:
+          PR_NUMBER: ${{ github.event.number }}
+        run: |
+          ARTIFACT_URL=$( jq -rn \
+            --arg org "$GITHUB_REPOSITORY_OWNER" \
+            --arg repo "${GITHUB_REPOSITORY#*/}" \
+            --arg workflow "$GITHUB_WORKFLOW" \
+            --arg pr "$PR_NUMBER" \
+            --arg artifact "playground-preview-${GITHUB_RUN_ID}" \
+            '"https://playground.wordpress.net/plugin-proxy.php?org=\($org|@uri)&repo=\($repo|@uri)&workflow=\($workflow|@uri)&pr=\($pr|@uri)&artifact=\($artifact|@uri)"' )
+
+          # The Blueprint in the repository expects the files in /tmp/pr. Here they come from the artifact,
+          # which is a zip that wraps what was uploaded.
+          playground_url() {
+            jq -r --arg artifact_url "$ARTIFACT_URL" --arg landing_page "$1" '
+              ( if $landing_page != "" then .landingPage = $landing_page else . end )
+              | .steps |= [ {
+                  step: "unzip",
+                  zipFile: { resource: "url", url: $artifact_url, caption: "Downloading the Customs Fees build for this PR" },
+                  extractToPath: "/tmp/pr"
+                } ] + .
+              # jq leaves parentheses alone before version 1.7, and one would end the Markdown link.
+              | "https://playground.wordpress.net/#" + ( tojson | @uri | gsub( "\\("; "%28" ) | gsub( "\\)"; "%29" ) )
+            ' tests/playground/blueprint.json
+          }
+
+          {
+            echo "settings_url=$( playground_url "" )"
+            echo "cart_url=$( playground_url "/cart/" )"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Write the comment
+        env:
+          BETA_BUILDER_SECRET: ${{ steps.beta-builder-secret.outputs.available }}
+          BETA_BUILDER_ACCEPTED: ${{ steps.beta-builder.outputs.accepted }}
+          PLAYGROUND_SETTINGS_URL: ${{ steps.playground.outputs.settings_url }}
+          PLAYGROUND_CART_URL: ${{ steps.playground.outputs.cart_url }}
+          PR_NUMBER: ${{ github.event.number }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: |
+          # Slashes stay as they are; anything that could break the link or its query string is encoded.
+          JN_BRANCH=$( jq -rn --arg ref "$PR_HEAD_REF" '$ref | @uri | gsub( "%2F"; "/" ) | gsub( "\\("; "%28" ) | gsub( "\\)"; "%29" )' )
+          RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+
+          {
+            echo "### Test the build"
+            echo
+
+            # A link that cannot work is worse than no link. Until the Jetpack Beta Builder has this build,
+            # the first two options say what they need instead.
+            if [ "$BETA_BUILDER_ACCEPTED" = "true" ]; then
+              cat <<EOF
+          #### Option 1. Jetpack Beta
+
+          - Install and activate [Jetpack Beta](https://jetpack.com/beta/#download-and-install).
+          - Use this build by searching for PR number \`${PR_NUMBER}\` or branch name \`${PR_HEAD_REF}\` in your-test.site/wp-admin/admin.php?page=jetpack-beta&plugin=${PLUGIN_SLUG}
+
+          :information_source: You need a site of your own with WooCommerce. The build brings no rules or products: enable taxes, then add rules under WooCommerce > Settings > Tax > Customs Fees, and give a product a country of origin.
+
+          #### Option 2. Jurassic Ninja - available for logged-in A12s
+
+          :warning: Log in at [jurassic.ninja](https://jurassic.ninja/) first. Without a login, the link below takes you to the Jurassic Ninja homepage and no site is created.
+
+          :rocket: [Launch a JN site with this branch and sample products](https://jurassic.ninja/create/?jetpack-beta&nojetpack&woocommerce&woocommerce-import-sample-data&branches.${PLUGIN_SLUG}=${JN_BRANCH}) :rocket:
+
+          :information_source: The site is temporary. It has WooCommerce's sample products but no customs rules, and the sample products have no country of origin: enable taxes, then add both yourself.
+
+          EOF
+            else
+              if [ "$BETA_BUILDER_SECRET" = "true" ]; then
+                REASON="The Jetpack Beta Builder did not accept this build; [the run's log](${RUN_URL}) has its answer."
+              else
+                REASON="Jetpack Beta only offers builds that were sent to the Jetpack Beta Builder, and this one was not. The plugin has to be registered there, and this workflow needs the registration's secret as the \`JETPACK_BETA_BUILDER_SECRET\` repository secret. Pull requests from forks and from Dependabot never receive that secret."
+              fi
+
+              cat <<EOF
+          #### Option 1. Jetpack Beta
+
+          :construction: Not available for this build. ${REASON}
+
+          #### Option 2. Jurassic Ninja - available for logged-in A12s
+
+          :construction: Not available for this build. Jurassic Ninja installs a branch through Jetpack Beta, so it needs what Option 1 needs.
+
+          EOF
+            fi
+
+            cat <<EOF
+          #### Option 3. WordPress Playground - runs in your browser
+
+          - :gear: [Open the settings](${PLAYGROUND_SETTINGS_URL}): WooCommerce > Settings > Tax > Customs Fees, with two rules for goods made in China: 10% to the United States and 20% to the United Kingdom.
+          - :shopping_cart: [Open the cart](${PLAYGROUND_CART_URL}): the cart holds a \$100 "Sample imported T-shirt" made in China, with a \$10 customs fee. At checkout, ship to the United Kingdom for a \$20 fee, or to any other country for none.
+
+          :information_source: Both links open the same made-up store, logged in as its admin: a US store with taxes enabled and no tax rates, free shipping everywhere and cash on delivery. Each click starts a new store, and reloading the Playground page starts over. It sends no emails, so the customs lines in order emails cannot be checked there. WooCommerce Subscriptions is not installed. The links stop working 14 days after the last build.
+
+          ---
+
+          Build info:
+
+          - Latest commit: ${PR_HEAD_SHA}
+          - Build time: $( date -u "+%Y-%m-%d %H:%M:%S UTC" )
+
+          _Note: the build is updated when a new commit is pushed to this PR._
+          EOF
+          } > "$RUNNER_TEMP/test-the-build.md"
+
+          cat "$RUNNER_TEMP/test-the-build.md" >> "$GITHUB_STEP_SUMMARY"
+
+      # The token of a pull request from a fork cannot write comments; the job summary has the same text.
+      - name: Add or update the comment in the PR
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.number }}
+        run: |
+          COMMENT_IDS=$( gh api "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments" --paginate \
+            --jq '.[] | select( .user.login == "github-actions[bot]" and ( .body | startswith( "### Test the build" ) ) ) | .id' )
+          COMMENT_ID=$( head -n 1 <<<"$COMMENT_IDS" )
+
+          if [ -n "$COMMENT_ID" ]; then
+            gh api "repos/${GITHUB_REPOSITORY}/issues/comments/${COMMENT_ID}" -X PATCH -F "body=@${RUNNER_TEMP}/test-the-build.md" --silent
+          else
+            gh api "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments" -F "body=@${RUNNER_TEMP}/test-the-build.md" --silent
+          fi
