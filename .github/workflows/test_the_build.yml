@@ -10,7 +10,6 @@ concurrency:
 permissions: {}
 
 env:
-  # Also the name the plugin has to be registered under in the Jetpack Beta Builder.
   PLUGIN_SLUG: customs-fees-for-woocommerce
 
 jobs:
@@ -47,7 +46,6 @@ jobs:
 
       # The version tells a tester which pull request and commit a site is running.
       - name: Set the dev version
-        id: dev-version
         env:
           PR_NUMBER: ${{ github.event.number }}
           PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
@@ -67,7 +65,6 @@ jobs:
           grep -q "'CFWC_VERSION', '${DEV_VERSION}'" "$MAIN_FILE"
 
           echo "Dev version: ${DEV_VERSION}" >> "$GITHUB_STEP_SUMMARY"
-          echo "version=${DEV_VERSION}" >> "$GITHUB_OUTPUT"
 
       # The Playground links download this artifact on every click, so it is kept for 14 days. The run ID
       # in the name ties each link to the files of one run. The setup script travels with the build
@@ -85,63 +82,6 @@ jobs:
           path: playground-preview
           if-no-files-found: error
           retention-days: 14
-
-      # Pull requests from forks and from Dependabot do not receive the secret.
-      - name: Check for the Jetpack Beta Builder secret
-        id: beta-builder-secret
-        env:
-          SECRET: ${{ secrets.JETPACK_BETA_BUILDER_SECRET }}
-        run: |
-          if [ -n "$SECRET" ]; then
-            echo "available=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "available=false" >> "$GITHUB_OUTPUT"
-          fi
-
-      # Jetpack Beta installs a dev build next to the released plugin, in a folder of its own.
-      - name: Collect the files for the Jetpack Beta Builder
-        if: steps.beta-builder-secret.outputs.available == 'true'
-        run: |
-          mkdir plugins
-          cd release
-          mv "${PLUGIN_SLUG}" "${PLUGIN_SLUG}-dev"
-          zip -q -r "../plugins/${PLUGIN_SLUG}-dev.zip" "${PLUGIN_SLUG}-dev"
-
-      - name: Upload the zip file as an artifact for the Jetpack Beta Builder
-        if: steps.beta-builder-secret.outputs.available == 'true'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: plugins # The name the Jetpack Beta Builder looks for.
-          path: plugins
-          if-no-files-found: error
-          # The Jetpack Beta Builder copies it right away.
-          retention-days: 1
-
-      # A refusal does not fail the job: the Playground links still work, and the comment says that
-      # the first two options are not available for this build.
-      - name: Inform the Jetpack Beta Builder webhook
-        id: beta-builder
-        if: steps.beta-builder-secret.outputs.available == 'true'
-        env:
-          SECRET: ${{ secrets.JETPACK_BETA_BUILDER_SECRET }}
-          DEV_VERSION: ${{ steps.dev-version.outputs.version }}
-          PR_NUMBER: ${{ github.event.number }}
-          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
-        run: |
-          PLUGIN_DATA=$( jq -cn --arg slug "$PLUGIN_SLUG" --arg version "$DEV_VERSION" '{ ($slug): { version: $version } }' )
-
-          # GITHUB_REF is "refs/pull/<number>/merge" here, and builds are looked up by branch name.
-          if curl --fail --silent --show-error -L \
-            --url "https://betadownload.jetpack.me/gh-action.php?run_id=${GITHUB_RUN_ID}&pr=${PR_NUMBER}&commit=${GITHUB_SHA}" \
-            --form-string "repo=${GITHUB_REPOSITORY}" \
-            --form-string "branch=${PR_HEAD_REF}" \
-            --form-string "plugins=${PLUGIN_DATA}" \
-            --form-string "secret=${SECRET}"; then
-            echo "accepted=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "accepted=false" >> "$GITHUB_OUTPUT"
-            echo "::warning::The Jetpack Beta Builder did not accept this build."
-          fi
 
       # WordPress Playground runs in the visitor's browser and can only fetch public URLs. Its artifact
       # proxy serves this workflow's artifacts for the pull request and finds the workflow by name, hence
@@ -184,63 +124,14 @@ jobs:
 
       - name: Write the comment
         env:
-          BETA_BUILDER_SECRET: ${{ steps.beta-builder-secret.outputs.available }}
-          BETA_BUILDER_ACCEPTED: ${{ steps.beta-builder.outputs.accepted }}
           PLAYGROUND_SETTINGS_URL: ${{ steps.playground.outputs.settings_url }}
           PLAYGROUND_CART_URL: ${{ steps.playground.outputs.cart_url }}
-          PR_NUMBER: ${{ github.event.number }}
           PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
         run: |
-          # Slashes stay as they are; anything that could break the link or its query string is encoded.
-          JN_BRANCH=$( jq -rn --arg ref "$PR_HEAD_REF" '$ref | @uri | gsub( "%2F"; "/" ) | gsub( "\\("; "%28" ) | gsub( "\\)"; "%29" )' )
-          RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          cat > "$RUNNER_TEMP/test-the-build.md" <<EOF
+          ### Test the build
 
-          {
-            echo "### Test the build"
-            echo
-
-            # A link that cannot work is worse than no link. Until the Jetpack Beta Builder has this build,
-            # the first two options say what they need instead.
-            if [ "$BETA_BUILDER_ACCEPTED" = "true" ]; then
-              cat <<EOF
-          #### Option 1. Jetpack Beta
-
-          - Install and activate [Jetpack Beta](https://jetpack.com/beta/#download-and-install).
-          - Use this build by searching for PR number \`${PR_NUMBER}\` or branch name \`${PR_HEAD_REF}\` in your-test.site/wp-admin/admin.php?page=jetpack-beta&plugin=${PLUGIN_SLUG}
-
-          :information_source: You need a site of your own with WooCommerce. The build brings no rules or products: enable taxes, then add rules under WooCommerce > Settings > Tax > Customs Fees, and give a product a country of origin.
-
-          #### Option 2. Jurassic Ninja - available for logged-in A12s
-
-          :warning: Log in at [jurassic.ninja](https://jurassic.ninja/) first. Without a login, the link below takes you to the Jurassic Ninja homepage and no site is created.
-
-          :rocket: [Launch a JN site with this branch and sample products](https://jurassic.ninja/create/?jetpack-beta&nojetpack&woocommerce&woocommerce-import-sample-data&branches.${PLUGIN_SLUG}=${JN_BRANCH}) :rocket:
-
-          :information_source: The site is temporary. It has WooCommerce's sample products but no customs rules, and the sample products have no country of origin: enable taxes, then add both yourself.
-
-          EOF
-            else
-              if [ "$BETA_BUILDER_SECRET" = "true" ]; then
-                REASON="The Jetpack Beta Builder did not accept this build; [the run's log](${RUN_URL}) has its answer."
-              else
-                REASON="Jetpack Beta only offers builds that were sent to the Jetpack Beta Builder, and this one was not. The plugin has to be registered there, and this workflow needs the registration's secret as the \`JETPACK_BETA_BUILDER_SECRET\` repository secret. Pull requests from forks and from Dependabot never receive that secret."
-              fi
-
-              cat <<EOF
-          #### Option 1. Jetpack Beta
-
-          :construction: Not available for this build. ${REASON}
-
-          #### Option 2. Jurassic Ninja - available for logged-in A12s
-
-          :construction: Not available for this build. Jurassic Ninja installs a branch through Jetpack Beta, so it needs what Option 1 needs.
-
-          EOF
-            fi
-
-            cat <<EOF
-          #### Option 3. WordPress Playground - runs in your browser
+          #### WordPress Playground - runs in your browser
 
           - :gear: [Open the settings](${PLAYGROUND_SETTINGS_URL}): WooCommerce > Settings > Tax > Customs Fees, with two rules for goods made in China: 10% to the United States and 20% to the United Kingdom.
           - :shopping_cart: [Open the cart](${PLAYGROUND_CART_URL}): the cart holds a \$100 "Sample imported T-shirt" made in China, with a \$10 customs fee. At checkout, ship to the United Kingdom for a \$20 fee, or to any other country for none.
@@ -256,7 +147,6 @@ jobs:
 
           _Note: the build is updated when a new commit is pushed to this PR._
           EOF
-          } > "$RUNNER_TEMP/test-the-build.md"
 
           cat "$RUNNER_TEMP/test-the-build.md" >> "$GITHUB_STEP_SUMMARY"
 
