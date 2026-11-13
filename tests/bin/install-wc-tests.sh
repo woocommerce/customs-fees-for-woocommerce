@@ -83,12 +83,22 @@ DB_HOST="${TEST_DB_HOST}:${TEST_DB_PORT}"
 # the client to a unix socket (a) whose path may not exist in this image and
 # (b) whose auth path doesn't match the `test_wp@%` grant created by the
 # env-file init. TCP to 127.0.0.1 matches `%` and is always available.
+#
+# The shim is used even when the host has its own client. A host client is a
+# different version from the server and fails in ways that only show up as a
+# 60 s timeout in wait_for_db: MariaDB 11.4+ clients require TLS by default,
+# which the container does not offer, and MySQL 8.x clients have an unreliable
+# handshake against MariaDB. The container's own client always matches.
 # ---------------------------------------------------------------------------
-if ! command -v mysqladmin >/dev/null 2>&1 || ! command -v mysql >/dev/null 2>&1; then
-    SHIM_DIR="${TEST_TMP_DIR}/cfwc-mysql-shim"
-    mkdir -p "$SHIM_DIR"
-    for _bin in mysqladmin mysql; do
-        cat > "$SHIM_DIR/$_bin" <<SHIM
+# Create the shim dir with `mktemp -d`: a unique name owned by the current
+# user, mode 0700. A fixed path under shared /tmp could be pre-created and
+# owned by a hostile local user who could then plant a malicious mysql /
+# mysqladmin that we would execute via the PATH prepend below. Clean it up on
+# exit — the shim is only needed while WC's install.sh runs, not by PHPUnit.
+SHIM_DIR="$(mktemp -d "${TEST_TMP_DIR}/cfwc-mysql-shim.XXXXXX")"
+trap 'rm -rf "$SHIM_DIR"' EXIT
+for _bin in mysqladmin mysql; do
+    cat > "$SHIM_DIR/$_bin" <<SHIM
 #!/usr/bin/env bash
 # Drop the host's --host/--port/--protocol and any -h/-P pairs from the
 # caller, then add our own that point at the in-container TCP listener.
@@ -105,11 +115,10 @@ exec docker compose -f "$COMPOSE_FILE" exec -T test_db $_bin \\
     --host=127.0.0.1 --port=3306 --protocol=tcp \\
     \${args[@]+"\${args[@]}"}
 SHIM
-        chmod +x "$SHIM_DIR/$_bin"
-    done
-    unset _bin
-    export PATH="$SHIM_DIR:$PATH"
-fi
+    chmod +x "$SHIM_DIR/$_bin"
+done
+unset _bin
+export PATH="$SHIM_DIR:$PATH"
 
 echo "============================================================"
 echo "Test environment repair"
@@ -241,7 +250,7 @@ install_wc() {
     echo "Installing WooCommerce $WC_VERSION → $WC_CLONE_DIR"
     echo "------------------------------------------------------------"
 
-    rm -rf "$WC_CLONE_DIR"
+    rm -rf "${WC_CLONE_DIR:?}"
 
     run_quiet "Cloning WooCommerce..." \
         git clone --depth=1 --branch="$WC_VERSION" https://github.com/woocommerce/woocommerce.git "$WC_CLONE_DIR" \
@@ -285,7 +294,7 @@ install_wp_core() {
         return
     fi
 
-    rm -rf "$WP_CORE_DIR"
+    rm -rf "${WP_CORE_DIR:?}"
     mkdir -p "$WP_CORE_DIR"
 
     if [[ $WP_VERSION == 'nightly' || $WP_VERSION == 'trunk' ]]; then
