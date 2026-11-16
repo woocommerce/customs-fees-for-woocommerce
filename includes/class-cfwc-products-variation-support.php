@@ -50,11 +50,14 @@ class CFWC_Products_Variation_Support {
 		$parent_id      = wp_get_post_parent_id( $variation_id );
 		$parent_hs_code = get_post_meta( $parent_id, '_cfwc_hs_code', true );
 		$parent_origin  = get_post_meta( $parent_id, '_cfwc_country_of_origin', true );
+
+		// WooCommerce 11.3+ adds its own customs fields to each variation. Say which ones the fee uses.
+		$wc_has_customs_fields = self::wc_has_product_customs_fields();
 		?>
 		<div class="cfwc-variation-customs-fields">
 			<p class="form-row form-row-first">
 				<label for="cfwc_hs_code_<?php echo esc_attr( $loop ); ?>">
-					<?php esc_html_e( 'HS Code', 'customs-fees-for-woocommerce' ); ?>
+					<?php esc_html_e( 'HS Code (Customs Fees)', 'customs-fees-for-woocommerce' ); ?>
 					<?php
 					echo wp_kses_post(
 						wc_help_tip(
@@ -62,7 +65,7 @@ class CFWC_Products_Variation_Support {
 							/* translators: %s: parent HS code */
 								__( 'Leave empty to use parent product HS code: %s', 'customs-fees-for-woocommerce' ),
 								! empty( $parent_hs_code ) ? $parent_hs_code : __( 'Not set', 'customs-fees-for-woocommerce' )
-							)
+							) . ( $wc_has_customs_fields ? ' ' . __( 'Customs fees use this field, not the WooCommerce Commodity code field.', 'customs-fees-for-woocommerce' ) : '' )
 						)
 					);
 					?>
@@ -76,7 +79,7 @@ class CFWC_Products_Variation_Support {
 			
 			<p class="form-row form-row-last">
 				<label for="cfwc_country_of_origin_<?php echo esc_attr( $loop ); ?>">
-					<?php esc_html_e( 'Country of Origin', 'customs-fees-for-woocommerce' ); ?>
+					<?php esc_html_e( 'Country of Origin (Customs Fees)', 'customs-fees-for-woocommerce' ); ?>
 					<?php
 					$countries = WC()->countries->get_countries();
 					echo wp_kses_post(
@@ -85,7 +88,7 @@ class CFWC_Products_Variation_Support {
 							/* translators: %s: parent country */
 								__( 'Leave empty to use parent product origin: %s', 'customs-fees-for-woocommerce' ),
 								$parent_origin && isset( $countries[ $parent_origin ] ) ? $countries[ $parent_origin ] : __( 'Not set', 'customs-fees-for-woocommerce' )
-							)
+							) . ( $wc_has_customs_fields ? ' ' . __( 'Customs fees use this field, not the WooCommerce Country of origin field.', 'customs-fees-for-woocommerce' ) : '' )
 						)
 					);
 					?>
@@ -108,6 +111,19 @@ class CFWC_Products_Variation_Support {
 			</p>
 		</div>
 		<?php
+	}
+
+	/**
+	 * Whether WooCommerce has its own product customs fields (added in WooCommerce 11.3).
+	 *
+	 * The plugin does not read those fields, so the variation editor says that
+	 * only the plugin's fields are used for fees.
+	 *
+	 * @since 1.3.8
+	 * @return bool
+	 */
+	private static function wc_has_product_customs_fields() {
+		return method_exists( 'WC_Product', 'get_customs_country_of_origin' );
 	}
 
 	/**
