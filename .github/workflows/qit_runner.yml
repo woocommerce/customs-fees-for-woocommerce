@@ -87,8 +87,8 @@ jobs:
 
                   # Add Partner.
                   ./vendor/bin/qit partner:add \
-                    --user='${{ secrets.PARTNER_USER }}' \
-                    --qit_token='${{ secrets.PARTNER_SECRET }}'
+                    --user='${{ secrets.ORG_PARTNER_USER }}' \
+                    --qit_token='${{ secrets.ORG_PARTNER_SECRET }}'
 
                   # Export ZIP file path to GITHUB_ENV.
                   echo "ZIP_FILE_PATH=${{ github.workspace }}/$EXTENSION_SLUG.zip" >> $GITHUB_ENV
