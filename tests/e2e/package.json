@@ -3,7 +3,7 @@
 	"private": true,
 	"description": "QIT E2E test package for customs-fees-for-woocommerce.",
 	"devDependencies": {
-		"@playwright/test": "1.61.1",
+		"@playwright/test": "1.62.1",
 		"@types/node": "^22.14.0",
 		"playwright-ctrf-json-reporter": "^0.0.29",
 		"typescript": "^5.9.3"
