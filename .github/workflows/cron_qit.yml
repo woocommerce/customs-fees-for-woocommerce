@@ -5,6 +5,9 @@ on:
     # Run at 02:00 on Sundays.
     - cron: '0 2 * * 0'
 
+permissions:
+  contents: read
+
 jobs:
 
   build:
@@ -17,7 +20,9 @@ jobs:
     name: QIT
     needs: build
     uses: ./.github/workflows/qit_runner.yml
-    secrets: inherit
+    secrets:
+      ORG_PARTNER_SECRET: ${{ secrets.ORG_PARTNER_SECRET }}
+      ORG_PARTNER_USER: ${{ secrets.ORG_PARTNER_USER }}
     with:
       extension: ${{ needs.build.outputs.plugin_name }}
       artifact: ${{ needs.build.outputs.plugin_name }}

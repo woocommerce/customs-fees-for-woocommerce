@@ -59,6 +59,11 @@ on:
             wait:
                 type: boolean
                 default: true
+        secrets:
+            ORG_PARTNER_SECRET:
+                required: true
+            ORG_PARTNER_USER:
+                required: true
 
 env:
     NO_COLOR: 1
@@ -70,6 +75,9 @@ env:
     ADDITIONAL_PLUGINS: ${{ inputs.test-additional-plugins && format( '--additional_plugins={0}', inputs.test-additional-plugins ) || '' }}
     WAIT_FLAG: ${{ inputs.wait && '--wait' || '' }}
     EXTRA_OPTIONS: ${{ inputs.options }}
+
+permissions:
+    contents: read
 
 jobs:
     qit-tests:
@@ -83,12 +91,15 @@ jobs:
 
             - name: Add Partner and Prepare Environment
               shell: bash
+              env:
+                  ORG_PARTNER_USER: ${{ secrets.ORG_PARTNER_USER }}
+                  ORG_PARTNER_SECRET: ${{ secrets.ORG_PARTNER_SECRET }}
               run: |
 
                   # Add Partner.
                   ./vendor/bin/qit partner:add \
-                    --user='${{ secrets.ORG_PARTNER_USER }}' \
-                    --qit_token='${{ secrets.ORG_PARTNER_SECRET }}'
+                    --user="$ORG_PARTNER_USER" \
+                    --qit_token="$ORG_PARTNER_SECRET"
 
                   # Export ZIP file path to GITHUB_ENV.
                   echo "ZIP_FILE_PATH=${{ github.workspace }}/$EXTENSION_SLUG.zip" >> $GITHUB_ENV
