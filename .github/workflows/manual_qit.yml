@@ -52,6 +52,9 @@ on:
 
 run-name: Tests with WP-${{ inputs.wp-version }} - WC-${{ inputs.wc-version }} - PHP ${{ inputs.php-version }} - Tests ${{ inputs.extension-tests }} - QIT ${{ inputs.qit-tests }}
 
+permissions:
+  contents: read
+
 jobs:
   build_project:
     name: Package
@@ -81,7 +84,9 @@ jobs:
       test-plugin-check: ${{ contains(inputs.qit-tests, 'dotOrg') && true || false }}
       options: ${{ inputs.options }}
       wait: ${{ inputs.qit-wait }}
-    secrets: inherit
+    secrets:
+      ORG_PARTNER_SECRET: ${{ secrets.ORG_PARTNER_SECRET }}
+      ORG_PARTNER_USER: ${{ secrets.ORG_PARTNER_USER }}
 
   # e2e-tests: // enable this once we have E2E tests
   #     if: contains(inputs.extension-tests, 'All') || contains(inputs.extension-tests, 'E2E')
