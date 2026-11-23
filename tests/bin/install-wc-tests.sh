@@ -306,17 +306,22 @@ resolve_wc_version() {
 
 resolve_wp_tests_tag() {
     # x.y: test the newest x.y.z release, so WP core and the test library come
-    # from the same release. Without a release yet (a beta branch), use the
-    # x.y branch for both.
+    # from the same release. An x.y with no release yet (a "Tested up to" that
+    # is ahead of the release) has no core zip, so use the nightly build and
+    # the trunk test library. If the release list cannot be read, keep x.y.
     if [[ $WP_VERSION =~ ^[0-9]+\.[0-9]+$ ]]; then
-        local versions_json="${WP_CORE_DIR%/}.versions.json" newest
+        local versions_json="${WP_CORE_DIR%/}.versions.json" newest listed=0
         if download https://api.wordpress.org/core/stable-check/1.0/ "$versions_json" 2> /dev/null; then
+            listed=1
             newest="$(grep -oE "\"${WP_VERSION//./\\.}(\\.[0-9]+)?\"" "$versions_json" | tr -d '"' | sort -t. -k3,3n | tail -1)"
         fi
         rm -f "$versions_json"
         if [ -n "${newest:-}" ]; then
             echo "ℹ️  Resolved WordPress ${WP_VERSION} to its newest release: ${newest}"
             WP_VERSION="$newest"
+        elif [ "$listed" = 1 ]; then
+            echo "ℹ️  WordPress ${WP_VERSION} has no release yet. Falling back to the nightly build and the trunk test library."
+            WP_VERSION="nightly"
         fi
     fi
     if [[ $WP_VERSION =~ ^[0-9]+\.[0-9]+$ ]]; then
@@ -350,8 +355,9 @@ resolve_wp_tests_tag() {
 new_partial_dir() {
     local partial="${1%/}.partial"
     # Left over from an interrupted install. It is marked, so st_rm_tree
-    # deletes it; anything else at this path is refused.
-    st_rm_tree "$partial"
+    # deletes it; anything else at this path is refused. Callers run this
+    # function in $(...), where set -e is off, so return on a refusal.
+    st_rm_tree "$partial" || return 1
     mkdir -p "$partial"
     st_mark_tree "$partial"
     printf '%s\n' "$partial"

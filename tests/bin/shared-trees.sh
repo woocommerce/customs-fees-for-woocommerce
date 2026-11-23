@@ -151,7 +151,13 @@ _st_lock_one() {
             # Remove only the lock we looked at. If another waiter already
             # broke it and took a new one, the target is different now.
             if [ "$(readlink "$lock" 2> /dev/null)" = "$owner" ]; then
-                rm -f "$lock"
+                # If it cannot be removed (another user's lock, a folder we
+                # cannot write to), stop: retrying would spin forever.
+                if ! err="$(rm -f "$lock" 2>&1)"; then
+                    echo "❌ Cannot remove the stale lock ${lock}: ${err}" >&2
+                    echo "   $(_st_describe "$owner") is no longer running. Remove the lock yourself and run again: rm -f '${lock}'" >&2
+                    return 1
+                fi
                 echo "   ℹ️  Removed a stale lock on ${tree}: $(_st_describe "$owner") is no longer running."
             fi
             continue
@@ -224,6 +230,7 @@ st_register() {
     done
 }
 
+# st_unregister <tree>... — remove this run's users/ entry from each tree.
 st_unregister() {
     local tree
     for tree in "$@"; do

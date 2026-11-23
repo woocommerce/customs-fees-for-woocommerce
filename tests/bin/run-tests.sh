@@ -32,8 +32,11 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/test-config.sh"
 # Our PID owns the shared-tree lock and users/ entries, also when the repair
-# below (a child process) takes them.
+# below (a child process) takes them. Drop a start time inherited from a
+# caller that sourced shared-trees.sh: it belongs to another PID, and other
+# runs would then see this run as gone.
 export TEST_ENV_OWNER_PID=$$
+unset TEST_ENV_OWNER_START
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/shared-trees.sh"
 
