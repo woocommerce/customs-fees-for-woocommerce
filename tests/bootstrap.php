@@ -51,10 +51,14 @@ if ( ! defined( 'WP_TESTS_CONFIG_FILE_PATH' ) ) {
 	if ( ! $plugin_wp_tests_config ) {
 		// vendor/bin/phpunit run by hand: use the file the last `composer test` wrote.
 		$plugin_wp_tests_config = __DIR__ . '/.wp-tests-config.php';
+		if ( ! is_readable( $plugin_wp_tests_config ) ) {
+			// Without it, WordPress would read the shared copy and could use another plugin's database.
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fwrite -- CLI bootstrap error before WP loads; WP_Filesystem unavailable.
+			fwrite( STDERR, "Could not find {$plugin_wp_tests_config}. Run composer test first: it writes this file." . PHP_EOL );
+			exit( 1 );
+		}
 	}
-	if ( is_readable( $plugin_wp_tests_config ) ) {
-		define( 'WP_TESTS_CONFIG_FILE_PATH', $plugin_wp_tests_config );
-	}
+	define( 'WP_TESTS_CONFIG_FILE_PATH', $plugin_wp_tests_config );
 	unset( $plugin_wp_tests_config );
 }
 
