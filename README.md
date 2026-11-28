@@ -347,6 +347,10 @@ GNU General Public License for more details.
 
 ## Changelog
 
+### Version 1.3.9
+
+- Tweak - WooCommerce 11.4 Compatibility.
+
 ### Version 1.3.8
 
 - Fix - Importing a product CSV with WooCommerce's "Country of origin" column no longer overwrites the product's Customs Fees country of origin, and the value now fills WooCommerce's own field.
