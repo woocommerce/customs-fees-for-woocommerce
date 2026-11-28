@@ -2,7 +2,7 @@
 Contributors: woocommerce
 Tags: woocommerce, customs, import-fees, international-shipping, tariffs
 Requires at least: 7.0
-Tested up to: 7.1
+Tested up to: 7.2
 Requires PHP: 7.4
 Requires Plugins: woocommerce
 WC requires at least: 11.1
